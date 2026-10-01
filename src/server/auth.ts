@@ -6,14 +6,20 @@ import { createClient } from "@/lib/supabase/server";
 import { db } from "@/db";
 import { profiles } from "@/db/schema";
 
-/** Current user id from a verified JWT, or null. One auth round-trip per request. */
-export const getUserId = cache(async (): Promise<string | null> => {
+export type AuthUser = { id: string; email: string | null; name: string | null };
+
+/** Current user from a verified JWT, or null. One auth round-trip per request. */
+export const getAuthUser = cache(async (): Promise<AuthUser | null> => {
   // Local-only stub so flows can be exercised without a real sign-in. Never active in production builds.
-  if (process.env.NODE_ENV === "development" && process.env.DEV_USER_ID) return process.env.DEV_USER_ID;
+  if (process.env.NODE_ENV === "development" && process.env.DEV_USER_ID) return { id: process.env.DEV_USER_ID, email: null, name: null };
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser(); // getUser, NOT getSession: verifies the JWT
-  return user?.id ?? null;
+  if (!user) return null;
+  const meta = user.user_metadata as { full_name?: string; name?: string } | undefined;
+  return { id: user.id, email: user.email ?? null, name: meta?.full_name ?? meta?.name ?? null };
 });
+
+export const getUserId = cache(async (): Promise<string | null> => (await getAuthUser())?.id ?? null);
 
 export const requireUser = cache(async () => {
   const userId = await getUserId();
