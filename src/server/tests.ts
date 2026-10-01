@@ -282,3 +282,11 @@ export async function listTests(userId: string) {
   return db.select().from(testSessions).where(eq(testSessions.userId, userId)).orderBy(desc(testSessions.startedAt)).limit(50);
 }
 
+/** Is any of this question's test sessions still running for this user? (No AI help during tests.) */
+export async function inRunningTest(userId: string, questionId: string) {
+  const [r] = await db.select({ id: testSessions.id }).from(testItems)
+    .innerJoin(testModules, eq(testModules.id, testItems.moduleId))
+    .innerJoin(testSessions, eq(testSessions.id, testModules.sessionId))
+    .where(and(eq(testItems.questionId, questionId), eq(testSessions.userId, userId), eq(testSessions.status, "in_progress"))).limit(1);
+  return !!r;
+}

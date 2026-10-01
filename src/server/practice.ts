@@ -11,6 +11,7 @@ import { pickQuestion, targetDifficulty } from "@/engine/select";
 import { recordAttempt } from "./attempts";
 import { ensureWeeklyFocus, skillsByPriority } from "./plan";
 import { toPublic, toRevealed } from "./questions";
+import { inRunningTest } from "./tests";
 
 export type PracticeMode = "skill" | "smart" | "review" | "set";
 export type SetDifficulty = Difficulty | "mixed"; // undefined = auto (targetDifficulty from theta)
@@ -121,8 +122,11 @@ export async function nextQuestion(userId: string, profile: Profile, input: {
 export async function submitAnswer(userId: string, input: {
   questionId: string; response: string | null; timeMs: number; confidence: 1 | 2 | 3;
 }) {
-  const [q] = await db.select().from(questions).where(eq(questions.id, input.questionId));
-  if (!q) return null;
+  const [[q], live] = await Promise.all([
+    db.select().from(questions).where(eq(questions.id, input.questionId)),
+    inRunningTest(userId, input.questionId), // practice would reveal the answer to a question in a live test
+  ]);
+  if (!q || live) return null;
   return db.transaction(async (tx) => {
     // A question in the user's review queue is always recorded as a review, whatever the client says.
     const [queued] = await tx.select().from(reviewItems)
