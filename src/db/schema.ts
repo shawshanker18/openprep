@@ -134,7 +134,7 @@ export const testItems = pgTable("test_items", {
   response: text("response"),
   flagged: boolean("flagged").notNull().default(false),
   timeMs: integer("time_ms").notNull().default(0),
-}, (t) => [primaryKey({ columns: [t.moduleId, t.position] })]);
+}, (t) => [primaryKey({ columns: [t.moduleId, t.position] }), index("ti_question").on(t.questionId)]);
 
 /* ───────── progress, plan, misc ───────── */
 export const scoreSnapshots = pgTable("score_snapshots", {

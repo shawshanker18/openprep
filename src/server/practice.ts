@@ -32,14 +32,16 @@ export async function countDueReviews(userId: string, now = new Date()) {
 }
 
 /** Pick a question in one skill: similar-question after a miss, else adaptive difficulty. `tags` (if any) is a strict filter. */
-async function pickInSkill(userId: string, skillId: string, exclude: string[], now: Date, forced?: Difficulty, tags: string[] = []) {
+async function pickInSkill(userId: string, skillId: string, exclude: string[], now: Date, forced?: Difficulty, tags: string[] = []): Promise<Question | null> {
+  // Only the fields selection needs; the full text is fetched for the one question picked.
+  const slim = { id: questions.id, difficulty: questions.difficulty, tags: questions.tags };
   const [pool, seen, queued, [state], [last]] = await Promise.all([
-    db.select().from(questions).where(and(eq(questions.skillId, skillId), eq(questions.status, "active"))),
+    db.select(slim).from(questions).where(and(eq(questions.skillId, skillId), eq(questions.status, "active"))),
     db.select({ id: attempts.questionId, at: sql<Date>`max(${attempts.createdAt})` }).from(attempts)
       .where(and(eq(attempts.userId, userId), eq(attempts.skillId, skillId))).groupBy(attempts.questionId),
     db.select({ id: reviewItems.questionId }).from(reviewItems).where(eq(reviewItems.userId, userId)),
     db.select().from(skillState).where(and(eq(skillState.userId, userId), eq(skillState.skillId, skillId))),
-    db.select({ q: questions, correct: attempts.correct }).from(attempts)
+    db.select({ q: slim, correct: attempts.correct }).from(attempts)
       .innerJoin(questions, eq(questions.id, attempts.questionId))
       .where(and(eq(attempts.userId, userId), eq(attempts.skillId, skillId)))
       .orderBy(desc(attempts.createdAt)).limit(1),
@@ -55,7 +57,10 @@ async function pickInSkill(userId: string, skillId: string, exclude: string[], n
   // Missed the previous question in this session → one similar question (same difficulty, shared tag).
   const missedJustNow = last && !last.correct && exclude.includes(last.q.id);
   const want = forced ?? (missedJustNow ? (last.q.difficulty as Difficulty) : targetDifficulty(state?.theta ?? 0, Math.random));
-  return pickQuestion(candidates, want, now, Math.random, missedJustNow ? last.q.tags : []) as (typeof candidates)[number] | null;
+  const pick = pickQuestion(candidates, want, now, Math.random, missedJustNow ? last.q.tags : []);
+  if (!pick) return null;
+  const [q] = await db.select().from(questions).where(eq(questions.id, pick.id));
+  return q ?? null;
 }
 
 /** Per-question countdown for a set: SAT pace when on; when auto, only for skills that are strong but slow. */
