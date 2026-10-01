@@ -6,11 +6,11 @@
     "stem": "Two lines intersect, forming four angles. One of the angles measures $48^\\circ$. What is the measure of an angle adjacent to it (sharing a side with it)?",
     "choices": ["$42^\\circ$", "$48^\\circ$", "$132^\\circ$", "$312^\\circ$"],
     "answer": "C",
-    "explanation": "Adjacent angles formed by two intersecting lines lie along a straight line, so they are supplementary: $180^\\circ - 48^\\circ = 132^\\circ$.",
+    "explanation": "Picture the two lines crossing. Any two angles that sit side by side share a straight line, and a straight line is $180^\\circ$.\n\nSo the neighbor of the $48^\\circ$ angle is $180^\\circ - 48^\\circ = 132^\\circ$.\n\nThe angle directly across (not touching) would equal $48^\\circ$. Side by side angles add to $180^\\circ$; opposite angles are equal.",
     "rationales": {
-      "A": "This subtracts from $90^\\circ$, treating the angles as complementary instead of supplementary.",
-      "B": "This is the measure of the vertical angle (the one opposite), not an adjacent angle.",
-      "D": "This subtracts from $360^\\circ$, which gives the total of the other three angles."
+      "A": "$90^\\circ$ is a right angle. Side by side angles on a straight line add to $180^\\circ$.",
+      "B": "$48^\\circ$ is the angle directly opposite. The one sharing a side with it is $180^\\circ - 48^\\circ$.",
+      "D": "Subtracting from $360^\\circ$ gives the other three angles combined, not one neighbor."
     },
     "tags": ["angle-relationships"]
   },
@@ -21,11 +21,11 @@
     "stem": "The measures of the angles of a triangle are $3x^\\circ$, $4x^\\circ$, and $5x^\\circ$. What is the measure of the smallest angle?",
     "choices": ["$15^\\circ$", "$45^\\circ$", "$75^\\circ$", "$90^\\circ$"],
     "answer": "B",
-    "explanation": "The angles of a triangle sum to $180^\\circ$: $3x + 4x + 5x = 12x = 180$, so $x = 15$. The smallest angle is $3x = 45^\\circ$.",
+    "explanation": "The three angles of any triangle add up to $180^\\circ$.\n\nSo $3x + 4x + 5x = 180$, which is $12x = 180$, giving $x = 15$.\n\nThe smallest angle is $3x = 45^\\circ$. (The others are $60^\\circ$ and $75^\\circ$, and all three add to $180^\\circ$.)",
     "rationales": {
-      "A": "This is the value of $x$, not the measure of the smallest angle.",
-      "C": "This is the largest angle, $5x$.",
-      "D": "This uses $360^\\circ$ as the angle sum, so $x = 30$ and $3x = 90$."
+      "A": "$15$ is the value of $x$. The smallest angle is $3x$, so multiply by $3$.",
+      "C": "$75^\\circ$ is $5x$, the largest angle. The question asks for the smallest.",
+      "D": "A triangle's angles add to $180^\\circ$, not $360^\\circ$."
     },
     "tags": ["triangle-angles"]
   },
@@ -35,7 +35,7 @@
     "type": "spr",
     "stem": "In an isosceles triangle, the angle between the two congruent sides measures $40^\\circ$. What is the measure, in degrees, of each of the other two angles?",
     "answer": ["70"],
-    "explanation": "The two base angles are equal and the three angles sum to $180^\\circ$: $40 + 2b = 180$, so $2b = 140$ and $b = 70$.",
+    "explanation": "In an isosceles triangle, the two angles across from the equal sides are equal. Those are the two angles you're looking for.\n\nAll three angles add to $180^\\circ$. Take away the $40^\\circ$ top angle: $180 - 40 = 140$. Split that evenly between the two equal angles: $140 \\div 2 = 70^\\circ$ each.",
     "tags": ["isosceles", "triangle-angles"]
   },
   {
@@ -45,11 +45,11 @@
     "stem": "Parallel lines $\\ell$ and $m$ are cut by a transversal. Two angles that lie between $\\ell$ and $m$ on the same side of the transversal measure $(3x + 20)^\\circ$ and $(5x - 16)^\\circ$. What is the measure of the larger of these two angles?",
     "choices": ["$22^\\circ$", "$74^\\circ$", "$86^\\circ$", "$94^\\circ$"],
     "answer": "D",
-    "explanation": "Same-side interior angles formed by parallel lines are supplementary: $(3x + 20) + (5x - 16) = 180$, so $8x + 4 = 180$ and $x = 22$. The angles are $3(22) + 20 = 86^\\circ$ and $5(22) - 16 = 94^\\circ$. The larger is $94^\\circ$.",
+    "explanation": "When a line cuts across two parallel lines, the two angles between the parallels on the same side add up to $180^\\circ$.\n\nSo $(3x + 20) + (5x - 16) = 180$. Combine: $8x + 4 = 180$, so $8x = 176$ and $x = 22$.\n\nThe angles are $3(22) + 20 = 86^\\circ$ and $5(22) - 16 = 94^\\circ$. They add to $180^\\circ$, as they should. The larger is $94^\\circ$.",
     "rationales": {
-      "A": "This is the value of $x$, not an angle measure.",
-      "B": "This sets the angles equal, as if they were alternate interior angles, giving $x = 18$ and both angles $74^\\circ$.",
-      "C": "This is the smaller of the two angles."
+      "A": "$22$ is the value of $x$. Plug it back in to get the angles.",
+      "B": "These two angles aren't equal; they add to $180^\\circ$. Equal angles come from pairs on opposite sides of the cutting line.",
+      "C": "$86^\\circ$ is the smaller of the two angles. The question asks for the larger one."
     },
     "tags": ["parallel-lines", "angle-relationships"]
   },
@@ -60,11 +60,11 @@
     "stem": "Triangle $ABC$ is similar to triangle $DEF$, where $A$, $B$, and $C$ correspond to $D$, $E$, and $F$, respectively. If $AB = 6$, $BC = 9$, and $DE = 4$, what is the length of $EF$?",
     "choices": ["$6$", "$7$", "$13.5$", "$36$"],
     "answer": "A",
-    "explanation": "Corresponding sides are proportional: $\\frac{EF}{BC} = \\frac{DE}{AB} = \\frac{4}{6} = \\frac{2}{3}$. So $EF = \\frac{2}{3}(9) = 6$.",
+    "explanation": "Similar triangles have the same shape, so every side of one is the same multiple of the matching side of the other.\n\n$DE$ matches $AB$: $\\frac{4}{6} = \\frac{2}{3}$. So triangle $DEF$ is $\\frac{2}{3}$ the size of $ABC$.\n\n$EF$ matches $BC$, so $EF = \\frac{2}{3} \\times 9 = 6$.\n\nThe order of the letters tells you which sides match: $AB$ with $DE$, $BC$ with $EF$.",
     "rationales": {
-      "B": "This subtracts the difference $AB - DE = 2$ from $BC$; similar triangles keep sides in the same ratio, not the same difference.",
-      "C": "This inverts the scale factor, multiplying $9$ by $\\frac{6}{4}$.",
-      "D": "This multiplies $BC$ by $DE$ without dividing by $AB$."
+      "B": "Similar triangles keep sides in the same ratio, not the same difference. Multiply by $\\frac{2}{3}$ instead of subtracting $2$.",
+      "C": "$DEF$ is the smaller triangle, so its sides shrink. Multiply by $\\frac{4}{6}$, not $\\frac{6}{4}$.",
+      "D": "You multiplied by $4$ but didn't divide by $6$. The scale factor is $\\frac{4}{6}$."
     },
     "tags": ["similar-triangles"]
   },
@@ -74,8 +74,8 @@
     "type": "spr",
     "stem": "In triangle $PQR$, the exterior angle at vertex $R$ measures $128^\\circ$. If angle $P$ measures $55^\\circ$, what is the measure, in degrees, of angle $Q$?",
     "answer": ["73"],
-    "explanation": "An exterior angle of a triangle equals the sum of the two remote interior angles: $128 = 55 + Q$, so $Q = 73^\\circ$.",
-    "fastMethod": "Equivalently, angle $R = 180 - 128 = 52^\\circ$, and $Q = 180 - 55 - 52 = 73^\\circ$.",
+    "explanation": "An exterior angle of a triangle equals the two inside angles that are far from it (not next to it) added together.\n\nThe exterior angle at $R$ is $128^\\circ$, and the far angles are $P$ and $Q$. So $55 + Q = 128$, which means $Q = 73^\\circ$.",
+    "fastMethod": "Or go step by step: angle $R$ is $180 - 128 = 52^\\circ$ (it sits on a straight line with the exterior angle). Then $Q = 180 - 55 - 52 = 73^\\circ$.",
     "tags": ["triangle-angles", "angle-relationships"]
   },
   {
@@ -85,11 +85,11 @@
     "stem": "In triangle $ABC$, point $D$ lies on $\\overline{AB}$ and point $E$ lies on $\\overline{AC}$ so that $\\overline{DE}$ is parallel to $\\overline{BC}$. If $AD = 4$, $DB = 6$, and $DE = 5$, what is the length of $\\overline{BC}$?",
     "choices": ["$\\frac{10}{3}$", "$7.5$", "$11$", "$12.5$"],
     "answer": "D",
-    "explanation": "Because $\\overline{DE} \\parallel \\overline{BC}$, triangle $ADE$ is similar to triangle $ABC$. The full side is $AB = 4 + 6 = 10$, so the scale factor is $\\frac{AB}{AD} = \\frac{10}{4} = 2.5$. Then $BC = 2.5 \\times 5 = 12.5$.",
+    "explanation": "Since $DE$ is parallel to $BC$, the small triangle $ADE$ is a shrunken copy of the big triangle $ABC$. Both share angle $A$.\n\nCompare whole sides from $A$. In the small triangle the side is $AD = 4$. In the big triangle the matching side is all of $AB = 4 + 6 = 10$. So the big triangle is $\\frac{10}{4} = 2.5$ times the small one.\n\n$BC$ matches $DE$, so $BC = 2.5 \\times 5 = 12.5$.\n\nThe common trap is comparing $4$ to $6$. Always compare the small triangle to the whole big triangle.",
     "rationales": {
-      "A": "This uses the ratio $\\frac{AD}{DB} = \\frac{4}{6}$, comparing two pieces of the side and inverting the direction.",
-      "B": "This uses $\\frac{DB}{AD} = \\frac{6}{4}$ instead of $\\frac{AB}{AD}$; the small triangle must be compared to the whole triangle.",
-      "C": "This adds $DB$ to $DE$, as if the sides grew by a fixed amount."
+      "A": "This compares two pieces of the side, $4$ and $6$, and goes the wrong direction. Compare $AD = 4$ to the whole side $AB = 10$.",
+      "B": "$6$ is only part of side $AB$. The big triangle's side is the whole $10$, so the scale is $\\frac{10}{4}$.",
+      "C": "Similar shapes grow by multiplying, not by adding a fixed amount."
     },
     "tags": ["similar-triangles", "parallel-lines"]
   },
@@ -100,11 +100,11 @@
     "stem": "In triangle $ABC$, $AB = AC$. The measure of angle $A$ is $(x + 12)^\\circ$ and the measure of angle $B$ is $(2x - 6)^\\circ$. What is the measure of angle $B$?",
     "choices": ["$30^\\circ$", "$36^\\circ$", "$66^\\circ$", "$110^\\circ$"],
     "answer": "C",
-    "explanation": "Since $AB = AC$, the angles opposite those sides are equal: angle $C$ = angle $B$ $= (2x - 6)^\\circ$. The angle sum gives $(x + 12) + 2(2x - 6) = 180$, so $5x = 180$ and $x = 36$. Angle $B = 2(36) - 6 = 66^\\circ$.",
+    "explanation": "$AB = AC$ means the triangle is isosceles, and the angles across from the equal sides are equal. The angle across from $AC$ is $B$, and across from $AB$ is $C$. So angles $B$ and $C$ are equal.\n\nNow add all three angles: $(x + 12) + (2x - 6) + (2x - 6) = 180$. That's $5x = 180$, so $x = 36$.\n\nAngle $B = 2(36) - 6 = 66^\\circ$. Check: $A = 48^\\circ$, and $48 + 66 + 66 = 180$.",
     "rationales": {
-      "A": "This sets angle $A$ equal to angle $B$; the equal angles are $B$ and $C$, opposite the equal sides.",
-      "B": "This is the value of $x$, not the measure of angle $B$.",
-      "D": "This leaves angle $C$ out of the angle sum: $(x + 12) + (2x - 6) = 180$ gives $x = 58$."
+      "A": "The equal angles are $B$ and $C$, the ones across from the equal sides. Angle $A$ is between the equal sides.",
+      "B": "$36$ is the value of $x$. Angle $B$ is $2x - 6 = 66^\\circ$.",
+      "D": "Angle $C$ was left out of the sum. It equals angle $B$, so include it: $(x + 12) + 2(2x - 6) = 180$."
     },
     "tags": ["isosceles", "triangle-angles"]
   },
@@ -114,7 +114,7 @@
     "type": "spr",
     "stem": "In right triangle $XYZ$, the altitude from the right angle $Y$ meets hypotenuse $\\overline{XZ}$ at point $W$. If $XW = 4$ and $WZ = 9$, what is the length of $\\overline{YW}$?",
     "answer": ["6"],
-    "explanation": "The altitude to the hypotenuse splits the triangle into two triangles similar to each other: $\\triangle XWY \\sim \\triangle YWZ$. So $\\frac{XW}{YW} = \\frac{YW}{WZ}$, which gives $YW^2 = 4 \\times 9 = 36$ and $YW = 6$.",
+    "explanation": "Dropping the altitude from the right angle splits the big triangle into two smaller right triangles that are similar to each other.\n\nIn those two triangles, $YW$ is a leg of both. Matching sides gives $\\frac{XW}{YW} = \\frac{YW}{WZ}$.\n\nCross multiply: $YW^2 = XW \\times WZ = 4 \\times 9 = 36$. So $YW = 6$.\n\nHandy fact: the altitude to the hypotenuse is the geometric mean of the two pieces it creates.",
     "tags": ["similar-triangles"]
   }
 ]

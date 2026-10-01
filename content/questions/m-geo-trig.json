@@ -6,11 +6,11 @@
     "stem": "A right triangle has legs of length $9$ and $12$. What is the length of the hypotenuse?",
     "choices": ["$\\sqrt{63}$", "$15$", "$21$", "$225$"],
     "answer": "B",
-    "explanation": "By the Pythagorean theorem, $c^2 = 9^2 + 12^2 = 81 + 144 = 225$, so $c = \\sqrt{225} = 15$.",
+    "explanation": "In a right triangle, the two legs and the hypotenuse are linked by the Pythagorean theorem: $a^2 + b^2 = c^2$, where $c$ is the longest side.\n\n$9^2 + 12^2 = 81 + 144 = 225$. So $c^2 = 225$ and $c = 15$.\n\nYou might spot it faster: $9$, $12$, $15$ is the $3$, $4$, $5$ triangle scaled up by $3$.",
     "rationales": {
-      "A": "This subtracts the squares, $144 - 81$, which is how to find a leg, not the hypotenuse.",
-      "C": "This adds the legs instead of their squares.",
-      "D": "This is $c^2$; the square root was never taken."
+      "A": "Subtracting the squares is how you find a missing leg. For the hypotenuse, add them.",
+      "C": "You need to add the squares of the legs, not the legs themselves. Then take the square root.",
+      "D": "$225$ is $c^2$. Take the square root to get $c = 15$."
     },
     "tags": ["pythagorean-theorem"]
   },
@@ -21,11 +21,11 @@
     "stem": "In right triangle $ABC$, angle $C$ is the right angle, $AC = 8$, $BC = 15$, and $AB = 17$. What is the value of $\\cos A$?",
     "choices": ["$\\frac{8}{17}$", "$\\frac{8}{15}$", "$\\frac{15}{17}$", "$\\frac{15}{8}$"],
     "answer": "A",
-    "explanation": "Cosine is adjacent over hypotenuse. The side adjacent to angle $A$ (that is not the hypotenuse) is $AC = 8$, and the hypotenuse is $AB = 17$. So $\\cos A = \\frac{8}{17}$.",
+    "explanation": "Remember SOH CAH TOA. Cosine is adjacent over hypotenuse.\n\nStand at angle $A$. The hypotenuse is the side across from the right angle: $AB = 17$. The side touching angle $A$ that isn't the hypotenuse is $AC = 8$.\n\nSo $\\cos A = \\frac{8}{17}$.",
     "rationales": {
-      "B": "This divides the adjacent side by the opposite side, which is $\\frac{1}{\\tan A}$.",
-      "C": "This is $\\sin A$, opposite over hypotenuse.",
-      "D": "This is $\\tan A$, opposite over adjacent."
+      "B": "Cosine divides by the hypotenuse, $17$. This divides by the other leg instead.",
+      "C": "$\\frac{15}{17}$ is opposite over hypotenuse, which is $\\sin A$.",
+      "D": "$\\frac{15}{8}$ is opposite over adjacent, which is $\\tan A$."
     },
     "tags": ["trig-ratios"]
   },
@@ -35,7 +35,7 @@
     "type": "spr",
     "stem": "If $\\sin(x^\\circ) = \\cos(32^\\circ)$ and $0 < x < 90$, what is the value of $x$?",
     "answer": ["58"],
-    "explanation": "The sine of an angle equals the cosine of its complement: $\\sin(x^\\circ) = \\cos(90^\\circ - x^\\circ)$. So $90 - x = 32$ and $x = 58$.",
+    "explanation": "In a right triangle, the two small angles add to $90^\\circ$. The side opposite one of them is adjacent to the other, so the sine of one angle equals the cosine of the other.\n\nThat means $\\sin(x^\\circ) = \\cos(32^\\circ)$ when $x$ and $32$ add to $90$.\n\nSo $x = 90 - 32 = 58$.",
     "tags": ["complementary-angles", "trig-ratios"]
   },
   {
@@ -45,11 +45,11 @@
     "stem": "In a $30^\\circ$-$60^\\circ$-$90^\\circ$ triangle, the hypotenuse has length $14$. What is the length of the side opposite the $60^\\circ$ angle?",
     "choices": ["$7$", "$7\\sqrt{2}$", "$7\\sqrt{3}$", "$14\\sqrt{3}$"],
     "answer": "C",
-    "explanation": "In a $30^\\circ$-$60^\\circ$-$90^\\circ$ triangle, the sides are in the ratio $1 : \\sqrt{3} : 2$. The hypotenuse is $14 = 2(7)$, so the short leg (opposite $30^\\circ$) is $7$ and the long leg (opposite $60^\\circ$) is $7\\sqrt{3}$.",
+    "explanation": "A right triangle with angles $30^\\circ$ and $60^\\circ$ always has sides in the ratio $1 : \\sqrt{3} : 2$. The short leg is across from $30^\\circ$, the long leg across from $60^\\circ$, and the hypotenuse is twice the short leg.\n\nThe hypotenuse is $14$, so the short leg is $7$.\n\nThe side across from $60^\\circ$ is the long leg: $7\\sqrt{3}$.",
     "rationales": {
-      "A": "This is the side opposite the $30^\\circ$ angle.",
-      "B": "This uses the $45^\\circ$-$45^\\circ$-$90^\\circ$ ratio, dividing the hypotenuse by $\\sqrt{2}$.",
-      "D": "This multiplies the hypotenuse by $\\sqrt{3}$ instead of the short leg."
+      "A": "$7$ is the short leg, across from the $30^\\circ$ angle. The side across from $60^\\circ$ is longer: $7\\sqrt{3}$.",
+      "B": "Dividing by $\\sqrt{2}$ is the rule for a triangle with two $45^\\circ$ angles. This one has $30^\\circ$ and $60^\\circ$.",
+      "D": "Multiply the short leg, $7$, by $\\sqrt{3}$, not the hypotenuse."
     },
     "tags": ["special-right-triangles"]
   },
@@ -60,11 +60,11 @@
     "stem": "A $20$-foot ladder leans against a vertical wall on level ground. The ladder makes a $60^\\circ$ angle with the ground. How far, in feet, is the bottom of the ladder from the wall?",
     "choices": ["$10$", "$10\\sqrt{2}$", "$10\\sqrt{3}$", "$20\\sqrt{3}$"],
     "answer": "A",
-    "explanation": "The ladder is the hypotenuse, and the distance from the wall is the side adjacent to the $60^\\circ$ angle: $20\\cos 60^\\circ = 20 \\cdot \\frac{1}{2} = 10$ feet.",
+    "explanation": "Sketch it: the ladder is the slanted side (the hypotenuse), the wall is one leg, and the ground is the other leg. The $60^\\circ$ angle is at the bottom, between the ladder and the ground.\n\nThe distance from the wall runs along the ground, right next to the $60^\\circ$ angle. Adjacent and hypotenuse means cosine.\n\n$20 \\cos 60^\\circ = 20 \\times \\frac{1}{2} = 10$ feet.\n\nSanity check: a steep ladder at $60^\\circ$ should have its foot fairly close to the wall, and $10$ feet out of $20$ fits.",
     "rationales": {
-      "B": "This uses $\\cos 45^\\circ$ instead of $\\cos 60^\\circ$.",
-      "C": "This uses sine instead of cosine, which gives the height the ladder reaches on the wall.",
-      "D": "This treats the $20$-foot ladder as the short leg and multiplies by $\\sqrt{3}$."
+      "B": "$\\cos 45^\\circ$ belongs to a $45^\\circ$ angle. Here the angle is $60^\\circ$, and $\\cos 60^\\circ = \\frac{1}{2}$.",
+      "C": "That's $20 \\sin 60^\\circ$, the height the ladder reaches up the wall. The distance along the ground uses cosine.",
+      "D": "The $20$ foot ladder is the hypotenuse, the longest side. No leg can be longer than $20$."
     },
     "tags": ["trig-ratios", "special-right-triangles"]
   },
@@ -74,7 +74,7 @@
     "type": "spr",
     "stem": "In a right triangle, one of the acute angles has measure $\\theta$, and $\\tan \\theta = \\frac{7}{24}$. What is the value of $\\sin \\theta$?",
     "answer": ["7/25"],
-    "explanation": "Let the side opposite $\\theta$ be $7$ and the adjacent side be $24$. The hypotenuse is $\\sqrt{7^2 + 24^2} = \\sqrt{625} = 25$. So $\\sin \\theta = \\frac{7}{25}$.",
+    "explanation": "Turn the tangent into a real triangle. $\\tan \\theta = \\frac{\\text{opposite}}{\\text{adjacent}} = \\frac{7}{24}$, so draw the opposite side as $7$ and the adjacent side as $24$.\n\nFind the hypotenuse: $\\sqrt{7^2 + 24^2} = \\sqrt{49 + 576} = \\sqrt{625} = 25$.\n\nNow sine is opposite over hypotenuse: $\\sin \\theta = \\frac{7}{25}$.",
     "tags": ["trig-ratios", "pythagorean-theorem"]
   },
   {
@@ -84,11 +84,11 @@
     "stem": "What is the value of $\\sin\\left(\\frac{7\\pi}{6}\\right)$?",
     "choices": ["$-\\frac{\\sqrt{3}}{2}$", "$-\\frac{1}{2}$", "$\\frac{1}{2}$", "$\\frac{\\sqrt{3}}{2}$"],
     "answer": "B",
-    "explanation": "$\\frac{7\\pi}{6} = \\pi + \\frac{\\pi}{6}$, so the angle is in Quadrant III with reference angle $\\frac{\\pi}{6}$. $\\sin\\frac{\\pi}{6} = \\frac{1}{2}$, and sine is negative in Quadrant III, so $\\sin\\frac{7\\pi}{6} = -\\frac{1}{2}$.",
+    "explanation": "Locate the angle on the unit circle. $\\frac{7\\pi}{6}$ is $\\pi + \\frac{\\pi}{6}$: half a turn, then a little more. That puts it in the third quadrant, where both $x$ and $y$ are negative.\n\nThe reference angle is $\\frac{\\pi}{6}$ (that's $30^\\circ$), and $\\sin \\frac{\\pi}{6} = \\frac{1}{2}$.\n\nSine is the $y$ value, which is negative in the third quadrant. So $\\sin \\frac{7\\pi}{6} = -\\frac{1}{2}$.",
     "rationales": {
-      "A": "This is $\\cos\\frac{7\\pi}{6}$, not the sine.",
-      "C": "This has the right reference value but the wrong sign; sine is negative in Quadrant III.",
-      "D": "This uses the cosine of the reference angle and also misses the negative sign."
+      "A": "$-\\frac{\\sqrt{3}}{2}$ is the cosine (the $x$ value) of this angle. Sine is the $y$ value.",
+      "C": "The size is right, but the angle is in the third quadrant, below the $x$ axis, so the sine is negative.",
+      "D": "That's the cosine of the reference angle, and it's also missing the negative sign."
     },
     "tags": ["radians", "unit-circle"]
   },
@@ -99,13 +99,13 @@
     "stem": "In right triangle $ABC$, angle $C$ is the right angle, $\\sin A = 0.6$, and $AB = 35$. What is the perimeter of triangle $ABC$?",
     "choices": ["$49$", "$56$", "$63$", "$84$"],
     "answer": "D",
-    "explanation": "$AB$ is the hypotenuse. $\\sin A = \\frac{BC}{AB}$, so $BC = 0.6(35) = 21$. Then $AC = \\sqrt{35^2 - 21^2} = \\sqrt{1{,}225 - 441} = \\sqrt{784} = 28$. The perimeter is $21 + 28 + 35 = 84$.",
+    "explanation": "The perimeter needs all three sides, and you only know one. Use the sine to find a second, then the Pythagorean theorem for the third.\n\n$AB$ is across from the right angle, so it's the hypotenuse. $\\sin A = \\frac{\\text{opposite}}{\\text{hypotenuse}} = \\frac{BC}{35} = 0.6$, so $BC = 21$.\n\nThe last side: $AC = \\sqrt{35^2 - 21^2} = \\sqrt{1{,}225 - 441} = \\sqrt{784} = 28$.\n\nPerimeter: $21 + 28 + 35 = 84$.",
     "rationales": {
-      "A": "This adds only the two legs, $21 + 28$, and leaves out the hypotenuse.",
-      "B": "This adds $BC$ and $AB$ but never finds $AC$.",
-      "C": "This adds $AC$ and $AB$ but leaves out $BC$."
+      "A": "$49$ adds only the two legs. The perimeter also includes the hypotenuse, $35$.",
+      "B": "$56$ adds $BC$ and $AB$ but leaves out $AC$. Find the third side with the Pythagorean theorem.",
+      "C": "$63$ adds $AC$ and $AB$ but leaves out $BC = 21$."
     },
-    "fastMethod": "$\\sin A = 0.6 = \\frac{3}{5}$ means the triangle is a $3$-$4$-$5$ triangle scaled by $7$: sides $21$, $28$, $35$.",
+    "fastMethod": "$0.6 = \\frac{3}{5}$, so this is the $3$, $4$, $5$ right triangle scaled by $7$. The sides are $21$, $28$ and $35$, which add to $84$.",
     "tags": ["trig-ratios", "pythagorean-theorem"]
   },
   {
@@ -114,7 +114,7 @@
     "type": "spr",
     "stem": "In triangle $XYZ$, angle $Y$ is a right angle and $\\cos X = \\frac{5}{13}$. What is the value of $\\tan Z$?",
     "answer": ["5/12"],
-    "explanation": "$\\cos X = \\frac{XY}{XZ} = \\frac{5}{13}$, so let $XY = 5$ and $XZ = 13$. Then $YZ = \\sqrt{13^2 - 5^2} = 12$. For angle $Z$, the opposite side is $XY = 5$ and the adjacent side is $YZ = 12$, so $\\tan Z = \\frac{5}{12}$.",
+    "explanation": "Build the triangle from the cosine. Angle $Y$ is the right angle, so $XZ$ is the hypotenuse. $\\cos X = \\frac{\\text{adjacent}}{\\text{hypotenuse}} = \\frac{XY}{XZ} = \\frac{5}{13}$, so take $XY = 5$ and $XZ = 13$.\n\nThe third side: $YZ = \\sqrt{13^2 - 5^2} = \\sqrt{144} = 12$.\n\nNow switch to angle $Z$. The side across from $Z$ is $XY = 5$, and the side next to it is $YZ = 12$. So $\\tan Z = \\frac{5}{12}$.\n\nThe key move is changing your point of view: opposite and adjacent swap when you switch angles.",
     "tags": ["trig-ratios", "complementary-angles"]
   }
 ]
