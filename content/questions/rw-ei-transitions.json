@@ -7,11 +7,11 @@
     "stem": "Which choice completes the text with the most logical transition?",
     "choices": ["However,", "Specifically,", "Nevertheless,", "Similarly,"],
     "answer": "B",
-    "explanation": "The second sentence gives a specific detail about how the dance communicates location, so the transition must introduce an elaboration of the first sentence.",
+    "explanation": "To pick a transition, first decide how the two sentences relate. Ignore the choices until you know.\n\nSentence 1 says bees share food locations through a dance. Sentence 2 explains exactly how part of that works: the angle points the way. So sentence 2 zooms in on sentence 1 with a detail.\n\n\"Specifically\" is the word for zooming in.",
     "rationales": {
-      "A": "\"However\" signals contrast, but the second sentence supports the first.",
-      "C": "\"Nevertheless\" signals a concession; nothing in the first sentence is being conceded.",
-      "D": "\"Similarly\" compares two different things; here one idea is explained in more detail."
+      "A": "\"However\" signals a contrast, but sentence 2 supports sentence 1.",
+      "C": "\"Nevertheless\" means \"in spite of that,\" but nothing here is being pushed against.",
+      "D": "\"Similarly\" compares two separate things. Here one idea is explained in more detail."
     },
     "tags": ["elaboration"]
   },
@@ -23,11 +23,11 @@
     "stem": "Which choice completes the text with the most logical transition?",
     "choices": ["For example,", "In other words,", "Similarly,", "However,"],
     "answer": "D",
-    "explanation": "The first sentence describes uncomfortable early bicycles; the second describes a change that made cycling comfortable. A contrast transition is needed.",
+    "explanation": "Sentence 1: early bikes were painfully bumpy. Sentence 2: air filled tires made riding far more comfortable.\n\nThat's a before and after contrast, from uncomfortable to comfortable. A contrast word fits, so \"However\" is right.",
     "rationales": {
-      "A": "\"For example\" introduces an instance of the previous idea, but air-filled tires are not an example of jarring rides.",
-      "B": "\"In other words\" restates the previous idea; the second sentence says something different.",
-      "C": "\"Similarly\" signals likeness, but the two sentences describe opposite experiences."
+      "A": "\"For example\" would introduce an example of a bumpy ride, but tires that fix the problem aren't that.",
+      "B": "\"In other words\" repeats the same idea in new words. Sentence 2 says something new and opposite.",
+      "C": "\"Similarly\" signals sameness, but the two sentences describe opposite experiences."
     },
     "tags": ["contrast"]
   },
@@ -39,11 +39,11 @@
     "stem": "Which choice completes the text with the most logical transition?",
     "choices": ["In contrast,", "As a result,", "For instance,", "Nevertheless,"],
     "answer": "B",
-    "explanation": "Heavy rainfall caused the reservoir to rise. The second sentence is a consequence of the first, so a cause-and-effect transition fits.",
+    "explanation": "Sentence 1: a very wet spring with almost double the usual rain. Sentence 2: the reservoir rose to its highest level in decades.\n\nThe rain caused the reservoir to rise. That's cause and effect, so \"As a result\" fits.\n\nA quick test: read it with \"because of this\" in the gap. If it makes sense, you want a cause and effect transition.",
     "rationales": {
-      "A": "\"In contrast\" signals opposition, but a rising reservoir is what you would expect after heavy rain.",
-      "C": "\"For instance\" introduces an example; the reservoir rising is a result, not an example of rainfall.",
-      "D": "\"Nevertheless\" signals that something happened despite the previous fact, but the rise happened because of it."
+      "A": "\"In contrast\" signals opposites, but a rising reservoir is exactly what you'd expect after heavy rain.",
+      "C": "\"For instance\" introduces an example. The rising reservoir is a result of the rain, not an example of it.",
+      "D": "\"Nevertheless\" means something happened despite the rain. The reservoir rose because of it."
     },
     "tags": ["cause-effect"]
   },
@@ -55,11 +55,11 @@
     "stem": "Which choice completes the text with the most logical transition?",
     "choices": ["Instead,", "Consequently,", "Additionally,", "Nonetheless,"],
     "answer": "C",
-    "explanation": "Both sentences describe unconventional design choices Bo Bardi made for the museum. The second adds another such choice, so an addition transition fits.",
+    "explanation": "Both sentences describe unusual choices Bo Bardi made for the museum. The first is about the floating gallery; the second adds another one: paintings on glass easels.\n\nWhen the second sentence adds another item of the same kind, use an addition word like \"Additionally.\"\n\nWatch the trap: \"rather than on walls\" makes \"Instead\" sound tempting. But that contrast happens inside the second sentence. Between the two sentences, the relationship is simply \"and also.\"",
     "rationales": {
-      "A": "\"Instead\" signals a replacement for something in the previous sentence. The phrase \"rather than on walls\" is a trap: the contrast is inside the second sentence, not between the two sentences.",
-      "B": "\"Consequently\" signals a result, but the floating gallery did not cause the choice of glass easels.",
-      "D": "\"Nonetheless\" signals a concession, but nothing in the first sentence works against the second."
+      "A": "\"Instead\" would mean the second sentence replaces something in the first. The \"rather than\" contrast is inside sentence 2, not between the sentences.",
+      "B": "\"Consequently\" signals a result, but the floating gallery didn't cause the glass easels.",
+      "D": "\"Nonetheless\" signals pushing on despite something, but nothing in sentence 1 works against sentence 2."
     },
     "tags": ["addition"]
   },
@@ -71,11 +71,11 @@
     "stem": "Which choice completes the text with the most logical transition?",
     "choices": ["Therefore,", "Likewise,", "In fact,", "Nevertheless,"],
     "answer": "D",
-    "explanation": "The critics predicted the novel would fail to hold readers, but it succeeded anyway. A transition that signals an outcome despite the previous point is needed.",
+    "explanation": "Sentence 1: critics said the novel couldn't hold readers. Sentence 2: it sold for decades and is taught worldwide.\n\nThe novel succeeded despite what the critics said. \"Nevertheless\" means \"in spite of that,\" so it fits.",
     "rationales": {
-      "A": "\"Therefore\" signals a result, but the novel's success did not follow from the critics' dismissal.",
-      "B": "\"Likewise\" signals similarity, but the second sentence contradicts the critics' view.",
-      "C": "\"In fact\" introduces support or emphasis for the previous claim, but the second sentence undercuts it."
+      "A": "\"Therefore\" signals a result, but the critics' dismissal didn't cause the book's success.",
+      "B": "\"Likewise\" signals similarity, but sentence 2 contradicts the critics.",
+      "C": "\"In fact\" usually backs up or strengthens the previous point. Here sentence 2 undercuts it."
     },
     "tags": ["concession"]
   },
@@ -87,11 +87,11 @@
     "stem": "Which choice completes the text with the most logical transition?",
     "choices": ["For instance,", "In other words,", "Even so,", "Meanwhile,"],
     "answer": "B",
-    "explanation": "The second sentence restates the facts of the first in terms of their meaning: quick closing means fast protection, and slow reopening means lost sunlight. A restatement transition fits.",
+    "explanation": "Sentence 1 gives the facts: the leaves shut in seconds but take minutes to reopen. Sentence 2 says what those facts mean: fast protection, but each reaction costs sunlight time.\n\nSentence 2 isn't new information; it's the same idea explained in plainer terms. That's what \"In other words\" signals.",
     "rationales": {
-      "A": "\"For instance\" introduces a specific example, but the second sentence interprets the first rather than giving an example of it.",
-      "C": "\"Even so\" signals a concession, but the second sentence does not go against the first.",
-      "D": "\"Meanwhile\" signals something happening at the same time, but the second sentence explains the first."
+      "A": "\"For instance\" introduces an example. Sentence 2 interprets sentence 1 rather than giving an example of it.",
+      "C": "\"Even so\" signals something surprising given the previous point, but sentence 2 follows naturally from sentence 1.",
+      "D": "\"Meanwhile\" means at the same time, but sentence 2 explains sentence 1 instead of describing something happening alongside it."
     },
     "tags": ["restatement"]
   },
@@ -103,11 +103,11 @@
     "stem": "Which choice completes the text with the most logical transition?",
     "choices": ["However,", "Instead,", "Similarly,", "Therefore,"],
     "answer": "B",
-    "explanation": "The second sentence says the expected pattern did not appear. The third sentence describes what was found in its place, so a transition that introduces an alternative to the expected outcome fits.",
+    "explanation": "Follow all three sentences. Sentence 1: economists expected winners to work much less. Sentence 2: a study didn't find that. Sentence 3: what the study found was that winners kept working about the same.\n\nThe blank connects sentences 2 and 3. Sentence 3 tells you what happened in place of the expected pattern. \"Instead\" introduces exactly that kind of replacement.\n\nThe trap is \"However.\" Sentence 3 doesn't contrast with sentence 2; it continues it.",
     "rationales": {
-      "A": "\"However\" would contrast the third sentence with the second, but the third sentence continues the second sentence's point that the expected pattern was absent.",
-      "C": "\"Similarly\" signals a comparison between two separate things; the third sentence describes the same finding in more detail.",
-      "D": "\"Therefore\" signals a conclusion drawn from evidence, but the third sentence is the evidence itself, not a conclusion from the second."
+      "A": "\"However\" would set sentence 3 against sentence 2, but sentence 3 continues sentence 2's point.",
+      "C": "\"Similarly\" compares two separate things. Sentence 3 describes the same finding in more detail.",
+      "D": "\"Therefore\" signals a conclusion, but sentence 3 is the finding itself, not a conclusion drawn from it."
     },
     "tags": ["contrast", "alternative"]
   },
@@ -119,11 +119,11 @@
     "stem": "Which choice completes the text with the most logical transition?",
     "choices": ["Thus,", "For example,", "Granted,", "Likewise,"],
     "answer": "C",
-    "explanation": "The second sentence admits a limitation of the first sentence's positive point before the third sentence returns to the argument with \"though.\" A concession transition is needed.",
+    "explanation": "Look at the shape of the whole argument. Sentence 1 makes a positive point: no emissions while working. Sentence 2 admits a downside: making panels takes energy. Sentence 3 comes back with \"though\": over their lifetime they repay that energy many times.\n\nSentence 2 is a concession, where the writer admits a point against their own side before answering it. \"Granted\" is the word for that.",
     "rationales": {
-      "A": "\"Thus\" signals a conclusion, but the manufacturing cost does not follow from the panels producing no emissions.",
-      "B": "\"For example\" introduces an instance of the previous claim, but the second sentence qualifies that claim instead.",
-      "D": "\"Likewise\" signals a similar point, but the second sentence points out a cost, which works against the first."
+      "A": "\"Thus\" signals a conclusion, but the manufacturing cost doesn't follow from the panels being emission free.",
+      "B": "\"For example\" gives an instance of the previous claim. Sentence 2 qualifies the claim instead.",
+      "D": "\"Likewise\" signals a similar point, but sentence 2 raises a cost that works against sentence 1."
     },
     "tags": ["concession"]
   },
@@ -135,11 +135,11 @@
     "stem": "Which choice completes the text with the most logical transition?",
     "choices": ["Likewise,", "At the same time,", "Therefore,", "For instance,"],
     "answer": "B",
-    "explanation": "The text sets Brooks's traditional forms against her contemporary subjects: both were true of her work at once, and they pull in different directions. \"At the same time\" signals this kind of coexisting contrast.",
+    "explanation": "The two sentences describe two things that were both true of Brooks's poetry, and they pull in different directions: very traditional forms, but very modern subjects.\n\n\"At the same time\" fits this perfectly. It means both are true together, with a sense of contrast between them.",
     "rationales": {
-      "A": "\"Likewise\" signals a similar point, but traditional form and contemporary subject matter are being contrasted, not compared.",
-      "C": "\"Therefore\" signals a result, but writing sonnets did not cause her to choose modern subjects.",
-      "D": "\"For instance\" introduces an example of traditional forms, but the second sentence is about subject matter."
+      "A": "\"Likewise\" signals a similar point, but traditional forms and modern subjects are being contrasted.",
+      "C": "\"Therefore\" signals a result, but writing sonnets didn't cause her to choose modern subjects.",
+      "D": "\"For instance\" would introduce an example of traditional forms, but sentence 2 is about her subjects."
     },
     "tags": ["contrast"]
   }

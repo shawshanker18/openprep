@@ -12,11 +12,11 @@
       "A public library in Santos's hometown displays one of her tapestries."
     ],
     "answer": "A",
-    "explanation": "The goal is the size of the largest tapestry. Only Choice A includes its measurement, 12 meters long.",
+    "explanation": "Notes questions are really about the goal, not the notes. Read the goal first and underline its key words. Here: the size of the largest tapestry.\n\nNow scan the choices for one that actually gives a size. Only choice A does: \"12 meters long.\"\n\nEvery choice is true according to the notes. The only question is which one does the job asked for.",
     "rationales": {
-      "B": "This describes her materials, not the size of any tapestry.",
-      "C": "This introduces Santos and her subject matter but gives no size.",
-      "D": "This tells where a tapestry hangs but not how large it is."
+      "B": "This is about her materials. It says nothing about size.",
+      "C": "This introduces Santos and her subjects, but gives no size.",
+      "D": "This says where a tapestry hangs, not how big it is."
     },
     "tags": ["emphasize", "rhetorical-goal"]
   },
@@ -33,11 +33,11 @@
       "The axolotl is a salamander that lives in water its entire life."
     ],
     "answer": "C",
-    "explanation": "The goal is the reason scientists study the axolotl. Choice C connects its ability to regrow limbs to scientists' interest in tissue regeneration.",
+    "explanation": "The goal: explain why scientists study the axolotl. So the right choice has to give a reason, and connect it to scientists.\n\nChoice C does both: it can regrow lost limbs, so scientists study it to learn about regrowing tissue. The word \"Because\" is a good sign when the goal asks \"why.\"",
     "rationales": {
-      "A": "This identifies the axolotl and its home but says nothing about scientific study.",
-      "B": "This states an unusual trait but doesn't connect it to why scientists study the animal.",
-      "D": "This describes the axolotl's habitat, not the reason it is studied."
+      "A": "This says what the axolotl is and where it lives, but not why scientists study it.",
+      "B": "Keeping its gills is interesting, but this doesn't connect it to why scientists study the animal.",
+      "D": "This describes where it lives, not why it's studied."
     },
     "tags": ["explain", "rhetorical-goal"]
   },
@@ -54,11 +54,11 @@
       "Marquez's maps, which covered more than 300 miles of river valleys, were used to plan new roads."
     ],
     "answer": "D",
-    "explanation": "The goal is how the maps were used. Choice D states their use: they helped plan new roads.",
+    "explanation": "The goal: how the maps were used. Look for a choice that states a use.\n\nChoice D says the maps \"were used to plan new roads.\" That's the use.\n\nThe extra detail about 300 miles is fine. It doesn't distract from the goal; it just adds context.",
     "rationales": {
-      "A": "This is about her assistants, not about the maps.",
+      "A": "This is about her assistants, not the maps.",
       "B": "This says where the maps are kept today, not how they were used.",
-      "C": "This identifies Marquez's profession but doesn't mention the maps' use."
+      "C": "This names her job but says nothing about how her maps were used."
     },
     "tags": ["emphasize", "rhetorical-goal"]
   },
@@ -75,11 +75,11 @@
       "Box cookers and panel cookers are the two main types of solar cookers in common use."
     ],
     "answer": "B",
-    "explanation": "An advantage of one type over another requires a comparison that favors panel cookers. Choice B gives one: panel cookers are lighter and cheaper than box cookers.",
+    "explanation": "The goal asks for an advantage of panel cookers over box cookers. That needs two things: it's about panel cookers, and it compares them favorably with box cookers.\n\nChoice B does both: panel cookers are \"lighter and cheaper to make than box cookers.\"",
     "rationales": {
-      "A": "This describes a strength of box cookers, not of panel cookers.",
-      "C": "This explains how panel cookers work but doesn't compare them with box cookers.",
-      "D": "This names both types but presents no advantage of either."
+      "A": "This praises box cookers, not panel cookers.",
+      "C": "This explains how panel cookers work, but doesn't compare them with box cookers.",
+      "D": "This just names the two types. It gives no advantage."
     },
     "tags": ["compare", "rhetorical-goal"]
   },
@@ -96,11 +96,11 @@
       "Kintsugi reflects the idea that an object's history is part of its beauty."
     ],
     "answer": "A",
-    "explanation": "An unfamiliar audience first needs to know what kintsugi is. Choice A identifies it as a Japanese pottery-repair technique and explains how it works and what it looks like.",
+    "explanation": "The audience has never heard of kintsugi, so the sentence must first say what it is. A meaning or a detail won't help someone who doesn't know the basic idea.\n\nChoice A tells them: a Japanese way of repairing broken pottery, using lacquer mixed with gold, which leaves gold lines where the cracks were. A newcomer could picture it.",
     "rationales": {
-      "B": "This discusses kintsugi's meaning but never says what it is, so it assumes the reader already knows.",
-      "C": "This gives one detail of the process without explaining that kintsugi is a way of repairing pottery.",
-      "D": "This gives the idea behind kintsugi but never tells an unfamiliar reader what the technique is."
+      "B": "This explains what kintsugi means, but never says what it is. A newcomer would be lost.",
+      "C": "This gives one step of the process without saying that kintsugi is a way of repairing pottery.",
+      "D": "This gives the idea behind it but never tells the reader what the technique actually is."
     },
     "tags": ["introduce", "audience", "rhetorical-goal"]
   },
@@ -117,11 +117,11 @@
       "At both the Harbor Lantern Festival and the Meadow Light Festival, residents display paper lanterns."
     ],
     "answer": "D",
-    "explanation": "A similarity must be something both festivals share. In each one, residents display paper lanterns, which Choice D states using \"both.\"",
+    "explanation": "A similarity is something both festivals share. Look for a choice that's true of both and says so.\n\nChoice D: at both festivals, residents display paper lanterns. The word \"both\" is a strong clue.\n\nWords like \"while\" and \"but\" usually signal a difference, which is the opposite of what's asked.",
     "rationales": {
-      "A": "This points out a difference in season, not a similarity.",
-      "B": "This describes only one festival, so it can't show what the two have in common.",
-      "C": "\"But\" signals a contrast; this emphasizes a difference in purpose."
+      "A": "Autumn versus spring is a difference, not a similarity.",
+      "B": "This describes only one festival, so it can't show what they share.",
+      "C": "\"But\" signals a contrast. This highlights how their purposes differ."
     },
     "tags": ["compare", "rhetorical-goal"]
   },
@@ -138,11 +138,11 @@
       "The researchers studied how city noise affects songbirds by comparing two groups of birds."
     ],
     "answer": "C",
-    "explanation": "Explaining significance means saying why the pitch difference matters, not just that it exists. Choice C connects the higher pitch to being heard over low-pitched traffic noise.",
+    "explanation": "\"Significance\" means why the result matters, not just what the result was.\n\nThe result: birds near roads sing higher. Why might that matter? The notes give the pieces: traffic noise is low, and higher songs are easier to hear over low noise. Put together, singing higher may help these birds be heard.\n\nChoice C makes that connection. Choice B is the tempting trap: it states the result, but not why it matters.",
     "rationales": {
-      "A": "This describes the study's method, not what the results mean.",
-      "B": "This states the difference itself but doesn't explain why it matters; it repeats the finding without its significance.",
-      "D": "This states the study's purpose and design, not the meaning of the result."
+      "A": "This describes how the study was done, not what the results mean.",
+      "B": "This repeats the finding but doesn't explain why it matters.",
+      "D": "This describes the study's design, not the meaning of what it found."
     },
     "tags": ["explain", "rhetorical-goal"]
   },
@@ -159,11 +159,11 @@
       "The Open Shelf Project places small, free book exchanges in public spaces."
     ],
     "answer": "B",
-    "explanation": "\"Widespread\" is about reach. Choice B gives both measures of reach in the notes: more than 1,200 exchanges in 14 countries, and \"grown\" stresses the expansion.",
+    "explanation": "\"Widespread\" is about how far something reaches. Which notes show reach? The number of book exchanges (more than $1{,}200$) and the number of countries ($14$).\n\nChoice B uses both, and the word \"grown\" adds the sense of expansion since 2015.",
     "rationales": {
-      "A": "This describes the project's origin but gives no sense of how far it has spread.",
-      "C": "This emphasizes the volunteers' ongoing effort, not the number or locations of the exchanges.",
-      "D": "This describes what the project does, not how widespread it is."
+      "A": "This tells how the project started, but nothing about how far it has spread.",
+      "C": "This highlights the volunteers' weekly work, not how many exchanges there are or where.",
+      "D": "This says what the project does, not how widespread it is."
     },
     "tags": ["emphasize", "rhetorical-goal"]
   },
@@ -180,11 +180,11 @@
       "When a stalactite and a stalagmite meet, they form a column."
     ],
     "answer": "A",
-    "explanation": "The goal has two parts: a difference and a similarity. Choice A gives the similarity (both form from mineral-rich dripping water) and the difference (ceiling versus floor).",
+    "explanation": "This goal has two parts: a difference AND something in common. The right choice must do both.\n\nChoice A starts with what they share (both form from mineral rich dripping water), then gives the difference (one hangs from the ceiling, the other rises from the floor).\n\nB and C each do only half the job. On two part goals, check that both halves are covered.",
     "rationales": {
-      "B": "This gives the difference but leaves out what the two formations have in common.",
-      "C": "This gives the similarity but leaves out how the formations differ.",
-      "D": "This describes what happens when the two meet, which is neither the difference nor the shared origin."
+      "B": "This gives the difference but leaves out what they have in common.",
+      "C": "This gives what they share but leaves out how they differ.",
+      "D": "This describes what happens when they meet, which is neither a difference nor a shared trait."
     },
     "tags": ["compare", "rhetorical-goal"]
   }

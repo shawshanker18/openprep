@@ -7,11 +7,11 @@
     "stem": "Which choice completes the text so that it conforms to the conventions of Standard English?",
     "choices": ["animals, today,", "animals today,", "animals; today,", "animals, today"],
     "answer": "C",
-    "explanation": "\"The first public zoo ... opened in 1891 with only a few dozen animals\" and \"today, it houses more than two thousand animals\" are both independent clauses. A semicolon correctly joins them, and the comma after \"today\" sets off the introductory word.",
+    "explanation": "For punctuation questions, the key test is: could each side of the blank stand alone as a full sentence?\n\nLeft side: \"The first public zoo in the city of Brennan opened in 1891 with only a few dozen animals.\" That's a full sentence. Right side: \"Today, it houses more than two thousand animals...\" Also a full sentence.\n\nTwo full sentences need a period or a semicolon between them, never just a comma. Choice C uses a semicolon, plus a comma after \"today,\" which is the usual way to set off an opening word.",
     "rationales": {
-      "A": "A comma alone can't join two independent clauses; this creates a comma splice.",
-      "B": "With no punctuation between the clauses, this creates a run-on sentence.",
-      "D": "This is still a comma splice: only a comma separates the two independent clauses."
+      "A": "Two full sentences joined by only a comma is called a comma splice. A comma isn't strong enough.",
+      "B": "With nothing between the two full sentences, they run together.",
+      "D": "This still has only a comma between two full sentences, so it's a comma splice."
     },
     "tags": ["sentence-joining", "semicolon"]
   },
@@ -23,11 +23,11 @@
     "stem": "Which choice completes the text so that it conforms to the conventions of Standard English?",
     "choices": ["ingredients:", "ingredients;", "ingredients, such as:", "ingredients"],
     "answer": "A",
-    "explanation": "The first part is a complete sentence (\"bakers use just three simple ingredients\"), and what follows is a list naming those ingredients. A colon is the correct way to introduce such a list.",
+    "explanation": "The part before the blank is a complete sentence: \"bakers use just three simple ingredients.\" What follows names those three ingredients.\n\nA colon is made for exactly this: after a complete sentence, it introduces a list or explanation of what was just mentioned. So choice A is right.\n\nThink of a colon as saying \"here they are.\"",
     "rationales": {
-      "B": "A semicolon must join two independent clauses, but the list that follows is not an independent clause.",
-      "C": "A colon can't follow \"such as,\" because \"such as\" already introduces the list; the colon interrupts the phrase.",
-      "D": "With no punctuation, the list runs into the sentence and is not set off from \"ingredients.\""
+      "B": "A semicolon needs a full sentence on both sides. The list after it isn't a sentence.",
+      "C": "\"Such as\" already introduces the list, so adding a colon after it interrupts the phrase. Also, \"such as\" means examples, but this is the complete set of three.",
+      "D": "Without punctuation, the list runs straight into \"ingredients\" and isn't set off."
     },
     "tags": ["colon", "list"]
   },
@@ -39,11 +39,11 @@
     "stem": "Which choice completes the text so that it conforms to the conventions of Standard English?",
     "choices": ["cities, many", "cities. Many", "cities many", "cities, and, many"],
     "answer": "B",
-    "explanation": "\"The museum's newest exhibit features pottery from several ancient trading cities\" and \"Many of the pieces were recovered ...\" are both independent clauses. A period correctly separates them into two sentences.",
+    "explanation": "Apply the test: can each side stand alone?\n\n\"The museum's newest exhibit features pottery from several ancient trading cities.\" Full sentence. \"Many of the pieces were recovered by divers...\" Also a full sentence.\n\nTwo full sentences can be separated with a period. Choice B does that.",
     "rationales": {
-      "A": "A comma alone between two independent clauses creates a comma splice.",
-      "C": "With no punctuation, the two independent clauses run together.",
-      "D": "\"And\" could join the clauses, but the comma after \"and\" is incorrect; no punctuation belongs between the conjunction and the clause it introduces."
+      "A": "A comma alone between two full sentences is a comma splice.",
+      "C": "With no punctuation, the two sentences crash into each other.",
+      "D": "\"And\" can join two sentences, but the comma goes before \"and,\" not after it."
     },
     "tags": ["sentence-joining", "end-punctuation"]
   },
@@ -55,11 +55,11 @@
     "stem": "Which choice completes the text so that it conforms to the conventions of Standard English?",
     "choices": ["decades;", "decades", "decades—", "decades,"],
     "answer": "D",
-    "explanation": "The phrase \"a marine biologist who has studied coral reefs for two decades\" is extra information about Tamsin Hale. It opens with a comma, so it must close with a comma before the main verb \"spends.\"",
+    "explanation": "Strip out the extra information and see what's left. The core sentence is \"Tamsin Hale spends several months each year diving...\"\n\nThe phrase \"a marine biologist who has studied coral reefs for two decades\" is a side note about her. Side notes are fenced off by matching punctuation on both ends. This one opens with a comma after \"Hale,\" so it must close with a comma after \"decades.\"\n\nChoice D closes the fence correctly.",
     "rationales": {
-      "A": "A semicolon would separate the subject \"Tamsin Hale\" from its verb \"spends,\" leaving neither side a complete clause.",
-      "B": "Without a closing comma, the nonessential phrase isn't properly set off from the rest of the sentence.",
-      "C": "The phrase opens with a comma, so it must close with a comma; mixing a comma and a dash is incorrect."
+      "A": "A semicolon would cut the subject \"Tamsin Hale\" off from its verb \"spends.\" Neither side would be a full sentence.",
+      "B": "The side note opened with a comma, so it needs a closing comma too.",
+      "C": "The side note opened with a comma, so it has to close with a comma, not a dash. The two ends must match."
     },
     "tags": ["nonessential-element", "comma-usage"]
   },
@@ -71,11 +71,11 @@
     "stem": "Which choice completes the text so that it conforms to the conventions of Standard English?",
     "choices": ["others, for example,", "others, for example", "others; for example,", "others for example,"],
     "answer": "C",
-    "explanation": "The text has two independent clauses: the first ends with \"many others,\" and the second begins with \"a customer ... would buy.\" A semicolon joins them, and \"for example,\" with a following comma, introduces the second clause.",
+    "explanation": "Find the two sentences hiding here. The first ends with \"connect one telephone to many others.\" The second is \"a customer who wanted to talk between a home and a shop would buy two telephones...\" Both are complete.\n\nSo you need a semicolon (or period) between them. \"For example\" belongs to the second sentence, and like any opening phrase, it gets a comma after it.\n\nChoice C: semicolon, then \"for example,\" then the rest.",
     "rationales": {
-      "A": "Commas alone can't join two independent clauses, so this is a comma splice, even with \"for example\" between them.",
-      "B": "This is a comma splice, and \"for example\" is also left without the comma that should follow it.",
-      "D": "With no punctuation before \"for example,\" the two independent clauses run together."
+      "A": "Putting \"for example\" between commas doesn't change the fact that only commas separate two full sentences. That's still a comma splice.",
+      "B": "This is a comma splice, and it's also missing the comma after \"for example.\"",
+      "D": "With nothing before \"for example,\" the two full sentences run together."
     },
     "tags": ["sentence-joining", "semicolon"]
   },
@@ -87,11 +87,11 @@
     "stem": "Which choice completes the text so that it conforms to the conventions of Standard English?",
     "choices": ["became", "became,", "became:", ", became"],
     "answer": "A",
-    "explanation": "The long subject (\"The recipe that ... fifty years ago\") is followed by its verb \"became\" and then by what it became, \"the restaurant's most popular dessert.\" No punctuation belongs between a subject and its verb or between a verb and its complement.",
+    "explanation": "Sometimes the right answer is no punctuation at all. Find the subject and verb.\n\nThe subject is long: \"The recipe that the chef's grandmother wrote on the back of an old envelope more than fifty years ago.\" Its verb is \"became.\" And what it became is \"the restaurant's most popular dessert.\"\n\nNever put a comma between a subject and its verb, or between a verb and what it became. So no punctuation: choice A.\n\nLong subjects tempt people to pause with a comma. Read it as \"The recipe became the dessert\" and you'll hear that it doesn't need one.",
     "rationales": {
-      "B": "A comma after \"became\" incorrectly separates the verb from its complement.",
-      "C": "A colon can't come between a verb and its complement; colons follow complete clauses.",
-      "D": "A comma before \"became\" incorrectly separates the subject from its verb, a common mistake when the subject is long."
+      "B": "A comma after \"became\" splits the verb from what it became.",
+      "C": "A colon must come after a complete sentence. \"The recipe ... became\" isn't complete yet.",
+      "D": "A comma before \"became\" splits the long subject from its verb, a very common mistake."
     },
     "tags": ["unnecessary-punctuation", "comma-usage"]
   },
@@ -103,11 +103,11 @@
     "stem": "Which choice completes the text so that it conforms to the conventions of Standard English?",
     "choices": ["ago; the", "ago, the", "ago. The", "ago: the"],
     "answer": "B",
-    "explanation": "\"Although the bridge's original wooden planks were replaced with steel decades ago\" is a dependent clause; it can't stand alone. It must be joined to the main clause (\"the railings ... remain in place\") with a comma.",
+    "explanation": "The sentence starts with \"Although,\" which makes the first part unable to stand alone. \"Although the planks were replaced with steel decades ago\" leaves you waiting for more.\n\nA dependent opening like this attaches to the main sentence with a comma. The main sentence is \"the railings ... remain in place.\" So choice B.\n\nWords like although, because, when and if create these dependent parts. They always need a main sentence to lean on.",
     "rationales": {
-      "A": "A semicolon must join two independent clauses, but the \"Although\" clause is dependent.",
-      "C": "A period would leave the \"Although\" clause as a sentence fragment.",
-      "D": "A colon must follow an independent clause, but the \"Although\" clause is dependent."
+      "A": "A semicolon needs a full sentence on both sides. The \"Although\" part can't stand alone.",
+      "C": "A period would leave \"Although ... decades ago\" stranded as an incomplete sentence.",
+      "D": "A colon must follow a complete sentence, and the \"Although\" part isn't one."
     },
     "tags": ["subordinate-clause", "sentence-joining"]
   },
@@ -119,11 +119,11 @@
     "stem": "Which choice completes the text so that it conforms to the conventions of Standard English?",
     "choices": ["Austria,", "Austria:", "Austria—", "Austria;"],
     "answer": "D",
-    "explanation": "Each list item already contains a comma (\"Vienna, Austria\"; \"Montreal, Canada\"), so the items must be separated by semicolons, as the rest of the list does after \"Canada.\" A semicolon after \"Austria\" keeps the list consistent and clear.",
+    "explanation": "Look at the items in this list: \"a string quartet from Vienna, Austria\" and \"a jazz trio from Montreal, Canada.\" Each item already contains a comma.\n\nWhen list items have their own commas, separate the items with semicolons so the reader can tell where each one ends. The list already uses a semicolon after \"Canada,\" so keep it consistent with a semicolon after \"Austria.\" Choice D.",
     "rationales": {
-      "A": "A comma here would make it unclear where one item ends and the next begins, and it doesn't match the semicolon used after \"Canada.\"",
-      "B": "A colon would introduce a new list in the middle of the existing one.",
-      "C": "A dash doesn't separate list items and doesn't match the semicolon used after \"Canada.\""
+      "A": "With a comma here, it's hard to tell where one item ends. It also clashes with the semicolon after \"Canada.\"",
+      "B": "A colon would start a brand new list in the middle of this one.",
+      "C": "A dash doesn't separate list items, and it doesn't match the semicolon after \"Canada.\""
     },
     "tags": ["semicolon", "list"]
   },
@@ -135,11 +135,11 @@
     "stem": "Which choice completes the text so that it conforms to the conventions of Standard English?",
     "choices": ["plant; which", "plant. Which", "plant, which", "plant: which"],
     "answer": "C",
-    "explanation": "\"Which will serve more than forty thousand residents ...\" is a relative clause that adds information about the plant; it can't stand alone. A comma correctly attaches it to the main clause.",
+    "explanation": "\"Which will serve more than forty thousand residents\" can't stand alone. It's a description of the plant, and it needs to attach to the sentence about the plant.\n\nAttach a \"which\" description with a comma: \"a new water treatment plant, which will serve...\" Choice C.",
     "rationales": {
-      "A": "A semicolon must be followed by an independent clause, but the \"which\" clause is dependent.",
-      "B": "A period would turn the \"which\" clause into a sentence fragment.",
-      "D": "A colon must be followed by an explanation or list, not a dependent relative clause that modifies \"plant.\""
+      "A": "A semicolon needs a full sentence after it, and the \"which\" part isn't one.",
+      "B": "A period would leave the \"which\" part as an incomplete sentence.",
+      "D": "A colon introduces a list or explanation. Here the \"which\" part simply describes the plant, so a comma attaches it."
     },
     "tags": ["nonessential-element", "subordinate-clause"]
   }

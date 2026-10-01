@@ -12,11 +12,11 @@
       "have included"
     ],
     "answer": "B",
-    "explanation": "The subject is the singular noun \"collection\"; \"of rare maps\" and \"in the university library\" are prepositional phrases that describe it. A singular subject takes the singular verb \"includes.\"",
+    "explanation": "To pick a verb, first find the real subject. It's often hiding in front of a phrase that starts with \"of\" or \"in.\"\n\nHere the subject is \"the collection.\" \"Of rare maps\" and \"in the university library\" just describe it. Cross them out in your head: \"The collection ______ several...\"\n\nOne collection, so the verb is singular: \"includes.\"",
     "rationales": {
-      "A": "\"Include\" is plural; it agrees with \"maps,\" which is inside a prepositional phrase and isn't the subject.",
-      "C": "\"Are including\" is plural and doesn't agree with the singular subject \"collection.\"",
-      "D": "\"Have included\" is plural and doesn't agree with the singular subject \"collection.\""
+      "A": "\"Include\" matches \"maps,\" but \"maps\" sits inside \"of rare maps\" and isn't the subject. The subject is the single collection.",
+      "C": "\"Are including\" is plural, but the subject, \"collection,\" is singular.",
+      "D": "\"Have included\" is plural, but the subject, \"collection,\" is singular."
     },
     "tags": [
       "subject-verb-agreement",
@@ -36,11 +36,11 @@
       "opened"
     ],
     "answer": "D",
-    "explanation": "\"In 1969\" places the action at a specific time in the past, and the rest of the sentence uses the past tense (\"carried\"). The simple past \"opened\" fits.",
+    "explanation": "Look for time clues. \"In 1969\" places this at a specific moment in the past, and the sentence later says the line \"carried\" passengers, also past.\n\nSo the verb should be simple past: \"opened.\"",
     "rationales": {
-      "A": "\"Opens\" is present tense, but the event happened in 1969.",
-      "B": "\"Will open\" is future tense, but the event is in the past.",
-      "C": "The present perfect \"has opened\" isn't used with a specific past time like \"In 1969.\""
+      "A": "\"Opens\" is present tense, but this happened in 1969.",
+      "B": "\"Will open\" is future tense, but this is in the past.",
+      "C": "\"Has opened\" doesn't go with a specific past date like \"In 1969.\" Use the simple past instead."
     },
     "tags": [
       "verb-tense",
@@ -60,11 +60,11 @@
       "one"
     ],
     "answer": "A",
-    "explanation": "The pronoun refers to \"the students,\" who built and displayed the model. A plural antecedent needs the plural pronoun \"they.\"",
+    "explanation": "A pronoun has to match the noun it stands for. Ask: who displayed the model? The students did.\n\n\"Students\" is plural, so the pronoun must be plural: \"they.\"",
     "rationales": {
-      "B": "\"It\" is singular and would seem to refer to the model, which can't display itself.",
-      "C": "\"He or she\" is singular, but \"students\" is plural.",
-      "D": "\"One\" is a singular, general pronoun and doesn't refer clearly to the students."
+      "B": "\"It\" is singular and would seem to mean the model, which can't display itself.",
+      "C": "\"He or she\" is for one person, but there are many students.",
+      "D": "\"One\" is a vague, general pronoun that doesn't clearly point to the students."
     },
     "tags": [
       "pronoun-antecedent",
@@ -84,11 +84,11 @@
       "sales's"
     ],
     "answer": "C",
-    "explanation": "The proceeds belong to one sale (\"a plant sale\"), so a singular possessive is needed: add an apostrophe and s to \"sale\" to get \"sale's.\"",
+    "explanation": "The proceeds belong to something, so you need a possessive. The question is singular or plural.\n\nThe text describes \"a plant sale,\" just one. For one owner, add an apostrophe and s: \"sale's.\"\n\nQuick rule: one owner gets 's; plural owners ending in s get just an apostrophe after the s.",
     "rationales": {
-      "A": "\"Sales\" is a plain plural with no apostrophe, so it doesn't show possession.",
-      "B": "\"Sales'\" is a plural possessive, but the text describes only one sale.",
-      "D": "\"Sales's\" isn't a correct form of either the singular or the plural possessive."
+      "A": "\"Sales\" is a plain plural. Without an apostrophe it doesn't show ownership.",
+      "B": "\"Sales'\" means the proceeds of several sales, but there's only one sale.",
+      "D": "\"Sales's\" isn't a correct possessive form."
     },
     "tags": [
       "possessives",
@@ -108,11 +108,11 @@
       "has been"
     ],
     "answer": "B",
-    "explanation": "Skip the phrase \"in the gallery's east wing\" and the clause \"which were donated ... 1950s\" to find the subject: \"The paintings.\" A plural subject needs the plural verb \"are.\"",
+    "explanation": "The subject is buried under a lot of extra words. Peel them away: \"in the gallery's east wing\" describes the paintings, and \"which were donated by a local collector in the 1950s\" is a side note.\n\nWhat's left: \"The paintings ______ some of the earliest known landscapes.\"\n\n\"Paintings\" is plural, so the verb is \"are.\"",
     "rationales": {
-      "A": "\"Is\" is singular; it may seem to agree with the nearby \"wing\" or \"collector,\" but the subject is \"paintings.\"",
-      "C": "\"Was\" is singular and also shifts to the past tense.",
-      "D": "\"Has been\" is singular and doesn't agree with the plural subject \"paintings.\""
+      "A": "\"Is\" is singular. It might sound right next to \"wing\" or \"collector,\" but the subject is \"paintings.\"",
+      "C": "\"Was\" is singular, and it also switches to past tense.",
+      "D": "\"Has been\" is singular, but \"paintings\" is plural."
     },
     "tags": [
       "subject-verb-agreement",
@@ -132,11 +132,11 @@
       "the archaeologist finally understood the layout of the ancient city."
     ],
     "answer": "D",
-    "explanation": "The opening phrase \"Having studied the ruins ...\" describes a person who did the studying. The noun that follows the comma must name that person, so the sentence must continue with \"the archaeologist.\"",
+    "explanation": "The sentence opens with a description, \"Having studied the ruins near the river for more than a decade...\" That describes someone who did the studying.\n\nWhatever comes right after the comma is the one doing that studying. It has to be a person, so it must be \"the archaeologist.\"\n\nChoice D puts the archaeologist right after the comma. The others put the city, the layout or an \"understanding\" there, which would mean those things studied the ruins.",
     "rationales": {
-      "A": "This makes \"the ancient city's layout\" the one that studied the ruins, which is illogical.",
-      "B": "This makes \"the archaeologist's understanding\" the one that studied the ruins; the possessive hides the person behind an abstract noun.",
-      "C": "This makes \"the ancient city\" the one that studied the ruins, which is illogical."
+      "A": "This makes the city's layout the one that studied the ruins, which doesn't make sense.",
+      "B": "This makes \"the archaeologist's understanding\" the one that studied the ruins. The person needs to come first, not their understanding.",
+      "C": "This makes the ancient city the one that studied the ruins."
     },
     "tags": [
       "modifier-placement",
@@ -156,11 +156,11 @@
       "is"
     ],
     "answer": "A",
-    "explanation": "This sentence is inverted: the subject comes after the verb. The subject is \"a bronze navigational instrument and a set of clay jars,\" two things joined by \"and,\" so it is plural and needs \"were.\"",
+    "explanation": "This sentence is flipped: the verb comes before the subject. Turn it around to see it clearly: \"A bronze instrument and a set of clay jars ______ among the artifacts.\"\n\nThe subject is two things joined by \"and,\" which makes it plural. Plural subject, plural verb: \"were.\"",
     "rationales": {
-      "B": "\"Was\" is singular; it may seem to agree with \"a bronze navigational instrument\" alone, but the subject is compound.",
-      "C": "\"Has been\" is singular and doesn't agree with the compound subject.",
-      "D": "\"Is\" is singular and also shifts out of the past tense used elsewhere in the sentence."
+      "B": "\"Was\" is singular. It might sound right next to \"a bronze navigational instrument,\" but the subject includes the jars too.",
+      "C": "\"Has been\" is singular, but the subject is two things.",
+      "D": "\"Is\" is singular and also switches to present tense."
     },
     "tags": [
       "subject-verb-agreement",
@@ -180,11 +180,11 @@
       "will have changed"
     ],
     "answer": "C",
-    "explanation": "\"By the time the expedition finally reached the summit\" sets a point in the past, and the weather changed before that point. An action completed before another past action takes the past perfect, \"had changed,\" which also matches \"had given way\" later in the sentence.",
+    "explanation": "Two past moments are in play. The expedition reached the summit, and before that, the weather changed.\n\nWhen one past event happened before another past event, use \"had\" for the earlier one: \"had changed.\" The sentence even models it later with \"had given way.\"",
     "rationales": {
-      "A": "\"Changes\" is present tense, but the events are in the past.",
-      "B": "\"Has changed\" is present perfect, which links the past to the present, not to an earlier point in the past.",
-      "D": "\"Will have changed\" is future perfect, but the expedition already reached the summit."
+      "A": "\"Changes\" is present tense, but everything here is in the past.",
+      "B": "\"Has changed\" connects the past to now. Here you need something earlier than another past moment.",
+      "D": "\"Will have changed\" is future, but the expedition has already reached the summit."
     },
     "tags": [
       "verb-tense",
@@ -204,11 +204,11 @@
       "had written"
     ],
     "answer": "B",
-    "explanation": "The main verb of the clause is \"were\"; the blank begins a phrase describing \"letters\" (the letters that were written by the poet). Because the letters received the action, the past participle \"written\" is needed.",
+    "explanation": "The sentence already has its main verb: \"were never published.\" So the blank isn't a main verb; it's a word describing the letters.\n\nThe letters didn't do any writing; they were written by the poet. Describing something that received an action calls for \"written.\"\n\nRead it back: \"Many of the letters written by the poet ... were never published.\" It flows.",
     "rationales": {
-      "A": "\"Writing\" would mean the letters were doing the writing, which is illogical.",
-      "C": "\"Wrote\" is a past-tense verb, not a participle, so it can't describe \"letters\"; it would also make the letters the writers.",
-      "D": "\"Had written\" is a complete verb that would compete with \"were\" and make the letters the writers."
+      "A": "\"Writing\" would mean the letters were doing the writing.",
+      "C": "\"Wrote\" is a main verb, so the sentence would have two competing verbs, and it would make the letters the writers.",
+      "D": "\"Had written\" is a full verb that clashes with \"were,\" and it would make the letters the writers."
     },
     "tags": [
       "verb-form",
