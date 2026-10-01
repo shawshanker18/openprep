@@ -1,5 +1,6 @@
 // Practice: which question next, and submitting an answer (spec 04 §3).
 import "server-only";
+import { memo } from "@/lib/memo";
 import { and, asc, count, desc, eq, gte, inArray, isNotNull, lte, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { attempts, questions, reviewItems, skillState, type Profile, type Question } from "@/db/schema";
@@ -139,14 +140,14 @@ export async function submitAnswer(userId: string, input: {
 }
 
 /** Active question tags per skill (the sub-skills), for pickers and the skill page. */
-export async function tagsBySkill(): Promise<Record<string, string[]>> {
+export const tagsBySkill = memo(600_000, async (): Promise<Record<string, string[]>> => {
   const rows = await db.select({ skillId: questions.skillId, tag: sql<string>`t.tag` }).from(questions)
     .innerJoin(sql`jsonb_array_elements_text(${questions.tags}) as t(tag)`, sql`true`)
     .where(eq(questions.status, "active")).groupBy(questions.skillId, sql`t.tag`).orderBy(sql`t.tag`);
   const out: Record<string, string[]> = {};
   for (const r of rows) (out[r.skillId] ??= []).push(r.tag);
   return out;
-}
+});
 
 /** Skill-page performance extras: confidence mix, last 10, diagnostic result, per-tag accuracy. */
 export async function skillStats(userId: string, skillId: string) {

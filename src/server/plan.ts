@@ -1,5 +1,6 @@
 // Weekly focus (spec 03 §5.1). Frozen for the ISO week; recomputed on the first visit of a new week.
 import "server-only";
+import { memo } from "@/lib/memo";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { profiles, questions, skillState, type Profile } from "@/db/schema";
@@ -9,10 +10,10 @@ import { sectionTarget, targetTheta } from "@/engine/score";
 import { skillPriority, weeklyFocus } from "@/engine/select";
 
 /** Skills that have at least one active question — you can't focus practice on a skill with no questions. */
-export async function skillsWithQuestions(): Promise<Set<string>> {
+export const skillsWithQuestions = memo(600_000, async () => {
   const rows = await db.selectDistinct({ skillId: questions.skillId }).from(questions).where(eq(questions.status, "active"));
   return new Set(rows.map((r) => r.skillId));
-}
+});
 
 /** All skills in priority order (highest expected score gain first), restricted to skills with questions. */
 export async function skillsByPriority(userId: string, profile: Profile) {

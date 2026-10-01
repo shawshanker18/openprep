@@ -1,6 +1,7 @@
 // First-visit-of-the-day side effects (spec 04 §6): weekly focus → daily plan → model score snapshot.
 // Idempotent; no cron. The plan is frozen for the day once written.
 import "server-only";
+import { cache } from "react";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { and, desc, eq, gte, inArray, like, sql } from "drizzle-orm";
@@ -48,6 +49,11 @@ export async function isMockDue(userId: string, daysLeft: number | null, now = n
     : !!diag?.completedAt && now.getTime() - diag.completedAt.getTime() >= 7 * DAY;
   return { due, lastMock };
 }
+
+/** Per-request memos: the layout (notifications) and the page ask the same questions. */
+export const mockDueNow = cache((userId: string, daysLeft: number | null) => isMockDue(userId, daysLeft));
+export const dueReviewsNow = cache((userId: string) => countDueReviews(userId));
+export const skillStatesOf = cache((userId: string) => db.select().from(skillState).where(eq(skillState.userId, userId)));
 
 export async function ensureDaily(userId: string, profile: Profile, now = new Date()) {
   const day = localDate(now, profile.timezone);
@@ -101,9 +107,9 @@ export async function getDashboard(userId: string, profile: Profile, now = new D
   const daily = await ensureDaily(userId, profile, now);
   const daysLeft = daysToTest(profile, now);
   const [states, dueReviews, { due: mockDue, lastMock }, week] = await Promise.all([
-    db.select().from(skillState).where(eq(skillState.userId, userId)),
-    countDueReviews(userId, now),
-    isMockDue(userId, daysLeft, now),
+    skillStatesOf(userId),
+    dueReviewsNow(userId),
+    mockDueNow(userId, daysLeft),
     db.select({ n: sql<number>`count(*)::int`, c: sql<number>`count(*) filter (where ${attempts.correct})::int`, ms: sql<number>`coalesce(sum(${attempts.timeMs}),0)::bigint` })
       .from(attempts).where(and(eq(attempts.userId, userId), gte(attempts.createdAt, new Date(now.getTime() - 7 * DAY)))),
   ]);
