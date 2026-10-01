@@ -103,6 +103,19 @@ export function validateContent() {
     }
   }
 
+  const dDir = path.join(ROOT, "desmos");
+  for (const file of fs.existsSync(dDir) ? fs.readdirSync(dDir).filter((f) => f.endsWith(".md")) : []) {
+    try {
+      const { data, content } = matter(fs.readFileSync(path.join(dDir, file), "utf8"));
+      if (!data.title || !Number.isFinite(Number(data.order))) errors.push(`desmos/${file}: frontmatter needs title and order`);
+      if (data.expressions !== undefined && !Array.isArray(data.expressions)) errors.push(`desmos/${file}: expressions must be a list`);
+      for (const tex of mathSpans(content)) {
+        try { katex.renderToString(tex, { throwOnError: true }); }
+        catch (e) { errors.push(`desmos/${file}: KaTeX: ${(e as Error).message.split("\n")[0]}`); }
+      }
+    } catch (e) { errors.push(`desmos/${file}: invalid frontmatter (${(e as Error).message.split("\n")[0]})`); }
+  }
+
   return { errors, warnings, rows };
 }
 

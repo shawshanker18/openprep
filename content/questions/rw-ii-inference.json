@@ -1,0 +1,191 @@
+[
+  {
+    "id": "rw-ii-inference-0001",
+    "difficulty": 1,
+    "type": "mcq",
+    "passage": "Gardeners in one region have noticed that a certain variety of tomato seems to produce more fruit when it is grown near basil plants. In a small experiment, tomato plants grown beside basil yielded about 20 percent more fruit than tomato plants grown alone. These results suggest that ______",
+    "stem": "Which choice most logically completes the text?",
+    "choices": [
+      "growing basil near this tomato variety may increase the amount of fruit the tomatoes produce.",
+      "basil plants grow larger when they are planted beside tomatoes.",
+      "this tomato variety produces more fruit than basil plants do.",
+      "tomato plants grown without basil will not produce any fruit."
+    ],
+    "answer": "A",
+    "explanation": "Tomatoes beside basil produced about 20 percent more fruit than tomatoes grown alone, so the logical conclusion is that basil nearby may increase the tomatoes' yield. Choice A states this and is appropriately cautious.",
+    "rationales": {
+      "B": "This reverses the relationship: the experiment measured the tomatoes' fruit, not the size of the basil.",
+      "C": "The experiment compared two groups of tomatoes, not tomatoes with basil.",
+      "D": "The tomatoes grown alone still produced fruit, just about 20 percent less."
+    },
+    "tags": ["logical-completion", "science"]
+  },
+  {
+    "id": "rw-ii-inference-0002",
+    "difficulty": 1,
+    "type": "mcq",
+    "passage": "Archaeologists excavating an ancient settlement found large numbers of fishhooks, fish bones, and stone net weights, but very few tools used for farming. Because the settlement sat on the shore of a large lake, the archaeologists concluded that ______",
+    "stem": "Which choice most logically completes the text?",
+    "choices": [
+      "the people of the settlement grew most of their own grain.",
+      "the lake dried up soon after the settlement was built.",
+      "fishing was likely an important source of food for the settlement's residents.",
+      "the residents traded their fishhooks to farmers in distant regions."
+    ],
+    "answer": "C",
+    "explanation": "Abundant fishing gear and fish bones, few farming tools, and a lakeside location all point to fishing as a major food source. Choice C follows directly from this evidence.",
+    "rationales": {
+      "A": "Very few farming tools were found, which argues against the residents growing most of their grain.",
+      "B": "Nothing in the text suggests the lake dried up; the fishing evidence suggests the opposite.",
+      "D": "The text gives no evidence of trade; the fish bones show the residents used the hooks themselves."
+    },
+    "tags": ["logical-completion", "social-studies"]
+  },
+  {
+    "id": "rw-ii-inference-0003",
+    "difficulty": 1,
+    "type": "mcq",
+    "passage": "Before the invention of photography, painted portraits were the main way for families to preserve images of their members. Portraits, however, were expensive and required many hours of sitting. When photographic portraits became widely available in the mid-1800s, they cost far less and required only a short sitting. As a result, ______",
+    "stem": "Which choice most logically completes the text?",
+    "choices": [
+      "portrait painters began charging more for their work.",
+      "many families who could never have afforded a painted portrait were able to obtain images of their members.",
+      "families stopped wanting to preserve images of their members.",
+      "photographs took longer to produce than painted portraits did."
+    ],
+    "answer": "B",
+    "explanation": "The text sets up a contrast: portraits were costly, while photographs were cheap and quick. The logical result is that more families, including those who couldn't afford paintings, could now have images made. Choice B states this.",
+    "rationales": {
+      "A": "The text gives no information about painters' prices after photography arrived.",
+      "C": "Cheaper images would make it easier, not less appealing, to preserve family images.",
+      "D": "The text says photographs required only a short sitting, so this contradicts it."
+    },
+    "tags": ["logical-completion", "social-studies"]
+  },
+  {
+    "id": "rw-ii-inference-0004",
+    "difficulty": 2,
+    "type": "mcq",
+    "passage": "Many species of moth are attracted to artificial lights at night, which can draw them away from the plants they would otherwise pollinate. In a recent study, researchers replaced the white streetlights in one town with amber lights, which moths find far less attractive. Over the following summer, the researchers recorded more moths visiting flowers in fields near the amber lights than in similar fields near white lights in a nearby town. These findings suggest that ______",
+    "stem": "Which choice most logically completes the text?",
+    "choices": [
+      "moths are more strongly attracted to amber lights than to white lights.",
+      "the amber streetlights made the flowers in the town more fragrant.",
+      "moths prefer to pollinate flowers in larger towns.",
+      "switching to lights that attract fewer moths may help protect pollination near towns."
+    ],
+    "answer": "D",
+    "explanation": "Step 1: white lights pull moths away from plants. Step 2: amber lights attract moths less, and more moths visited flowers near amber lights. So replacing white lights with less attractive ones may help preserve pollination. Choice D draws this conclusion.",
+    "rationales": {
+      "A": "This reverses the text, which says moths find amber lights \"far less attractive.\"",
+      "B": "The text never mentions fragrance; it attributes the difference to how the lights affect moths.",
+      "C": "The text doesn't compare town sizes, so nothing supports a preference for larger towns."
+    },
+    "tags": ["logical-completion", "science"]
+  },
+  {
+    "id": "rw-ii-inference-0005",
+    "difficulty": 2,
+    "type": "mcq",
+    "passage": "In the early twentieth century, one city opened a public library branch in each of its neighborhoods. Library records show that branches in neighborhoods with many young children lent far more picture books than other branches did, and over time those branches set aside more shelf space for children's books. This pattern suggests that the branches ______",
+    "stem": "Which choice most logically completes the text?",
+    "choices": [
+      "eventually stopped lending books to adults.",
+      "adjusted their collections to fit the needs of the people who used them.",
+      "were built only in neighborhoods with many young children.",
+      "lent more books overall than the branches in other neighborhoods did."
+    ],
+    "answer": "B",
+    "explanation": "Branches where children borrowed many picture books responded by giving more space to children's books. That shows the branches shaping their collections around local demand, as Choice B says.",
+    "rationales": {
+      "A": "Giving more space to children's books doesn't mean adults lost access; this goes far beyond the evidence.",
+      "C": "The text says the city opened a branch in each of its neighborhoods, not only in those with many children.",
+      "D": "The records show these branches lent more picture books, not more books of all kinds."
+    },
+    "tags": ["logical-completion", "social-studies"]
+  },
+  {
+    "id": "rw-ii-inference-0006",
+    "difficulty": 2,
+    "type": "mcq",
+    "passage": "Art historians sometimes date paintings by examining the pigments they contain. One blue pigment, for example, was not manufactured until the early 1700s. A painting long attributed to an artist who died in 1650 was recently found to contain this pigment throughout its original layers of paint. This discovery suggests that ______",
+    "stem": "Which choice most logically completes the text?",
+    "choices": [
+      "the painting was probably not made by the artist to whom it has long been attributed.",
+      "the artist who died in 1650 invented the blue pigment.",
+      "the painting was repaired in the 1700s by a different artist.",
+      "blue pigments were widely used by artists before 1650."
+    ],
+    "answer": "A",
+    "explanation": "The pigment didn't exist until the early 1700s, and it appears in the painting's original layers, so the painting was likely made after 1700. An artist who died in 1650 could not have made it. Choice A follows.",
+    "rationales": {
+      "B": "The pigment was not manufactured until decades after this artist died, so the artist couldn't have invented it.",
+      "C": "A later repair would explain the pigment only in added paint, but it appears throughout the original layers.",
+      "D": "The text discusses one blue pigment's date of manufacture, not how common blue pigments were before 1650."
+    },
+    "tags": ["logical-completion", "humanities"]
+  },
+  {
+    "id": "rw-ii-inference-0007",
+    "difficulty": 3,
+    "type": "mcq",
+    "passage": "Some plants release chemical signals when insects begin eating their leaves. Researchers found that nearby undamaged plants of the same species increased their production of bitter-tasting defensive compounds shortly after these signals were released. However, when the researchers placed a barrier that blocked airflow between the damaged and undamaged plants, the undamaged plants did not increase their production of the compounds. Taken together, these findings suggest that ______",
+    "stem": "Which choice most logically completes the text?",
+    "choices": [
+      "damaged plants produce more defensive compounds than undamaged plants do.",
+      "insects avoid plants that release chemical signals.",
+      "the barrier caused the undamaged plants to stop producing defensive compounds altogether.",
+      "the chemical signals likely reach neighboring plants by traveling through the air."
+    ],
+    "answer": "D",
+    "explanation": "With open air between them, neighbors responded to the signals; when only airflow was blocked, they didn't respond. The simplest explanation is that the signals travel through the air. Choice D draws this conclusion.",
+    "rationales": {
+      "A": "The study measured the response of undamaged plants; it doesn't compare compound levels in damaged and undamaged plants.",
+      "B": "Insect behavior toward signaling plants is never tested or described.",
+      "C": "The text says the plants did not increase production, not that they stopped producing the compounds; this overstates the result."
+    },
+    "tags": ["logical-completion", "science"]
+  },
+  {
+    "id": "rw-ii-inference-0008",
+    "difficulty": 3,
+    "type": "mcq",
+    "passage": "Historians have long believed that a particular eighteenth-century almanac was printed in only one city, since every surviving copy bears the mark of a printer there. Recently, however, a scholar examined the paper of several copies and found watermarks from two different paper mills, one of which supplied only printers in a distant city. Because printers typically bought paper from nearby mills, the scholar's findings suggest that ______",
+    "stem": "Which choice most logically completes the text?",
+    "choices": [
+      "all copies of the almanac were printed in the distant city rather than in the first city.",
+      "the printer's mark on the surviving copies was added later by collectors.",
+      "some copies of the almanac may have been printed in the distant city, despite bearing the same printer's mark.",
+      "the distant paper mill produced lower-quality paper than historians had believed."
+    ],
+    "answer": "C",
+    "explanation": "Only some copies use paper from a mill that supplied printers in the distant city, and printers bought paper locally. So those copies were probably printed there, even though they carry the first city's printer's mark. Choice C states this with appropriate caution.",
+    "rationales": {
+      "A": "Only one of the two mills is linked to the distant city, so the evidence points to some copies, not all of them.",
+      "B": "Nothing in the text suggests the marks were added later; that is an unsupported explanation.",
+      "D": "The scholar used the watermarks to trace where the paper came from, not to judge its quality."
+    },
+    "tags": ["logical-completion", "humanities"]
+  },
+  {
+    "id": "rw-ii-inference-0009",
+    "difficulty": 3,
+    "type": "mcq",
+    "passage": "A literary scholar notes that the novelist Henrike Vass wrote her first three novels in the first person, each narrated by a young woman recalling her childhood. Her fourth novel, by contrast, moves among the perspectives of six characters of different ages. Several early reviewers criticized the fourth novel as disorganized, but the scholar argues that its structure reflects the novel's central theme: that no single person can fully understand a community's history. If the scholar is correct, then ______",
+    "stem": "Which choice most logically completes the text?",
+    "choices": [
+      "Vass's first three novels were also about the histories of communities.",
+      "the shifting perspectives that some reviewers found disorganized were a deliberate choice that serves the novel's theme.",
+      "Vass stopped writing in the first person because reviewers had criticized her earlier novels.",
+      "the fourth novel is more disorganized than any of Vass's earlier novels."
+    ],
+    "answer": "B",
+    "explanation": "The scholar says the multiple perspectives \"reflect\" the theme that no one person can grasp a community's history. If so, the structure the reviewers disliked is purposeful, as Choice B says.",
+    "rationales": {
+      "A": "The text says the earlier novels recalled the narrators' childhoods; nothing says they concerned community histories.",
+      "C": "The text mentions criticism only of the fourth novel, which came after the first-person novels, so it can't explain the change.",
+      "D": "This accepts the reviewers' judgment, which is the view the scholar argues against."
+    },
+    "tags": ["logical-completion", "humanities"]
+  }
+]

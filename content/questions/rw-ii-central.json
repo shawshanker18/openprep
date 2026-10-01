@@ -1,0 +1,191 @@
+[
+  {
+    "id": "rw-ii-central-0001",
+    "difficulty": 1,
+    "type": "mcq",
+    "passage": "Sea otters spend a large part of each day grooming their fur. Unlike most marine mammals, otters lack a thick layer of blubber, so they rely on air trapped in their dense fur to stay warm in cold ocean water. Regular grooming fluffs the fur and keeps that insulating layer of air in place.",
+    "stem": "Which choice best states the main idea of the text?",
+    "choices": [
+      "Sea otters spend more time grooming than any other marine mammal does.",
+      "Sea otters groom often because their fur, rather than blubber, keeps them warm.",
+      "Most marine mammals have stopped relying on fur to stay warm.",
+      "Cold ocean water slowly damages the fur of sea otters."
+    ],
+    "answer": "B",
+    "explanation": "The text says otters lack blubber, depend on air trapped in their fur for warmth, and groom to keep that air layer intact. Choice B links the grooming to that purpose, which is the point of the whole text.",
+    "rationales": {
+      "A": "The text never compares how much time otters and other marine mammals spend grooming.",
+      "C": "The text says most marine mammals have blubber; it says nothing about them giving up fur.",
+      "D": "The text describes cold water as the reason otters need warmth, not as something that harms their fur."
+    },
+    "tags": ["main-idea", "informational-text"]
+  },
+  {
+    "id": "rw-ii-central-0002",
+    "difficulty": 1,
+    "type": "mcq",
+    "passage": "The following text is from a story. Marisol has recently moved to a small coastal town.\n\nEvery morning before school, Marisol walked to the end of the pier. She did not fish, and she did not talk to the old men who did. She simply stood with her hands in her coat pockets and watched the fog lift off the water, counting the boats as they appeared one by one.",
+    "stem": "According to the text, what does Marisol do at the end of the pier each morning?",
+    "choices": [
+      "She fishes alongside the old men.",
+      "She talks with the fishermen about their boats.",
+      "She waits for a friend to walk with her to school.",
+      "She watches the fog lift and counts the boats."
+    ],
+    "answer": "D",
+    "explanation": "The text states directly that Marisol \"watched the fog lift off the water, counting the boats as they appeared one by one.\" Choice D restates this detail.",
+    "rationales": {
+      "A": "The text says Marisol \"did not fish.\"",
+      "B": "The text says she \"did not talk to the old men\" who fished.",
+      "C": "No friend is mentioned; she stands on the pier alone."
+    },
+    "tags": ["detail", "literary-text"]
+  },
+  {
+    "id": "rw-ii-central-0003",
+    "difficulty": 1,
+    "type": "mcq",
+    "passage": "In the early 1800s, most towns in the United States kept their own local time, setting their clocks by the position of the sun. As railroads expanded, this patchwork of times made train schedules confusing, since each station along a route might keep a slightly different time. To solve the problem, railroad companies adopted a system of standard time zones in 1883.",
+    "stem": "Which choice best states the main idea of the text?",
+    "choices": [
+      "Railroad companies adopted standard time zones to end the confusion caused by many different local times.",
+      "Towns in the 1800s set their clocks according to railroad schedules.",
+      "Trains in the 1800s frequently arrived late because of poorly built tracks.",
+      "Local time based on the sun was more accurate than standard time."
+    ],
+    "answer": "A",
+    "explanation": "The text describes a problem (many local times confusing train schedules) and its solution (standard time zones). Choice A captures both the problem and the solution.",
+    "rationales": {
+      "B": "This reverses the text: towns set clocks by the sun, and railroads later created a shared standard.",
+      "C": "The text never mentions late trains or track quality.",
+      "D": "The text does not compare the accuracy of local and standard time."
+    },
+    "tags": ["main-idea", "informational-text"]
+  },
+  {
+    "id": "rw-ii-central-0004",
+    "difficulty": 2,
+    "type": "mcq",
+    "passage": "Choreographer Dana Ilves rehearses her dancers in an unusual way: before they learn any steps, she asks them to walk across the studio as they would on a crowded street, a quiet beach, or an icy sidewalk. Ilves argues that ordinary movements carry emotional information that audiences recognize instantly. By building her dances from these everyday gestures rather than from classical ballet positions, she aims to create works that feel familiar even to viewers who have never attended a dance performance.",
+    "stem": "Which choice best states the main idea of the text?",
+    "choices": [
+      "Ilves believes that classical ballet training is unnecessary for professional dancers.",
+      "Ilves's dancers find walking exercises more difficult than learning traditional steps.",
+      "Ilves builds her dances from everyday movements so that they will feel relatable to a broad audience.",
+      "Audiences who rarely attend dance performances prefer works based on classical ballet."
+    ],
+    "answer": "C",
+    "explanation": "The walking exercise is an example; the key claim is that Ilves builds dances from everyday gestures so that even people unfamiliar with dance will find them familiar. Choice C states that method and its purpose.",
+    "rationales": {
+      "A": "Ilves chooses not to build dances from ballet positions, but the text never says ballet training is unnecessary for dancers.",
+      "B": "The text never says how difficult the dancers find the exercises.",
+      "D": "The text suggests the opposite: Ilves thinks everyday gestures will appeal to such viewers."
+    },
+    "tags": ["main-idea", "informational-text"]
+  },
+  {
+    "id": "rw-ii-central-0005",
+    "difficulty": 2,
+    "type": "mcq",
+    "passage": "Researchers studying a population of desert lizards noticed that the lizards' tails varied greatly in length. To find out why, the team compared lizards from rocky hillsides with lizards from flat, sandy areas. Lizards from the hillsides had noticeably longer tails, which the researchers suggest help the animals keep their balance while leaping between rocks. On the flat sand, where lizards mostly run in straight lines, shorter tails appeared to be no disadvantage.",
+    "stem": "Based on the text, how do the lizards from flat, sandy areas differ from the lizards from rocky hillsides?",
+    "choices": [
+      "They have shorter tails, which do not seem to put them at a disadvantage in their habitat.",
+      "They have longer tails, which help them run in straight lines.",
+      "They leap between rocks less successfully because their tails are short.",
+      "Their tails vary more in length than the hillside lizards' tails do."
+    ],
+    "answer": "A",
+    "explanation": "Since the hillside lizards had \"noticeably longer tails,\" the sand lizards must have shorter ones, and the last sentence says shorter tails \"appeared to be no disadvantage\" on flat sand. Choice A combines these two details.",
+    "rationales": {
+      "B": "This mixes up the groups: the hillside lizards are the ones with longer tails.",
+      "C": "The sand lizards live on flat sand and mostly run; the text never describes them leaping between rocks.",
+      "D": "The text says tail length varied across the whole population, not that one group varied more than the other."
+    },
+    "tags": ["detail", "informational-text"]
+  },
+  {
+    "id": "rw-ii-central-0006",
+    "difficulty": 2,
+    "type": "mcq",
+    "passage": "The following text is from a story. Teodor, an elderly clockmaker, is showing his shop to a new apprentice.\n\nTeodor lifted a small brass clock from the shelf and turned it over in his hands. \"This one has not kept good time in forty years,\" he said. \"Customers offer to buy it, and I always refuse.\" He set it down gently by the window, where the light fell on its scratched face. \"My father made it for my mother the year they married. Some things we keep for what they remember, not for what they do.\"",
+    "stem": "Which choice best states the main idea of the text?",
+    "choices": [
+      "Teodor is frustrated that he has never been able to repair the brass clock.",
+      "Teodor wants the apprentice to learn how to repair old clocks.",
+      "Teodor believes that customers undervalue the clocks in his shop.",
+      "Teodor keeps the brass clock because of its meaning to his family, not because of its usefulness."
+    ],
+    "answer": "D",
+    "explanation": "Teodor admits the clock doesn't work, refuses to sell it, explains that his father made it for his mother, and says some things are kept \"for what they remember, not for what they do.\" Choice D summarizes this.",
+    "rationales": {
+      "A": "Teodor handles the clock gently and with affection; nothing suggests he has tried and failed to repair it.",
+      "B": "Teodor is showing the shop to the apprentice, but the scene focuses on why he keeps one clock, not on teaching repairs.",
+      "C": "Customers actually want to buy the clock; the text gives no sign that Teodor thinks they undervalue anything."
+    },
+    "tags": ["main-idea", "literary-text"]
+  },
+  {
+    "id": "rw-ii-central-0007",
+    "difficulty": 3,
+    "type": "mcq",
+    "passage": "For decades, ecologists assumed that lanternfish, small fish that live in the deep ocean, were a minor part of the ocean's food web because few of them were caught in research nets. A newer method, which estimates fish numbers by measuring how sound waves bounce off them, suggests that lanternfish may be far more abundant than net surveys indicated. Researchers using this method propose that lanternfish can sense approaching nets and swim away, so earlier surveys likely undercounted them.",
+    "stem": "Which choice best states the main idea of the text?",
+    "choices": [
+      "Lanternfish are the most abundant fish in the ocean.",
+      "A newer counting method suggests that lanternfish are more plentiful than net surveys showed, possibly because the fish avoid nets.",
+      "Research nets are no longer useful for studying fish that live in the deep ocean.",
+      "Ecologists have concluded that lanternfish play only a minor role in the ocean's food web."
+    ],
+    "answer": "B",
+    "explanation": "The text contrasts an old assumption (few lanternfish, based on nets) with a newer sound-based estimate (many more lanternfish) and offers a reason for the gap (fish escaping nets). Choice B includes the new finding and the proposed explanation without overstating either.",
+    "rationales": {
+      "A": "The text says lanternfish \"may be far more abundant\" than thought; it never ranks them against all other ocean fish.",
+      "C": "The text suggests nets undercount lanternfish, not that nets are useless for all deep-ocean fish.",
+      "D": "This is the older assumption that the newer findings call into question."
+    },
+    "tags": ["main-idea", "informational-text"]
+  },
+  {
+    "id": "rw-ii-central-0008",
+    "difficulty": 3,
+    "type": "mcq",
+    "passage": "In a study of nineteenth-century household account books from one rural region, a historian found that many entries recorded not only purchases but also trades: eggs exchanged for thread, a day of sewing exchanged for flour. The historian argues that these records reveal an economy in which money was only one of several ways families obtained goods. She cautions, however, that account books were kept mainly by households that could read and write, so they may not represent every family in the region.",
+    "stem": "Based on the text, what is the historian's view of the account books?",
+    "choices": [
+      "They show that families in the region rarely used money.",
+      "They are unreliable because many of their entries were recorded incorrectly.",
+      "They offer useful evidence about how families obtained goods, though they may not reflect every household.",
+      "They prove that families who could read and write traded more often than other families did."
+    ],
+    "answer": "C",
+    "explanation": "The historian uses the books as evidence that money was one of several ways to get goods, then adds a limitation: the books come mainly from literate households. Choice C captures both the value and the limitation.",
+    "rationales": {
+      "A": "The historian says money was \"only one of several ways,\" not that it was rarely used; this overstates her claim.",
+      "B": "Her caution is about which families kept the books, not about the accuracy of the entries.",
+      "D": "The text does not compare how often literate and non-literate families traded."
+    },
+    "tags": ["detail", "informational-text"]
+  },
+  {
+    "id": "rw-ii-central-0009",
+    "difficulty": 3,
+    "type": "mcq",
+    "passage": "The following text is from a story. Ines has returned to her childhood home after many years away.\n\nThe kitchen was smaller than Ines remembered, and the yellow paint she had loved as a child had faded to the color of weak tea. Yet when she opened the drawer beside the stove, the same wooden spoons lay inside, arranged exactly as her grandmother had always kept them, largest to smallest. Ines stood there for a long moment, her hand resting on the drawer's edge, before she closed it softly.",
+    "stem": "Which choice best states the main idea of the text?",
+    "choices": [
+      "Although parts of the kitchen have changed, Ines is moved to find something that has stayed exactly the same.",
+      "Ines is disappointed that the kitchen no longer matches her memories of it.",
+      "Ines decides to repaint the kitchen the yellow color she loved as a child.",
+      "Ines realizes that her grandmother kept the kitchen poorly organized."
+    ],
+    "answer": "A",
+    "explanation": "The first sentence notes changes (smaller room, faded paint), but \"Yet\" turns to the unchanged spoons, and Ines's long pause and soft closing of the drawer show she is moved. Choice A covers both halves of the text.",
+    "rationales": {
+      "B": "This describes only the first sentence and ignores the turn at \"Yet,\" which is where the scene's emphasis falls.",
+      "C": "Ines notices the faded paint, but nothing suggests she plans to repaint.",
+      "D": "The spoons are arranged neatly from largest to smallest, which suggests careful organization."
+    },
+    "tags": ["main-idea", "literary-text"]
+  }
+]

@@ -1,0 +1,146 @@
+[
+  {
+    "id": "rw-sec-boundaries-0001",
+    "difficulty": 1,
+    "type": "mcq",
+    "passage": "The first public zoo in the city of Brennan opened in 1891 with only a few dozen ______ it houses more than two thousand animals representing nearly four hundred species from six continents.",
+    "stem": "Which choice completes the text so that it conforms to the conventions of Standard English?",
+    "choices": ["animals, today,", "animals today,", "animals; today,", "animals, today"],
+    "answer": "C",
+    "explanation": "\"The first public zoo ... opened in 1891 with only a few dozen animals\" and \"today, it houses more than two thousand animals\" are both independent clauses. A semicolon correctly joins them, and the comma after \"today\" sets off the introductory word.",
+    "rationales": {
+      "A": "A comma alone can't join two independent clauses; this creates a comma splice.",
+      "B": "With no punctuation between the clauses, this creates a run-on sentence.",
+      "D": "This is still a comma splice: only a comma separates the two independent clauses."
+    },
+    "tags": ["sentence-joining", "semicolon"]
+  },
+  {
+    "id": "rw-sec-boundaries-0002",
+    "difficulty": 1,
+    "type": "mcq",
+    "passage": "To make the village's traditional bread, bakers use just three simple ______ flour, water, and a sourdough starter that some families have kept alive for several generations.",
+    "stem": "Which choice completes the text so that it conforms to the conventions of Standard English?",
+    "choices": ["ingredients:", "ingredients;", "ingredients, such as:", "ingredients"],
+    "answer": "A",
+    "explanation": "The first part is a complete sentence (\"bakers use just three simple ingredients\"), and what follows is a list naming those ingredients. A colon is the correct way to introduce such a list.",
+    "rationales": {
+      "B": "A semicolon must join two independent clauses, but the list that follows is not an independent clause.",
+      "C": "A colon can't follow \"such as,\" because \"such as\" already introduces the list; the colon interrupts the phrase.",
+      "D": "With no punctuation, the list runs into the sentence and is not set off from \"ingredients.\""
+    },
+    "tags": ["colon", "list"]
+  },
+  {
+    "id": "rw-sec-boundaries-0003",
+    "difficulty": 1,
+    "type": "mcq",
+    "passage": "The museum's newest exhibit features pottery from several ancient trading ______ of the pieces were recovered by divers exploring a sunken merchant ship off the island's northern coast.",
+    "stem": "Which choice completes the text so that it conforms to the conventions of Standard English?",
+    "choices": ["cities, many", "cities. Many", "cities many", "cities, and, many"],
+    "answer": "B",
+    "explanation": "\"The museum's newest exhibit features pottery from several ancient trading cities\" and \"Many of the pieces were recovered ...\" are both independent clauses. A period correctly separates them into two sentences.",
+    "rationales": {
+      "A": "A comma alone between two independent clauses creates a comma splice.",
+      "C": "With no punctuation, the two independent clauses run together.",
+      "D": "\"And\" could join the clauses, but the comma after \"and\" is incorrect; no punctuation belongs between the conjunction and the clause it introduces."
+    },
+    "tags": ["sentence-joining", "end-punctuation"]
+  },
+  {
+    "id": "rw-sec-boundaries-0004",
+    "difficulty": 2,
+    "type": "mcq",
+    "passage": "Tamsin Hale, a marine biologist who has studied coral reefs for two ______ spends several months each year diving off the coast of northern Australia to measure how quickly damaged reefs recover.",
+    "stem": "Which choice completes the text so that it conforms to the conventions of Standard English?",
+    "choices": ["decades;", "decades", "decades—", "decades,"],
+    "answer": "D",
+    "explanation": "The phrase \"a marine biologist who has studied coral reefs for two decades\" is extra information about Tamsin Hale. It opens with a comma, so it must close with a comma before the main verb \"spends.\"",
+    "rationales": {
+      "A": "A semicolon would separate the subject \"Tamsin Hale\" from its verb \"spends,\" leaving neither side a complete clause.",
+      "B": "Without a closing comma, the nonessential phrase isn't properly set off from the rest of the sentence.",
+      "C": "The phrase opens with a comma, so it must close with a comma; mixing a comma and a dash is incorrect."
+    },
+    "tags": ["nonessential-element", "comma-usage"]
+  },
+  {
+    "id": "rw-sec-boundaries-0005",
+    "difficulty": 2,
+    "type": "mcq",
+    "passage": "Many early telephones were sold in pairs, since there was not yet a network that could connect one telephone to many ______ a customer who wanted to talk between a home and a shop would buy two telephones and string a wire between them.",
+    "stem": "Which choice completes the text so that it conforms to the conventions of Standard English?",
+    "choices": ["others, for example,", "others, for example", "others; for example,", "others for example,"],
+    "answer": "C",
+    "explanation": "The text has two independent clauses: the first ends with \"many others,\" and the second begins with \"a customer ... would buy.\" A semicolon joins them, and \"for example,\" with a following comma, introduces the second clause.",
+    "rationales": {
+      "A": "Commas alone can't join two independent clauses, so this is a comma splice, even with \"for example\" between them.",
+      "B": "This is a comma splice, and \"for example\" is also left without the comma that should follow it.",
+      "D": "With no punctuation before \"for example,\" the two independent clauses run together."
+    },
+    "tags": ["sentence-joining", "semicolon"]
+  },
+  {
+    "id": "rw-sec-boundaries-0006",
+    "difficulty": 2,
+    "type": "mcq",
+    "passage": "The recipe that the chef's grandmother wrote on the back of an old envelope more than fifty years ago ______ the restaurant's most popular dessert: a lemon cake topped with candied ginger.",
+    "stem": "Which choice completes the text so that it conforms to the conventions of Standard English?",
+    "choices": ["became", "became,", "became:", ", became"],
+    "answer": "A",
+    "explanation": "The long subject (\"The recipe that ... fifty years ago\") is followed by its verb \"became\" and then by what it became, \"the restaurant's most popular dessert.\" No punctuation belongs between a subject and its verb or between a verb and its complement.",
+    "rationales": {
+      "B": "A comma after \"became\" incorrectly separates the verb from its complement.",
+      "C": "A colon can't come between a verb and its complement; colons follow complete clauses.",
+      "D": "A comma before \"became\" incorrectly separates the subject from its verb, a common mistake when the subject is long."
+    },
+    "tags": ["unnecessary-punctuation", "comma-usage"]
+  },
+  {
+    "id": "rw-sec-boundaries-0007",
+    "difficulty": 3,
+    "type": "mcq",
+    "passage": "Although the bridge's original wooden planks were replaced with steel decades ______ railings, carved by local craftspeople in the 1880s, remain in place and continue to draw visitors from across the region.",
+    "stem": "Which choice completes the text so that it conforms to the conventions of Standard English?",
+    "choices": ["ago; the", "ago, the", "ago. The", "ago: the"],
+    "answer": "B",
+    "explanation": "\"Although the bridge's original wooden planks were replaced with steel decades ago\" is a dependent clause; it can't stand alone. It must be joined to the main clause (\"the railings ... remain in place\") with a comma.",
+    "rationales": {
+      "A": "A semicolon must join two independent clauses, but the \"Although\" clause is dependent.",
+      "C": "A period would leave the \"Although\" clause as a sentence fragment.",
+      "D": "A colon must follow an independent clause, but the \"Although\" clause is dependent."
+    },
+    "tags": ["subordinate-clause", "sentence-joining"]
+  },
+  {
+    "id": "rw-sec-boundaries-0008",
+    "difficulty": 3,
+    "type": "mcq",
+    "passage": "The festival's lineup features three acts from abroad: a string quartet from Vienna, ______ a jazz trio from Montreal, Canada; and a folk singer from Lagos, Nigeria.",
+    "stem": "Which choice completes the text so that it conforms to the conventions of Standard English?",
+    "choices": ["Austria,", "Austria:", "Austria—", "Austria;"],
+    "answer": "D",
+    "explanation": "Each list item already contains a comma (\"Vienna, Austria\"; \"Montreal, Canada\"), so the items must be separated by semicolons, as the rest of the list does after \"Canada.\" A semicolon after \"Austria\" keeps the list consistent and clear.",
+    "rationales": {
+      "A": "A comma here would make it unclear where one item ends and the next begins, and it doesn't match the semicolon used after \"Canada.\"",
+      "B": "A colon would introduce a new list in the middle of the existing one.",
+      "C": "A dash doesn't separate list items and doesn't match the semicolon used after \"Canada.\""
+    },
+    "tags": ["semicolon", "list"]
+  },
+  {
+    "id": "rw-sec-boundaries-0009",
+    "difficulty": 3,
+    "type": "mcq",
+    "passage": "After months of negotiation, the two neighboring towns agreed to share the cost of a new water treatment ______ will serve more than forty thousand residents when it opens next year.",
+    "stem": "Which choice completes the text so that it conforms to the conventions of Standard English?",
+    "choices": ["plant; which", "plant. Which", "plant, which", "plant: which"],
+    "answer": "C",
+    "explanation": "\"Which will serve more than forty thousand residents ...\" is a relative clause that adds information about the plant; it can't stand alone. A comma correctly attaches it to the main clause.",
+    "rationales": {
+      "A": "A semicolon must be followed by an independent clause, but the \"which\" clause is dependent.",
+      "B": "A period would turn the \"which\" clause into a sentence fragment.",
+      "D": "A colon must be followed by an explanation or list, not a dependent relative clause that modifies \"plant.\""
+    },
+    "tags": ["nonessential-element", "subordinate-clause"]
+  }
+]
