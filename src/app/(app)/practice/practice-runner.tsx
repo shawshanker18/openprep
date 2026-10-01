@@ -71,9 +71,14 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block, set }:
   const shownAt = useRef(0);
   const hiddenMs = useRef(0);
   const hiddenSince = useRef<number | null>(null);
+  const similarTo = useRef<string | null>(null); // skill of a just-missed question → next pick is a similar one
 
   const load = useCallback((exclude: string[]) => start(async () => {
-    const res = await nextQuestion({ mode, skillId, difficulty, exclude, skillIds: set?.skillIds, tags: set?.tags, timing: set?.timing });
+    const sim = similarTo.current;
+    similarTo.current = null;
+    const res = await nextQuestion(sim
+      ? { mode: "skill", skillId: sim, exclude }
+      : { mode, skillId, difficulty, exclude, skillIds: set?.skillIds, tags: set?.tags, timing: set?.timing });
     if (!res.ok) { toast.error(res.error); return; }
     if ("done" in res.data) dispatch({ type: "done" });
     else { dispatch({ type: "loaded", q: res.data.question, limitS: res.data.timeLimitS }); shownAt.current = performance.now(); hiddenMs.current = 0; }
@@ -226,6 +231,9 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block, set }:
           )}
           <div className="flex flex-wrap gap-2">
             <Button size="lg" onClick={next}>{set && s.answered >= set.count ? "See summary" : "Next"}</Button>
+            {!r.correct && !(set && s.answered >= set.count) && (
+              <Button size="lg" variant="outline" onClick={() => { similarTo.current = s.q.skillId; next(); }}>Try a similar question</Button>
+            )}
             <TutorPanel questionId={s.q.id} answered isMath={s.q.section === "math"} wrongChoice={!r.correct && s.q.type === "mcq" ? s.value : null} />
           </div>
         </div>
