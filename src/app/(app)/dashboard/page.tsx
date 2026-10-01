@@ -43,7 +43,7 @@ export default async function DashboardPage() {
 
   const cards: Record<DashboardCardId, React.ReactNode> = {
     score: (
-      <Card key="score" title="Your score" className="md:col-span-2">
+      <Card key="score" title="Your score" className="lg:col-span-2">
         <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1">
           <p className="text-3xl font-semibold tabular-nums">Estimated {d.estimate.lo}–{d.estimate.hi}</p>
           {profile.targetScore && <p className="text-muted-foreground">Target {profile.targetScore}</p>}
@@ -54,7 +54,7 @@ export default async function DashboardPage() {
       </Card>
     ),
     countdown: (
-      <Card key="countdown" title="SAT countdown" className="md:col-span-2">
+      <Card key="countdown" title="SAT countdown" className="lg:col-span-2">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             {testDay
@@ -128,12 +128,12 @@ export default async function DashboardPage() {
 
   const layout = dashboardLayout(profile);
   // Custom layout: cards in the chosen order on the two-column grid (score and countdown stay full width).
-  if (layout) return <div className="flex flex-col gap-6">{header}<div className="grid gap-4 md:grid-cols-2">{layout.filter((c) => c.visible).map((c) => cards[c.id])}</div></div>;
+  if (layout) return <div className="flex flex-col gap-6">{header}<div className="grid gap-4 lg:grid-cols-2">{layout.filter((c) => c.visible).map((c) => cards[c.id])}</div></div>;
 
   return (
     <div className="flex flex-col gap-6">
     {header}
-    <div className="grid gap-4 md:grid-cols-2">
+    <div className="grid gap-4 lg:grid-cols-2">
       {cards.countdown}
       {cards.today}
       <div className="flex flex-col gap-4">
