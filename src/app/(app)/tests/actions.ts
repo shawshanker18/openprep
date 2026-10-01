@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { SKILL_BY_ID } from "@/content/taxonomy";
-import { requireUser } from "@/server/auth";
+import { diagnosticPending, requireUser } from "@/server/auth";
 import { ensureWeeklyFocus } from "@/server/plan";
 import { startTest } from "@/server/tests";
 
@@ -19,6 +19,7 @@ const Start = z.discriminatedUnion("kind", [
 
 export async function startTestAction(form: FormData) {
   const { userId, profile } = await requireUser();
+  if (diagnosticPending(profile)) redirect("/dashboard");
   const raw = Object.fromEntries(form);
   const p = Start.safeParse({ ...raw, skillIds: form.getAll("skillIds"), timed: form.get("timed") === "on" });
   if (!p.success) redirect("/tests?error=invalid");

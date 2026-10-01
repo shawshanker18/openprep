@@ -21,3 +21,6 @@ export const MOCK_HALF_WIDTH = 30;
 export const MAX_ATTEMPT_MS = 10 * 60_000;
 export const DIAGNOSTIC_PER_DOMAIN = 3;
 export const AI_INPUT_MAX_CHARS = 1000;
+// ponytail: rough planning assumption for the "ready by" month; recalibrate from real score gains (spec 05 §8).
+export const POINTS_PER_STUDY_HOUR = 4;
+export const READY_BUFFER_WEEKS = 2; // time to sit a final full mock before test day

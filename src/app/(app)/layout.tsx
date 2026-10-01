@@ -13,7 +13,7 @@ const NAV = [
 
 export default async function AppLayout({ children }: LayoutProps<"/">) {
   const { profile } = await requireUser();
-  if (profile.onboardingStep !== "done") redirect("/onboarding");
+  if (profile.onboardingStep !== "done" && profile.onboardingStep !== "diagnostic_skipped") redirect("/onboarding");
 
   return (
     <div className="flex flex-1 flex-col md:flex-row">

@@ -1,5 +1,5 @@
 // Daily plan: generated once per local day, never rearranged (spec 03 §10).
-import { TARGET_SECONDS } from "./constants";
+import { POINTS_PER_STUDY_HOUR, READY_BUFFER_WEEKS, TARGET_SECONDS } from "./constants";
 
 export type PlanBlock =
   | { kind: "review"; minutes: number; done: boolean }
@@ -63,4 +63,16 @@ export const dayOfWeekIndex = (day: string) => (new Date(`${day}T00:00:00Z`).get
 export function paceCheck(estimateTotal: number, targetTotal: number, daysLeft: number): "stretch" | "ok" {
   const weeks = Math.max(1, daysLeft / 7);
   return (targetTotal - estimateTotal) / weeks > 25 ? "stretch" : "ok";
+}
+
+/**
+ * When the student is predicted to reach their target at their current study budget.
+ * weeks = ceil(points needed / (study hours per week × POINTS_PER_STUDY_HOUR)) + buffer. null = more than two years away.
+ */
+export function readyBy(x: { estimate: number; target: number; minutesPerDay: number; daysPerWeek: number; now: Date }) {
+  const gap = x.target - x.estimate;
+  const perWeek = ((x.minutesPerDay * x.daysPerWeek) / 60) * POINTS_PER_STUDY_HOUR;
+  const weeks = gap <= 0 ? READY_BUFFER_WEEKS : perWeek > 0 ? Math.ceil(gap / perWeek) + READY_BUFFER_WEEKS : Infinity;
+  if (weeks > 104) return null;
+  return { weeks, date: new Date(x.now.getTime() + weeks * 7 * 86_400_000) };
 }

@@ -5,7 +5,7 @@ import { z } from "zod";
 import { db } from "@/db";
 import { attempts, bookmarks, questionReports, questions } from "@/db/schema";
 import { MISTAKE_TYPES } from "@/engine/mistakes";
-import { requireUser } from "@/server/auth";
+import { diagnosticPending, requireUser } from "@/server/auth";
 import { nextQuestion as next, submitAnswer as submit } from "@/server/practice";
 
 const id = z.string().min(1).max(64);
@@ -18,6 +18,7 @@ const Next = z.object({
 });
 export async function nextQuestion(input: z.input<typeof Next>) {
   const { userId, profile } = await requireUser();
+  if (diagnosticPending(profile)) return { ok: false as const, error: "Take the diagnostic first." };
   const p = Next.safeParse(input);
   if (!p.success) return { ok: false as const, error: "Invalid request." };
   const r = await next(userId, profile, p.data);
@@ -31,7 +32,8 @@ const Submit = z.object({
   confidence: z.union([z.literal(1), z.literal(2), z.literal(3)]),
 });
 export async function submitAnswer(input: z.input<typeof Submit>) {
-  const { userId } = await requireUser();
+  const { userId, profile } = await requireUser();
+  if (diagnosticPending(profile)) return { ok: false as const, error: "Take the diagnostic first." };
   const p = Submit.safeParse(input);
   if (!p.success) return { ok: false as const, error: "Invalid answer." };
   const r = await submit(userId, { ...p.data, timeMs: Math.max(1000, p.data.timeMs) });

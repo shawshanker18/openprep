@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { requireUser } from "@/server/auth";
-import { beginDiagnostic } from "./actions";
+import { beginDiagnostic, skipDiagnostic } from "./actions";
 import { SelfAssessment } from "./self-assessment";
 import { SurveyForm } from "./survey-form";
 
@@ -10,7 +10,7 @@ const STEPS = { survey: 1, self: 2, diagnostic: 3 } as const;
 export default async function OnboardingPage() {
   const { profile } = await requireUser();
   if (profile.onboardingStep === "done") redirect("/dashboard");
-  const step = profile.onboardingStep as keyof typeof STEPS;
+  const step = (profile.onboardingStep === "diagnostic_skipped" ? "diagnostic" : profile.onboardingStep) as keyof typeof STEPS;
 
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-10">
@@ -29,9 +29,17 @@ export default async function OnboardingPage() {
       </div>
       {step === "survey" && <SurveyForm />}
       {step === "self" && <SelfAssessment />}
-      {step === "diagnostic" && (
-        <form action={beginDiagnostic}><Button size="lg" type="submit">Start the diagnostic</Button></form>
-      )}
+      {step === "diagnostic" && (<>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <form action={beginDiagnostic}><Button size="lg" type="submit">Start the diagnostic</Button></form>
+          {profile.onboardingStep === "diagnostic" && (
+            <form action={skipDiagnostic}><Button size="lg" variant="outline" type="submit">Skip for now</Button></form>
+          )}
+        </div>
+        {profile.onboardingStep === "diagnostic" && (
+          <p className="text-sm text-muted-foreground">You can look around first, but practice, tests and your plan unlock only after the diagnostic.</p>
+        )}
+      </>)}
     </main>
   );
 }
