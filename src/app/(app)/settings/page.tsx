@@ -18,6 +18,7 @@ const ERRORS: Record<string, string> = {
   profile: "Please check your profile and try again.",
   dashboard: "Couldn't save the dashboard layout — please try again.",
   score: "Scores must be 200–800 in steps of 10, with a date.",
+  scores: "That's the maximum of 20 official scores — remove one to add another.",
   retake: "You can retake the diagnostic once every 30 days.",
   delete: "Type DELETE in capitals to confirm.",
 };

@@ -83,6 +83,8 @@ export async function addOfficialScore(form: FormData) {
   const { userId } = await requireUser();
   const p = z.object({ takenOn: z.iso.date(), math: score, rw: score }).safeParse(Object.fromEntries(form));
   if (!p.success) redirect("/settings?error=score");
+  const [{ n }] = (await db.select({ n: sql<number>`count(*)::int` }).from(satAttempts).where(eq(satAttempts.userId, userId))) as [{ n: number }];
+  if (n >= 20) redirect("/settings?error=scores");
   await db.insert(satAttempts).values({ userId, ...p.data });
   revalidatePath("/settings");
 }
