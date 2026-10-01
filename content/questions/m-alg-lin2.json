@@ -1,0 +1,138 @@
+[
+  {
+    "id": "m-alg-lin2-0001",
+    "difficulty": 1,
+    "type": "mcq",
+    "stem": "What is the slope of the graph of $3x + 4y = 24$ in the $xy$-plane?",
+    "choices": ["$-\\frac{4}{3}$", "$-\\frac{3}{4}$", "$\\frac{3}{4}$", "$6$"],
+    "answer": "B",
+    "explanation": "Solve for $y$: $4y = -3x + 24$, so $y = -\\frac{3}{4}x + 6$. The slope is the coefficient of $x$: $-\\frac{3}{4}$.",
+    "rationales": {
+      "A": "This divides the coefficients in the wrong order, computing $-\\frac{4}{3}$ instead of $-\\frac{3}{4}$.",
+      "C": "This loses the negative sign when moving $3x$ to the other side.",
+      "D": "This is the $y$-intercept, $\\frac{24}{4}$, not the slope."
+    },
+    "tags": ["slope-intercept", "standard-form"]
+  },
+  {
+    "id": "m-alg-lin2-0002",
+    "difficulty": 1,
+    "type": "mcq",
+    "stem": "A bakery sells muffins for \\$3 each and scones for \\$4 each. On Monday, the bakery's sales of muffins and scones totaled \\$96. Which equation represents this situation, where $m$ is the number of muffins sold and $s$ is the number of scones sold?",
+    "choices": ["$3m + 4s = 96$", "$4m + 3s = 96$", "$m + s = 96$", "$\\frac{m}{3} + \\frac{s}{4} = 96$"],
+    "answer": "A",
+    "explanation": "Muffin sales are $3m$ dollars and scone sales are $4s$ dollars. Together they total \\$96: $3m + 4s = 96$.",
+    "rationales": {
+      "B": "This pairs each price with the wrong item.",
+      "C": "This sets the number of items equal to the dollar total and ignores the prices.",
+      "D": "This divides by the prices instead of multiplying by them."
+    },
+    "tags": ["modeling", "standard-form"]
+  },
+  {
+    "id": "m-alg-lin2-0003",
+    "difficulty": 1,
+    "type": "spr",
+    "stem": "The point $(k, 5)$ lies on the line $y = 2x - 7$. What is the value of $k$?",
+    "answer": ["6"],
+    "explanation": "Substitute $x = k$ and $y = 5$: $5 = 2k - 7$. Add $7$: $12 = 2k$, so $k = 6$.",
+    "tags": ["slope-intercept"]
+  },
+  {
+    "id": "m-alg-lin2-0004",
+    "difficulty": 2,
+    "type": "mcq",
+    "stem": "A line in the $xy$-plane has slope $\\frac{4}{3}$ and passes through the point $(-3, 2)$. Which of the following is an equation of the line?",
+    "choices": ["$y = \\frac{4}{3}x - 2$", "$y = \\frac{4}{3}x + 2$", "$y = \\frac{3}{4}x + \\frac{17}{4}$", "$y = \\frac{4}{3}x + 6$"],
+    "answer": "D",
+    "explanation": "Write $y = \\frac{4}{3}x + b$ and substitute the point: $2 = \\frac{4}{3}(-3) + b = -4 + b$, so $b = 6$. The equation is $y = \\frac{4}{3}x + 6$.",
+    "rationales": {
+      "A": "This has a sign error when solving for $b$: from $2 = -4 + b$ it subtracts $4$ instead of adding.",
+      "B": "This uses the $y$-coordinate of the given point as the $y$-intercept.",
+      "C": "This inverts the slope to $\\frac{3}{4}$ before finding $b$."
+    },
+    "tags": ["slope-intercept"]
+  },
+  {
+    "id": "m-alg-lin2-0005",
+    "difficulty": 2,
+    "type": "mcq",
+    "stem": "A student has a \\$150 gift card to spend on notebooks that cost \\$6 each and pens that cost \\$2 each. The equation $6n + 2p = 150$ represents spending the full amount on $n$ notebooks and $p$ pens. If the equation is graphed with $n$ on the horizontal axis, what is the $n$-intercept and what does it represent?",
+    "choices": [
+      "$75$; the number of notebooks bought if no pens are bought",
+      "$6$; the cost of one notebook",
+      "$25$; the number of notebooks bought if no pens are bought",
+      "$75$; the number of pens bought if no notebooks are bought"
+    ],
+    "answer": "C",
+    "explanation": "The $n$-intercept is where $p = 0$: $6n = 150$, so $n = 25$. With no pens bought, the whole \\$150 buys $25$ notebooks.",
+    "rationales": {
+      "A": "This divides \\$150 by the pen price, \\$2, instead of the notebook price.",
+      "B": "This is the coefficient of $n$, not an intercept.",
+      "D": "This describes the $p$-intercept, $(0, 75)$, not the $n$-intercept."
+    },
+    "tags": ["intercepts", "modeling"]
+  },
+  {
+    "id": "m-alg-lin2-0006",
+    "difficulty": 2,
+    "type": "mcq",
+    "stem": "The graph of $5x - 2y = 30$ crosses the $y$-axis at the point $(0, b)$. What is the value of $b$?",
+    "choices": ["$-15$", "$6$", "$15$", "$30$"],
+    "answer": "A",
+    "explanation": "On the $y$-axis, $x = 0$. Substitute: $-2y = 30$, so $y = -15$. Thus $b = -15$.",
+    "rationales": {
+      "B": "This is the $x$-intercept: setting $y = 0$ gives $5x = 30$, so $x = 6$.",
+      "C": "This drops the negative sign on the $-2y$ term.",
+      "D": "This sets $x = 0$ but forgets to divide by the coefficient of $y$."
+    },
+    "desmos": {
+      "expressions": ["5x-2y=30"],
+      "steps": "Type the equation as written. Click where the line crosses the $y$-axis: $(0, -15)$."
+    },
+    "tags": ["intercepts", "standard-form", "desmos"]
+  },
+  {
+    "id": "m-alg-lin2-0007",
+    "difficulty": 3,
+    "type": "mcq",
+    "stem": "In the $xy$-plane, the graph of $2x + ky = 18$, where $k$ is a constant, passes through the point $(3, 4)$. What is the $y$-coordinate of the $y$-intercept of the graph?",
+    "choices": ["$-6$", "$3$", "$6$", "$9$"],
+    "answer": "C",
+    "explanation": "Substitute $(3, 4)$: $2(3) + 4k = 18$, so $4k = 12$ and $k = 3$. The equation is $2x + 3y = 18$. At the $y$-intercept, $x = 0$: $3y = 18$, so $y = 6$.",
+    "rationales": {
+      "A": "This makes a sign error solving $6 + 4k = 18$, getting $k = -3$ and then $-3y = 18$.",
+      "B": "This is the value of $k$, not the $y$-intercept.",
+      "D": "This is the $x$-intercept: with $y = 0$, $2x = 18$ gives $x = 9$."
+    },
+    "tags": ["intercepts", "standard-form"]
+  },
+  {
+    "id": "m-alg-lin2-0008",
+    "difficulty": 3,
+    "type": "spr",
+    "stem": "A caterer spends exactly \\$540 on chicken that costs \\$4.50 per pound and beef that costs \\$7.20 per pound. If the caterer buys $48$ pounds of chicken, how many pounds of beef does the caterer buy?",
+    "answer": ["45"],
+    "explanation": "Let $c$ be pounds of chicken and $b$ pounds of beef: $4.50c + 7.20b = 540$. With $c = 48$: $4.50(48) = 216$, so $7.20b = 540 - 216 = 324$ and $b = \\frac{324}{7.20} = 45$.",
+    "desmos": {
+      "expressions": ["4.5x+7.2y=540", "x=48"],
+      "steps": "Graph the cost equation with $x$ as pounds of chicken and the line $x = 48$. They intersect at $(48, 45)$, so the caterer buys $45$ pounds of beef."
+    },
+    "tags": ["modeling", "desmos"]
+  },
+  {
+    "id": "m-alg-lin2-0009",
+    "difficulty": 3,
+    "type": "mcq",
+    "stem": "Line $q$ in the $xy$-plane is perpendicular to the graph of $2x - 5y = 10$ and passes through the point $(4, 1)$. What is the $y$-coordinate of the $y$-intercept of line $q$?",
+    "choices": ["$-9$", "$-\\frac{3}{5}$", "$\\frac{13}{5}$", "$11$"],
+    "answer": "D",
+    "explanation": "Rewrite the given line: $y = \\frac{2}{5}x - 2$, so its slope is $\\frac{2}{5}$. A perpendicular line has slope $-\\frac{5}{2}$ (the negative reciprocal). Using $(4, 1)$: $1 = -\\frac{5}{2}(4) + b = -10 + b$, so $b = 11$.",
+    "rationales": {
+      "A": "This uses $\\frac{5}{2}$, the reciprocal without the sign change: $1 = 10 + b$.",
+      "B": "This uses the parallel slope $\\frac{2}{5}$: $1 = \\frac{8}{5} + b$.",
+      "C": "This uses $-\\frac{2}{5}$, changing the sign without taking the reciprocal: $1 = -\\frac{8}{5} + b$."
+    },
+    "tags": ["parallel-perpendicular", "slope-intercept"]
+  }
+]

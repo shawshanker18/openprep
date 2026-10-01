@@ -1,0 +1,149 @@
+[
+  {
+    "id": "m-psda-claims-0001",
+    "difficulty": 1,
+    "type": "mcq",
+    "stem": "A researcher surveyed $500$ voters selected at random from the list of all registered voters in a city. To which group can the results of the survey most appropriately be generalized?",
+    "choices": [
+      "All registered voters in the city",
+      "All registered voters in the country",
+      "Only the $500$ voters who were surveyed",
+      "All residents of the city, including those who are not registered voters"
+    ],
+    "answer": "A",
+    "explanation": "Results from a random sample can be generalized to the population the sample was drawn from. The sample was drawn at random from all registered voters in the city.",
+    "rationales": {
+      "B": "Voters outside the city had no chance of being selected, so the sample does not represent them.",
+      "C": "Because the sample was random, the results can be extended beyond the people surveyed to the population they were drawn from.",
+      "D": "Residents who are not registered voters were not part of the population sampled."
+    },
+    "tags": ["generalization"]
+  },
+  {
+    "id": "m-psda-claims-0002",
+    "difficulty": 1,
+    "type": "mcq",
+    "stem": "An observational study of high school students found that students who eat breakfast every day tend to have higher test scores than students who do not. Which conclusion is best supported by the study?",
+    "choices": [
+      "Eating breakfast every day causes students to earn higher test scores.",
+      "Among the students studied, eating breakfast every day is associated with higher test scores.",
+      "Requiring students to eat breakfast would raise their test scores.",
+      "Skipping breakfast causes students to earn lower test scores."
+    ],
+    "answer": "B",
+    "explanation": "In an observational study, researchers do not assign the treatment, so other differences between the groups could explain the result. The study supports an association, not cause and effect.",
+    "rationales": {
+      "A": "An observational study cannot show cause and effect; students who eat breakfast may differ in other ways.",
+      "C": "This claims a causal effect from an intervention that the study never tested.",
+      "D": "This is still a cause-and-effect claim, which an observational study cannot support."
+    },
+    "tags": ["causation"]
+  },
+  {
+    "id": "m-psda-claims-0003",
+    "difficulty": 1,
+    "type": "spr",
+    "stem": "In an experiment, $60$ tomato plants were randomly assigned to receive a new fertilizer and $60$ were randomly assigned to receive no fertilizer. The mean growth was $14.8$ centimeters for the fertilizer group and $11.3$ centimeters for the other group. How many centimeters greater was the mean growth of the fertilizer group?",
+    "answer": ["3.5"],
+    "explanation": "Subtract the means: $14.8 - 11.3 = 3.5$ centimeters.",
+    "tags": ["experimental-design"]
+  },
+  {
+    "id": "m-psda-claims-0004",
+    "difficulty": 2,
+    "type": "mcq",
+    "stem": "A teacher wants to test whether using a new vocabulary app improves students' vocabulary scores. Which study design would best allow the teacher to conclude that the app causes an improvement?",
+    "choices": [
+      "Let students decide whether to use the app, then compare the scores of users and non-users.",
+      "Give the app to all students this year and compare their scores with last year's students.",
+      "Randomly assign students from a large group to either use the app or not, then compare the two groups' scores.",
+      "Survey students who already use the app about whether their scores have improved."
+    ],
+    "answer": "C",
+    "explanation": "Random assignment makes the two groups similar in every way except app use, on average. A difference in their scores can then be attributed to the app.",
+    "rationales": {
+      "A": "Students who choose the app may already be more motivated, so the groups differ in more than app use.",
+      "B": "This year's and last year's students may differ in many ways, such as ability or teaching, so the comparison is not controlled.",
+      "D": "Self-reported improvement from current users has no comparison group and may be biased."
+    },
+    "tags": ["experimental-design", "causation"]
+  },
+  {
+    "id": "m-psda-claims-0005",
+    "difficulty": 2,
+    "type": "mcq",
+    "stem": "A researcher selected $200$ adults at random from the members of a city's gyms. Half were randomly assigned to follow a high-protein diet and half to follow their usual diet. After $12$ weeks, the high-protein group had gained significantly more muscle. Which conclusion is most appropriate?",
+    "choices": [
+      "A high-protein diet causes greater muscle gain for adults in the city.",
+      "A high-protein diet causes greater muscle gain for adults in the country.",
+      "No conclusion about cause and effect can be drawn because only $200$ adults were studied.",
+      "A high-protein diet likely causes greater muscle gain for members of the city's gyms."
+    ],
+    "answer": "D",
+    "explanation": "Random assignment to diets supports a cause-and-effect conclusion. Random selection from the city's gym members allows that conclusion to be generalized to that population, but not beyond it.",
+    "rationales": {
+      "A": "The sample came only from gym members, who may differ from adults in the city who do not use a gym.",
+      "B": "The sample came only from one city's gym members, so it does not represent the whole country.",
+      "C": "The diets were randomly assigned, and $200$ subjects is enough to draw a conclusion; random assignment is what allows a causal claim."
+    },
+    "tags": ["generalization", "causation"]
+  },
+  {
+    "id": "m-psda-claims-0006",
+    "difficulty": 2,
+    "type": "spr",
+    "stem": "A student council surveyed $80$ randomly selected students about a proposed later start time, and $32$ of them said they support it. A council member claims that most students support the proposal. What percent of the surveyed students supported the proposal?",
+    "answer": ["40"],
+    "explanation": "$\\frac{32}{80} = 0.40$, so 40% of the sampled students supported the proposal. (This does not support the claim that most students, more than 50%, support it.)",
+    "tags": ["sampling-bias", "generalization"]
+  },
+  {
+    "id": "m-psda-claims-0007",
+    "difficulty": 3,
+    "type": "mcq",
+    "stem": "A survey of $1{,}000$ adults selected at random from a region found that adults who own a dog reported exercising more minutes per week, on average, than adults who do not own a dog. Which statement is best supported by the survey?",
+    "choices": [
+      "Among adults in the region, owning a dog is associated with reporting more exercise.",
+      "Owning a dog causes adults in the region to exercise more.",
+      "The association applies only to the $1{,}000$ adults who were surveyed.",
+      "If an adult in the region gets a dog, that adult will exercise more."
+    ],
+    "answer": "A",
+    "explanation": "Random selection lets the results be generalized to adults in the region. But dog ownership was not randomly assigned, so the survey shows only an association, not a cause.",
+    "rationales": {
+      "B": "Dog ownership was observed, not assigned; people who already like exercise may be more likely to own dogs.",
+      "C": "Because the adults were selected at random from the region, the association can be generalized to the region's adults.",
+      "D": "This predicts a causal effect for an individual, which an observational survey cannot support."
+    },
+    "tags": ["causation", "generalization"]
+  },
+  {
+    "id": "m-psda-claims-0008",
+    "difficulty": 3,
+    "type": "mcq",
+    "stem": "A local news website asked its visitors to vote on whether the city should build a new stadium. Of the $5{,}000$ visitors who voted, 78% voted yes. Which of the following is the best reason the result may not represent the opinion of the city's residents?",
+    "choices": [
+      "A sample of $5{,}000$ is too small to represent a city.",
+      "78% is too high a percent to be accurate.",
+      "The voters chose to respond, and many of them may not live in the city.",
+      "A margin of error cannot be found for a percent."
+    ],
+    "answer": "C",
+    "explanation": "This is a voluntary-response sample: people decided for themselves whether to vote, and people with strong opinions are more likely to respond. Website visitors may also live outside the city. The sample is not random, so it may be biased.",
+    "rationales": {
+      "A": "The problem is how the sample was chosen, not its size; $5{,}000$ responses is a large sample.",
+      "B": "A high percent is not a sign of bias by itself.",
+      "D": "Margins of error are routinely reported for percents; the real issue is that the sample was not random."
+    },
+    "tags": ["sampling-bias"]
+  },
+  {
+    "id": "m-psda-claims-0009",
+    "difficulty": 3,
+    "type": "spr",
+    "stem": "In a randomized experiment, $150$ participants were assigned to take a new sleep aid and $150$ were assigned to take a placebo. In the sleep-aid group, $96$ participants reported improved sleep; in the placebo group, $66$ did. By how many percentage points was the percent reporting improved sleep in the sleep-aid group greater than in the placebo group?",
+    "answer": ["20"],
+    "explanation": "Sleep-aid group: $\\frac{96}{150} = 0.64$, or 64%. Placebo group: $\\frac{66}{150} = 0.44$, or 44%. The difference is $64 - 44 = 20$ percentage points.",
+    "tags": ["experimental-design"]
+  }
+]

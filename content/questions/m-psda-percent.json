@@ -1,0 +1,119 @@
+[
+  {
+    "id": "m-psda-percent-0001",
+    "difficulty": 1,
+    "type": "mcq",
+    "stem": "What is 35% of $240$?",
+    "choices": ["$84$", "$156$", "$275$", "$840$"],
+    "answer": "A",
+    "explanation": "Write 35% as the decimal $0.35$ and multiply: $0.35 \\times 240 = 84$.",
+    "rationales": {
+      "B": "This is 65% of $240$, the part that remains after taking away 35%.",
+      "C": "This adds $35$ to $240$ instead of taking a percent.",
+      "D": "This converts 35% to $3.5$ instead of $0.35$."
+    },
+    "tags": ["percent-of"]
+  },
+  {
+    "id": "m-psda-percent-0002",
+    "difficulty": 1,
+    "type": "mcq",
+    "stem": "The price of a concert ticket rose from \\$60 to \\$75. By what percent did the price increase?",
+    "choices": ["15%", "20%", "25%", "125%"],
+    "answer": "C",
+    "explanation": "Percent change is the change divided by the original value: $\\frac{75 - 60}{60} = \\frac{15}{60} = 0.25$, which is a 25% increase.",
+    "rationales": {
+      "A": "This is the dollar amount of the increase, not the percent.",
+      "B": "This divides the change by the new price, $\\frac{15}{75}$, instead of the original price.",
+      "D": "This is the new price as a percent of the old price, not the percent increase."
+    },
+    "tags": ["percent-change"]
+  },
+  {
+    "id": "m-psda-percent-0003",
+    "difficulty": 1,
+    "type": "spr",
+    "stem": "A jacket that regularly costs \\$120 is on sale for 30% off. What is the sale price of the jacket, in dollars?",
+    "answer": ["84"],
+    "explanation": "A 30% discount leaves 70% of the price: $0.70 \\times 120 = 84$ dollars.",
+    "tags": ["percent-change"]
+  },
+  {
+    "id": "m-psda-percent-0004",
+    "difficulty": 2,
+    "type": "mcq",
+    "stem": "After a 20% discount, a lamp costs \\$52. What was the price of the lamp before the discount?",
+    "choices": ["\\$41.60", "\\$62.40", "\\$65.00", "\\$72.00"],
+    "answer": "C",
+    "explanation": "After a 20% discount the sale price is 80% of the original: $0.8p = 52$. Divide: $p = \\frac{52}{0.8} = 65$.",
+    "rationales": {
+      "A": "This takes another 20% off the sale price: $0.8 \\times 52$.",
+      "B": "This adds 20% of the sale price back on: $1.2 \\times 52$. The 20% was taken from the original price, not the sale price.",
+      "D": "This adds $20$ dollars instead of undoing a 20% decrease."
+    },
+    "tags": ["reverse-percent"]
+  },
+  {
+    "id": "m-psda-percent-0005",
+    "difficulty": 2,
+    "type": "mcq",
+    "stem": "A store raised the price of a \\$250 bike by 20%. Later, it discounted the new price by 25%. What was the final price of the bike?",
+    "choices": ["\\$187.50", "\\$225.00", "\\$237.50", "\\$300.00"],
+    "answer": "B",
+    "explanation": "After the increase: $250 \\times 1.20 = 300$. After the discount: $300 \\times 0.75 = 225$. The final price is \\$225.",
+    "rationales": {
+      "A": "This applies only the 25% discount to the original \\$250 and ignores the increase.",
+      "C": "This combines the changes into a single 5% decrease, but the 25% is taken from a larger amount than the 20% was.",
+      "D": "This is the price after the increase only; the discount was never applied."
+    },
+    "tags": ["successive-percent"]
+  },
+  {
+    "id": "m-psda-percent-0006",
+    "difficulty": 2,
+    "type": "spr",
+    "stem": "In a class of $40$ students, $15$ are in the school band. What percent of the students in the class are NOT in the band?",
+    "answer": ["62.5"],
+    "explanation": "Students not in the band: $40 - 15 = 25$. As a percent of the class: $\\frac{25}{40} = 0.625$, which is 62.5%.",
+    "tags": ["percent-of"]
+  },
+  {
+    "id": "m-psda-percent-0007",
+    "difficulty": 3,
+    "type": "mcq",
+    "stem": "The number of members of a club increased by 25% from 2022 to 2023 and then decreased by 12% from 2023 to 2024. There were $220$ members in 2024. How many members were there in 2022?",
+    "choices": ["$176$", "$200$", "$242$", "$250$"],
+    "answer": "B",
+    "explanation": "Let $x$ be the 2022 membership. Then $x(1.25)(0.88) = 220$. Since $1.25 \\times 0.88 = 1.1$, this is $1.1x = 220$, so $x = 200$.",
+    "rationales": {
+      "A": "This undoes only the 25% increase ($\\frac{220}{1.25}$) and ignores the 12% decrease.",
+      "C": "This applies the combined change forward to the 2024 number, $220 \\times 1.1$, instead of working backward.",
+      "D": "This undoes only the 12% decrease ($\\frac{220}{0.88}$) and ignores the 25% increase."
+    },
+    "tags": ["reverse-percent", "successive-percent"]
+  },
+  {
+    "id": "m-psda-percent-0008",
+    "difficulty": 3,
+    "type": "spr",
+    "stem": "A $400$-gram salt solution is 30% salt by mass. How many grams of pure water must be added so that the solution is 24% salt by mass?",
+    "answer": ["100"],
+    "explanation": "The salt stays the same: $0.30 \\times 400 = 120$ grams. After adding $w$ grams of water, $\\frac{120}{400 + w} = 0.24$. So $400 + w = \\frac{120}{0.24} = 500$, and $w = 100$ grams.",
+    "tags": ["percent-of"]
+  },
+  {
+    "id": "m-psda-percent-0009",
+    "difficulty": 3,
+    "type": "mcq",
+    "stem": "The number $a$ is 40% greater than $b$, and $b$ is 25% greater than $c$, where $c > 0$. The number $a$ is what percent of $c$?",
+    "choices": ["125%", "140%", "165%", "175%"],
+    "answer": "D",
+    "explanation": "Write each relationship as a multiplier: $a = 1.4b$ and $b = 1.25c$. Substitute: $a = 1.4(1.25c) = 1.75c$. So $a$ is 175% of $c$.",
+    "rationales": {
+      "A": "This uses only the relationship between $b$ and $c$.",
+      "B": "This uses only the relationship between $a$ and $b$.",
+      "C": "This adds the percents ($100 + 40 + 25$) instead of multiplying the factors."
+    },
+    "tags": ["successive-percent"]
+  }
+]
