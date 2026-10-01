@@ -23,6 +23,7 @@ export const profiles = pgTable("profiles", {
   testDate: date("test_date"),
   minutesPerDay: smallint("minutes_per_day").notNull().default(45),
   daysPerWeek: smallint("days_per_week").notNull().default(5),
+  reminderHour: smallint("reminder_hour"), // local hour 0–23 for the daily practice reminder; null = off
   dashboardLayout: jsonb("dashboard_layout").$type<{ id: string; visible: boolean }[] | null>(), // null = automatic default
   weeklyFocus: jsonb("weekly_focus").$type<{ weekOf: string; skillIds: string[] } | null>(),
 });
@@ -175,6 +176,16 @@ export const aiMessages = pgTable("ai_messages", {
   content: text("content").notNull(),
   createdAt: ts("created_at").notNull().defaultNow(),
 }, (t) => [index("ai_user_time").on(t.userId, t.createdAt)]);
+
+/** One row per device that allowed push notifications (web push / installed app). */
+export const pushSubscriptions = pgTable("push_subscriptions", {
+  endpoint: text("endpoint").primaryKey(),
+  userId: userRef(),
+  p256dh: text("p256dh").notNull(),
+  auth: text("auth").notNull(),
+  createdAt: ts("created_at").notNull().defaultNow(),
+  lastSentOn: date("last_sent_on"), // local date of the last reminder, so each device gets at most one a day
+}, (t) => [index("push_user").on(t.userId)]);
 
 export const aiCache = pgTable("ai_cache", {
   key: text("key").primaryKey(),
