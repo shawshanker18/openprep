@@ -29,7 +29,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
       </header>
       <main className="mx-auto w-full min-w-0 max-w-5xl flex-1 px-4 pb-8 pt-6 md:px-8">{children}</main>
       <MobileTabs />
-      <AppBridge reminderHour={profile.reminderHour} />
+      <AppBridge reminderHour={profile.reminderHour} timezone={profile.timezone} />
     </div>
   );
 }
