@@ -1,0 +1,50 @@
+{
+  "name": "openprep-desktop",
+  "productName": "OpenPrep",
+  "version": "0.1.0",
+  "description": "OpenPrep desktop app — adaptive SAT prep with lockdown mode for tests and focus sessions.",
+  "main": "main.js",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win nsis portable",
+    "check": "node --check main.js && node --check preload.js && node --test"
+  },
+  "build": {
+    "appId": "com.openprep.desktop",
+    "productName": "OpenPrep",
+    "files": [
+      "main.js",
+      "preload.js",
+      "lib.js",
+      "icon.png"
+    ],
+    "protocols": [
+      {
+        "name": "OpenPrep",
+        "schemes": [
+          "openprep"
+        ]
+      }
+    ],
+    "win": {
+      "icon": "icon.png",
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false
+    },
+    "directories": {
+      "output": "dist"
+    }
+  },
+  "devDependencies": {
+    "electron": "^44.5.1",
+    "electron-builder": "^26.15.3"
+  }
+}
