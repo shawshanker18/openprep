@@ -6,8 +6,8 @@ import { Bell } from "lucide-react";
 import type { Notification } from "@/server/notifications";
 
 /** Native <details> dropdown; closes itself when an item is followed (the layout persists across navigations). */
-// `fixed`: for the mobile row, whose overflow-x-auto would clip an absolutely positioned panel.
-export function NotificationBell({ items, fixed }: { items: Notification[]; fixed?: boolean }) {
+// align="right": anchored to the right edge (mobile header), so the panel doesn't run off-screen.
+export function NotificationBell({ items, align = "left" }: { items: Notification[]; align?: "left" | "right" }) {
   const ref = useRef<HTMLDetailsElement>(null);
   return (
     <details ref={ref} className="relative">
@@ -15,7 +15,7 @@ export function NotificationBell({ items, fixed }: { items: Notification[]; fixe
         <Bell className="size-4" />
         {items.length > 0 && <span className="rounded-full bg-primary px-1.5 text-xs text-primary-foreground tabular-nums">{items.length}</span>}
       </summary>
-      <div className={`${fixed ? "fixed" : "absolute"} z-20 mt-1 w-64 rounded-lg border bg-background p-2 text-sm text-foreground shadow-sm`}>
+      <div className={`absolute ${align === "right" ? "right-0" : "left-0"} z-20 mt-1 w-64 max-w-[calc(100vw-2rem)] rounded-lg border bg-background p-2 text-sm text-foreground shadow-sm`}>
         {items.length ? (
           <ul className="flex flex-col gap-1">
             {items.map((n) => (

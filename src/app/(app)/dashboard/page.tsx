@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { MasteryBar } from "@/components/mastery-bar";
 import { PlanBlocks } from "@/components/plan-blocks";
 import { DiagnosticGate } from "@/components/diagnostic-gate";
-import { diagnosticPending, requireUser } from "@/server/auth";
+import { diagnosticPending, getAuthUser, requireUser } from "@/server/auth";
 import { dashboardLayout, getDashboard, type DashboardCardId } from "@/server/daily";
 import { getSkillSummary } from "@/server/analytics";
 import { SatCountdown } from "@/components/sat-countdown";
@@ -19,10 +19,18 @@ function Card({ title, children, className }: { title: string; children: React.R
   );
 }
 
+function greeting(timeZone: string) {
+  const h = Number(new Date().toLocaleString("en-US", { hour: "numeric", hourCycle: "h23", timeZone }));
+  return h < 5 ? "Good late night" : h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
+}
+
 export default async function DashboardPage() {
-  const { userId, profile } = await requireUser();
-  if (diagnosticPending(profile)) return <DiagnosticGate />;
+  const [{ userId, profile }, user] = await Promise.all([requireUser(), getAuthUser()]);
+  const first = user?.name?.split(" ")[0];
+  const hello = <h1 className="text-2xl font-semibold">{greeting(profile.timezone)}{first ? `, ${first}` : ""}</h1>;
+  if (diagnosticPending(profile)) return <div className="flex flex-col gap-6">{hello}<DiagnosticGate /></div>;
   const [d, summary] = await Promise.all([getDashboard(userId, profile), getSkillSummary(userId)]);
+  const planLeft = d.blocks.filter((b) => !b.done).length;
   const sectionMastery = (section: "math" | "rw") => {
     const measured = summary.skills.filter((k) => k.section === section && k.status !== "unknown");
     return measured.length ? `${Math.round(measured.reduce((a, k) => a + k.mastery, 0) / measured.length)}%` : "—";
@@ -106,22 +114,37 @@ export default async function DashboardPage() {
     ),
   };
 
+  const header = (
+    <div className="flex flex-wrap items-end justify-between gap-3">
+      <div>
+        {hello}
+        <p className="text-sm text-muted-foreground">
+          {planLeft ? `${planLeft} block${planLeft === 1 ? "" : "s"} left in today's plan.` : "Today's plan is done — extra practice still counts."}
+        </p>
+      </div>
+      <Button render={<Link href={planLeft ? "/plan" : "/practice"} />}>{planLeft ? "Continue today's plan" : "Smart practice"}</Button>
+    </div>
+  );
+
   const layout = dashboardLayout(profile);
   // Custom layout: cards in the chosen order on the two-column grid (score and countdown stay full width).
-  if (layout) return <div className="grid gap-4 md:grid-cols-2">{layout.filter((c) => c.visible).map((c) => cards[c.id])}</div>;
+  if (layout) return <div className="flex flex-col gap-6">{header}<div className="grid gap-4 md:grid-cols-2">{layout.filter((c) => c.visible).map((c) => cards[c.id])}</div></div>;
 
   return (
+    <div className="flex flex-col gap-6">
+    {header}
     <div className="grid gap-4 md:grid-cols-2">
-      {cards.score}
       {cards.countdown}
       {cards.today}
       <div className="flex flex-col gap-4">
+        {cards.score}
         {cards.focus}
         {cards["mock-due"]}
         {cards.pace}
         {cards.mistakes}
         {cards.week}
       </div>
+    </div>
     </div>
   );
 }
