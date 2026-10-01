@@ -8,6 +8,8 @@ import { profiles } from "@/db/schema";
 
 /** Current user id from a verified JWT, or null. One auth round-trip per request. */
 export const getUserId = cache(async (): Promise<string | null> => {
+  // Local-only stub so flows can be exercised without a real sign-in. Never active in production builds.
+  if (process.env.NODE_ENV === "development" && process.env.DEV_USER_ID) return process.env.DEV_USER_ID;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser(); // getUser, NOT getSession: verifies the JWT
   return user?.id ?? null;
