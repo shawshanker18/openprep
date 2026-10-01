@@ -6,11 +6,11 @@
     "stem": "The function $f$ is defined by $f(x) = 5x - 3$. What is the value of $f(4)$?",
     "choices": ["$\\frac{7}{5}$", "$6$", "$17$", "$23$"],
     "answer": "C",
-    "explanation": "Substitute $4$ for $x$: $f(4) = 5(4) - 3 = 20 - 3 = 17$.",
+    "explanation": "$f(4)$ means \"put $4$ in wherever you see $x$.\" It is asking for an output, not asking you to solve anything.\n\n$f(4) = 5(4) - 3 = 20 - 3 = 17$.",
     "rationales": {
-      "A": "This solves $5x - 3 = 4$ for $x$ instead of evaluating $f$ at $x = 4$.",
-      "B": "This treats $5x$ as $5 + x$, computing $5 + 4 - 3$.",
-      "D": "This adds $3$ instead of subtracting it: $20 + 3$."
+      "A": "You solved $5x - 3 = 4$, which treats $4$ as the output. In $f(4)$, the $4$ is the input, so substitute it for $x$.",
+      "B": "$5x$ means $5$ times $x$, not $5$ plus $x$. So $5(4)$ is $20$.",
+      "D": "The function subtracts $3$: $20 - 3 = 17$, not $20 + 3$."
     },
     "tags": ["function-notation"]
   },
@@ -21,11 +21,11 @@
     "stem": "The graph of the linear function $g$ passes through the points $(2, 7)$ and $(6, 19)$. What is the slope of the graph of $g$?",
     "choices": ["$-3$", "$\\frac{1}{3}$", "$\\frac{13}{4}$", "$3$"],
     "answer": "D",
-    "explanation": "Slope is the change in $y$ divided by the change in $x$: $\\frac{19 - 7}{6 - 2} = \\frac{12}{4} = 3$.",
+    "explanation": "Slope tells you how much $y$ changes for each step in $x$: rise over run.\n\nFrom $(2, 7)$ to $(6, 19)$, $y$ goes up by $19 - 7 = 12$ while $x$ goes up by $6 - 2 = 4$.\n\nSlope $= \\frac{12}{4} = 3$. Every time $x$ goes up by $1$, $y$ goes up by $3$.",
     "rationales": {
-      "A": "This subtracts the $y$-values and the $x$-values in opposite orders, which flips the sign.",
-      "B": "This divides the change in $x$ by the change in $y$ (run over rise).",
-      "C": "This adds the coordinates instead of subtracting them: $\\frac{7 + 19}{2 + 6} = \\frac{26}{8}$."
+      "A": "You subtracted in opposite orders on top and bottom, which flips the sign. Start with the same point in both: $\\frac{19 - 7}{6 - 2}$.",
+      "B": "That is run over rise. Slope puts the change in $y$ on top: $\\frac{12}{4}$, not $\\frac{4}{12}$.",
+      "C": "Slope uses differences, not sums. Subtract the coordinates: $\\frac{19 - 7}{6 - 2}$."
     },
     "tags": ["slope"]
   },
@@ -35,7 +35,7 @@
     "type": "spr",
     "stem": "The function $h(t) = 120 - 8t$ gives the depth of water, in centimeters, in a draining sink $t$ minutes after the drain is opened. After how many minutes is the depth $56$ centimeters?",
     "answer": ["8"],
-    "explanation": "Set $h(t) = 56$: $120 - 8t = 56$. Subtract $120$: $-8t = -64$. Divide by $-8$: $t = 8$.",
+    "explanation": "Here you know the output (the depth, $56$) and need the input (the time). So set the function equal to $56$ and solve for $t$.\n\n$120 - 8t = 56$. Subtract $120$ from both sides: $-8t = -64$. Divide by $-8$: $t = 8$.\n\nIt makes sense too: the sink loses $8$ cm a minute, and it needs to lose $120 - 56 = 64$ cm, which takes $8$ minutes.",
     "tags": ["function-notation", "modeling"]
   },
   {
@@ -50,11 +50,11 @@
       "The tank loses $15$ liters of water each minute."
     ],
     "answer": "D",
-    "explanation": "In $V(t) = 450 - 15t$, the coefficient of $t$ is the rate of change. It is $-15$, so the volume decreases by $15$ liters for each minute that passes. The $450$ is the starting volume.",
+    "explanation": "In a linear model, the number multiplied by the input is the rate: how much the output changes each time the input goes up by $1$. The number standing alone is the starting value.\n\nIn $V(t) = 450 - 15t$, the $15$ multiplies $t$ (minutes) and has a minus sign. So each minute the volume goes down by $15$ liters.\n\nThe $450$ is how much water was in the tank at the start, when $t = 0$.",
     "rationales": {
-      "A": "This confuses the rate with the initial value; the starting volume is $V(0) = 450$ liters.",
-      "B": "The tank is empty when $450 - 15t = 0$, which is at $t = 30$ minutes, not $15$.",
-      "C": "The minus sign in front of $15t$ means the volume decreases over time."
+      "A": "The starting amount is the number on its own. Put in $t = 0$ and you get $V(0) = 450$ liters, not $15$.",
+      "B": "The tank is empty when $450 - 15t = 0$, which happens at $t = 30$ minutes. The $15$ is a rate, not a time.",
+      "C": "Look at the sign. It is $-15t$, so the volume goes down $15$ liters each minute, not up."
     },
     "tags": ["modeling", "slope"]
   },
@@ -65,15 +65,15 @@
     "stem": "The functions $f$ and $g$ are defined by $f(x) = 2.5x - 4$ and $g(x) = -1.5x + 22$. For what value of $x$ does $f(x) = g(x)$?",
     "choices": ["$4.5$", "$6.5$", "$12.25$", "$26$"],
     "answer": "B",
-    "explanation": "Set the expressions equal: $2.5x - 4 = -1.5x + 22$. Add $1.5x$ to both sides: $4x - 4 = 22$. Add $4$: $4x = 26$, so $x = 6.5$.",
+    "explanation": "\"$f(x) = g(x)$\" asks for the input where both functions give the same output. Set the two rules equal and solve.\n\n$2.5x - 4 = -1.5x + 22$. Add $1.5x$ to both sides: $4x - 4 = 22$. Add $4$: $4x = 26$. Divide by $4$: $x = 6.5$.\n\nCheck: $f(6.5) = 16.25 - 4 = 12.25$ and $g(6.5) = -9.75 + 22 = 12.25$. Same output, as expected.",
     "rationales": {
-      "A": "This subtracts $4$ from $22$ instead of adding it, getting $4x = 18$.",
-      "C": "This is the common output $f(6.5) = g(6.5) = 12.25$, not the value of $x$.",
-      "D": "This subtracts $1.5x$ from $2.5x$ instead of adding, getting $x = 26$."
+      "A": "You subtracted $4$ from $22$, but to undo $-4$ you add $4$. That gives $4x = 26$.",
+      "C": "$12.25$ is the shared output, $f(6.5)$. The question asks for the input $x$, which is $6.5$.",
+      "D": "To bring $-1.5x$ across you add $1.5x$ to both sides, which makes $4x$, not $x$."
     },
     "desmos": {
       "expressions": ["f(x)=2.5x-4", "g(x)=-1.5x+22"],
-      "steps": "Graph both functions and click their intersection: $(6.5, 12.25)$. The question asks for $x$, so the answer is $6.5$."
+      "steps": "Graph both functions and click the point where they cross: $(6.5, 12.25)$. The question asks for $x$, so the answer is $6.5$."
     },
     "tags": ["function-notation", "desmos"]
   },
@@ -83,7 +83,7 @@
     "type": "spr",
     "stem": "The graph of a linear function has an $x$-intercept of $6$ and a $y$-intercept of $-4$. What is the slope of the graph?",
     "answer": ["2/3"],
-    "explanation": "The intercepts are the points $(6, 0)$ and $(0, -4)$. Slope $= \\frac{0 - (-4)}{6 - 0} = \\frac{4}{6} = \\frac{2}{3}$.",
+    "explanation": "Each intercept is a point. An $x$ intercept of $6$ is the point $(6, 0)$, and a $y$ intercept of $-4$ is the point $(0, -4)$.\n\nNow use rise over run between them: $\\frac{0 - (-4)}{6 - 0} = \\frac{4}{6} = \\frac{2}{3}$.\n\nPicture it: starting at $(0, -4)$, you go right $6$ and up $4$ to reach $(6, 0)$. That is a gentle upward slope of $\\frac{2}{3}$.",
     "tags": ["intercepts", "slope"]
   },
   {
@@ -93,11 +93,11 @@
     "stem": "The function $g$ is linear. If $g(3) = 10$ and $g(x + 4) = g(x) + 6$ for all values of $x$, what is the value of $g(0)$?",
     "choices": ["$-8$", "$5.5$", "$8$", "$14.5$"],
     "answer": "B",
-    "explanation": "Increasing the input by $4$ increases the output by $6$, so the slope is $\\frac{6}{4} = 1.5$. Going from $x = 3$ back to $x = 0$ decreases the input by $3$, so the output decreases by $3(1.5) = 4.5$: $g(0) = 10 - 4.5 = 5.5$.",
+    "explanation": "Read $g(x + 4) = g(x) + 6$ in plain words: whenever the input goes up by $4$, the output goes up by $6$. That is the slope, $\\frac{6}{4} = 1.5$.\n\nYou know $g(3) = 10$ and want $g(0)$. Going from $x = 3$ down to $x = 0$ lowers the input by $3$, so the output drops by $3 \\times 1.5 = 4.5$.\n\n$g(0) = 10 - 4.5 = 5.5$.",
     "rationales": {
-      "A": "This uses $6$ as the slope (ignoring that the input changed by $4$), so $g(0) = 10 - 3(6) = -8$.",
-      "C": "This inverts the slope to $\\frac{4}{6} = \\frac{2}{3}$, so $g(0) = 10 - 2 = 8$.",
-      "D": "This adds $4.5$ instead of subtracting it when moving from $x = 3$ to the smaller input $x = 0$."
+      "A": "The output rises $6$ when the input rises $4$, so the slope is $\\frac{6}{4}$, not $6$.",
+      "C": "You flipped the slope to $\\frac{4}{6}$. Slope is change in output over change in input: $\\frac{6}{4} = 1.5$.",
+      "D": "Moving from $x = 3$ to $x = 0$ means going down in input, so the output goes down by $4.5$, not up."
     },
     "tags": ["function-notation", "slope"]
   },
@@ -108,16 +108,16 @@
     "stem": "The graph of the linear function $f$ in the $xy$-plane passes through the points $(-2, 9)$ and $(4, -3)$. What is the value of $f(10)$?",
     "choices": ["$-15$", "$-11$", "$3$", "$33$"],
     "answer": "A",
-    "explanation": "Slope: $\\frac{-3 - 9}{4 - (-2)} = \\frac{-12}{6} = -2$. Using $(4, -3)$: $-3 = -2(4) + b$, so $b = 5$ and $f(x) = -2x + 5$. Then $f(10) = -20 + 5 = -15$.",
+    "explanation": "To find $f(10)$ you need the rule for $f$, so build it from the two points.\n\nSlope: $\\frac{-3 - 9}{4 - (-2)} = \\frac{-12}{6} = -2$.\n\nNow find the intercept with one point, say $(4, -3)$: $-3 = -2(4) + b = -8 + b$, so $b = 5$. The rule is $f(x) = -2x + 5$.\n\nFinally, $f(10) = -2(10) + 5 = -15$.",
     "rationales": {
-      "B": "This uses $9$, the $y$-value of a given point, as the $y$-intercept: $-2(10) + 9$.",
-      "C": "This inverts the slope to $-\\frac{1}{2}$ and uses the point $(-2, 9)$, giving $f(x) = -\\frac{1}{2}x + 8$ and $f(10) = 3$.",
-      "D": "This drops the negative sign on the slope and uses the point $(-2, 9)$, giving $f(x) = 2x + 13$ and $f(10) = 33$."
+      "B": "$9$ is the $y$ value of the point $(-2, 9)$, but that point is not on the $y$ axis. Solve for $b$ with a point instead.",
+      "C": "You flipped the slope to $-\\frac{1}{2}$. Slope is change in $y$ over change in $x$: $\\frac{-12}{6} = -2$.",
+      "D": "The slope is negative, because $y$ falls from $9$ to $-3$ as $x$ rises. Using $+2$ sends the line the wrong way."
     },
-    "fastMethod": "Each step of $6$ in $x$ lowers $f$ by $12$. From $x = 4$ to $x = 10$ is one more step: $-3 - 12 = -15$.",
+    "fastMethod": "Notice the pattern: each step of $6$ in $x$ lowers $f$ by $12$. Going from $x = 4$ to $x = 10$ is exactly one more step, so $f(10) = -3 - 12 = -15$.",
     "desmos": {
       "expressions": ["y=9+\\frac{-3-9}{4+2}(x+2)", "x=10"],
-      "steps": "Enter the line through the two points in point-slope form and the vertical line $x = 10$. They meet at $(10, -15)$."
+      "steps": "Enter the line through the two points and the vertical line $x = 10$. They meet at $(10, -15)$."
     },
     "tags": ["slope", "function-notation", "desmos"]
   },
@@ -127,8 +127,8 @@
     "type": "spr",
     "stem": "The fare for a ride with a certain car service is a linear function of the distance traveled. A $4$-mile ride costs \\$13.10 and a $10$-mile ride costs \\$25.70. What is the fare, in dollars, for a $15$-mile ride?",
     "answer": ["36.2"],
-    "explanation": "The rate is $\\frac{25.70 - 13.10}{10 - 4} = \\frac{12.60}{6} = 2.10$ dollars per mile. The fixed charge is $13.10 - 4(2.10) = 4.70$. So the fare for $15$ miles is $4.70 + 15(2.10) = 4.70 + 31.50 = 36.20$ dollars.",
-    "fastMethod": "From $10$ miles to $15$ miles is $5$ more miles at \\$2.10 each: $25.70 + 10.50 = 36.20$.",
+    "explanation": "A linear fare has two parts: a fixed charge plus a price per mile. Find the price per mile first by comparing the two rides.\n\nThe $10$ mile ride costs \\$12.60 more than the $4$ mile ride ($25.70 - 13.10$), for $6$ extra miles. So each mile costs $12.60 \\div 6 = 2.10$ dollars.\n\nThe fixed charge is what's left when you take the miles out of a known fare: $13.10 - 4(2.10) = 13.10 - 8.40 = 4.70$.\n\nSo a $15$ mile ride costs $4.70 + 15(2.10) = 4.70 + 31.50 = 36.20$ dollars.",
+    "fastMethod": "Skip the fixed charge entirely. From $10$ miles to $15$ miles is $5$ more miles at \\$2.10 each, so add $10.50$ to the $10$ mile fare: $25.70 + 10.50 = 36.20$.",
     "tags": ["modeling", "slope"]
   }
 ]

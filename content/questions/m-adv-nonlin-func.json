@@ -6,11 +6,11 @@
     "stem": "The function $f$ is defined by $f(x) = 2x^2 - 3x + 1$. What is the value of $f(-2)$?",
     "choices": ["$-1$", "$3$", "$15$", "$23$"],
     "answer": "C",
-    "explanation": "Substitute $-2$ for $x$: $f(-2) = 2(-2)^2 - 3(-2) + 1 = 2(4) + 6 + 1 = 15$.",
+    "explanation": "Replace every $x$ with $-2$, and put it in parentheses so the signs stay right.\n\n$f(-2) = 2(-2)^2 - 3(-2) + 1$.\n\nDo the exponent first: $(-2)^2 = 4$, so the first term is $2 \\cdot 4 = 8$. Next, $-3 \\cdot (-2) = +6$. Add it up: $8 + 6 + 1 = 15$.\n\nThe parentheses matter. $(-2)^2$ is $4$, but $-2^2$ without parentheses would be $-4$.",
     "rationales": {
-      "A": "This treats $(-2)^2$ as $-4$, giving $2(-4) + 6 + 1$.",
-      "B": "This treats $-3(-2)$ as $-6$, giving $8 - 6 + 1$.",
-      "D": "This squares $2x$ instead of only $x$: $(2 \\cdot -2)^2 = 16$, giving $16 + 6 + 1$."
+      "A": "$(-2)^2$ is $(-2)(-2) = 4$, not $-4$. A negative times a negative is positive.",
+      "B": "$-3 \\cdot (-2)$ is $+6$, not $-6$. Two negatives multiply to a positive.",
+      "D": "Only the $x$ is squared, not the $2x$. So it is $2 \\cdot (-2)^2 = 2 \\cdot 4 = 8$, not $(2 \\cdot -2)^2 = 16$."
     },
     "tags": ["function-notation", "quadratic-functions"]
   },
@@ -26,11 +26,11 @@
       "The population increases by 30% each year."
     ],
     "answer": "B",
-    "explanation": "The growth factor is $1.03 = 1 + 0.03$. Each year the population is multiplied by $1.03$, which means it grows by 3% of the previous year's value.",
+    "explanation": "In an exponential model, the number being raised to the power $t$ is the growth factor: what the amount gets multiplied by each year.\n\nHere it is $1.03$. Multiplying by $1.03$ keeps all of last year's population ($1$) and adds $0.03$ of it. So the population grows by 3% each year.\n\nThe $4{,}200$ is the starting population, in 2020.",
     "rationales": {
-      "A": "Exponential growth adds a percent of the current value, not a fixed number of people each year.",
-      "C": "Multiplying by $1.03$ keeps 100% and adds 3%; an increase of 103% would mean multiplying by $2.03$.",
-      "D": "This reads $1.03$ as $1.3$."
+      "A": "Exponential growth adds a percent of the current size, so the number of new people grows each year. A fixed $3$ people a year would be linear.",
+      "C": "Multiplying by $1.03$ keeps 100% and adds 3%. Growing by 103% would mean multiplying by $2.03$.",
+      "D": "$1.03$ is $1 + 0.03$, which is 3%. A 30% increase would be a factor of $1.30$."
     },
     "tags": ["exponential"]
   },
@@ -40,7 +40,7 @@
     "type": "spr",
     "stem": "The function $g$ is defined by $g(x) = 5 \\cdot 2^x$. What is the value of $g(3)$?",
     "answer": ["40"],
-    "explanation": "Evaluate the power first: $2^3 = 8$. Then multiply: $g(3) = 5 \\cdot 8 = 40$.",
+    "explanation": "Order of operations: do the exponent before multiplying.\n\n$2^3 = 2 \\cdot 2 \\cdot 2 = 8$. Then multiply by $5$: $g(3) = 5 \\cdot 8 = 40$.\n\nA common slip is to multiply first and compute $10^3 = 1{,}000$. The exponent only belongs to the $2$.",
     "tags": ["exponential", "function-notation"]
   },
   {
@@ -50,13 +50,13 @@
     "stem": "The function $f$ is defined by $f(x) = x^2 - 10x + 21$. What are the coordinates of the vertex of the graph of $y = f(x)$ in the $xy$-plane?",
     "choices": ["$(-5, 96)$", "$(3, 0)$", "$(5, -4)$", "$(5, 21)$"],
     "answer": "C",
-    "explanation": "The vertex has $x$-coordinate $-\\frac{b}{2a} = -\\frac{-10}{2(1)} = 5$. Then $f(5) = 25 - 50 + 21 = -4$. The vertex is $(5, -4)$.",
+    "explanation": "The vertex is the turning point of the parabola. Its $x$ value is $-\\frac{b}{2a}$.\n\nHere $a = 1$ and $b = -10$, so $x = -\\frac{-10}{2(1)} = 5$.\n\nTo get the $y$ value, plug $5$ into the function: $f(5) = 25 - 50 + 21 = -4$.\n\nSo the vertex is $(5, -4)$.",
     "rationales": {
-      "A": "This drops the negative sign in $-\\frac{b}{2a}$, using $x = -5$, and then $f(-5) = 96$.",
-      "B": "This is an $x$-intercept of the graph, not the vertex: $f(x) = (x - 3)(x - 7)$.",
-      "D": "This finds the correct $x$-coordinate but uses the constant term $21$ as the $y$-coordinate."
+      "A": "$-\\frac{b}{2a}$ with $b = -10$ is $+5$. Dropping that negative sign sends you to the wrong side.",
+      "B": "$(3, 0)$ is where the graph crosses the $x$ axis, since $f(x) = (x - 3)(x - 7)$. The vertex is the turning point, halfway between the crossings.",
+      "D": "The $x$ value is right, but $21$ is the $y$ intercept. Plug $5$ into $f$ to get the vertex height, $-4$."
     },
-    "fastMethod": "Factor: $f(x) = (x - 3)(x - 7)$. The vertex is midway between the zeros, at $x = 5$.",
+    "fastMethod": "Factor: $f(x) = (x - 3)(x - 7)$. A parabola is symmetric, so the vertex sits halfway between the zeros, at $x = 5$. Then $f(5) = (2)(-2) = -4$.",
     "desmos": {
       "expressions": ["y=x^2-10x+21"],
       "steps": "Graph the function and click the lowest point of the parabola: $(5, -4)$."
@@ -70,11 +70,11 @@
     "stem": "A car bought for \\$28,000 loses 15% of its value each year. Which function gives the car's value $V$, in dollars, $t$ years after it was bought?",
     "choices": ["$V(t) = 28{,}000(0.15)^t$", "$V(t) = 28{,}000(1.15)^t$", "$V(t) = 28{,}000 - 4{,}200t$", "$V(t) = 28{,}000(0.85)^t$"],
     "answer": "D",
-    "explanation": "Losing 15% each year leaves 85% of the previous year's value, so the value is multiplied by $0.85$ each year: $V(t) = 28{,}000(0.85)^t$.",
+    "explanation": "If something loses 15% of its value, 85% is left. So each year the value gets multiplied by $0.85$.\n\nStart at \\$28,000 and multiply by $0.85$ once per year: $V(t) = 28{,}000(0.85)^t$.\n\nThe pattern to remember: losing $r\\%$ means multiplying by $1 - \\frac{r}{100}$, and gaining $r\\%$ means multiplying by $1 + \\frac{r}{100}$.",
     "rationales": {
-      "A": "This uses the percent lost, $0.15$, as the factor; that would keep only 15% of the value each year.",
-      "B": "A factor of $1.15$ means the value grows by 15% each year.",
-      "C": "This subtracts 15% of the original price every year, which is linear decay, not a 15% loss of the current value."
+      "A": "Multiplying by $0.15$ would keep only 15% each year. Losing 15% keeps 85%, so the factor is $0.85$.",
+      "B": "A factor of $1.15$ makes the value grow by 15% a year, but the car loses value.",
+      "C": "This takes away the same \\$4,200 every year. But 15% of a smaller value is a smaller amount, so the losses shrink over time. That calls for an exponential model."
     },
     "tags": ["exponential"]
   },
@@ -84,7 +84,7 @@
     "type": "spr",
     "stem": "The function $f$ is defined by $f(x) = (x + 3)(x - 7)$. What is the $x$-coordinate of the vertex of the graph of $y = f(x)$ in the $xy$-plane?",
     "answer": ["2"],
-    "explanation": "The zeros are $x = -3$ and $x = 7$. A parabola is symmetric, so the vertex lies halfway between the zeros: $\\frac{-3 + 7}{2} = 2$.",
+    "explanation": "From the factored form you can read the zeros straight off: $x = -3$ and $x = 7$.\n\nA parabola is symmetric, like a mirror image around its vertex. So the vertex sits exactly halfway between the two zeros.\n\nHalfway between $-3$ and $7$ is $\\frac{-3 + 7}{2} = 2$.",
     "tags": ["quadratic-functions"]
   },
   {
@@ -94,11 +94,11 @@
     "stem": "The graph of the quadratic function $h$ in the $xy$-plane has its vertex at $(2, -3)$ and passes through the point $(0, 5)$. What is the value of $h(5)$?",
     "choices": ["$1.5$", "$6$", "$15$", "$95$"],
     "answer": "C",
-    "explanation": "Use vertex form: $h(x) = a(x - 2)^2 - 3$. Substitute $(0, 5)$: $5 = a(4) - 3$, so $4a = 8$ and $a = 2$. Then $h(5) = 2(5 - 2)^2 - 3 = 2(9) - 3 = 15$.",
+    "explanation": "Knowing the vertex lets you write the parabola in vertex form, $h(x) = a(x - h)^2 + k$, with only $a$ missing.\n\nWith vertex $(2, -3)$: $h(x) = a(x - 2)^2 - 3$.\n\nUse the other point, $(0, 5)$, to find $a$: $5 = a(0 - 2)^2 - 3 = 4a - 3$. Add $3$: $4a = 8$, so $a = 2$.\n\nNow $h(5) = 2(5 - 2)^2 - 3 = 2(9) - 3 = 15$.",
     "rationales": {
-      "A": "This solves $4a - 3 = 5$ as $4a = 2$, getting $a = \\frac{1}{2}$.",
-      "B": "This assumes $a = 1$ instead of using the point $(0, 5)$ to find $a$.",
-      "D": "This writes the vertex form as $a(x + 2)^2 - 3$, so $h(5) = 2(7)^2 - 3$."
+      "A": "From $4a - 3 = 5$, add $3$ to both sides to get $4a = 8$, so $a = 2$. It looks like the $3$ was subtracted instead.",
+      "B": "You can't assume $a = 1$. The point $(0, 5)$ is there so you can find $a$, which turns out to be $2$.",
+      "D": "In vertex form the vertex's $x$ value is subtracted: $(x - 2)^2$, not $(x + 2)^2$."
     },
     "tags": ["quadratic-functions"]
   },
@@ -109,15 +109,15 @@
     "stem": "The function $p$ is defined by $p(x) = x^3 - 4x^2 - 11x + 30$. Which of the following is an $x$-intercept of the graph of $y = p(x)$ in the $xy$-plane?",
     "choices": ["$(2, 0)$", "$(-2, 0)$", "$(3, 0)$", "$(-5, 0)$"],
     "answer": "A",
-    "explanation": "Test $x = 2$: $8 - 16 - 22 + 30 = 0$, so $(2, 0)$ is an $x$-intercept. Dividing out $x - 2$ gives $p(x) = (x - 2)(x^2 - 2x - 15) = (x - 2)(x - 5)(x + 3)$, so the zeros are $2$, $5$, and $-3$.",
+    "explanation": "An $x$ intercept is a point where $p(x) = 0$. The quickest approach is to test the choices.\n\nTry $x = 2$: $2^3 - 4(2)^2 - 11(2) + 30 = 8 - 16 - 22 + 30 = 0$. So $(2, 0)$ is an $x$ intercept.\n\nIf you want the full picture, divide out $(x - 2)$: $p(x) = (x - 2)(x^2 - 2x - 15) = (x - 2)(x - 5)(x + 3)$. The zeros are $2$, $5$, and $-3$, and only $2$ is a choice.",
     "rationales": {
-      "B": "This is the opposite of the zero $x = 2$; the factor $x - 2$ gives $x = 2$, not $x = -2$.",
-      "C": "This is the opposite of the zero $x = -3$, from the factor $x + 3$.",
-      "D": "This is the opposite of the zero $x = 5$, from the factor $x - 5$."
+      "B": "Plug it in: $p(-2) = -8 - 16 + 22 + 30 = 28$, not $0$. The zero is $x = 2$, not $-2$.",
+      "C": "Plug it in: $p(3) = 27 - 36 - 33 + 30 = -12$, not $0$. The real zero nearby is $x = -3$.",
+      "D": "Plug it in: $p(-5) = -125 - 100 + 55 + 30 = -140$, not $0$. The real zero is $x = 5$."
     },
     "desmos": {
       "expressions": ["y=x^3-4x^2-11x+30"],
-      "steps": "Graph the polynomial and click where it crosses the $x$-axis: $(-3, 0)$, $(2, 0)$, and $(5, 0)$. Only $(2, 0)$ is a choice."
+      "steps": "Graph the polynomial and click where it crosses the $x$ axis: $(-3, 0)$, $(2, 0)$, and $(5, 0)$. Only $(2, 0)$ is a choice."
     },
     "tags": ["polynomial", "desmos"]
   },
@@ -127,11 +127,11 @@
     "type": "spr",
     "stem": "A lab sample contains $640$ milligrams of a substance. The amount remaining $t$ hours later is modeled by $m(t) = 640\\left(\\frac{1}{2}\\right)^{\\frac{t}{6}}$. After how many hours will exactly $40$ milligrams remain?",
     "answer": ["24"],
-    "explanation": "Set $640\\left(\\frac{1}{2}\\right)^{\\frac{t}{6}} = 40$. Divide by $640$: $\\left(\\frac{1}{2}\\right)^{\\frac{t}{6}} = \\frac{1}{16} = \\left(\\frac{1}{2}\\right)^4$. So $\\frac{t}{6} = 4$ and $t = 24$.",
-    "fastMethod": "The amount halves every $6$ hours: $640 \\to 320 \\to 160 \\to 80 \\to 40$ is $4$ halvings, or $24$ hours.",
+    "explanation": "Read the model first. The $\\frac{1}{2}$ means the amount halves, and the $\\frac{t}{6}$ means it halves once every $6$ hours.\n\nSet the amount to $40$: $640\\left(\\frac{1}{2}\\right)^{\\frac{t}{6}} = 40$. Divide by $640$: $\\left(\\frac{1}{2}\\right)^{\\frac{t}{6}} = \\frac{1}{16}$.\n\nSince $\\frac{1}{16} = \\left(\\frac{1}{2}\\right)^4$, the exponents must match: $\\frac{t}{6} = 4$, so $t = 24$.",
+    "fastMethod": "Just count halvings: $640 \\to 320 \\to 160 \\to 80 \\to 40$. That is $4$ halvings at $6$ hours each, so $24$ hours.",
     "desmos": {
       "expressions": ["y=640\\left(\\frac{1}{2}\\right)^{\\frac{x}{6}}", "y=40"],
-      "steps": "Graph the model and the horizontal line $y = 40$. They intersect at $(24, 40)$."
+      "steps": "Graph the model and the flat line $y = 40$. They cross at $(24, 40)$."
     },
     "tags": ["exponential", "desmos"]
   }

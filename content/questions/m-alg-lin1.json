@@ -6,11 +6,11 @@
     "stem": "If $4x - 9 = 23$, what is the value of $x$?",
     "choices": ["$3.5$", "$5.75$", "$8$", "$128$"],
     "answer": "C",
-    "explanation": "Add $9$ to both sides: $4x = 32$. Divide both sides by $4$: $x = 8$.",
+    "explanation": "The goal is to get $x$ by itself, so undo what was done to it in reverse order. Right now $x$ is multiplied by $4$, and then $9$ is subtracted.\n\nFirst undo the subtraction by adding $9$ to both sides: $4x = 32$. Then undo the multiplication by dividing both sides by $4$: $x = 8$.\n\nQuick check: $4(8) - 9 = 32 - 9 = 23$. It works.",
     "rationales": {
-      "A": "This subtracts $9$ from $23$ instead of adding it, giving $4x = 14$.",
-      "B": "This divides $23$ by $4$ and ignores the $-9$.",
-      "D": "This multiplies $32$ by $4$ instead of dividing by $4$."
+      "A": "You probably subtracted $9$ from $23$ instead of adding it. That gives $4x = 14$ and $x = 3.5$. To undo a subtraction, you add.",
+      "B": "It looks like you divided $23$ by $4$ and forgot about the $-9$. Clear the $-9$ first, then divide.",
+      "D": "You found $4x = 32$ correctly, then multiplied by $4$ instead of dividing. To undo multiplying by $4$, divide by $4$."
     },
     "tags": ["solving-equations"]
   },
@@ -21,11 +21,11 @@
     "stem": "What value of $x$ satisfies $3(x + 5) = 27$?",
     "choices": ["$4$", "$\\frac{22}{3}$", "$9$", "$19$"],
     "answer": "A",
-    "explanation": "Divide both sides by $3$: $x + 5 = 9$. Subtract $5$: $x = 4$. (Or distribute: $3x + 15 = 27$, so $3x = 12$ and $x = 4$.)",
+    "explanation": "Here the whole group $(x + 5)$ is multiplied by $3$, so the cleanest move is to undo that multiplication first.\n\nDivide both sides by $3$: $x + 5 = 9$. Then subtract $5$ from both sides: $x = 4$.\n\nYou could also distribute first: $3x + 15 = 27$, so $3x = 12$ and $x = 4$. Both roads lead to the same place.\n\nCheck: $3(4 + 5) = 3(9) = 27$.",
     "rationales": {
-      "B": "This distributes the $3$ to $x$ only, writing $3x + 5 = 27$.",
-      "C": "This is the value of $x + 5$, not $x$.",
-      "D": "This subtracts $3$ from both sides instead of dividing by $3$: $x + 5 = 24$."
+      "B": "You multiplied the $3$ into $x$ but not into the $5$, which gave $3x + 5 = 27$. When you distribute, the $3$ multiplies every term inside the parentheses.",
+      "C": "So close! $9$ is the value of $x + 5$. The question asks for $x$, so there is one more step: subtract $5$.",
+      "D": "You subtracted $3$ from both sides, but the $3$ is multiplying, not adding. To undo multiplication, divide."
     },
     "tags": ["distributing", "solving-equations"]
   },
@@ -35,7 +35,7 @@
     "type": "spr",
     "stem": "A plumber charges a \\$45 service fee plus \\$30 for each hour of work. A customer's bill for one repair was \\$165. For how many hours did the plumber work?",
     "answer": ["4"],
-    "explanation": "Let $h$ be the number of hours. Then $45 + 30h = 165$. Subtract $45$: $30h = 120$. Divide by $30$: $h = 4$.",
+    "explanation": "Turn the story into an equation. The \\$45 fee is paid once, however long the job takes, so it is a constant. The \\$30 is paid for every hour, so it multiplies the number of hours.\n\nIf $h$ is the number of hours, the bill is $45 + 30h$. Set that equal to the actual bill: $45 + 30h = 165$.\n\nTake away the fixed fee: $30h = 120$. Divide by the hourly rate: $h = 4$.\n\nCheck: $45 + 30(4) = 45 + 120 = 165$. The plumber worked 4 hours.",
     "tags": ["word-problems"]
   },
   {
@@ -45,16 +45,16 @@
     "stem": "What is the solution to $\\frac{2x}{3} - 4 = \\frac{x}{6} + 5$?",
     "choices": ["$2$", "$3$", "$10.8$", "$18$"],
     "answer": "D",
-    "explanation": "Multiply every term by $6$ to clear the fractions: $4x - 24 = x + 30$. Subtract $x$ from both sides: $3x - 24 = 30$. Add $24$: $3x = 54$, so $x = 18$.",
+    "explanation": "Fractions make equations messy, so start by getting rid of them. The denominators are $3$ and $6$, and $6$ is a multiple of both, so multiply every term on both sides by $6$.\n\n$6 \\cdot \\frac{2x}{3} = 4x$, $\\; 6 \\cdot 4 = 24$, $\\; 6 \\cdot \\frac{x}{6} = x$, and $6 \\cdot 5 = 30$. That gives $4x - 24 = x + 30$.\n\nNow collect the $x$ terms on one side by subtracting $x$: $3x - 24 = 30$. Add $24$: $3x = 54$. Divide by $3$: $x = 18$.\n\nCheck: the left side is $\\frac{36}{3} - 4 = 8$ and the right side is $\\frac{18}{6} + 5 = 8$. They match.",
     "rationales": {
-      "A": "When moving $-24$ to the other side, this subtracts instead of adding: $3x = 30 - 24 = 6$.",
-      "B": "This multiplies only the fraction terms by $6$, not the constants: $4x - 4 = x + 5$.",
-      "C": "This adds $x$ to both sides instead of subtracting it, getting $5x = 54$."
+      "A": "You moved the $-24$ across by subtracting it, which gave $3x = 6$. To undo $-24$, add $24$ to both sides.",
+      "B": "You multiplied the fraction terms by $6$ but left the $4$ and the $5$ alone. Every term needs to be multiplied, including the plain numbers.",
+      "C": "You added $x$ to both sides instead of subtracting it, which gave $5x = 54$. To collect the $x$ terms, subtract the smaller one from both sides."
     },
-    "fastMethod": "Check the choices: with $x = 18$, the left side is $12 - 4 = 8$ and the right side is $3 + 5 = 8$.",
+    "fastMethod": "With answer choices to pick from, you can simply test them. Try $x = 18$: the left side is $12 - 4 = 8$ and the right side is $3 + 5 = 8$. They are equal, so $18$ is the answer.",
     "desmos": {
       "expressions": ["y=\\frac{2x}{3}-4", "y=\\frac{x}{6}+5"],
-      "steps": "Graph each side as its own line. They intersect at $(18, 8)$, so $x = 18$."
+      "steps": "Type each side as its own line. The two lines cross at $(18, 8)$, and the $x$ value of that crossing point, $18$, is the solution."
     },
     "tags": ["fractions", "solving-equations", "desmos"]
   },
@@ -65,11 +65,11 @@
     "stem": "In the equation $5(2x - 3) + 4 = 10x + k$, $k$ is a constant. If the equation has infinitely many solutions, what is the value of $k$?",
     "choices": ["$1$", "$-11$", "$-15$", "$-19$"],
     "answer": "B",
-    "explanation": "Simplify the left side: $10x - 15 + 4 = 10x - 11$. An equation has infinitely many solutions when both sides are identical, so $10x - 11 = 10x + k$ gives $k = -11$.",
+    "explanation": "An equation has infinitely many solutions when both sides turn out to be exactly the same expression. Then every value of $x$ makes it true.\n\nSo simplify the left side and compare. Distribute the $5$: $10x - 15$. Add the $4$: $10x - 11$.\n\nNow the equation reads $10x - 11 = 10x + k$. The $x$ parts already match, so the constants have to match too. That means $k = -11$.\n\nWhenever you see \"infinitely many solutions,\" think \"both sides are identical.\"",
     "rationales": {
-      "A": "This multiplies only the $2x$ by $5$, getting $10x - 3 + 4 = 10x + 1$.",
-      "C": "This drops the $+4$ term after distributing.",
-      "D": "This subtracts $4$ instead of adding it: $-15 - 4 = -19$."
+      "A": "You multiplied the $5$ into the $2x$ but not into the $-3$, so you got $10x - 3 + 4$. The $5$ multiplies both terms inside the parentheses.",
+      "C": "You distributed correctly to get $10x - 15$, but then dropped the $+4$. Combine it too: $-15 + 4 = -11$.",
+      "D": "You subtracted the $4$ instead of adding it. The equation says $+4$, so $-15 + 4 = -11$."
     },
     "tags": ["solution-count", "distributing"]
   },
@@ -79,7 +79,7 @@
     "type": "spr",
     "stem": "If $\\frac{x + 4}{3} = \\frac{2x - 1}{5}$, what is the value of $x$?",
     "answer": ["23"],
-    "explanation": "Cross-multiply: $5(x + 4) = 3(2x - 1)$, so $5x + 20 = 6x - 3$. Subtract $5x$ from both sides and add $3$: $23 = x$.",
+    "explanation": "When one fraction equals another, you can cross multiply to clear both denominators at once: multiply each numerator by the other side's denominator.\n\n$5(x + 4) = 3(2x - 1)$, which becomes $5x + 20 = 6x - 3$.\n\nGet the $x$ terms together by subtracting $5x$ from both sides: $20 = x - 3$. Add $3$: $x = 23$.\n\nCheck: $\\frac{23 + 4}{3} = 9$ and $\\frac{46 - 1}{5} = 9$. Both sides equal $9$.",
     "tags": ["fractions", "solving-equations"]
   },
   {
@@ -89,11 +89,11 @@
     "stem": "In the equation $a(3x - 2) = 12x + b$, $a$ and $b$ are constants. If the equation has no solution, which of the following could be the values of $a$ and $b$?",
     "choices": ["$a = 4$ and $b = -8$", "$a = 12$ and $b = -24$", "$a = -4$ and $b = 8$", "$a = 4$ and $b = 8$"],
     "answer": "D",
-    "explanation": "The left side is $3ax - 2a$. A linear equation has no solution when the $x$-coefficients are equal but the constants are different. Equal coefficients: $3a = 12$, so $a = 4$. Then the left side is $12x - 8$, so the constants differ as long as $b \\ne -8$. Only $a = 4$, $b = 8$ fits.",
+    "explanation": "Start with what \"no solution\" looks like. After simplifying, the $x$ terms on both sides are identical but the constants are different, so you end up with something impossible like $-8 = 8$.\n\nDistribute on the left: $3ax - 2a$. For the $x$ term to match $12x$, you need $3a = 12$, so $a = 4$. Then the left side is $12x - 8$.\n\nNow the equation is $12x - 8 = 12x + b$. For no solution, the constants must be different, so $b$ can be anything except $-8$. Only choice D has $a = 4$ and a $b$ that is not $-8$.\n\nCheck D: $12x - 8 = 12x + 8$ simplifies to $-8 = 8$, which is never true.",
     "rationales": {
-      "A": "With these values both sides are $12x - 8$, so every $x$ works: infinitely many solutions, not none.",
-      "B": "This sets $a$ equal to $12$ without dividing by $3$. Then the left side is $36x - 24$, the $x$-coefficients differ, and there is exactly one solution.",
-      "C": "With $a = -4$ the left side is $-12x + 8$. The $x$-coefficients are opposites, not equal, so there is exactly one solution."
+      "A": "With $a = 4$ and $b = -8$, both sides become $12x - 8$. They are identical, so every $x$ works. That is infinitely many solutions, the opposite of what the question wants.",
+      "B": "You set $a = 12$ to match the $12x$, but the left side has $3a$ in front of $x$, not $a$. With $a = 12$ you get $36x$, the $x$ terms differ, and there is exactly one solution.",
+      "C": "With $a = -4$ the left side becomes $-12x + 8$. Its $x$ term is $-12x$, not $12x$, so the $x$ terms differ and there is exactly one solution."
     },
     "tags": ["solution-count"]
   },
@@ -103,7 +103,7 @@
     "type": "spr",
     "stem": "Maya has \\$300 in savings and adds \\$30 each week. Leo has \\$600 in savings and spends \\$15 of it each week. After how many weeks will Maya have exactly twice as much money as Leo?",
     "answer": ["15"],
-    "explanation": "After $w$ weeks Maya has $300 + 30w$ dollars and Leo has $600 - 15w$ dollars. Set Maya's amount equal to twice Leo's: $300 + 30w = 2(600 - 15w) = 1200 - 30w$. Add $30w$ and subtract $300$: $60w = 900$, so $w = 15$. Check: Maya has \\$750 and Leo has \\$375.",
+    "explanation": "Write each person's money as an expression in weeks, $w$. Maya starts at \\$300 and gains \\$30 a week, so she has $300 + 30w$. Leo starts at \\$600 and loses \\$15 a week, so he has $600 - 15w$.\n\n\"Maya has twice as much as Leo\" translates to Maya equals 2 times Leo: $300 + 30w = 2(600 - 15w)$.\n\nDistribute the $2$: $300 + 30w = 1200 - 30w$. Add $30w$ to both sides: $300 + 60w = 1200$. Subtract $300$: $60w = 900$, so $w = 15$.\n\nCheck: after 15 weeks Maya has \\$750 and Leo has \\$375, and $750$ is exactly twice $375$.",
     "tags": ["word-problems"]
   },
   {
@@ -113,16 +113,16 @@
     "stem": "What value of $x$ satisfies $0.4(5x - 15) = 1.2x - 2(0.3x + 1.6)$?",
     "choices": ["$2$", "$-\\frac{13}{7}$", "$\\frac{38}{7}$", "$\\frac{46}{7}$"],
     "answer": "A",
-    "explanation": "Left side: $0.4(5x - 15) = 2x - 6$. Right side: $1.2x - 0.6x - 3.2 = 0.6x - 3.2$. So $2x - 6 = 0.6x - 3.2$. Subtract $0.6x$ and add $6$: $1.4x = 2.8$, so $x = 2$.",
+    "explanation": "Decimals are just fractions in disguise, so treat this like any linear equation: simplify each side, then solve.\n\nLeft side: $0.4 \\cdot 5x = 2x$ and $0.4 \\cdot 15 = 6$, so it is $2x - 6$.\n\nRight side: distribute the $-2$ to both terms to get $-0.6x - 3.2$, then combine with $1.2x$: $0.6x - 3.2$.\n\nNow solve $2x - 6 = 0.6x - 3.2$. Subtract $0.6x$: $1.4x - 6 = -3.2$. Add $6$: $1.4x = 2.8$. Divide by $1.4$: $x = 2$.\n\nIf decimals slow you down, multiply both sides by $10$ at the start and work with whole numbers instead.",
     "rationales": {
-      "B": "This computes $0.4 \\cdot 15$ as $0.6$, giving $2x - 0.6 = 0.6x - 3.2$ and $1.4x = -2.6$.",
-      "C": "This multiplies only the $0.3x$ by $-2$ and adds $1.6$, giving $0.6x + 1.6$ on the right and $1.4x = 7.6$.",
-      "D": "This distributes $-2$ with a sign error, getting $-0.6x + 3.2$, so the right side is $0.6x + 3.2$ and $1.4x = 9.2$."
+      "B": "You worked out $0.4 \\cdot 15$ as $0.6$ instead of $6$. Line the decimal up carefully: $0.4 \\times 15 = 6$.",
+      "C": "You multiplied the $-2$ into $0.3x$ but not into $1.6$, and the constant's sign flipped. Distribute the $-2$ to both terms: $-0.6x - 3.2$.",
+      "D": "The $-2$ has to change the sign of both terms inside. You got $-0.6x + 3.2$, but $-2 \\times 1.6$ is $-3.2$."
     },
-    "fastMethod": "Plug in $x = 2$: the left side is $0.4(-5) = -2$ and the right side is $2.4 - 2(2.2) = -2$.",
+    "fastMethod": "Plug in the friendliest choice first. With $x = 2$, the left side is $0.4(10 - 15) = -2$ and the right side is $2.4 - 2(2.2) = -2$. They match, so you are done.",
     "desmos": {
       "expressions": ["y=0.4(5x-15)", "y=1.2x-2(0.3x+1.6)"],
-      "steps": "Graph each side as a line. They intersect at $(2, -2)$, so $x = 2$."
+      "steps": "Type each side as its own line. They cross at $(2, -2)$, so $x = 2$."
     },
     "tags": ["distributing", "solving-equations", "desmos"]
   }

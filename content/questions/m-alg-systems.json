@@ -6,11 +6,11 @@
     "stem": "If $y = 3x$ and $x + y = 24$, what is the value of $x$?",
     "choices": ["$6$", "$8$", "$12$", "$18$"],
     "answer": "A",
-    "explanation": "Substitute $3x$ for $y$ in the second equation: $x + 3x = 24$, so $4x = 24$ and $x = 6$.",
+    "explanation": "The first equation hands you $y$ directly: $y$ is $3x$. So swap $3x$ in for $y$ in the second equation and you are left with only $x$.\n\n$x + 3x = 24$, so $4x = 24$ and $x = 6$.\n\nCheck: then $y = 18$, and $6 + 18 = 24$. Both equations work.",
     "rationales": {
-      "B": "This divides $24$ by $3$, forgetting to include the $x$ term: it solves $3x = 24$.",
-      "C": "This splits $24$ evenly between $x$ and $y$, as if $x = y$.",
-      "D": "This is the value of $y$, not $x$."
+      "B": "You solved $3x = 24$, which leaves out the $x$ in $x + y$. After substituting, it is $x + 3x = 4x$.",
+      "C": "Splitting $24$ in half assumes $x$ and $y$ are equal, but $y$ is three times $x$.",
+      "D": "$18$ is the value of $y$. The question asks for $x$."
     },
     "tags": ["substitution"]
   },
@@ -21,11 +21,11 @@
     "stem": "$$2x + y = 11$$ $$2x - y = 5$$ What value of $x$ satisfies the system of equations above?",
     "choices": ["$3$", "$4$", "$8$", "$16$"],
     "answer": "B",
-    "explanation": "Add the equations to eliminate $y$: $4x = 16$, so $x = 4$.",
+    "explanation": "Look at the $y$ terms: one equation has $+y$ and the other has $-y$. Adding the equations makes them cancel, which is exactly what you want when you are solving for $x$.\n\n$(2x + y) + (2x - y) = 11 + 5$ gives $4x = 16$, so $x = 4$.\n\nWhenever the same variable appears with opposite signs, adding the equations is the quickest route.",
     "rationales": {
-      "A": "This is the value of $y$: subtracting the equations gives $2y = 6$.",
-      "C": "This divides $16$ by $2$ instead of by $4$.",
-      "D": "This is the value of $4x$, not $x$."
+      "A": "$3$ is the value of $y$, which you get by subtracting the equations. The question asks for $x$.",
+      "C": "Adding gives $4x = 16$. Divide by $4$, not $2$.",
+      "D": "$16$ is the value of $4x$. Divide by $4$ to finish."
     },
     "tags": ["elimination"]
   },
@@ -35,7 +35,7 @@
     "type": "spr",
     "stem": "If $x + y = 15$ and $x - y = 3$, what is the value of $y$?",
     "answer": ["6"],
-    "explanation": "Subtract the second equation from the first: $(x + y) - (x - y) = 15 - 3$, so $2y = 12$ and $y = 6$.",
+    "explanation": "You want $y$, so make the $x$ terms disappear. Both equations have a plain $x$, so subtract the second equation from the first.\n\n$(x + y) - (x - y) = 15 - 3$. On the left, the $x$ terms cancel and $y - (-y) = 2y$. So $2y = 12$ and $y = 6$.\n\nCheck: $x = 9$, and $9 + 6 = 15$, $9 - 6 = 3$.",
     "tags": ["elimination"]
   },
   {
@@ -45,11 +45,11 @@
     "stem": "A theater sold $200$ tickets for one show. Adult tickets cost \\$15 each and child tickets cost \\$9 each. Ticket sales for the show totaled \\$2,520. How many adult tickets were sold?",
     "choices": ["$80$", "$100$", "$120$", "$168$"],
     "answer": "C",
-    "explanation": "Let $a$ be adult tickets and $c$ child tickets: $a + c = 200$ and $15a + 9c = 2{,}520$. Substitute $c = 200 - a$: $15a + 1{,}800 - 9a = 2{,}520$, so $6a = 720$ and $a = 120$.",
+    "explanation": "There are two unknowns, so you need two facts. One fact is about how many tickets were sold, the other is about money.\n\nLet $a$ be adult tickets and $c$ be child tickets. Count: $a + c = 200$. Money: $15a + 9c = 2{,}520$.\n\nFrom the count, $c = 200 - a$. Put that into the money equation: $15a + 9(200 - a) = 2{,}520$, so $15a + 1{,}800 - 9a = 2{,}520$. That simplifies to $6a = 720$, so $a = 120$.\n\nCheck: $120$ adults and $80$ children make $200$ tickets, and $1{,}800 + 720 = 2{,}520$ dollars.",
     "rationales": {
-      "A": "This is the number of child tickets, $200 - 120$.",
-      "B": "This assumes the tickets were split evenly between adults and children.",
-      "D": "This divides \\$2,520 by \\$15, as if every ticket sold were an adult ticket."
+      "A": "$80$ is the number of child tickets. The question asks for adult tickets.",
+      "B": "This assumes half the tickets were adult tickets, but the money total tells you there were more adults than that.",
+      "D": "Dividing \\$2,520 by \\$15 assumes every ticket was an adult ticket. Some were child tickets at \\$9."
     },
     "tags": ["modeling", "substitution"]
   },
@@ -65,11 +65,11 @@
       "$6x - 3y = 9$ and $y = 2x + 1$"
     ],
     "answer": "D",
-    "explanation": "A system has no solution when the lines are parallel and distinct: same slope, different intercepts. Solving $6x - 3y = 9$ for $y$ gives $y = 2x - 3$. That has the same slope as $y = 2x + 1$ but a different intercept, so the lines never meet.",
+    "explanation": "Think of each equation as a line. Two lines have no point in common when they are parallel but not the same line: same slope, different intercept.\n\nPut choice D in slope form. From $6x - 3y = 9$: $-3y = -6x + 9$, so $y = 2x - 3$. The other line is $y = 2x + 1$.\n\nBoth have slope $2$, but they cross the $y$ axis at different places ($-3$ and $1$). They run side by side forever and never meet, so there is no solution.",
     "rationales": {
-      "A": "The slopes are $2$ and $-2$, which differ, so the lines cross once (at $(0, 3)$). Only the intercepts match.",
-      "B": "The slopes are $-1$ and $1$, so the lines cross exactly once, at $(5, 0)$.",
-      "C": "Solving $4x - 2y = 6$ for $y$ gives $y = 2x - 3$, the same line, so there are infinitely many solutions."
+      "A": "The slopes are $2$ and $-2$, so the lines tilt in different directions and cross once, at $(0, 3)$. Matching intercepts alone don't make lines parallel.",
+      "B": "The slopes are $-1$ and $1$, so these lines cross exactly once, at $(5, 0)$.",
+      "C": "Solving $4x - 2y = 6$ for $y$ gives $y = 2x - 3$, the very same line. Same line means infinitely many solutions, not none."
     },
     "tags": ["solution-count"]
   },
@@ -79,10 +79,10 @@
     "type": "spr",
     "stem": "$$3x + 2y = 19$$ $$x - 4y = -3$$ If $(x, y)$ is the solution to the system of equations above, what is the value of $x + y$?",
     "answer": ["7"],
-    "explanation": "From the second equation, $x = 4y - 3$. Substitute into the first: $3(4y - 3) + 2y = 19$, so $14y - 9 = 19$, $14y = 28$, and $y = 2$. Then $x = 4(2) - 3 = 5$, and $x + y = 7$.",
+    "explanation": "The second equation has a plain $x$, so it is easy to solve for $x$: $x = 4y - 3$.\n\nSubstitute that into the first equation: $3(4y - 3) + 2y = 19$. That is $12y - 9 + 2y = 19$, so $14y = 28$ and $y = 2$.\n\nThen $x = 4(2) - 3 = 5$, and $x + y = 5 + 2 = 7$.\n\nDon't stop at $y = 2$. The question asks for the sum.",
     "desmos": {
       "expressions": ["3x+2y=19", "x-4y=-3"],
-      "steps": "Graph both equations and click the intersection: $(5, 2)$. Add the coordinates: $5 + 2 = 7$."
+      "steps": "Graph both equations and click where they cross: $(5, 2)$. Add the coordinates: $5 + 2 = 7$."
     },
     "tags": ["substitution", "desmos"]
   },
@@ -93,11 +93,11 @@
     "stem": "$$kx + 6y = 12$$ $$2x + 3y = 5$$ In the system of equations above, $k$ is a constant. For what value of $k$ does the system have no solution?",
     "choices": ["$-4$", "$1$", "$4$", "$\\frac{24}{5}$"],
     "answer": "C",
-    "explanation": "The second equation's $y$-coefficient, $3$, doubles to $6$ in the first, so the lines are parallel when the $x$-coefficient also doubles: $k = 2(2) = 4$. Then the first equation is $4x + 6y = 12$, or $2x + 3y = 6$, which is parallel to $2x + 3y = 5$ but not the same line. So there is no solution.",
+    "explanation": "No solution means the two lines are parallel and separate. In standard form, parallel lines have their $x$ and $y$ coefficients in the same ratio.\n\nCompare the $y$ coefficients: $6$ in the first equation, $3$ in the second. The first is double the second. For the lines to be parallel, the $x$ coefficient must also double: $k = 2 \\times 2 = 4$.\n\nCheck that they are not the same line. With $k = 4$, the first equation is $4x + 6y = 12$, which halves to $2x + 3y = 6$. The second says $2x + 3y = 5$. The same expression can't equal both $6$ and $5$, so there is no solution.",
     "rationales": {
-      "A": "This makes a sign error when matching slopes, setting $-\\frac{k}{6} = \\frac{2}{3}$ instead of $-\\frac{2}{3}$.",
-      "B": "This sets up the ratio upside down, $\\frac{k}{2} = \\frac{3}{6}$.",
-      "D": "This matches the ratio of the constants, $\\frac{k}{2} = \\frac{12}{5}$, which has nothing to do with the slopes."
+      "A": "This comes from a sign slip when matching slopes. Both lines have slope $-\\frac{2}{3}$, so $k$ is positive.",
+      "B": "The ratio is upside down. The first equation's coefficients should be double the second's, so $k = 2 \\times 2$.",
+      "D": "This matches the ratio of the constants on the right. Parallel lines depend on the $x$ and $y$ coefficients, not the constants."
     },
     "tags": ["solution-count"]
   },
@@ -107,7 +107,7 @@
     "type": "spr",
     "stem": "$$5x - 3y = 8$$ $$15x + by = c$$ In the system of equations above, $b$ and $c$ are constants. If the system has infinitely many solutions, what is the value of $b + c$?",
     "answer": ["15"],
-    "explanation": "Infinitely many solutions means the equations describe the same line. The $x$-coefficient went from $5$ to $15$, so the second equation must be $3$ times the first: $15x - 9y = 24$. So $b = -9$, $c = 24$, and $b + c = 15$.",
+    "explanation": "Infinitely many solutions means both equations describe the very same line. So the second equation must be the first one multiplied by some number.\n\nThe $x$ coefficient went from $5$ to $15$, so that number is $3$. Multiply every term of the first equation by $3$: $15x - 9y = 24$.\n\nMatch it up with $15x + by = c$: $b = -9$ and $c = 24$. So $b + c = 15$.",
     "tags": ["solution-count"]
   },
   {
@@ -117,15 +117,15 @@
     "stem": "$$0.6x + 1.5y = 9.3$$ $$2.4x - 0.5y = 4.7$$ If $(x, y)$ is the solution to the system of equations above, what is the value of $x + y$?",
     "choices": ["$-2$", "$3$", "$5$", "$8$"],
     "answer": "D",
-    "explanation": "Multiply the second equation by $3$: $7.2x - 1.5y = 14.1$. Add it to the first equation: $7.8x = 23.4$, so $x = 3$. Then $0.6(3) + 1.5y = 9.3$ gives $1.5y = 7.5$ and $y = 5$. So $x + y = 8$.",
+    "explanation": "Elimination works well here because the $y$ terms are $+1.5y$ and $-0.5y$. Multiply the second equation by $3$ so they become opposites.\n\n$3(2.4x - 0.5y) = 3(4.7)$ gives $7.2x - 1.5y = 14.1$. Add this to the first equation: the $y$ terms cancel and $7.8x = 23.4$, so $x = 3$.\n\nPut $x = 3$ back into the first equation: $1.8 + 1.5y = 9.3$, so $1.5y = 7.5$ and $y = 5$.\n\nThe question wants $x + y = 3 + 5 = 8$.",
     "rationales": {
-      "A": "This is $x - y$, not $x + y$.",
-      "B": "This is only the value of $x$.",
-      "C": "This is only the value of $y$."
+      "A": "$-2$ is $x - y$. The question asks for $x + y$.",
+      "B": "$3$ is just $x$. Find $y$ too and add them.",
+      "C": "$5$ is just $y$. Add $x$ to it."
     },
     "desmos": {
       "expressions": ["0.6x+1.5y=9.3", "2.4x-0.5y=4.7"],
-      "steps": "Graph both equations and click the intersection: $(3, 5)$. Then $x + y = 8$."
+      "steps": "Graph both equations and click where they cross: $(3, 5)$. Then $x + y = 8$."
     },
     "tags": ["elimination", "desmos"]
   }

@@ -6,11 +6,11 @@
     "stem": "If $x^2 = 49$ and $x > 0$, what is the value of $x$?",
     "choices": ["$24.5$", "$7$", "$49$", "$2{,}401$"],
     "answer": "B",
-    "explanation": "Take the square root of both sides: $x = \\pm 7$. Since $x > 0$, $x = 7$.",
+    "explanation": "$x^2 = 49$ asks: what number times itself gives $49$? Both $7$ and $-7$ do, since $(-7)(-7) = 49$ too.\n\nThe question says $x > 0$, so the negative one is ruled out and $x = 7$.\n\nSquares always have two candidate roots, one positive and one negative. Read the conditions in the question to pick the right one.",
     "rationales": {
-      "A": "This divides $49$ by $2$, treating $x^2$ as $2x$.",
-      "C": "This is the value of $x^2$, not $x$; the square root was never taken.",
-      "D": "This squares $49$ instead of taking its square root."
+      "A": "Dividing by $2$ treats $x^2$ as $2x$. But $x^2$ means $x$ times $x$, so you need a square root.",
+      "C": "$49$ is the value of $x^2$. To get $x$, take the square root.",
+      "D": "This squares $49$, but you need to undo a square, which means taking the square root."
     },
     "tags": ["square-roots"]
   },
@@ -21,11 +21,11 @@
     "stem": "What are the solutions to $(x - 3)(x + 5) = 0$?",
     "choices": ["$x = -3$ and $x = 5$", "$x = 3$ and $x = 5$", "$x = 3$ and $x = -5$", "$x = -3$ and $x = -5$"],
     "answer": "C",
-    "explanation": "A product is zero when a factor is zero. $x - 3 = 0$ gives $x = 3$, and $x + 5 = 0$ gives $x = -5$.",
+    "explanation": "When two things multiply to give zero, at least one of them must be zero. So set each factor equal to zero.\n\n$x - 3 = 0$ gives $x = 3$. $x + 5 = 0$ gives $x = -5$.\n\nNotice the signs: each solution is the opposite of the number you see inside the parentheses. That is a very common place to slip.",
     "rationales": {
-      "A": "Both signs are flipped: the solutions are the values that make each factor zero, not the numbers shown in the factors.",
-      "B": "The sign of the second solution is wrong: $x + 5 = 0$ means $x = -5$.",
-      "D": "The sign of the first solution is wrong: $x - 3 = 0$ means $x = 3$."
+      "A": "Both signs are flipped. The solutions are the values that make each factor zero: $x - 3 = 0$ means $x = 3$, and $x + 5 = 0$ means $x = -5$.",
+      "B": "The first one is right, but $x + 5 = 0$ means $x = -5$, not $5$.",
+      "D": "The second one is right, but $x - 3 = 0$ means $x = 3$, not $-3$."
     },
     "tags": ["factoring"]
   },
@@ -35,7 +35,7 @@
     "type": "spr",
     "stem": "If $x^2 + 6 = 31$ and $x > 0$, what is the value of $x$?",
     "answer": ["5"],
-    "explanation": "Subtract $6$ from both sides: $x^2 = 25$. So $x = \\pm 5$, and because $x > 0$, $x = 5$.",
+    "explanation": "Get $x^2$ by itself first, then take the square root.\n\nSubtract $6$ from both sides: $x^2 = 25$. The numbers whose square is $25$ are $5$ and $-5$. The question says $x > 0$, so $x = 5$.\n\nCheck: $5^2 + 6 = 31$.",
     "tags": ["square-roots"]
   },
   {
@@ -45,16 +45,16 @@
     "stem": "What is the positive solution of $x^2 - 5x - 14 = 0$?",
     "choices": ["$2$", "$5$", "$7$", "$14$"],
     "answer": "C",
-    "explanation": "Find two numbers that multiply to $-14$ and add to $-5$: $-7$ and $2$. So $(x - 7)(x + 2) = 0$, giving $x = 7$ or $x = -2$. The positive solution is $7$.",
+    "explanation": "Factor by finding two numbers that multiply to the constant, $-14$, and add to the middle number, $-5$. Those are $-7$ and $2$.\n\nSo $x^2 - 5x - 14 = (x - 7)(x + 2)$. Setting each factor to zero gives $x = 7$ and $x = -2$.\n\nThe positive solution is $7$. Check: $49 - 35 - 14 = 0$.",
     "rationales": {
-      "A": "This is the absolute value of the negative solution, $-2$.",
-      "B": "This is the sum of the solutions (the coefficient of $x$ with its sign flipped).",
-      "D": "This is the absolute value of the constant term."
+      "A": "$2$ appears in the factored form, but the factor $(x + 2)$ gives the solution $x = -2$, which is negative.",
+      "B": "$5$ is the sum of the two solutions ($7 + (-2)$), not a solution itself.",
+      "D": "$14$ is the constant term. The solutions come from factoring, not from reading a number off the equation."
     },
-    "fastMethod": "Test the choices: only $7$ works, since $49 - 35 - 14 = 0$.",
+    "fastMethod": "Test the choices. Only $7$ works: $49 - 35 - 14 = 0$.",
     "desmos": {
       "expressions": ["y=x^2-5x-14"],
-      "steps": "Type the expression. Click the two $x$-intercepts: $(-2, 0)$ and $(7, 0)$. Pick the positive one."
+      "steps": "Type the expression and click the two places it crosses the $x$ axis: $(-2, 0)$ and $(7, 0)$. Pick the positive one."
     },
     "tags": ["factoring", "desmos"]
   },
@@ -65,15 +65,15 @@
     "stem": "How many distinct real solutions does $2x^2 - 4x + 5 = 0$ have?",
     "choices": ["Zero", "Exactly one", "Exactly two", "Infinitely many"],
     "answer": "A",
-    "explanation": "Use the discriminant $b^2 - 4ac$ with $a = 2$, $b = -4$, $c = 5$: $(-4)^2 - 4(2)(5) = 16 - 40 = -24$. A negative discriminant means there are no real solutions.",
+    "explanation": "The discriminant, $b^2 - 4ac$, tells you how many real solutions a quadratic has without solving it. Positive means two, zero means one, negative means none.\n\nHere $a = 2$, $b = -4$, $c = 5$. So $b^2 - 4ac = 16 - 40 = -24$.\n\nIt is negative, so there are no real solutions. On a graph, the parabola never touches the $x$ axis.",
     "rationales": {
-      "B": "Exactly one real solution requires a discriminant of $0$; here it is $-24$.",
-      "C": "This comes from computing $16 + 40$ instead of $16 - 40$, which makes the discriminant positive.",
-      "D": "A quadratic equation can never have infinitely many solutions."
+      "B": "Exactly one solution needs a discriminant of $0$. Here it is $-24$.",
+      "C": "Watch the sign: $b^2 - 4ac$ is $16 - 40$, which is negative. It looks like you added $40$ instead.",
+      "D": "A quadratic equation can have at most two solutions, never infinitely many."
     },
     "desmos": {
       "expressions": ["y=2x^2-4x+5"],
-      "steps": "Graph the left side. The parabola sits entirely above the $x$-axis (its lowest point is $(1, 3)$), so it never crosses: zero real solutions."
+      "steps": "Graph the left side. The parabola stays above the $x$ axis the whole way (its lowest point is $(1, 3)$), so it never crosses. That means zero real solutions."
     },
     "tags": ["discriminant", "desmos"]
   },
@@ -83,10 +83,10 @@
     "type": "spr",
     "stem": "The system $y = x^2$ and $y = 4x - 4$ has exactly one solution $(x, y)$. What is the value of $y$?",
     "answer": ["4"],
-    "explanation": "Set the right sides equal: $x^2 = 4x - 4$, so $x^2 - 4x + 4 = 0$, which is $(x - 2)^2 = 0$. Then $x = 2$ and $y = 2^2 = 4$.",
+    "explanation": "At a solution of the system, both equations give the same $y$. So set the two expressions for $y$ equal: $x^2 = 4x - 4$.\n\nMove everything to one side: $x^2 - 4x + 4 = 0$. That is a perfect square, $(x - 2)^2 = 0$, so $x = 2$.\n\nNow find $y$ from either equation: $y = 2^2 = 4$.\n\nOnly one solution makes sense here: the line just touches the parabola at one point.",
     "desmos": {
       "expressions": ["y=x^2", "y=4x-4"],
-      "steps": "Graph both equations. The line touches the parabola at a single point, $(2, 4)$. The $y$-value is $4$."
+      "steps": "Graph both equations. The line touches the parabola at exactly one point, $(2, 4)$, so $y = 4$."
     },
     "tags": ["nonlinear-systems", "desmos"]
   },
@@ -97,13 +97,13 @@
     "stem": "What is the solution set of $\\sqrt{x + 7} = x - 5$?",
     "choices": ["$x = 2$ only", "$x = 9$ only", "$x = 2$ and $x = 9$", "$x = -2$ and $x = -9$"],
     "answer": "B",
-    "explanation": "Square both sides: $x + 7 = x^2 - 10x + 25$, so $x^2 - 11x + 18 = 0$, which factors as $(x - 2)(x - 9) = 0$. Check both in the original equation. $x = 9$: $\\sqrt{16} = 4$ and $9 - 5 = 4$, so it works. $x = 2$: $\\sqrt{9} = 3$ but $2 - 5 = -3$, so it fails. The only solution is $x = 9$.",
+    "explanation": "To remove a square root, square both sides. But squaring can create fake solutions, so you must check every answer in the original equation.\n\nSquare both sides: $x + 7 = (x - 5)^2 = x^2 - 10x + 25$. Move everything to one side: $x^2 - 11x + 18 = 0$, which factors as $(x - 2)(x - 9) = 0$. So the candidates are $2$ and $9$.\n\nCheck $x = 9$: $\\sqrt{16} = 4$ and $9 - 5 = 4$. It works.\n\nCheck $x = 2$: $\\sqrt{9} = 3$, but $2 - 5 = -3$. A square root can't be negative, so $x = 2$ is a fake solution.\n\nOnly $x = 9$ works.",
     "rationales": {
-      "A": "This keeps the extraneous solution and discards the real one; $x = 2$ makes the right side negative.",
-      "C": "Squaring can create extraneous solutions. Checking shows $x = 2$ does not satisfy the original equation.",
-      "D": "These come from factoring $x^2 - 11x + 18$ with the wrong signs."
+      "A": "$x = 2$ is the fake one. It makes the right side $-3$, but a square root is never negative.",
+      "C": "Squaring can sneak in solutions that don't work. Checking shows $x = 2$ gives $3 = -3$, so it has to go.",
+      "D": "These come from factoring with the wrong signs. $(x - 2)(x - 9)$ gives positive solutions."
     },
-    "fastMethod": "Plug each answer into the original equation. $x = 9$ works; $x = 2$ gives $3 = -3$.",
+    "fastMethod": "Plug the choices into the original equation. $x = 9$ works, and $x = 2$ gives $3 = -3$.",
     "tags": ["radical-equations"]
   },
   {
@@ -112,8 +112,8 @@
     "type": "spr",
     "stem": "In the equation $x^2 + kx + 9 = 0$, $k$ is a positive constant. If the equation has exactly one real solution, what is the value of $k$?",
     "answer": ["6"],
-    "explanation": "Exactly one real solution means the discriminant is zero: $k^2 - 4(1)(9) = 0$, so $k^2 = 36$ and $k = \\pm 6$. Since $k$ is positive, $k = 6$.",
-    "fastMethod": "A perfect square trinomial has one solution: $(x + 3)^2 = x^2 + 6x + 9$, so $k = 6$.",
+    "explanation": "A quadratic has exactly one real solution when its discriminant is zero.\n\nHere $a = 1$, $b = k$, $c = 9$. Set $k^2 - 4(1)(9) = 0$, so $k^2 = 36$ and $k = 6$ or $k = -6$. The question says $k$ is positive, so $k = 6$.\n\nIt makes sense: $x^2 + 6x + 9 = (x + 3)^2$, which equals zero only when $x = -3$.",
+    "fastMethod": "One solution means a perfect square. Since $9 = 3^2$, try $(x + 3)^2 = x^2 + 6x + 9$. So $k = 6$.",
     "tags": ["discriminant"]
   },
   {
@@ -123,15 +123,15 @@
     "stem": "The graph of $y = -x^2 + 6x$ and the graph of $y = c$, where $c$ is a constant, intersect at exactly one point. What is the value of $c$?",
     "choices": ["$3$", "$6$", "$9$", "$36$"],
     "answer": "C",
-    "explanation": "A horizontal line meets a downward-opening parabola exactly once at its vertex. The vertex is at $x = -\\frac{b}{2a} = -\\frac{6}{2(-1)} = 3$, and $y = -(3)^2 + 6(3) = 9$. So $c = 9$.",
+    "explanation": "The parabola $y = -x^2 + 6x$ opens down, like a hill. A flat line $y = c$ touches a hill at exactly one point only when it just grazes the very top, the vertex.\n\nThe vertex is at $x = -\\frac{b}{2a} = -\\frac{6}{2(-1)} = 3$. Its height is $y = -(3)^2 + 6(3) = -9 + 18 = 9$.\n\nSo the line is $y = 9$, and $c = 9$. Any higher line misses the hill; any lower line cuts through it twice.",
     "rationales": {
-      "A": "This is the $x$-coordinate of the vertex, not the $y$-coordinate.",
-      "B": "This is the coefficient of $x$, not the maximum value of the function.",
-      "D": "This squares the coefficient $6$ instead of evaluating the function at the vertex."
+      "A": "$3$ is where the top of the hill is sideways (its $x$ value). The line $y = c$ needs the height, the $y$ value.",
+      "B": "$6$ is the coefficient of $x$. The height of the top is found by plugging the vertex's $x$ value into the function.",
+      "D": "Squaring the $6$ doesn't give the height. Plug $x = 3$ into $-x^2 + 6x$ to get $9$."
     },
     "desmos": {
       "expressions": ["y=-x^2+6x", "y=c"],
-      "steps": "Type both lines and add a slider for $c$. Drag $c$ until the line just touches the top of the parabola: that happens at $(3, 9)$, so $c = 9$."
+      "steps": "Type both equations and add a slider for $c$. Drag $c$ until the line just touches the top of the parabola. That happens at $(3, 9)$, so $c = 9$."
     },
     "tags": ["vertex-form", "nonlinear-systems", "desmos"]
   }

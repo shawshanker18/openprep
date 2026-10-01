@@ -6,11 +6,11 @@
     "stem": "Which of the following is the solution to $3x - 7 > 11$?",
     "choices": ["$x > 6$", "$x < 6$", "$x > \\frac{4}{3}$", "$x > 54$"],
     "answer": "A",
-    "explanation": "Add $7$ to both sides: $3x > 18$. Divide by $3$ (a positive number, so the sign stays the same): $x > 6$.",
+    "explanation": "Solve an inequality the same way you solve an equation. The only extra rule: if you multiply or divide by a negative number, flip the symbol.\n\nAdd $7$ to both sides: $3x > 18$. Divide by $3$: $x > 6$. Since $3$ is positive, the symbol stays as it is.\n\nQuick sense check: try $x = 7$. Then $3(7) - 7 = 14$, which is more than $11$. Good.",
     "rationales": {
-      "B": "This reverses the inequality symbol, which is only needed when multiplying or dividing by a negative number.",
-      "C": "This subtracts $7$ from $11$ instead of adding: $3x > 4$.",
-      "D": "This multiplies $18$ by $3$ instead of dividing."
+      "B": "You flipped the symbol, but that only happens when you multiply or divide by a negative. Here you divide by positive $3$.",
+      "C": "You subtracted $7$ from $11$, but to undo $-7$ you add $7$. That gives $3x > 18$.",
+      "D": "You multiplied $18$ by $3$ instead of dividing. To undo $3x$, divide by $3$."
     },
     "tags": ["solving-inequalities"]
   },
@@ -21,11 +21,11 @@
     "stem": "Which of the following is the solution to $-4x + 5 \\le 25$?",
     "choices": ["$x \\le -5$", "$x \\ge -\\frac{15}{2}$", "$x \\ge -5$", "$x \\ge 5$"],
     "answer": "C",
-    "explanation": "Subtract $5$: $-4x \\le 20$. Divide by $-4$ and reverse the inequality symbol: $x \\ge -5$.",
+    "explanation": "This one has the classic trap: you will divide by a negative number, so the symbol has to flip.\n\nSubtract $5$ from both sides: $-4x \\le 20$. Now divide by $-4$ and flip $\\le$ to $\\ge$: $x \\ge -5$.\n\nWhy flip? Dividing by a negative reverses the order of numbers. For example, $2 < 3$, but $-2 > -3$.\n\nCheck with $x = 0$, which should work since $0 \\ge -5$: $-4(0) + 5 = 5$, and $5 \\le 25$. Yes.",
     "rationales": {
-      "A": "This forgets to reverse the inequality symbol after dividing by a negative number.",
-      "B": "This adds $5$ to $25$ instead of subtracting, getting $-4x \\le 30$.",
-      "D": "This divides $20$ by $4$ instead of $-4$, losing the negative sign."
+      "A": "Right numbers, but the symbol needed to flip when you divided by $-4$. So it is $x \\ge -5$.",
+      "B": "You added $5$ to $25$, but to undo $+5$ you subtract $5$. That gives $-4x \\le 20$.",
+      "D": "Dividing $20$ by $-4$ gives $-5$, not $5$. Keep the negative sign."
     },
     "tags": ["solving-inequalities"]
   },
@@ -35,7 +35,7 @@
     "type": "spr",
     "stem": "A delivery van can carry at most $1{,}200$ kilograms. The driver weighs $80$ kilograms, and each box weighs $32$ kilograms. What is the greatest number of boxes the van can carry on a trip with the driver?",
     "answer": ["35"],
-    "explanation": "The total weight must satisfy $80 + 32b \\le 1{,}200$. Subtract $80$: $32b \\le 1{,}120$. Divide by $32$: $b \\le 35$. The greatest number of boxes is $35$.",
+    "explanation": "\"At most\" means the total weight can be equal to or less than the limit, so you need $\\le$.\n\nTotal weight is the driver plus the boxes: $80 + 32b \\le 1{,}200$. Subtract the driver's weight: $32b \\le 1{,}120$. Divide by $32$: $b \\le 35$.\n\nSo the van can carry at most $35$ boxes. Check: $80 + 32(35) = 80 + 1{,}120 = 1{,}200$, exactly the limit.",
     "tags": ["modeling"]
   },
   {
@@ -50,11 +50,11 @@
       "$t + c \\le 24$ and $14t + 11c \\ge 280$"
     ],
     "answer": "D",
-    "explanation": "\"At most $24$ hours\" means $t + c \\le 24$. Earnings are $14t + 11c$ dollars, and \"at least \\$280\" means $14t + 11c \\ge 280$.",
+    "explanation": "Translate one sentence at a time and watch the key words.\n\n\"At most $24$ hours in total\" is about hours: $t + c \\le 24$. \"At most\" means no more than, so $\\le$.\n\n\"At least \\$280\" is about money. She earns \\$14 an hour tutoring and \\$11 an hour at the café, so her earnings are $14t + 11c$. \"At least\" means no less than, so $14t + 11c \\ge 280$.\n\nThat pair is choice D.",
     "rationales": {
-      "A": "Both inequality symbols are reversed: \"at most\" is $\\le$ and \"at least\" is $\\ge$.",
-      "B": "This swaps the two limits, putting the dollar amount on the hours and the hours on the earnings.",
-      "C": "This pairs each hourly rate with the wrong job."
+      "A": "Both symbols are reversed. \"At most\" means $\\le$ and \"at least\" means $\\ge$.",
+      "B": "The limits got swapped. $24$ is a number of hours, so it belongs with $t + c$, and $280$ is dollars, so it belongs with the earnings.",
+      "C": "The pay rates are attached to the wrong jobs. Tutoring pays \\$14, so the $14$ goes with $t$."
     },
     "tags": ["modeling", "systems-of-inequalities"]
   },
@@ -65,15 +65,15 @@
     "stem": "Which point $(x, y)$ is a solution to the system of inequalities $y > 2x - 3$ and $y \\le -x + 6$?",
     "choices": ["$(0, -3)$", "$(1, 4)$", "$(2, 5)$", "$(4, 3)$"],
     "answer": "B",
-    "explanation": "Test $(1, 4)$: $4 > 2(1) - 3 = -1$ is true, and $4 \\le -1 + 6 = 5$ is true. Both inequalities hold, so $(1, 4)$ is a solution.",
+    "explanation": "A point solves a system only if it makes every inequality true. So test the choices one at a time.\n\nTry $(1, 4)$. First: is $4 > 2(1) - 3 = -1$? Yes. Second: is $4 \\le -(1) + 6 = 5$? Yes. Both are true, so $(1, 4)$ is a solution.\n\nPay attention to $>$ versus $\\ge$. A point that makes one side exactly equal only counts when the symbol includes \"or equal to.\"",
     "rationales": {
-      "A": "This point lies on the boundary $y = 2x - 3$, since $-3 = -3$; the strict inequality $>$ excludes it.",
-      "C": "This fails the second inequality: $5 \\le -2 + 6 = 4$ is false.",
-      "D": "This fails the first inequality: $3 > 2(4) - 3 = 5$ is false."
+      "A": "This point makes the first inequality an equality: $-3 = 2(0) - 3$. The symbol is a strict $>$, so being exactly on the line doesn't count.",
+      "C": "It passes the first test but fails the second: is $5 \\le -2 + 6 = 4$? No.",
+      "D": "It fails the first test: is $3 > 2(4) - 3 = 5$? No."
     },
     "desmos": {
       "expressions": ["y>2x-3", "y\\le-x+6", "(0,-3)", "(1,4)", "(2,5)", "(4,3)"],
-      "steps": "Graph both inequalities and the four points. Only $(1, 4)$ sits strictly inside the region where the two shadings overlap. $(0, -3)$ lies on the dashed boundary, so it does not count."
+      "steps": "Graph both inequalities and the four points. Only $(1, 4)$ sits inside the area where both shadings overlap. $(0, -3)$ is on the dashed boundary line, so it doesn't count."
     },
     "tags": ["systems-of-inequalities", "desmos"]
   },
@@ -83,7 +83,7 @@
     "type": "spr",
     "stem": "If $2(x - 3) + 5 \\ge 4x - 15$, what is the greatest possible value of $x$?",
     "answer": ["7"],
-    "explanation": "Simplify the left side: $2x - 6 + 5 = 2x - 1$. So $2x - 1 \\ge 4x - 15$. Subtract $2x$ and add $15$: $14 \\ge 2x$, so $x \\le 7$. The greatest possible value is $7$.",
+    "explanation": "Simplify first, then solve, and read the final inequality carefully to see what \"greatest\" means.\n\nLeft side: $2(x - 3) + 5 = 2x - 6 + 5 = 2x - 1$. So $2x - 1 \\ge 4x - 15$.\n\nMove the $x$ terms to the side where they stay positive: subtract $2x$ from both sides to get $-1 \\ge 2x - 15$. Add $15$: $14 \\ge 2x$. Divide by $2$: $7 \\ge x$.\n\nSo $x$ can be $7$ or anything smaller, and the greatest possible value is $7$.",
     "tags": ["solving-inequalities"]
   },
   {
@@ -93,11 +93,11 @@
     "stem": "Which of the following is the solution to $-7 < 3 - 2x \\le 9$?",
     "choices": ["$-5 < x \\le 3$", "$-3 \\le x < 5$", "$-3 < x \\le 5$", "There are no values of $x$ that satisfy the inequality."],
     "answer": "B",
-    "explanation": "Subtract $3$ from all three parts: $-10 < -2x \\le 6$. Divide all three parts by $-2$ and reverse both symbols: $5 > x \\ge -3$. Written from smallest to largest: $-3 \\le x < 5$.",
+    "explanation": "This is a compound inequality: three parts at once. Whatever you do, do it to all three parts.\n\nSubtract $3$ everywhere: $-10 < -2x \\le 6$.\n\nNow divide everything by $-2$. Because it is negative, both symbols flip: $5 > x \\ge -3$.\n\nRead it from smallest to largest: $-3 \\le x < 5$. Notice the \"or equal\" stays with $-3$ and the strict symbol stays with $5$.",
     "rationales": {
-      "A": "This divides by $2$ instead of $-2$, so the negative sign on $x$ is lost and the symbols are never reversed.",
-      "C": "This gets the right endpoints but leaves each symbol attached to the wrong end: the $\\le$ belongs with $-3$ and the $<$ with $5$.",
-      "D": "This divides by $-2$ without reversing the symbols, giving $5 < x \\le -3$, which no number satisfies."
+      "A": "You divided by $2$ instead of $-2$. The $-2$ in front of $x$ makes the endpoints change sign and the symbols flip.",
+      "C": "The endpoints are right, but the symbols are attached to the wrong ends. The $\\le$ belongs with $-3$ and the strict $<$ with $5$.",
+      "D": "Dividing by $-2$ without flipping the symbols gives $5 < x \\le -3$, which looks impossible. Flip both symbols and it becomes a normal range."
     },
     "tags": ["solving-inequalities"]
   },
@@ -107,10 +107,10 @@
     "type": "spr",
     "stem": "The point $(a, b)$ is a solution to the system of inequalities $y < -2x + 10$ and $y > 3x - 5$. If $a$ is an integer, what is the greatest possible value of $a$?",
     "answer": ["2"],
-    "explanation": "For a given $x = a$, a value of $y$ works only if $3a - 5 < y < -2a + 10$. That requires $3a - 5 < -2a + 10$, so $5a < 15$ and $a < 3$. The greatest integer less than $3$ is $2$. (Check: with $a = 2$, any $y$ with $1 < y < 6$ works.)",
+    "explanation": "Pick any $x = a$. For some $y$ to work, $y$ has to sit above the line $y = 3x - 5$ and below the line $y = -2x + 10$. That is only possible while the lower line is still below the upper line.\n\nSo you need $3a - 5 < -2a + 10$. Add $2a$ and $5$: $5a < 15$, so $a < 3$.\n\nThe greatest whole number less than $3$ is $2$.\n\nCheck: with $a = 2$, $y$ must be above $1$ and below $6$, and plenty of values like $y = 3$ fit.",
     "desmos": {
       "expressions": ["y<-2x+10", "y>3x-5"],
-      "steps": "Graph both inequalities. The overlapping region is a wedge that closes at the intersection of the boundary lines, $(3, 4)$. Because both inequalities are strict, the region contains points with $x$ just below $3$ but none with $x = 3$, so the greatest integer $a$ is $2$."
+      "steps": "Graph both inequalities. The overlapping region is a wedge that closes where the boundary lines meet, at $(3, 4)$. Both inequalities are strict, so the region has points with $x$ just under $3$ but none at $x = 3$. The greatest integer $a$ is $2$."
     },
     "tags": ["systems-of-inequalities", "desmos"]
   },
@@ -121,11 +121,11 @@
     "stem": "A hiker starts at an elevation of $1{,}850$ meters and descends at a constant rate of $12$ meters per minute. What is the least whole number of minutes after which the hiker's elevation is below $1{,}250$ meters?",
     "choices": ["$49$", "$50$", "$51$", "$105$"],
     "answer": "C",
-    "explanation": "After $t$ minutes the elevation is $1{,}850 - 12t$. Solve $1{,}850 - 12t < 1{,}250$: $-12t < -600$, so $t > 50$. At exactly $50$ minutes the hiker is at $1{,}250$ meters, not below it, so the least whole number of minutes is $51$.",
+    "explanation": "Write the elevation after $t$ minutes: it starts at $1{,}850$ and drops $12$ each minute, so it is $1{,}850 - 12t$.\n\nYou want it below $1{,}250$: $1{,}850 - 12t < 1{,}250$. Subtract $1{,}850$: $-12t < -600$. Divide by $-12$ and flip the symbol: $t > 50$.\n\nAt exactly $50$ minutes the hiker is at $1{,}250$ meters, which is not below it. The first whole minute after that is $51$.\n\nWatch the word \"below.\" It means strictly less, so the boundary value itself doesn't count.",
     "rationales": {
-      "A": "This reverses the inequality, solving $1{,}850 - 12t > 1{,}250$ to get $t < 50$, and takes the greatest whole number.",
-      "B": "At $t = 50$ the elevation equals $1{,}250$ meters; the hiker must be strictly below it.",
-      "D": "This ignores the starting elevation and solves $12t > 1{,}250$, as if the hiker had to descend $1{,}250$ meters."
+      "A": "Dividing by $-12$ flips the symbol, so the answer is $t > 50$, not $t < 50$.",
+      "B": "At $50$ minutes the hiker is exactly at $1{,}250$ meters. \"Below\" needs one more minute.",
+      "D": "This treats it as if the hiker had to descend $1{,}250$ meters. The hiker only needs to drop $1{,}850 - 1{,}250 = 600$ meters."
     },
     "tags": ["modeling", "solving-inequalities"]
   }

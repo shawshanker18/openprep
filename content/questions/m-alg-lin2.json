@@ -6,11 +6,11 @@
     "stem": "What is the slope of the graph of $3x + 4y = 24$ in the $xy$-plane?",
     "choices": ["$-\\frac{4}{3}$", "$-\\frac{3}{4}$", "$\\frac{3}{4}$", "$6$"],
     "answer": "B",
-    "explanation": "Solve for $y$: $4y = -3x + 24$, so $y = -\\frac{3}{4}x + 6$. The slope is the coefficient of $x$: $-\\frac{3}{4}$.",
+    "explanation": "The slope is easiest to read when the equation is in the form $y = mx + b$, because then the slope is just the number in front of $x$.\n\nSo solve for $y$. Subtract $3x$ from both sides: $4y = -3x + 24$. Divide everything by $4$: $y = -\\frac{3}{4}x + 6$.\n\nThe number in front of $x$ is $-\\frac{3}{4}$, so that is the slope.\n\nA shortcut for any line written as $Ax + By = C$: the slope is $-\\frac{A}{B}$. Here that is $-\\frac{3}{4}$.",
     "rationales": {
-      "A": "This divides the coefficients in the wrong order, computing $-\\frac{4}{3}$ instead of $-\\frac{3}{4}$.",
-      "C": "This loses the negative sign when moving $3x$ to the other side.",
-      "D": "This is the $y$-intercept, $\\frac{24}{4}$, not the slope."
+      "A": "You flipped the fraction. The slope of $Ax + By = C$ is $-\\frac{A}{B}$, which here is $-\\frac{3}{4}$, not $-\\frac{4}{3}$.",
+      "C": "You lost the negative sign. When $3x$ moves to the other side it becomes $-3x$, so the slope is negative.",
+      "D": "$6$ is the $y$ intercept, the $b$ in $y = mx + b$. The slope is the number in front of $x$."
     },
     "tags": ["slope-intercept", "standard-form"]
   },
@@ -21,11 +21,11 @@
     "stem": "A bakery sells muffins for \\$3 each and scones for \\$4 each. On Monday, the bakery's sales of muffins and scones totaled \\$96. Which equation represents this situation, where $m$ is the number of muffins sold and $s$ is the number of scones sold?",
     "choices": ["$3m + 4s = 96$", "$4m + 3s = 96$", "$m + s = 96$", "$\\frac{m}{3} + \\frac{s}{4} = 96$"],
     "answer": "A",
-    "explanation": "Muffin sales are $3m$ dollars and scone sales are $4s$ dollars. Together they total \\$96: $3m + 4s = 96$.",
+    "explanation": "Money from each item is price times how many were sold. Muffins bring in $3$ dollars each, so $m$ muffins bring in $3m$ dollars. Scones bring in $4$ dollars each, so $s$ scones bring in $4s$ dollars.\n\nThe two amounts together make the total, so $3m + 4s = 96$.\n\nA good habit: say each piece out loud in units. \"$3$ dollars per muffin times $m$ muffins\" gives dollars, which is what the $96$ is measured in.",
     "rationales": {
-      "B": "This pairs each price with the wrong item.",
-      "C": "This sets the number of items equal to the dollar total and ignores the prices.",
-      "D": "This divides by the prices instead of multiplying by them."
+      "B": "The prices got swapped. Muffins cost \\$3, so the $3$ belongs with $m$, the number of muffins.",
+      "C": "This adds up the number of items, but $96$ is a dollar amount. You need each count multiplied by its price.",
+      "D": "Dividing by the price doesn't give money. To get dollars, multiply the number sold by the price."
     },
     "tags": ["modeling", "standard-form"]
   },
@@ -35,7 +35,7 @@
     "type": "spr",
     "stem": "The point $(k, 5)$ lies on the line $y = 2x - 7$. What is the value of $k$?",
     "answer": ["6"],
-    "explanation": "Substitute $x = k$ and $y = 5$: $5 = 2k - 7$. Add $7$: $12 = 2k$, so $k = 6$.",
+    "explanation": "A point lies on a line when its coordinates make the equation true. So plug the point in: $x = k$ and $y = 5$.\n\n$5 = 2k - 7$. Add $7$ to both sides: $12 = 2k$. Divide by $2$: $k = 6$.\n\nCheck: $2(6) - 7 = 5$. The point $(6, 5)$ is on the line.",
     "tags": ["slope-intercept"]
   },
   {
@@ -45,11 +45,11 @@
     "stem": "A line in the $xy$-plane has slope $\\frac{4}{3}$ and passes through the point $(-3, 2)$. Which of the following is an equation of the line?",
     "choices": ["$y = \\frac{4}{3}x - 2$", "$y = \\frac{4}{3}x + 2$", "$y = \\frac{3}{4}x + \\frac{17}{4}$", "$y = \\frac{4}{3}x + 6$"],
     "answer": "D",
-    "explanation": "Write $y = \\frac{4}{3}x + b$ and substitute the point: $2 = \\frac{4}{3}(-3) + b = -4 + b$, so $b = 6$. The equation is $y = \\frac{4}{3}x + 6$.",
+    "explanation": "You know the slope, so the line looks like $y = \\frac{4}{3}x + b$. The only missing piece is $b$, and the given point tells you what it is.\n\nPlug in $x = -3$ and $y = 2$: $2 = \\frac{4}{3}(-3) + b$. Since $\\frac{4}{3} \\cdot (-3) = -4$, that is $2 = -4 + b$, so $b = 6$.\n\nThe line is $y = \\frac{4}{3}x + 6$.\n\nCheck: at $x = -3$, $y = -4 + 6 = 2$. Correct.",
     "rationales": {
-      "A": "This has a sign error when solving for $b$: from $2 = -4 + b$ it subtracts $4$ instead of adding.",
-      "B": "This uses the $y$-coordinate of the given point as the $y$-intercept.",
-      "C": "This inverts the slope to $\\frac{3}{4}$ before finding $b$."
+      "A": "From $2 = -4 + b$, you need to add $4$ to both sides, which gives $b = 6$. Subtracting gives the wrong sign.",
+      "B": "The point $(-3, 2)$ is not on the $y$ axis, so its $y$ value isn't the intercept. Plug the point in to find $b$.",
+      "C": "You flipped the slope to $\\frac{3}{4}$. The slope is given as $\\frac{4}{3}$, so keep it as it is."
     },
     "tags": ["slope-intercept"]
   },
@@ -65,11 +65,11 @@
       "$75$; the number of pens bought if no notebooks are bought"
     ],
     "answer": "C",
-    "explanation": "The $n$-intercept is where $p = 0$: $6n = 150$, so $n = 25$. With no pens bought, the whole \\$150 buys $25$ notebooks.",
+    "explanation": "An intercept is where the graph meets an axis. The $n$ intercept is on the horizontal axis, where the other variable, $p$, equals $0$.\n\nSet $p = 0$: $6n = 150$, so $n = 25$.\n\nNow say what it means in the story. $p = 0$ means no pens are bought, so all \\$150 goes on notebooks, and that buys $25$ of them.\n\nWhen the SAT asks what an intercept represents, plug in $0$ for the other variable and describe that situation in words.",
     "rationales": {
-      "A": "This divides \\$150 by the pen price, \\$2, instead of the notebook price.",
-      "B": "This is the coefficient of $n$, not an intercept.",
-      "D": "This describes the $p$-intercept, $(0, 75)$, not the $n$-intercept."
+      "A": "You divided \\$150 by \\$2, the price of a pen. Notebooks cost \\$6, so with no pens the card buys $150 \\div 6 = 25$ notebooks.",
+      "B": "$6$ is the price of a notebook, the coefficient of $n$. An intercept is a point where the graph meets an axis.",
+      "D": "$75$ pens is the other intercept, on the $p$ axis, where no notebooks are bought. The question asks about the $n$ intercept."
     },
     "tags": ["intercepts", "modeling"]
   },
@@ -80,15 +80,15 @@
     "stem": "The graph of $5x - 2y = 30$ crosses the $y$-axis at the point $(0, b)$. What is the value of $b$?",
     "choices": ["$-15$", "$6$", "$15$", "$30$"],
     "answer": "A",
-    "explanation": "On the $y$-axis, $x = 0$. Substitute: $-2y = 30$, so $y = -15$. Thus $b = -15$.",
+    "explanation": "Every point on the $y$ axis has $x = 0$. So to find where the line crosses the $y$ axis, plug in $x = 0$.\n\n$5(0) - 2y = 30$ becomes $-2y = 30$. Divide by $-2$: $y = -15$.\n\nSo the line crosses at $(0, -15)$, and $b = -15$.",
     "rationales": {
-      "B": "This is the $x$-intercept: setting $y = 0$ gives $5x = 30$, so $x = 6$.",
-      "C": "This drops the negative sign on the $-2y$ term.",
-      "D": "This sets $x = 0$ but forgets to divide by the coefficient of $y$."
+      "B": "$6$ is where the line crosses the $x$ axis (set $y = 0$ to get $5x = 30$). For the $y$ axis, set $x = 0$ instead.",
+      "C": "The term is $-2y$, so you divide by $-2$, not $2$. That keeps the answer negative.",
+      "D": "After setting $x = 0$ you have $-2y = 30$. You still need to divide by $-2$ to get $y$ alone."
     },
     "desmos": {
       "expressions": ["5x-2y=30"],
-      "steps": "Type the equation as written. Click where the line crosses the $y$-axis: $(0, -15)$."
+      "steps": "Type the equation exactly as written. Click where the line crosses the $y$ axis and Desmos shows $(0, -15)$."
     },
     "tags": ["intercepts", "standard-form", "desmos"]
   },
@@ -99,11 +99,11 @@
     "stem": "In the $xy$-plane, the graph of $2x + ky = 18$, where $k$ is a constant, passes through the point $(3, 4)$. What is the $y$-coordinate of the $y$-intercept of the graph?",
     "choices": ["$-6$", "$3$", "$6$", "$9$"],
     "answer": "C",
-    "explanation": "Substitute $(3, 4)$: $2(3) + 4k = 18$, so $4k = 12$ and $k = 3$. The equation is $2x + 3y = 18$. At the $y$-intercept, $x = 0$: $3y = 18$, so $y = 6$.",
+    "explanation": "There are two unknowns here: the constant $k$, and the intercept you are asked for. Use the point first to find $k$.\n\nPlug in $(3, 4)$: $2(3) + k(4) = 18$, so $6 + 4k = 18$. Then $4k = 12$ and $k = 3$.\n\nNow the line is $2x + 3y = 18$. The $y$ intercept is where $x = 0$: $3y = 18$, so $y = 6$.\n\nThis two step pattern is common on the SAT: a point on the line gives you the missing constant, and then the question you actually care about becomes easy.",
     "rationales": {
-      "A": "This makes a sign error solving $6 + 4k = 18$, getting $k = -3$ and then $-3y = 18$.",
-      "B": "This is the value of $k$, not the $y$-intercept.",
-      "D": "This is the $x$-intercept: with $y = 0$, $2x = 18$ gives $x = 9$."
+      "A": "From $6 + 4k = 18$, subtract $6$ to get $4k = 12$, so $k$ is positive $3$. A sign slip makes $k = -3$, which flips the intercept.",
+      "B": "$3$ is the value of $k$. The question goes one step further and asks for the $y$ intercept.",
+      "D": "$9$ is where the line crosses the $x$ axis (set $y = 0$). The $y$ intercept comes from setting $x = 0$."
     },
     "tags": ["intercepts", "standard-form"]
   },
@@ -113,10 +113,10 @@
     "type": "spr",
     "stem": "A caterer spends exactly \\$540 on chicken that costs \\$4.50 per pound and beef that costs \\$7.20 per pound. If the caterer buys $48$ pounds of chicken, how many pounds of beef does the caterer buy?",
     "answer": ["45"],
-    "explanation": "Let $c$ be pounds of chicken and $b$ pounds of beef: $4.50c + 7.20b = 540$. With $c = 48$: $4.50(48) = 216$, so $7.20b = 540 - 216 = 324$ and $b = \\frac{324}{7.20} = 45$.",
+    "explanation": "Set up the cost equation: chicken costs \\$4.50 a pound and beef \\$7.20 a pound, so $4.50c + 7.20b = 540$.\n\nYou know $c = 48$, so work out the chicken first: $4.50 \\times 48 = 216$. That leaves $540 - 216 = 324$ dollars for beef.\n\nEach pound of beef costs \\$7.20, so the beef is $324 \\div 7.20 = 45$ pounds.\n\nCheck: $216 + 7.20(45) = 216 + 324 = 540$.",
     "desmos": {
       "expressions": ["4.5x+7.2y=540", "x=48"],
-      "steps": "Graph the cost equation with $x$ as pounds of chicken and the line $x = 48$. They intersect at $(48, 45)$, so the caterer buys $45$ pounds of beef."
+      "steps": "Graph the cost equation with $x$ as pounds of chicken and $y$ as pounds of beef, then add the line $x = 48$. They cross at $(48, 45)$, so the caterer buys $45$ pounds of beef."
     },
     "tags": ["modeling", "desmos"]
   },
@@ -127,11 +127,11 @@
     "stem": "Line $q$ in the $xy$-plane is perpendicular to the graph of $2x - 5y = 10$ and passes through the point $(4, 1)$. What is the $y$-coordinate of the $y$-intercept of line $q$?",
     "choices": ["$-9$", "$-\\frac{3}{5}$", "$\\frac{13}{5}$", "$11$"],
     "answer": "D",
-    "explanation": "Rewrite the given line: $y = \\frac{2}{5}x - 2$, so its slope is $\\frac{2}{5}$. A perpendicular line has slope $-\\frac{5}{2}$ (the negative reciprocal). Using $(4, 1)$: $1 = -\\frac{5}{2}(4) + b = -10 + b$, so $b = 11$.",
+    "explanation": "Perpendicular lines have slopes that are negative reciprocals: flip the fraction and change the sign. So first find the slope of the given line.\n\nSolve $2x - 5y = 10$ for $y$: $-5y = -2x + 10$, so $y = \\frac{2}{5}x - 2$. Its slope is $\\frac{2}{5}$.\n\nFlip and change the sign: line $q$ has slope $-\\frac{5}{2}$.\n\nNow use the point $(4, 1)$ in $y = -\\frac{5}{2}x + b$: $1 = -\\frac{5}{2}(4) + b = -10 + b$, so $b = 11$.\n\nRemember both moves for perpendicular slopes. Flipping alone or changing the sign alone is a classic trap.",
     "rationales": {
-      "A": "This uses $\\frac{5}{2}$, the reciprocal without the sign change: $1 = 10 + b$.",
-      "B": "This uses the parallel slope $\\frac{2}{5}$: $1 = \\frac{8}{5} + b$.",
-      "C": "This uses $-\\frac{2}{5}$, changing the sign without taking the reciprocal: $1 = -\\frac{8}{5} + b$."
+      "A": "You flipped the slope to $\\frac{5}{2}$ but kept it positive. Perpendicular slopes also change sign, so use $-\\frac{5}{2}$.",
+      "B": "You used the original slope $\\frac{2}{5}$, which gives a parallel line. Perpendicular lines need the negative reciprocal.",
+      "C": "You changed the sign to $-\\frac{2}{5}$ but didn't flip the fraction. The negative reciprocal is $-\\frac{5}{2}$."
     },
     "tags": ["parallel-perpendicular", "slope-intercept"]
   }
