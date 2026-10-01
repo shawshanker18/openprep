@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase/client";
+import { GoogleButton } from "./google-button";
 
 export function LoginForm({ google: showGoogle }: { google: boolean }) {
   const [age, setAge] = useState(false);
@@ -13,9 +14,6 @@ export function LoginForm({ google: showGoogle }: { google: boolean }) {
   const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const redirectTo = () => `${window.location.origin}/auth/callback`;
 
-  const google = async () => {
-    await createClient().auth.signInWithOAuth({ provider: "google", options: { redirectTo: redirectTo() } });
-  };
   const magic = async (e: React.FormEvent) => {
     e.preventDefault();
     setState("sending");
@@ -33,7 +31,7 @@ export function LoginForm({ google: showGoogle }: { google: boolean }) {
         </span>
       </label>
       {showGoogle && <>
-        <Button onClick={google} disabled={!age} size="lg">Continue with Google</Button>
+        <GoogleButton enabled={age} />
         <div className="text-center text-xs text-muted-foreground">or</div>
       </>}
       {state === "sent" ? (
