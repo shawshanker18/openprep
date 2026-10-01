@@ -10,7 +10,8 @@ import { ReferenceSheet } from "@/components/reference-sheet";
 import { DesmosToggle } from "@/components/desmos-panel";
 import { cn } from "@/lib/utils";
 import type { PublicQuestion } from "@/server/questions";
-import { abandon, saveResponse, startModule, submitModule } from "./actions";
+import { setLockdown } from "@/lib/native";
+import { abandon, reportFocusLoss, saveResponse, startModule, submitModule } from "./actions";
 
 type Item = { position: number; question: PublicQuestion; response: string | null; flagged: boolean };
 type Mod = { id: string; idx: number; section: string; route: string; timeLimitS: number | null; startedAt: string | null; deadlineAt: string | null; adaptive: boolean };
@@ -48,6 +49,24 @@ export function TestRunner({ sessionId, module: m, items: initial, serverNow, br
     enteredAt.current = t;
   }, [pos]);
   useEffect(() => { enteredAt.current = screen === "question" ? now() : 0; }, [screen, pos]);
+
+  // While a module runs: desktop app locks down (kiosk); everywhere, leaving the window is counted on the results.
+  const running = screen === "question" || screen === "review";
+  useEffect(() => {
+    if (!running) return;
+    setLockdown(true);
+    let last = 0;
+    const lost = () => {
+      if (Date.now() - last < 3000) return; // blur + visibilitychange fire together
+      last = Date.now();
+      void reportFocusLoss(sessionId);
+      toast.warning("You left the test window — this is noted on your results.");
+    };
+    const onVis = () => { if (document.hidden) lost(); };
+    window.addEventListener("blur", lost);
+    document.addEventListener("visibilitychange", onVis);
+    return () => { window.removeEventListener("blur", lost); document.removeEventListener("visibilitychange", onVis); setLockdown(false); };
+  }, [running, sessionId]);
 
   const save = useCallback(async (position: number, it: Item) => {
     const delta = Math.round(acc.current[position] ?? 0);

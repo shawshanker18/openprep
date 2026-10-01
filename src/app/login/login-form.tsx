@@ -5,11 +5,12 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { GoogleButton } from "./google-button";
 
-export function LoginForm({ google: showGoogle }: { google: boolean }) {
+export function LoginForm({ google: showGoogle, inApp = false }: { google: boolean; inApp?: boolean }) {
   const [age, setAge] = useState(false);
   const [email, setEmail] = useState("");
   const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
-  const redirectTo = () => `${window.location.origin}/auth/callback`;
+  // In the apps the email link opens in a browser, which hands the code back to the app (see /auth/callback).
+  const redirectTo = () => `${window.location.origin}/auth/callback${inApp ? "?app=1" : ""}`;
 
   const magic = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,6 +24,7 @@ export function LoginForm({ google: showGoogle }: { google: boolean }) {
       <div className="flex flex-col gap-2 rounded-2xl border p-6 text-center">
         <p className="font-medium">Check your inbox</p>
         <p className="text-sm text-muted-foreground">We sent a sign-in link to <b className="text-foreground">{email}</b>. It works once.</p>
+        {inApp && <p className="text-sm text-muted-foreground">Open it on this device — your browser will send you back to the app.</p>}
         <button className="mt-2 text-sm underline" onClick={() => setState("idle")}>Use a different email</button>
       </div>
     );

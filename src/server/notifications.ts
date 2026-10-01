@@ -41,6 +41,6 @@ export async function getChecklist(userId: string, profile: Profile): Promise<Ch
     { id: "practice", label: "Answer 10 practice questions", href: "/practice", done: !!r?.practiced },
     { id: "review", label: "Review a mistake", href: "/mistakes", done: !!r?.reviewed },
     { id: "mock", label: "Take a full practice test", href: "/tests", done: !!r?.mock },
-    { id: "reminders", label: "Turn on study reminders", href: "/settings#reminders", done: !!r?.push },
+    { id: "reminders", label: "Turn on study reminders", href: "/settings#reminders", done: !!r?.push || profile.reminderHour != null },
   ];
 }

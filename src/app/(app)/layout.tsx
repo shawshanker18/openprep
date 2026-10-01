@@ -4,6 +4,7 @@ import { getAuthUser, requireUser } from "@/server/auth";
 import { signOut } from "@/app/auth/actions";
 import { NotificationBell } from "@/components/notification-bell";
 import { MobileMenu, MobileTabs, NavLinks } from "@/components/app-nav";
+import { AppBridge } from "@/components/app-bridge";
 import { getChecklist, getNotifications } from "@/server/notifications";
 
 export default async function AppLayout({ children }: LayoutProps<"/">) {
@@ -28,6 +29,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
       </header>
       <main className="mx-auto w-full min-w-0 max-w-5xl flex-1 px-4 pb-8 pt-6 md:px-8">{children}</main>
       <MobileTabs />
+      <AppBridge reminderHour={profile.reminderHour} />
     </div>
   );
 }

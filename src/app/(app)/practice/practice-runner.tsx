@@ -9,6 +9,7 @@ import { Markdown } from "@/components/markdown";
 import { QuestionView } from "@/components/question-view";
 import { DesmosCalculator, DesmosToggle } from "@/components/desmos-panel";
 import { TutorPanel } from "@/components/tutor-panel";
+import { FocusToggle } from "@/components/focus-toggle";
 import { MISTAKE_LABEL, MISTAKE_TYPES, type MistakeType } from "@/engine/mistakes";
 import { cn } from "@/lib/utils";
 import type { PublicQuestion, RevealedQuestion } from "@/server/questions";
@@ -171,6 +172,7 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block, set }:
           {mode === "smart" && <> · <Link href="/practice/custom" className="underline">Customize practice</Link></>}
         </span>
         <div className="flex items-center gap-1">
+          <FocusToggle />
           {s.phase === "answering" && s.limitS && <Countdown key={s.q.id} limitS={s.limitS} />}
           <Button variant="ghost" size="sm" aria-label="Bookmark" onClick={async () => {
             const res = await toggleBookmark({ questionId: s.q.id });
