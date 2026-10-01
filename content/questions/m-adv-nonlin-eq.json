@@ -1,0 +1,138 @@
+[
+  {
+    "id": "m-adv-nonlin-eq-0001",
+    "difficulty": 1,
+    "type": "mcq",
+    "stem": "If $x^2 = 49$ and $x > 0$, what is the value of $x$?",
+    "choices": ["$24.5$", "$7$", "$49$", "$2{,}401$"],
+    "answer": "B",
+    "explanation": "Take the square root of both sides: $x = \\pm 7$. Since $x > 0$, $x = 7$.",
+    "rationales": {
+      "A": "This divides $49$ by $2$, treating $x^2$ as $2x$.",
+      "C": "This is the value of $x^2$, not $x$; the square root was never taken.",
+      "D": "This squares $49$ instead of taking its square root."
+    },
+    "tags": ["square-roots"]
+  },
+  {
+    "id": "m-adv-nonlin-eq-0002",
+    "difficulty": 1,
+    "type": "mcq",
+    "stem": "What are the solutions to $(x - 3)(x + 5) = 0$?",
+    "choices": ["$x = -3$ and $x = 5$", "$x = 3$ and $x = 5$", "$x = 3$ and $x = -5$", "$x = -3$ and $x = -5$"],
+    "answer": "C",
+    "explanation": "A product is zero when a factor is zero. $x - 3 = 0$ gives $x = 3$, and $x + 5 = 0$ gives $x = -5$.",
+    "rationales": {
+      "A": "Both signs are flipped: the solutions are the values that make each factor zero, not the numbers shown in the factors.",
+      "B": "The sign of the second solution is wrong: $x + 5 = 0$ means $x = -5$.",
+      "D": "The sign of the first solution is wrong: $x - 3 = 0$ means $x = 3$."
+    },
+    "tags": ["factoring"]
+  },
+  {
+    "id": "m-adv-nonlin-eq-0003",
+    "difficulty": 1,
+    "type": "spr",
+    "stem": "If $x^2 + 6 = 31$ and $x > 0$, what is the value of $x$?",
+    "answer": ["5"],
+    "explanation": "Subtract $6$ from both sides: $x^2 = 25$. So $x = \\pm 5$, and because $x > 0$, $x = 5$.",
+    "tags": ["square-roots"]
+  },
+  {
+    "id": "m-adv-nonlin-eq-0004",
+    "difficulty": 2,
+    "type": "mcq",
+    "stem": "What is the positive solution of $x^2 - 5x - 14 = 0$?",
+    "choices": ["$2$", "$5$", "$7$", "$14$"],
+    "answer": "C",
+    "explanation": "Find two numbers that multiply to $-14$ and add to $-5$: $-7$ and $2$. So $(x - 7)(x + 2) = 0$, giving $x = 7$ or $x = -2$. The positive solution is $7$.",
+    "rationales": {
+      "A": "This is the absolute value of the negative solution, $-2$.",
+      "B": "This is the sum of the solutions (the coefficient of $x$ with its sign flipped).",
+      "D": "This is the absolute value of the constant term."
+    },
+    "fastMethod": "Test the choices: only $7$ works, since $49 - 35 - 14 = 0$.",
+    "desmos": {
+      "expressions": ["y=x^2-5x-14"],
+      "steps": "Type the expression. Click the two $x$-intercepts: $(-2, 0)$ and $(7, 0)$. Pick the positive one."
+    },
+    "tags": ["factoring", "desmos"]
+  },
+  {
+    "id": "m-adv-nonlin-eq-0005",
+    "difficulty": 2,
+    "type": "mcq",
+    "stem": "How many distinct real solutions does $2x^2 - 4x + 5 = 0$ have?",
+    "choices": ["Zero", "Exactly one", "Exactly two", "Infinitely many"],
+    "answer": "A",
+    "explanation": "Use the discriminant $b^2 - 4ac$ with $a = 2$, $b = -4$, $c = 5$: $(-4)^2 - 4(2)(5) = 16 - 40 = -24$. A negative discriminant means there are no real solutions.",
+    "rationales": {
+      "B": "Exactly one real solution requires a discriminant of $0$; here it is $-24$.",
+      "C": "This comes from computing $16 + 40$ instead of $16 - 40$, which makes the discriminant positive.",
+      "D": "A quadratic equation can never have infinitely many solutions."
+    },
+    "desmos": {
+      "expressions": ["y=2x^2-4x+5"],
+      "steps": "Graph the left side. The parabola sits entirely above the $x$-axis (its lowest point is $(1, 3)$), so it never crosses: zero real solutions."
+    },
+    "tags": ["discriminant", "desmos"]
+  },
+  {
+    "id": "m-adv-nonlin-eq-0006",
+    "difficulty": 2,
+    "type": "spr",
+    "stem": "The system $y = x^2$ and $y = 4x - 4$ has exactly one solution $(x, y)$. What is the value of $y$?",
+    "answer": ["4"],
+    "explanation": "Set the right sides equal: $x^2 = 4x - 4$, so $x^2 - 4x + 4 = 0$, which is $(x - 2)^2 = 0$. Then $x = 2$ and $y = 2^2 = 4$.",
+    "desmos": {
+      "expressions": ["y=x^2", "y=4x-4"],
+      "steps": "Graph both equations. The line touches the parabola at a single point, $(2, 4)$. The $y$-value is $4$."
+    },
+    "tags": ["nonlinear-systems", "desmos"]
+  },
+  {
+    "id": "m-adv-nonlin-eq-0007",
+    "difficulty": 3,
+    "type": "mcq",
+    "stem": "What is the solution set of $\\sqrt{x + 7} = x - 5$?",
+    "choices": ["$x = 2$ only", "$x = 9$ only", "$x = 2$ and $x = 9$", "$x = -2$ and $x = -9$"],
+    "answer": "B",
+    "explanation": "Square both sides: $x + 7 = x^2 - 10x + 25$, so $x^2 - 11x + 18 = 0$, which factors as $(x - 2)(x - 9) = 0$. Check both in the original equation. $x = 9$: $\\sqrt{16} = 4$ and $9 - 5 = 4$, so it works. $x = 2$: $\\sqrt{9} = 3$ but $2 - 5 = -3$, so it fails. The only solution is $x = 9$.",
+    "rationales": {
+      "A": "This keeps the extraneous solution and discards the real one; $x = 2$ makes the right side negative.",
+      "C": "Squaring can create extraneous solutions. Checking shows $x = 2$ does not satisfy the original equation.",
+      "D": "These come from factoring $x^2 - 11x + 18$ with the wrong signs."
+    },
+    "fastMethod": "Plug each answer into the original equation. $x = 9$ works; $x = 2$ gives $3 = -3$.",
+    "tags": ["radical-equations"]
+  },
+  {
+    "id": "m-adv-nonlin-eq-0008",
+    "difficulty": 3,
+    "type": "spr",
+    "stem": "In the equation $x^2 + kx + 9 = 0$, $k$ is a positive constant. If the equation has exactly one real solution, what is the value of $k$?",
+    "answer": ["6"],
+    "explanation": "Exactly one real solution means the discriminant is zero: $k^2 - 4(1)(9) = 0$, so $k^2 = 36$ and $k = \\pm 6$. Since $k$ is positive, $k = 6$.",
+    "fastMethod": "A perfect square trinomial has one solution: $(x + 3)^2 = x^2 + 6x + 9$, so $k = 6$.",
+    "tags": ["discriminant"]
+  },
+  {
+    "id": "m-adv-nonlin-eq-0009",
+    "difficulty": 3,
+    "type": "mcq",
+    "stem": "The graph of $y = -x^2 + 6x$ and the graph of $y = c$, where $c$ is a constant, intersect at exactly one point. What is the value of $c$?",
+    "choices": ["$3$", "$6$", "$9$", "$36$"],
+    "answer": "C",
+    "explanation": "A horizontal line meets a downward-opening parabola exactly once at its vertex. The vertex is at $x = -\\frac{b}{2a} = -\\frac{6}{2(-1)} = 3$, and $y = -(3)^2 + 6(3) = 9$. So $c = 9$.",
+    "rationales": {
+      "A": "This is the $x$-coordinate of the vertex, not the $y$-coordinate.",
+      "B": "This is the coefficient of $x$, not the maximum value of the function.",
+      "D": "This squares the coefficient $6$ instead of evaluating the function at the vertex."
+    },
+    "desmos": {
+      "expressions": ["y=-x^2+6x", "y=c"],
+      "steps": "Type both lines and add a slider for $c$. Drag $c$ until the line just touches the top of the parabola: that happens at $(3, 9)$, so $c = 9$."
+    },
+    "tags": ["vertex-form", "nonlinear-systems", "desmos"]
+  }
+]

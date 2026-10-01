@@ -1,0 +1,146 @@
+[
+  {
+    "id": "rw-ei-transitions-0001",
+    "difficulty": 1,
+    "type": "mcq",
+    "passage": "Honeybees communicate the location of food through a \"waggle dance.\" ______ the angle of the dance relative to vertical tells other bees the direction of the food relative to the sun.",
+    "stem": "Which choice completes the text with the most logical transition?",
+    "choices": ["However,", "Specifically,", "Nevertheless,", "Similarly,"],
+    "answer": "B",
+    "explanation": "The second sentence gives a specific detail about how the dance communicates location, so the transition must introduce an elaboration of the first sentence.",
+    "rationales": {
+      "A": "\"However\" signals contrast, but the second sentence supports the first.",
+      "C": "\"Nevertheless\" signals a concession; nothing in the first sentence is being conceded.",
+      "D": "\"Similarly\" compares two different things; here one idea is explained in more detail."
+    },
+    "tags": ["elaboration"]
+  },
+  {
+    "id": "rw-ei-transitions-0002",
+    "difficulty": 1,
+    "type": "mcq",
+    "passage": "Early bicycles had iron-rimmed wooden wheels that made riding on cobblestone streets painfully jarring. ______ the introduction of air-filled rubber tires in the late 1880s made cycling far more comfortable and helped spark a boom in its popularity.",
+    "stem": "Which choice completes the text with the most logical transition?",
+    "choices": ["For example,", "In other words,", "Similarly,", "However,"],
+    "answer": "D",
+    "explanation": "The first sentence describes uncomfortable early bicycles; the second describes a change that made cycling comfortable. A contrast transition is needed.",
+    "rationales": {
+      "A": "\"For example\" introduces an instance of the previous idea, but air-filled tires are not an example of jarring rides.",
+      "B": "\"In other words\" restates the previous idea; the second sentence says something different.",
+      "C": "\"Similarly\" signals likeness, but the two sentences describe opposite experiences."
+    },
+    "tags": ["contrast"]
+  },
+  {
+    "id": "rw-ei-transitions-0003",
+    "difficulty": 1,
+    "type": "mcq",
+    "passage": "The town of Marlow Creek received nearly twice its usual rainfall during one unusually wet spring. ______ the reservoir that supplies the town's drinking water rose to its highest level in decades.",
+    "stem": "Which choice completes the text with the most logical transition?",
+    "choices": ["In contrast,", "As a result,", "For instance,", "Nevertheless,"],
+    "answer": "B",
+    "explanation": "Heavy rainfall caused the reservoir to rise. The second sentence is a consequence of the first, so a cause-and-effect transition fits.",
+    "rationales": {
+      "A": "\"In contrast\" signals opposition, but a rising reservoir is what you would expect after heavy rain.",
+      "C": "\"For instance\" introduces an example; the reservoir rising is a result, not an example of rainfall.",
+      "D": "\"Nevertheless\" signals that something happened despite the previous fact, but the rise happened because of it."
+    },
+    "tags": ["cause-effect"]
+  },
+  {
+    "id": "rw-ei-transitions-0004",
+    "difficulty": 2,
+    "type": "mcq",
+    "passage": "Architect Lina Bo Bardi designed the São Paulo Museum of Art so that its main gallery appears to float above an open public plaza. ______ she displayed the paintings inside on freestanding glass easels rather than on walls, allowing visitors to wander among the works as if through a forest.",
+    "stem": "Which choice completes the text with the most logical transition?",
+    "choices": ["Instead,", "Consequently,", "Additionally,", "Nonetheless,"],
+    "answer": "C",
+    "explanation": "Both sentences describe unconventional design choices Bo Bardi made for the museum. The second adds another such choice, so an addition transition fits.",
+    "rationales": {
+      "A": "\"Instead\" signals a replacement for something in the previous sentence. The phrase \"rather than on walls\" is a trap: the contrast is inside the second sentence, not between the two sentences.",
+      "B": "\"Consequently\" signals a result, but the floating gallery did not cause the choice of glass easels.",
+      "D": "\"Nonetheless\" signals a concession, but nothing in the first sentence works against the second."
+    },
+    "tags": ["addition"]
+  },
+  {
+    "id": "rw-ei-transitions-0005",
+    "difficulty": 2,
+    "type": "mcq",
+    "passage": "Many early critics dismissed the novel as too long and too loosely plotted to hold readers' attention. ______ it sold steadily for decades and is now taught in classrooms around the world.",
+    "stem": "Which choice completes the text with the most logical transition?",
+    "choices": ["Therefore,", "Likewise,", "In fact,", "Nevertheless,"],
+    "answer": "D",
+    "explanation": "The critics predicted the novel would fail to hold readers, but it succeeded anyway. A transition that signals an outcome despite the previous point is needed.",
+    "rationales": {
+      "A": "\"Therefore\" signals a result, but the novel's success did not follow from the critics' dismissal.",
+      "B": "\"Likewise\" signals similarity, but the second sentence contradicts the critics' view.",
+      "C": "\"In fact\" introduces support or emphasis for the previous claim, but the second sentence undercuts it."
+    },
+    "tags": ["concession"]
+  },
+  {
+    "id": "rw-ei-transitions-0006",
+    "difficulty": 2,
+    "type": "mcq",
+    "passage": "When touched, the leaves of one tropical plant species fold shut within seconds, but they can take many minutes to reopen. ______ the plant can protect itself almost instantly, yet each defensive reaction costs it time it could have spent gathering sunlight.",
+    "stem": "Which choice completes the text with the most logical transition?",
+    "choices": ["For instance,", "In other words,", "Even so,", "Meanwhile,"],
+    "answer": "B",
+    "explanation": "The second sentence restates the facts of the first in terms of their meaning: quick closing means fast protection, and slow reopening means lost sunlight. A restatement transition fits.",
+    "rationales": {
+      "A": "\"For instance\" introduces a specific example, but the second sentence interprets the first rather than giving an example of it.",
+      "C": "\"Even so\" signals a concession, but the second sentence does not go against the first.",
+      "D": "\"Meanwhile\" signals something happening at the same time, but the second sentence explains the first."
+    },
+    "tags": ["restatement"]
+  },
+  {
+    "id": "rw-ei-transitions-0007",
+    "difficulty": 3,
+    "type": "mcq",
+    "passage": "Economists have long assumed that people who win large lottery prizes will sharply reduce the number of hours they work. A recent study of lottery winners in one country did not find this pattern. ______ most winners kept working nearly the same hours as before, cutting back only slightly.",
+    "stem": "Which choice completes the text with the most logical transition?",
+    "choices": ["However,", "Instead,", "Similarly,", "Therefore,"],
+    "answer": "B",
+    "explanation": "The second sentence says the expected pattern did not appear. The third sentence describes what was found in its place, so a transition that introduces an alternative to the expected outcome fits.",
+    "rationales": {
+      "A": "\"However\" would contrast the third sentence with the second, but the third sentence continues the second sentence's point that the expected pattern was absent.",
+      "C": "\"Similarly\" signals a comparison between two separate things; the third sentence describes the same finding in more detail.",
+      "D": "\"Therefore\" signals a conclusion drawn from evidence, but the third sentence is the evidence itself, not a conclusion from the second."
+    },
+    "tags": ["contrast", "alternative"]
+  },
+  {
+    "id": "rw-ei-transitions-0008",
+    "difficulty": 3,
+    "type": "mcq",
+    "passage": "Rooftop solar panels produce no emissions while they are generating electricity. ______ manufacturing the panels does require energy and raw materials, so their environmental impact is not zero. Over a typical lifespan, though, a panel generates many times the energy used to make it.",
+    "stem": "Which choice completes the text with the most logical transition?",
+    "choices": ["Thus,", "For example,", "Granted,", "Likewise,"],
+    "answer": "C",
+    "explanation": "The second sentence admits a limitation of the first sentence's positive point before the third sentence returns to the argument with \"though.\" A concession transition is needed.",
+    "rationales": {
+      "A": "\"Thus\" signals a conclusion, but the manufacturing cost does not follow from the panels producing no emissions.",
+      "B": "\"For example\" introduces an instance of the previous claim, but the second sentence qualifies that claim instead.",
+      "D": "\"Likewise\" signals a similar point, but the second sentence points out a cost, which works against the first."
+    },
+    "tags": ["concession"]
+  },
+  {
+    "id": "rw-ei-transitions-0009",
+    "difficulty": 3,
+    "type": "mcq",
+    "passage": "The poet Gwendolyn Brooks often wrote in tightly controlled traditional forms, such as the sonnet and the ballad. ______ her subject matter was strikingly contemporary: the everyday lives of people in the neighborhoods of Chicago's South Side.",
+    "stem": "Which choice completes the text with the most logical transition?",
+    "choices": ["Likewise,", "At the same time,", "Therefore,", "For instance,"],
+    "answer": "B",
+    "explanation": "The text sets Brooks's traditional forms against her contemporary subjects: both were true of her work at once, and they pull in different directions. \"At the same time\" signals this kind of coexisting contrast.",
+    "rationales": {
+      "A": "\"Likewise\" signals a similar point, but traditional form and contemporary subject matter are being contrasted, not compared.",
+      "C": "\"Therefore\" signals a result, but writing sonnets did not cause her to choose modern subjects.",
+      "D": "\"For instance\" introduces an example of traditional forms, but the second sentence is about subject matter."
+    },
+    "tags": ["contrast"]
+  }
+]
