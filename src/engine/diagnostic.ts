@@ -12,8 +12,10 @@ export function nextDiagnosticSpec(
   answered: DiagAnswered[],
   domainPriorTheta: Record<string, number>, // mean prior theta of the domain's skills
   skillsByDomain: Record<string, string[]>, // in taxonomy order
+  skipDomains: ReadonlySet<string> = new Set(), // domains with no questions left (thin bank)
 ): DiagSpec | null {
-  const domain = DOMAIN_ORDER.find((d) => answered.filter((a) => a.domain === d).length < DIAGNOSTIC_PER_DOMAIN);
+  const domain = DOMAIN_ORDER.find((d) =>
+    !skipDomains.has(d) && answered.filter((a) => a.domain === d).length < DIAGNOSTIC_PER_DOMAIN);
   if (!domain) return null;
   const done = answered.filter((a) => a.domain === domain);
   let difficulty: Difficulty;
