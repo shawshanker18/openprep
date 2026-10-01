@@ -5,6 +5,8 @@ import { diagnosticPending, requireUser } from "@/server/auth";
 import { getTodayBlock } from "@/server/daily";
 import { PracticeRunner } from "./practice-runner";
 
+export const metadata = { title: "Practice" };
+
 const list = (v: string | string[] | undefined) => [v ?? []].flat().flatMap((x) => x.split(",")).filter(Boolean);
 
 export default async function PracticePage({ searchParams }: PageProps<"/practice">) {

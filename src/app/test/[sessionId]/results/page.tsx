@@ -11,6 +11,8 @@ import { TestResults } from "./test-results";
 import { skillsByPriority } from "@/server/plan";
 import { SKILL_BY_ID } from "@/content/taxonomy";
 
+export const metadata = { title: "Results" };
+
 const SELF = ["Don't know", "A little", "Know it", "Very confident"];
 
 function SkillList({ title, skills }: { title: string; skills: SkillSummary[] }) {

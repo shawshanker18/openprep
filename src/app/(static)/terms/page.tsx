@@ -1,4 +1,4 @@
-export const metadata = { title: "OpenPrep terms" };
+export const metadata = { title: "Terms" };
 
 // Plain-English draft (spec 05 §6). The project owner should review before public launch.
 export default function Terms() {

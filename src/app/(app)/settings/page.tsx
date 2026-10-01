@@ -12,6 +12,8 @@ import {
   addOfficialScore, deleteAccount, removeOfficialScore, resetDashboard, retakeDiagnostic, saveDashboard, updateProfile, updateSettings,
 } from "./actions";
 
+export const metadata = { title: "Settings" };
+
 const control = "h-9 rounded-md border bg-background px-2 text-sm";
 const ERRORS: Record<string, string> = {
   settings: "Please check your settings and try again.",

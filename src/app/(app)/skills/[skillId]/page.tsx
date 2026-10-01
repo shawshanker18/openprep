@@ -32,6 +32,10 @@ function Sparkline({ points }: { points: number[] }) {
   );
 }
 
+export async function generateMetadata({ params }: PageProps<"/skills/[skillId]">) {
+  return { title: SKILL_BY_ID[(await params).skillId]?.name ?? "Skill" };
+}
+
 export default async function SkillPage({ params, searchParams }: PageProps<"/skills/[skillId]">) {
   const { skillId } = await params;
   const skill = SKILL_BY_ID[skillId];

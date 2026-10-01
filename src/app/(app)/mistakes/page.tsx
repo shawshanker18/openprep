@@ -9,6 +9,8 @@ import { MISTAKE_LABEL, MISTAKE_TYPES, type MistakeType } from "@/engine/mistake
 import { cn } from "@/lib/utils";
 import { requireUser } from "@/server/auth";
 
+export const metadata = { title: "Mistakes" };
+
 export default async function MistakesPage({ searchParams }: PageProps<"/mistakes">) {
   const sp = await searchParams;
   const view = sp.view === "all" ? "all" : "due";

@@ -5,6 +5,8 @@ import { beginDiagnostic, skipDiagnostic } from "./actions";
 import { SelfAssessment } from "./self-assessment";
 import { SurveyForm } from "./survey-form";
 
+export const metadata = { title: "Get started" };
+
 const STEPS = { survey: 1, self: 2, diagnostic: 3 } as const;
 
 export default async function OnboardingPage() {

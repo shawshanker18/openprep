@@ -8,6 +8,8 @@ import { attempts, bookmarks, questions } from "@/db/schema";
 import { SKILL_BY_ID } from "@/content/taxonomy";
 import { requireUser } from "@/server/auth";
 
+export const metadata = { title: "Saved questions" };
+
 async function removeBookmark(questionId: string) {
   "use server";
   const { userId } = await requireUser();
