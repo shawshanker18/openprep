@@ -13,7 +13,7 @@
     "db:migrate": "drizzle-kit migrate && tsx scripts/enable-rls.mts",
     "content:validate": "tsx scripts/content-validate.ts",
     "content:seed": "tsx scripts/content-seed.mts",
-    "vercel-build": "npm run db:migrate && npm run content:seed && next build"
+    "vercel-build": "if [ -n \"$MIGRATE_DATABASE_URL\" ]; then npm run db:migrate; fi && npm run content:seed && next build"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.71",
@@ -57,5 +57,8 @@
     "tsx": "^4.23.15",
     "typescript": "^5",
     "vitest": "^5.0.3"
+  },
+  "engines": {
+    "node": "24.x"
   }
 }
