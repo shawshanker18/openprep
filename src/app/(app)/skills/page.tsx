@@ -9,6 +9,8 @@ import { lessonProgress } from "@/db/schema";
 import { skillsByPriority } from "@/server/plan";
 import { cn } from "@/lib/utils";
 
+export const metadata = { title: "Skills" };
+
 const STATUS_LABEL = { unknown: "Not measured yet", weak: "Needs work", developing: "Developing", strong: "Strong", mastered: "Mastered" };
 
 export default async function SkillsPage({ searchParams }: PageProps<"/skills">) {

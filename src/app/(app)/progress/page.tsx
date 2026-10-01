@@ -4,6 +4,8 @@ import { MISTAKE_LABEL, type MistakeType } from "@/engine/mistakes";
 import { requireUser } from "@/server/auth";
 import { getProgress, getSkillSummary } from "@/server/analytics";
 
+export const metadata = { title: "Progress" };
+
 type Point = { t: number; total: number; half: number; source: string };
 
 /** Estimate over time: model line with ±range band, other sources as markers, target as a dashed line. */

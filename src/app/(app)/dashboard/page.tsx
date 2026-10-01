@@ -10,6 +10,8 @@ import { SatCountdown } from "@/components/sat-countdown";
 import { readyBy } from "@/engine/plan";
 import { POINTS_PER_STUDY_HOUR } from "@/engine/constants";
 
+export const metadata = { title: "Home" };
+
 function Card({ title, children, className }: { title: string; children: React.ReactNode; className?: string }) {
   return (
     <section className={`flex flex-col gap-3 rounded-xl border p-5 ${className ?? ""}`}>

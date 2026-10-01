@@ -5,6 +5,8 @@ import { lessonProgress } from "@/db/schema";
 import { requireUser } from "@/server/auth";
 import { listDesmosLessons } from "@/server/lessons";
 
+export const metadata = { title: "Desmos lessons" };
+
 export default async function DesmosPage() {
   const { userId } = await requireUser();
   const [lessons, opened] = await Promise.all([

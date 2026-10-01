@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { getUserId } from "@/server/auth";
 import { LoginForm } from "./login-form";
 
+export const metadata = { title: "Sign in" };
+
 /** Which sign-in methods are switched on in Supabase (cached for 5 minutes). */
 async function providers(): Promise<{ google: boolean; email: boolean }> {
   try {

@@ -7,6 +7,8 @@ import { diagnosticPending, requireUser } from "@/server/auth";
 import { getDashboard } from "@/server/daily";
 import { addPlanBlock, resetPlan } from "./actions";
 
+export const metadata = { title: "Study plan" };
+
 const control = "h-9 rounded-md border bg-background px-2 text-sm";
 const ERRORS: Record<string, string> = {
   block: "Pick a skill for practice, learn and check-in blocks, and between 5 and 60 minutes.",

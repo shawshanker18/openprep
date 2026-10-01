@@ -11,6 +11,8 @@ import { SkillTagPicker } from "../practice/skill-tag-picker";
 import { abandon } from "@/app/test/[sessionId]/actions";
 import { startTestAction } from "./actions";
 
+export const metadata = { title: "Practice tests" };
+
 const KIND = { full: "Full practice test", section: "Section test", module: "Single module", mini: "Mini test", weakness: "Weakness test", custom: "Custom test", diagnostic: "Diagnostic" } as Record<string, string>;
 const ERR: Record<string, string> = { empty: "There aren't enough questions for that test yet.", invalid: "Please check the test options.", rate: "You've started a lot of tests in the last hour. Finish one, or try again a bit later." };
 const control = "h-9 rounded-md border bg-background px-2 text-sm";

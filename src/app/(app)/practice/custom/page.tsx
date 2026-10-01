@@ -6,6 +6,8 @@ import { skillsWithQuestions } from "@/server/plan";
 import { tagsBySkill } from "@/server/practice";
 import { SkillTagPicker } from "../skill-tag-picker";
 
+export const metadata = { title: "Custom practice" };
+
 const control = "h-9 rounded-md border bg-background px-2 text-sm";
 
 // A plain GET form: /practice?mode=set&… runs the set in PracticeRunner.

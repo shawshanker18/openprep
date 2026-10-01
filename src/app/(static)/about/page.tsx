@@ -1,4 +1,4 @@
-export const metadata = { title: "About OpenPrep" };
+export const metadata = { title: "About" };
 
 export default function About() {
   return (<>

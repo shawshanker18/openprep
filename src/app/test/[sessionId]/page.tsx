@@ -8,6 +8,8 @@ import { getTestState } from "@/server/tests";
 import { DiagnosticRunner } from "./diagnostic-runner";
 import { TestRunner } from "./test-runner";
 
+export const metadata = { title: "Test" };
+
 export default async function TestPage({ params }: PageProps<"/test/[sessionId]">) {
   const { sessionId } = await params;
   const { userId } = await requireUser();

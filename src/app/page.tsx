@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { getUserId } from "@/server/auth";
 import { Button } from "@/components/ui/button";
 
 const STEPS = [
@@ -7,7 +9,8 @@ const STEPS = [
   { title: "Test and track", body: "Full adaptive mocks, mistake review, and an honest score estimate that tightens as you go." },
 ];
 
-export default function Landing() {
+export default async function Landing() {
+  if (await getUserId()) redirect("/dashboard"); // signed in: straight to the app
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-12 px-4 py-16">
       <section className="flex flex-col gap-4">

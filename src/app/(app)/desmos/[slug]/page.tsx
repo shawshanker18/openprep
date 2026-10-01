@@ -8,6 +8,11 @@ import { requireUser } from "@/server/auth";
 import { completeBlock } from "@/server/daily";
 import { listDesmosLessons } from "@/server/lessons";
 
+export async function generateMetadata({ params }: PageProps<"/desmos/[slug]">) {
+  const { slug } = await params;
+  return { title: (await listDesmosLessons()).find((l) => l.slug === slug)?.title ?? "Desmos lesson" };
+}
+
 export default async function DesmosLessonPage({ params, searchParams }: PageProps<"/desmos/[slug]">) {
   const [{ slug }, sp] = await Promise.all([params, searchParams]);
   const lesson = (await listDesmosLessons()).find((l) => l.slug === slug);
