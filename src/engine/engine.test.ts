@@ -9,7 +9,7 @@ import { pickQuestion, skillPriority, weeklyFocus, type Candidate } from "./sele
 import { afterReview } from "./review";
 import { assembleModule, largestRemainder, moduleBlueprint, RW_DOMAIN_ORDER, type PoolQ } from "./assemble";
 import { buildTestResult, mockSectionScore, sectionEstimate } from "./score";
-import { buildDailyPlan, weekOf } from "./plan";
+import { buildDailyPlan, streak, weekOf } from "./plan";
 
 // Deterministic RNG for tests (mulberry32).
 const rngFrom = (seed: number) => () => {
@@ -344,5 +344,15 @@ describe("plan near the test date", () => {
   it("a past test date is ignored", () => {
     const input = { ...base, minutes: 60, focus: focus(false) };
     expect(buildDailyPlan({ ...input, daysToTest: -3 })).toEqual(buildDailyPlan(input));
+  });
+});
+
+describe("streak", () => {
+  it("counts back from today, or from yesterday if today has no practice yet", () => {
+    expect(streak(["2026-10-01", "2026-09-30", "2026-09-29", "2026-09-27"], "2026-10-01")).toBe(3);
+    expect(streak(["2026-09-30", "2026-09-29"], "2026-10-01")).toBe(2);
+    expect(streak(["2026-09-29"], "2026-10-01")).toBe(0);
+    expect(streak([], "2026-10-01")).toBe(0);
+    expect(streak(["2026-03-01", "2026-02-28"], "2026-03-01")).toBe(2); // month boundary
   });
 });
