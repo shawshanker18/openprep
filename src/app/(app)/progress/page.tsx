@@ -89,7 +89,7 @@ export default async function ProgressPage() {
         })}
       </section>
 
-      <div className="grid gap-10 md:grid-cols-2">
+      <div className="grid gap-10 lg:grid-cols-2">
         <section className="flex flex-col gap-3">
           <h2 className="font-medium">Mistake types · 30 days</h2>
           {p.mistakesByType.length ? <Bars rows={p.mistakesByType.map((m) => ({ label: MISTAKE_LABEL[m.type as MistakeType] ?? m.type!, value: m.n }))} />

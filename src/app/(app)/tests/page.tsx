@@ -53,7 +53,7 @@ export default async function TestsPage({ searchParams }: PageProps<"/tests">) {
         </div>
       ))}
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2">
         <StartCard title="Full practice test" time="2 h 14 min · 98 questions + 10-min break" fields={<input type="hidden" name="kind" value="full" />}>
           Both sections, adaptive like the real test: how you do in each first module sets the difficulty of the second.
         </StartCard>
