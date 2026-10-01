@@ -1,0 +1,21 @@
+{
+  "appId": "com.openprep.app",
+  "appName": "OpenPrep",
+  "webDir": "www",
+  "server": {
+    "url": "https://openprep-opal.vercel.app/dashboard",
+    "errorPath": "offline.html",
+    "androidScheme": "https"
+  },
+  "android": {
+    "appendUserAgent": "OpenPrepApp/android",
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": false
+  },
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_openprep",
+      "iconColor": "#171717"
+    }
+  }
+}

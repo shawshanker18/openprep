@@ -20,6 +20,8 @@ const csp = [
 ].join("; ");
 
 const nextConfig: NextConfig = {
+  // The Android emulator reaches the dev server as 10.0.2.2 (dev only; ignored in production builds).
+  allowedDevOrigins: ["10.0.2.2"],
   // Lessons are read from disk at request time; make sure they ship with the server bundle.
   outputFileTracingIncludes: {
     "/skills/*": ["./content/lessons/**/*.md"],
