@@ -12,11 +12,11 @@
       "Cold ocean water slowly damages the fur of sea otters."
     ],
     "answer": "B",
-    "explanation": "The text says otters lack blubber, depend on air trapped in their fur for warmth, and groom to keep that air layer intact. Choice B links the grooming to that purpose, which is the point of the whole text.",
+    "explanation": "Before looking at the choices, try to sum up the text in one sentence of your own. Something like: otters groom a lot because their fur is what keeps them warm.\n\nEvery sentence builds toward that. Otters have no blubber, they rely on air trapped in their fur, and grooming keeps that air in place.\n\nChoice B says the same thing: frequent grooming, explained by fur instead of blubber.",
     "rationales": {
-      "A": "The text never compares how much time otters and other marine mammals spend grooming.",
-      "C": "The text says most marine mammals have blubber; it says nothing about them giving up fur.",
-      "D": "The text describes cold water as the reason otters need warmth, not as something that harms their fur."
+      "A": "The text never compares grooming time with other marine mammals. Watch out for choices that add a comparison the text doesn't make.",
+      "C": "The text says most marine mammals have blubber. It never says they stopped relying on fur.",
+      "D": "Cold water is why otters need to stay warm. The text never says it damages their fur."
     },
     "tags": ["main-idea", "informational-text"]
   },
@@ -33,11 +33,11 @@
       "She watches the fog lift and counts the boats."
     ],
     "answer": "D",
-    "explanation": "The text states directly that Marisol \"watched the fog lift off the water, counting the boats as they appeared one by one.\" Choice D restates this detail.",
+    "explanation": "This question asks what the text says, so the answer will be right there in the passage. Find the sentence about what Marisol does.\n\nIt says she \"watched the fog lift off the water, counting the boats as they appeared one by one.\" Choice D says exactly that.\n\nNotice how the text also tells you what she does NOT do: she doesn't fish and doesn't talk to the old men. Those details are there to rule out the trap answers.",
     "rationales": {
-      "A": "The text says Marisol \"did not fish.\"",
-      "B": "The text says she \"did not talk to the old men\" who fished.",
-      "C": "No friend is mentioned; she stands on the pier alone."
+      "A": "The text says plainly that she \"did not fish.\"",
+      "B": "The text says she \"did not talk to the old men\" who fish.",
+      "C": "No friend appears in the text. She stands on the pier by herself."
     },
     "tags": ["detail", "literary-text"]
   },
@@ -54,11 +54,11 @@
       "Local time based on the sun was more accurate than standard time."
     ],
     "answer": "A",
-    "explanation": "The text describes a problem (many local times confusing train schedules) and its solution (standard time zones). Choice A captures both the problem and the solution.",
+    "explanation": "This text follows a problem and solution pattern, which is very common on the SAT.\n\nProblem: every town kept its own time, so train schedules got confusing. Solution: railroads adopted standard time zones in 1883.\n\nA good main idea covers the whole pattern, not just one half. Choice A includes both the confusion and the fix.",
     "rationales": {
-      "B": "This reverses the text: towns set clocks by the sun, and railroads later created a shared standard.",
-      "C": "The text never mentions late trains or track quality.",
-      "D": "The text does not compare the accuracy of local and standard time."
+      "B": "This reverses the order. Towns set their clocks by the sun, and the railroads came later with a shared standard.",
+      "C": "Late trains and tracks are never mentioned. The confusion was about schedules and clocks.",
+      "D": "The text never says which kind of time was more accurate."
     },
     "tags": ["main-idea", "informational-text"]
   },
@@ -75,11 +75,11 @@
       "Audiences who rarely attend dance performances prefer works based on classical ballet."
     ],
     "answer": "C",
-    "explanation": "The walking exercise is an example; the key claim is that Ilves builds dances from everyday gestures so that even people unfamiliar with dance will find them familiar. Choice C states that method and its purpose.",
+    "explanation": "The first sentence describes an unusual exercise, but that's just an example. The main idea is the reason behind it.\n\nIlves builds her dances from ordinary movements because she thinks everyone recognizes them, so even people new to dance will find her work familiar.\n\nChoice C captures both the method (everyday movements) and the purpose (feeling relatable to a wide audience).\n\nTip: when a text opens with a specific example, look for the bigger point it is there to illustrate.",
     "rationales": {
-      "A": "Ilves chooses not to build dances from ballet positions, but the text never says ballet training is unnecessary for dancers.",
-      "B": "The text never says how difficult the dancers find the exercises.",
-      "D": "The text suggests the opposite: Ilves thinks everyday gestures will appeal to such viewers."
+      "A": "Ilves chooses not to build her dances from ballet positions, but she never says dancers don't need ballet training.",
+      "B": "The text never says how hard the dancers find the walking exercises.",
+      "D": "This contradicts the text. Ilves expects everyday gestures to appeal to people who rarely see dance."
     },
     "tags": ["main-idea", "informational-text"]
   },
@@ -96,11 +96,11 @@
       "Their tails vary more in length than the hillside lizards' tails do."
     ],
     "answer": "A",
-    "explanation": "Since the hillside lizards had \"noticeably longer tails,\" the sand lizards must have shorter ones, and the last sentence says shorter tails \"appeared to be no disadvantage\" on flat sand. Choice A combines these two details.",
+    "explanation": "The question asks about the sand lizards, but the text describes them partly by comparison with the hillside lizards. So you have to put two details together.\n\nThe hillside lizards had \"noticeably longer tails,\" which means the sand lizards had shorter ones. The last sentence says shorter tails \"appeared to be no disadvantage\" on flat sand.\n\nChoice A combines both: shorter tails, and no disadvantage.",
     "rationales": {
-      "B": "This mixes up the groups: the hillside lizards are the ones with longer tails.",
-      "C": "The sand lizards live on flat sand and mostly run; the text never describes them leaping between rocks.",
-      "D": "The text says tail length varied across the whole population, not that one group varied more than the other."
+      "B": "This mixes up the groups. The hillside lizards are the ones with longer tails.",
+      "C": "Sand lizards mostly run in straight lines. The text never describes them leaping between rocks.",
+      "D": "The text says tails varied across the whole population, not that one group varied more."
     },
     "tags": ["detail", "informational-text"]
   },
@@ -117,11 +117,11 @@
       "Teodor keeps the brass clock because of its meaning to his family, not because of its usefulness."
     ],
     "answer": "D",
-    "explanation": "Teodor admits the clock doesn't work, refuses to sell it, explains that his father made it for his mother, and says some things are kept \"for what they remember, not for what they do.\" Choice D summarizes this.",
+    "explanation": "In a story excerpt, the main idea often comes through what a character says at the end.\n\nTeodor admits the clock doesn't work and refuses to sell it. Then he explains why: his father made it for his mother. He sums it up himself: \"Some things we keep for what they remember, not for what they do.\"\n\nChoice D restates that line in plain words.",
     "rationales": {
-      "A": "Teodor handles the clock gently and with affection; nothing suggests he has tried and failed to repair it.",
-      "B": "Teodor is showing the shop to the apprentice, but the scene focuses on why he keeps one clock, not on teaching repairs.",
-      "C": "Customers actually want to buy the clock; the text gives no sign that Teodor thinks they undervalue anything."
+      "A": "Teodor handles the clock gently and fondly. Nothing suggests he tried and failed to fix it, or that he's frustrated.",
+      "B": "He is showing the apprentice around, but the scene is about why he keeps one clock, not about teaching repairs.",
+      "C": "Customers actually want to buy the clock. Nothing suggests Teodor thinks they undervalue anything."
     },
     "tags": ["main-idea", "literary-text"]
   },
@@ -138,11 +138,11 @@
       "Ecologists have concluded that lanternfish play only a minor role in the ocean's food web."
     ],
     "answer": "B",
-    "explanation": "The text contrasts an old assumption (few lanternfish, based on nets) with a newer sound-based estimate (many more lanternfish) and offers a reason for the gap (fish escaping nets). Choice B includes the new finding and the proposed explanation without overstating either.",
+    "explanation": "This text has a classic shape: an old belief, new evidence against it, and an explanation for the difference.\n\nOld belief: lanternfish are rare, because nets caught few of them. New evidence: sound waves suggest there are many more. Explanation: the fish may sense nets and swim away.\n\nChoice B includes the new finding and the likely reason, and it uses careful words like \"suggests\" and \"possibly,\" just like the text.\n\nOn harder questions, watch for choices that state things more strongly than the text does.",
     "rationales": {
-      "A": "The text says lanternfish \"may be far more abundant\" than thought; it never ranks them against all other ocean fish.",
-      "C": "The text suggests nets undercount lanternfish, not that nets are useless for all deep-ocean fish.",
-      "D": "This is the older assumption that the newer findings call into question."
+      "A": "The text says lanternfish \"may be far more abundant\" than thought. It never claims they are the most abundant fish in the ocean.",
+      "C": "The text says nets undercount lanternfish, not that nets are useless for every deep sea fish.",
+      "D": "That's the old assumption, the one the new research calls into question."
     },
     "tags": ["main-idea", "informational-text"]
   },
@@ -159,11 +159,11 @@
       "They prove that families who could read and write traded more often than other families did."
     ],
     "answer": "C",
-    "explanation": "The historian uses the books as evidence that money was one of several ways to get goods, then adds a limitation: the books come mainly from literate households. Choice C captures both the value and the limitation.",
+    "explanation": "The historian does two things: she uses the account books as evidence, and then she adds a warning about them. A good answer needs both.\n\nThe evidence: trades like eggs for thread show that money was only one way families got goods.\n\nThe warning: mostly families who could read and write kept these books, so they may not represent everyone.\n\nChoice C captures the value and the limit together.",
     "rationales": {
-      "A": "The historian says money was \"only one of several ways,\" not that it was rarely used; this overstates her claim.",
-      "B": "Her caution is about which families kept the books, not about the accuracy of the entries.",
-      "D": "The text does not compare how often literate and non-literate families traded."
+      "A": "She says money was \"only one of several ways,\" which isn't the same as rarely used. This overstates her point.",
+      "B": "Her warning is about which families kept the books, not about mistakes in the entries.",
+      "D": "The text never compares how often different kinds of families traded."
     },
     "tags": ["detail", "informational-text"]
   },
@@ -180,11 +180,11 @@
       "Ines realizes that her grandmother kept the kitchen poorly organized."
     ],
     "answer": "A",
-    "explanation": "The first sentence notes changes (smaller room, faded paint), but \"Yet\" turns to the unchanged spoons, and Ines's long pause and soft closing of the drawer show she is moved. Choice A covers both halves of the text.",
+    "explanation": "Watch for turning words. The first sentence lists what has changed: the room seems smaller and the paint has faded. Then \"Yet\" turns the scene toward something that hasn't changed: the spoons, arranged just as her grandmother kept them.\n\nInes's reaction shows how she feels. She stands still for a long moment and closes the drawer softly. She's moved.\n\nChoice A covers both halves: things changed, but finding something unchanged touches her.",
     "rationales": {
-      "B": "This describes only the first sentence and ignores the turn at \"Yet,\" which is where the scene's emphasis falls.",
-      "C": "Ines notices the faded paint, but nothing suggests she plans to repaint.",
-      "D": "The spoons are arranged neatly from largest to smallest, which suggests careful organization."
+      "B": "This only covers the first sentence. The word \"Yet\" shifts the focus to what stayed the same, and that's where the scene lands.",
+      "C": "She notices the faded paint, but nothing suggests she plans to repaint.",
+      "D": "The spoons are arranged neatly from largest to smallest, which shows careful organization."
     },
     "tags": ["main-idea", "literary-text"]
   }
