@@ -1,7 +1,7 @@
 // Tests: assembly, module lifecycle, server-authoritative timing, scoring at completion (spec 03 §7–8, 04 §5).
 // Mastery is only updated when the whole session completes; abandoned sessions change nothing.
 import "server-only";
-import { and, asc, desc, eq, inArray, isNull, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gte, inArray, isNull, sql } from "drizzle-orm";
 import { db, type Tx } from "@/db";
 import { attempts, questions, scoreSnapshots, skillState, testItems, testModules, testSessions } from "@/db/schema";
 import { SKILL_BY_ID } from "@/content/taxonomy";
@@ -62,10 +62,15 @@ async function skillSetModule(tx: Tx, userId: string, sessionId: string, idx: nu
   return insertModule(tx, sessionId, idx, sections.size === 1 ? [...sections][0]! : "mixed", "base", timeLimitS, picked);
 }
 
+const MAX_STARTS_PER_HOUR = 30;
+
 export async function startTest(userId: string, input: {
   kind: TestKind; section?: Section; skillId?: string; skillIds?: string[]; count?: number; timed?: boolean; focus?: string[];
   tags?: string[]; difficulty?: Difficulty | "mixed";
 }): Promise<{ ok: true; id: string } | { ok: false; error: string; resumeId?: string }> {
+  const [{ n }] = (await db.select({ n: sql<number>`count(*)::int` }).from(testSessions)
+    .where(and(eq(testSessions.userId, userId), gte(testSessions.startedAt, new Date(Date.now() - 3_600_000))))) as [{ n: number }];
+  if (n >= MAX_STARTS_PER_HOUR) return { ok: false, error: "rate" };
   if (input.kind === "full" || input.kind === "section") {
     const [open] = await db.select({ id: testSessions.id }).from(testSessions)
       .where(and(eq(testSessions.userId, userId), eq(testSessions.status, "in_progress"), inArray(testSessions.kind, ["full", "section"]))).limit(1);

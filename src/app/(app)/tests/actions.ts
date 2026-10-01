@@ -29,6 +29,6 @@ export async function startTestAction(form: FormData) {
   if (!p.success) redirect("/tests?error=invalid");
   const focus = p.data.kind === "weakness" ? await ensureWeeklyFocus(userId, profile) : undefined;
   const r = await startTest(userId, { ...p.data, focus });
-  if (!r.ok) redirect(r.resumeId ? `/tests?resume=${r.resumeId}` : "/tests?error=empty");
+  if (!r.ok) redirect(r.resumeId ? `/tests?resume=${r.resumeId}` : r.error === "rate" ? "/tests?error=rate" : "/tests?error=empty");
   redirect(`/test/${r.id}`);
 }
