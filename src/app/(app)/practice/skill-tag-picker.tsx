@@ -28,7 +28,7 @@ export function SkillTagPicker({ skills, tagsBySkill, name }: {
       </fieldset>
       {tags.length > 0 && (
         <fieldset className="flex max-h-32 flex-col gap-1 overflow-y-auto text-sm">
-          <span className="text-xs text-muted-foreground">Sub-topics (optional — none ticked = all)</span>
+          <span className="text-xs text-muted-foreground">Sub topics (optional; leave all unticked to include every one)</span>
           {tags.map((t) => <label key={t} className="flex gap-2"><input type="checkbox" name="tags" value={t} />{t.replace(/-/g, " ")}</label>)}
         </fieldset>
       )}

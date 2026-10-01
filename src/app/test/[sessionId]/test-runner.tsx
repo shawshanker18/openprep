@@ -60,7 +60,7 @@ export function TestRunner({ sessionId, module: m, items: initial, serverNow, br
       if (Date.now() - last < 3000) return; // blur + visibilitychange fire together
       last = Date.now();
       void reportFocusLoss(sessionId);
-      toast.warning("You left the test window — this is noted on your results.");
+      toast.warning("You left the test window. This is noted on your results.");
     };
     const onVis = () => { if (document.hidden) lost(); };
     window.addEventListener("blur", lost);
@@ -236,7 +236,7 @@ function Break({ onDone }: { onDone: () => void }) {
     <div className="mx-auto flex max-w-md flex-col items-center gap-4 py-16 text-center">
       <h1 className="text-2xl font-semibold">Break</h1>
       <p className="text-5xl tabular-nums">{clock(left)}</p>
-      <p className="text-muted-foreground">Reading and Writing is done. Stretch, drink some water — Math starts after the break.</p>
+      <p className="text-muted-foreground">Reading and Writing is done. Stretch and drink some water. Math starts after the break.</p>
       <Button size="lg" onClick={onDone}>Resume now</Button>
     </div>
   );

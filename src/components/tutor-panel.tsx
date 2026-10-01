@@ -45,7 +45,7 @@ export function TutorPanel({ questionId, answered, isMath, wrongChoice }: {
         setMsgs((m) => [...m.slice(0, -1), { role: "assistant", content: out }]);
       }
     } catch {
-      setMsgs((m) => [...m.slice(0, -1), { role: "assistant", content: "Something went wrong — try again in a moment." }]);
+      setMsgs((m) => [...m.slice(0, -1), { role: "assistant", content: "Something went wrong. Please try again in a moment." }]);
     } finally { setBusy(false); }
   };
 

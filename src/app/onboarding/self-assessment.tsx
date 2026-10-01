@@ -60,7 +60,7 @@ export function SelfAssessment() {
       ))}
       <div className="flex flex-col gap-2 sm:flex-row">
         <Button size="lg" disabled={pending} onClick={() => save(ratings)}>Continue</Button>
-        <Button size="lg" variant="outline" disabled={pending} onClick={() => save({})}>Skip — just test me</Button>
+        <Button size="lg" variant="outline" disabled={pending} onClick={() => save({})}>Skip and just test me</Button>
       </div>
     </div>
   );

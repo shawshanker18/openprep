@@ -33,7 +33,7 @@ export default async function DashboardPage() {
   const planLeft = d.blocks.filter((b) => !b.done).length;
   const sectionMastery = (section: "math" | "rw") => {
     const measured = summary.skills.filter((k) => k.section === section && k.status !== "unknown");
-    return measured.length ? `${Math.round(measured.reduce((a, k) => a + k.mastery, 0) / measured.length)}%` : "—";
+    return measured.length ? `${Math.round(measured.reduce((a, k) => a + k.mastery, 0) / measured.length)}%` : "not measured yet";
   };
   const ready = profile.targetScore ? readyBy({ estimate: d.estimate.total, target: profile.targetScore,
     minutesPerDay: profile.minutesPerDay, daysPerWeek: profile.daysPerWeek, now: new Date() }) : null;
@@ -45,7 +45,7 @@ export default async function DashboardPage() {
     score: (
       <Card key="score" title="Your score" className="lg:col-span-2">
         <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1">
-          <p className="text-3xl font-semibold tabular-nums">Estimated {d.estimate.lo}–{d.estimate.hi}</p>
+          <p className="text-3xl font-semibold tabular-nums">Estimated {d.estimate.lo} to {d.estimate.hi}</p>
           {profile.targetScore && <p className="text-muted-foreground">Target {profile.targetScore}</p>}
           {d.daysLeft != null && d.daysLeft >= 0 && <p className="text-muted-foreground">{d.daysLeft} days to go</p>}
         </div>
@@ -59,11 +59,11 @@ export default async function DashboardPage() {
           <div>
             {testDay
               ? <p className="text-lg">{testDay.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}</p>
-              : <p className="text-sm">No test date yet — <Link className="underline" href="/settings">add one</Link>.</p>}
+              : <p className="text-sm">No test date yet. <Link className="underline" href="/settings">Add one</Link> so we can count down with you.</p>}
             <p className="text-sm text-muted-foreground">
               {ready
-                ? <>Predicted ready for {profile.targetScore}: <b className="text-foreground">{month(ready.date)}</b>{tooSoon && " — later than your test date"}</>
-                : profile.targetScore ? "At your current study time your target is more than two years away — add study time in Settings." : "Set a target score in Settings."}
+                ? <>Predicted ready for {profile.targetScore}: <b className="text-foreground">{month(ready.date)}</b>{tooSoon && ", which is after your test date"}</>
+                : profile.targetScore ? "At your current study time, your target is more than two years away. Adding a little study time in Settings brings it much closer." : "Set a target score in Settings."}
             </p>
           </div>
           {testDay && <SatCountdown testDate={profile.testDate!} timeZone={profile.timezone} />}
@@ -96,12 +96,12 @@ export default async function DashboardPage() {
     ),
     pace: d.stretch && (
       <Card key="pace" title="Pace check">
-        <p className="text-sm">At your current time budget this target is a stretch — consider adding study time or moving the date.</p>
+        <p className="text-sm">At your current study time, this target is a stretch. Adding some study time or moving your test date would make it more realistic.</p>
       </Card>
     ),
     mistakes: (
       <Card key="mistakes" title="Mistakes to review">
-        <p className="text-sm">{d.dueReviews ? `${d.dueReviews} due now` : "None due — nice."}</p>
+        <p className="text-sm">{d.dueReviews ? `${d.dueReviews} due now` : "Nothing due right now. Nice work."}</p>
         {d.dueReviews > 0 && <Button className="self-start" render={<Link href="/practice?mode=review" />}>Review now</Button>}
       </Card>
     ),
@@ -119,7 +119,7 @@ export default async function DashboardPage() {
       <div>
         {hello}
         <p className="text-sm text-muted-foreground">
-          {planLeft ? `${planLeft} block${planLeft === 1 ? "" : "s"} left in today's plan.` : "Today's plan is done — extra practice still counts."}
+          {planLeft ? `${planLeft} block${planLeft === 1 ? "" : "s"} left in today's plan.` : "Today's plan is done. Any extra practice still counts."}
         </p>
       </div>
       <div className="flex items-center gap-3">

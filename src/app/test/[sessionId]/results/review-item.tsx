@@ -19,7 +19,7 @@ export function ReviewItem({ n, q, response, correct, attemptId, mistakeType }: 
     <details className="rounded-lg border">
       <summary className="flex cursor-pointer items-center gap-3 px-4 py-2 text-sm">
         <span className="w-6 tabular-nums text-muted-foreground">{n}</span>
-        <span className={correct ? "text-emerald-700" : "text-red-700"}>{correct ? "✓ Correct" : response ? "✗ Incorrect" : "— Not answered"}</span>
+        <span className={correct ? "text-emerald-700" : "text-red-700"}>{correct ? "✓ Correct" : response ? "✗ Incorrect" : "Not answered"}</span>
       </summary>
       <div className="flex flex-col gap-4 border-t p-4">
         <QuestionView question={q} value={response} onChange={() => {}} disabled correct={choice} />

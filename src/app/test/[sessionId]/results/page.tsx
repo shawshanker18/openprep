@@ -54,7 +54,7 @@ export default async function ResultsPage({ params }: PageProps<"/test/[sessionI
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-8 px-4 py-10">
       <div>
         <p className="text-sm text-muted-foreground">Your starting profile</p>
-        <h1 className="text-3xl font-semibold tabular-nums">Estimated {estimate.total.lo}–{estimate.total.hi}</h1>
+        <h1 className="text-3xl font-semibold tabular-nums">Estimated {estimate.total.lo} to {estimate.total.hi}</h1>
         <p className="text-muted-foreground">
           Reading &amp; Writing ≈ {estimate.rw.score} · Math ≈ {estimate.math.score}. This is an estimate from a short diagnostic;
           it narrows as you practise.
@@ -102,7 +102,7 @@ export default async function ResultsPage({ params }: PageProps<"/test/[sessionI
 
       {unmeasured.length > 0 && (
         <p className="text-sm text-muted-foreground">
-          {unmeasured.length} skills weren&apos;t measured yet — practice will fill them in.
+          {unmeasured.length} skills weren&apos;t measured yet. Practice will fill them in.
         </p>
       )}
       <div><Button size="lg" render={<Link href="/dashboard" />}>See my plan</Button></div>

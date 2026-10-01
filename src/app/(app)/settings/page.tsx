@@ -16,9 +16,9 @@ const control = "h-9 rounded-md border bg-background px-2 text-sm";
 const ERRORS: Record<string, string> = {
   settings: "Please check your settings and try again.",
   profile: "Please check your profile and try again.",
-  dashboard: "Couldn't save the dashboard layout — please try again.",
-  score: "Scores must be 200–800 in steps of 10, with a date.",
-  scores: "That's the maximum of 20 official scores — remove one to add another.",
+  dashboard: "Couldn't save the dashboard layout. Please try again.",
+  score: "Each section score must be between 200 and 800 in steps of 10, with a date.",
+  scores: "You can keep up to 20 official scores. Remove one to add another.",
   retake: "You can retake the diagnostic once every 30 days.",
   delete: "Type DELETE in capitals to confirm.",
 };
@@ -59,7 +59,7 @@ export default async function SettingsPage({ searchParams }: PageProps<"/setting
               {[3, 4, 5, 6, 7].map((d) => <option key={d} value={d}>{d} days</option>)}
             </select></label>
         </div>
-        <p className="text-xs text-muted-foreground">Changes apply from tomorrow&apos;s plan — today&apos;s stays as it is.</p>
+        <p className="text-xs text-muted-foreground">Changes apply from tomorrow&apos;s plan. Today&apos;s plan stays as it is.</p>
         <Button type="submit" className="self-start">Save</Button>
       </form>
 

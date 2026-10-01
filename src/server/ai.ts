@@ -45,7 +45,7 @@ export async function checkAccess(userId: string, q: Question, mode: Mode): Prom
   if (mode === "hint") return null;
   const [a] = await db.select({ id: attempts.id }).from(attempts)
     .where(and(eq(attempts.userId, userId), eq(attempts.questionId, q.id))).limit(1);
-  return a ? null : "Answer the question first — then the tutor can explain it.";
+  return a ? null : "Answer the question first, then the tutor can explain it.";
 }
 
 export const cacheKey = (q: Question, mode: Mode, choice?: string) =>
@@ -81,7 +81,7 @@ export async function systemPrompt(userId: string, q: Question, mode: Mode, choi
 
   return `You are OpenPrep's SAT tutor. You help one high-school student understand one SAT practice question.
 
-GROUND TRUTH (reviewed by humans — never contradict it):
+GROUND TRUTH (reviewed by humans; never contradict it):
 Question: ${q.passageMd ? `${q.passageMd}\n` : ""}${q.stemMd}
 Choices:
 ${letters}
@@ -94,6 +94,8 @@ Skill: ${SKILL_BY_ID[q.skillId]?.name ?? q.skillId} (difficulty ${q.difficulty})
 RULES:
 - Mode = ${mode}. ${MODE_RULE[mode]}
 - Match depth to mastery when known: below 45% define terms and go slower; above 70% be brief.
+- Sound like a patient human tutor talking to one student: plain, warm sentences that say WHY each step works and what to notice first.
+  No dashes used as punctuation (no "—" or " - "), no filler, no praise padding, no headings for short answers.
 - Use $...$ for all math. Keep answers under 180 words unless asked for more steps or the mode allows more.
 - Stay on this question, its skill, and SAT preparation. Politely decline anything else.
 - If the student claims the official answer is wrong, re-check carefully. If you still agree with the official answer, explain why.

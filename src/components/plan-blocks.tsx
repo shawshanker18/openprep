@@ -17,7 +17,7 @@ function describe(b: PlanBlock, i: number): { label: string; href: string } {
 }
 
 export function PlanBlocks({ blocks, removable }: { blocks: PlanBlock[]; removable?: boolean }) {
-  if (!blocks.length) return <p className="text-sm text-muted-foreground">Nothing planned today — try smart practice.</p>;
+  if (!blocks.length) return <p className="text-sm text-muted-foreground">Nothing planned today. Try smart practice.</p>;
   return (
     <ol className="flex flex-col gap-2">
       {blocks.map((b, i) => {

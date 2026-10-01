@@ -116,7 +116,7 @@ export function buildTestResult(
 
   // Insights, in priority order, max 4.
   const insights: string[] = [];
-  if (unanswered >= 3) insights.push(`You ran out of time on ${unanswered} questions — timing is costing you points.`);
+  if (unanswered >= 3) insights.push(`You ran out of time on ${unanswered} questions, so timing is costing you points.`);
   for (const sec of ["rw", "math"] as const) {
     const hard = items.filter((i) => i.section === sec && i.difficulty === 3);
     if (hard.length < 3) continue;
@@ -143,11 +143,11 @@ export function buildTestResult(
   for (const i of items) if (!i.correct) missedBySkill.set(i.skillId, (missedBySkill.get(i.skillId) ?? 0) + 1);
   const worstSkill = [...missedBySkill.entries()].sort((a, b) => b[1] - a[1])[0];
   if (worstSkill && worstSkill[1] >= 3)
-    insights.push(`Most-missed skill: ${SKILL_BY_ID[worstSkill[0]]?.name ?? worstSkill[0]} (${worstSkill[1]} wrong) — practise it next.`);
+    insights.push(`Most-missed skill: ${SKILL_BY_ID[worstSkill[0]]?.name ?? worstSkill[0]} (${worstSkill[1]} wrong). Practise it next.`);
   const easy = ofDiff(1);
   const easyMissed = easy.filter((i) => !i.correct).length;
   if (easy.length >= 3 && easyMissed / easy.length > 0.2)
-    insights.push(`You missed ${easyMissed} easy questions — slow down on the first read.`);
+    insights.push(`You missed ${easyMissed} easy questions. Slow down on the first read.`);
 
   const halfWidth = total != null ? round10(Math.SQRT2 * MOCK_HALF_WIDTH) : MOCK_HALF_WIDTH;
   return { sections, total, halfWidth, byDomain, bySkill, timing, insights: insights.slice(0, 4) };

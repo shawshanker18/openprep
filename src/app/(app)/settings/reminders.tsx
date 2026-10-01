@@ -62,7 +62,7 @@ export function Reminders({ hour }: { hour: number | null }) {
     setBusy(true);
     try {
       const r = await testPush();
-      if (r.ok) toast(r.data.delivered ? `Sent to ${r.data.delivered} device${r.data.delivered === 1 ? "" : "s"}.` : "Nothing was delivered — try turning reminders off and on.");
+      if (r.ok) toast(r.data.delivered ? `Sent to ${r.data.delivered} device${r.data.delivered === 1 ? "" : "s"}.` : "Nothing was delivered. Try turning reminders off and on again.");
     } finally { setBusy(false); }
   }
 
@@ -84,7 +84,7 @@ export function Reminders({ hour }: { hour: number | null }) {
       {state === "loading" && <p className="text-sm text-muted-foreground">Checking this browser…</p>}
       {state === "unsupported" && <p className="text-sm text-muted-foreground">This browser can&apos;t receive notifications.</p>}
       {state === "ios-install" && <p className="text-sm">On iPhone and iPad: tap Share → <b>Add to Home Screen</b>, open OpenPrep from your home screen, then come back here.</p>}
-      {state === "denied" && <p className="text-sm">Notifications are blocked for this site — allow them in your browser&apos;s site settings, then reload.</p>}
+      {state === "denied" && <p className="text-sm">Notifications are blocked for this site. Allow them in your browser&apos;s site settings, then reload.</p>}
       {state === "off" && <Button className="self-start" disabled={busy} onClick={enable}>Turn on for this device</Button>}
       {state === "on" && (
         <div className="flex flex-wrap gap-2">

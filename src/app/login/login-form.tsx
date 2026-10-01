@@ -24,7 +24,7 @@ export function LoginForm({ google: showGoogle, inApp = false }: { google: boole
       <div className="flex flex-col gap-2 rounded-2xl border p-6 text-center">
         <p className="font-medium">Check your inbox</p>
         <p className="text-sm text-muted-foreground">We sent a sign-in link to <b className="text-foreground">{email}</b>. It works once.</p>
-        {inApp && <p className="text-sm text-muted-foreground">Open it on this device — your browser will send you back to the app.</p>}
+        {inApp && <p className="text-sm text-muted-foreground">Open it on this device and your browser will send you back to the app.</p>}
         <button className="mt-2 text-sm underline" onClick={() => setState("idle")}>Use a different email</button>
       </div>
     );
@@ -62,7 +62,7 @@ export function LoginForm({ google: showGoogle, inApp = false }: { google: boole
       </form>
 
       <p className="text-center text-sm text-muted-foreground">
-        New or returning — the same link signs you in. No password needed.
+        New or returning, the same link signs you in. No password needed.
       </p>
     </div>
   );
