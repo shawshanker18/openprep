@@ -7,7 +7,9 @@ export async function GET(request: NextRequest) {
   if (code) {
     // The PKCE verifier lives where the sign-in was requested. No verifier here means the link was opened somewhere
     // else: usually the email app's browser after asking from the desktop/Android app, so hand the code back to it.
-    const handOff = NextResponse.redirect(`${origin}/auth/open-app?code=${encodeURIComponent(code)}`);
+    // Already inside the app: handing off to the app makes no sense, so a failed code is just an expired link.
+    const inApp = (request.headers.get("user-agent") ?? "").includes("OpenPrepApp");
+    const handOff = NextResponse.redirect(inApp ? `${origin}/login?error=auth` : `${origin}/auth/open-app?code=${encodeURIComponent(code)}`);
     if (!request.cookies.getAll().some((c) => c.name.includes("-code-verifier"))) return handOff;
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
