@@ -9,7 +9,7 @@ import { db } from "@/db";
 import { attempts, dailyPlans, lessonProgress, scoreSnapshots, skillState, testSessions, type Profile } from "@/db/schema";
 import { SKILL_BY_ID } from "@/content/taxonomy";
 import { masteryPct } from "@/engine/mastery";
-import { buildDailyPlan, dayOfWeekIndex, localDate, paceCheck, questionsForBlock, weekOf, type PlanBlock } from "@/engine/plan";
+import { buildDailyPlan, dayOfWeekIndex, localDate, paceCheck, questionsForBlock, streak, weekOf, type PlanBlock } from "@/engine/plan";
 import { headlineEstimate, sectionEstimate, totalEstimate } from "@/engine/score";
 import { ensureWeeklyFocus } from "./plan";
 import { lessonExists } from "./lessons";
@@ -187,3 +187,11 @@ export function dashboardLayout(profile: Profile): { id: DashboardCardId; visibl
   const saved = profile.dashboardLayout.filter((c) => ids.includes(c.id)) as { id: DashboardCardId; visible: boolean }[];
   return [...saved, ...DASHBOARD_CARDS.filter((c) => !saved.some((s) => s.id === c.id)).map((c) => ({ id: c.id, visible: true }))];
 }
+
+/** Study streak in the student's timezone: distinct local days with an answer, last ~13 months. */
+export const getStreak = cache(async (userId: string, timezone: string) => {
+  const rows = await db.execute<{ d: string }>(sql`
+    select distinct (created_at at time zone ${timezone})::date::text as d from attempts
+    where user_id = ${userId} and created_at > now() - interval '400 days'`);
+  return streak(rows.map((r) => r.d), localDate(new Date(), timezone));
+});

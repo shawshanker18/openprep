@@ -94,3 +94,13 @@ export function readyBy(x: { estimate: number; target: number; minutesPerDay: nu
   if (weeks > 104) return null;
   return { weeks, date: new Date(x.now.getTime() + weeks * 7 * 86_400_000) };
 }
+
+/** Consecutive study days ending today (or yesterday — today isn't over yet). `days` = distinct local dates, any order. */
+export function streak(days: string[], today: string): number {
+  const set = new Set(days);
+  const prev = (d: string) => { const x = new Date(`${d}T00:00:00Z`); x.setUTCDate(x.getUTCDate() - 1); return x.toISOString().slice(0, 10); };
+  let d = set.has(today) ? today : prev(today);
+  let n = 0;
+  while (set.has(d)) { n++; d = prev(d); }
+  return n;
+}

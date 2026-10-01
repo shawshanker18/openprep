@@ -4,7 +4,7 @@ import { MasteryBar } from "@/components/mastery-bar";
 import { PlanBlocks } from "@/components/plan-blocks";
 import { DiagnosticGate } from "@/components/diagnostic-gate";
 import { diagnosticPending, getAuthUser, requireUser } from "@/server/auth";
-import { dashboardLayout, getDashboard, type DashboardCardId } from "@/server/daily";
+import { dashboardLayout, getDashboard, getStreak, type DashboardCardId } from "@/server/daily";
 import { getSkillSummary } from "@/server/analytics";
 import { SatCountdown } from "@/components/sat-countdown";
 import { readyBy } from "@/engine/plan";
@@ -29,7 +29,7 @@ export default async function DashboardPage() {
   const first = user?.name?.split(" ")[0];
   const hello = <h1 className="text-2xl font-semibold">{greeting(profile.timezone)}{first ? `, ${first}` : ""}</h1>;
   if (diagnosticPending(profile)) return <div className="flex flex-col gap-6">{hello}<DiagnosticGate /></div>;
-  const [d, summary] = await Promise.all([getDashboard(userId, profile), getSkillSummary(userId)]);
+  const [d, summary, days] = await Promise.all([getDashboard(userId, profile), getSkillSummary(userId), getStreak(userId, profile.timezone)]);
   const planLeft = d.blocks.filter((b) => !b.done).length;
   const sectionMastery = (section: "math" | "rw") => {
     const measured = summary.skills.filter((k) => k.section === section && k.status !== "unknown");
@@ -122,7 +122,12 @@ export default async function DashboardPage() {
           {planLeft ? `${planLeft} block${planLeft === 1 ? "" : "s"} left in today's plan.` : "Today's plan is done — extra practice still counts."}
         </p>
       </div>
-      <Button render={<Link href={planLeft ? "/plan" : "/practice"} />}>{planLeft ? "Continue today's plan" : "Smart practice"}</Button>
+      <div className="flex items-center gap-3">
+        <span className="rounded-full border px-3 py-1 text-sm tabular-nums" title="Days in a row with practice">
+          {days ? `🔥 ${days}-day streak` : "Start a streak today"}
+        </span>
+        <Button render={<Link href={planLeft ? "/plan" : "/practice"} />}>{planLeft ? "Continue today's plan" : "Smart practice"}</Button>
+      </div>
     </div>
   );
 
