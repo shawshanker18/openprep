@@ -1,0 +1,191 @@
+[
+  {
+    "id": "rw-ii-evidence-0001",
+    "difficulty": 1,
+    "type": "mcq",
+    "passage": "A team of agricultural researchers hypothesized that planting clover between the rows of a cornfield would reduce the number of weeds in the field, because the clover would cover bare soil where weed seeds might otherwise sprout.",
+    "stem": "Which finding, if true, would most directly support the researchers' hypothesis?",
+    "choices": [
+      "Corn plants grown with clover between the rows were slightly taller than corn plants grown without clover.",
+      "Clover grew more quickly in fields that received more rainfall.",
+      "Fields with clover between the corn rows had far fewer weeds than fields with bare soil between the rows.",
+      "A few weeds managed to grow even in fields where clover had been planted."
+    ],
+    "answer": "C",
+    "explanation": "The hypothesis predicts fewer weeds where clover covers the soil between rows. Choice C reports exactly that comparison: clover fields had far fewer weeds than bare-soil fields.",
+    "rationales": {
+      "A": "Corn height is not what the hypothesis is about; it concerns the number of weeds.",
+      "B": "How fast clover grows in rainy fields says nothing about whether clover reduces weeds.",
+      "D": "Weeds growing despite the clover does not support the hypothesis; if anything, it slightly works against it."
+    },
+    "tags": ["textual-evidence", "support-claim"]
+  },
+  {
+    "id": "rw-ii-evidence-0002",
+    "difficulty": 1,
+    "type": "mcq",
+    "passage": "A student surveyed 200 visitors to a city library, asking each visitor which library service they used most often. The results are shown in the table.\n\n| Service | Number of visitors |\n|---|---|\n| Borrowing books | 84 |\n| Computer use | 52 |\n| Study rooms | 37 |\n| Children's programs | 27 |\n\nAccording to the survey results, ______",
+    "stem": "Which choice most effectively uses data from the table to complete the statement?",
+    "choices": [
+      "more visitors chose borrowing books than chose any other service.",
+      "more visitors chose computer use than chose borrowing books.",
+      "study rooms were the service chosen by the fewest visitors.",
+      "more visitors chose children's programs than chose study rooms."
+    ],
+    "answer": "A",
+    "explanation": "Borrowing books has the highest count in the table (84), more than computer use (52), study rooms (37), or children's programs (27). Choice A states this accurately.",
+    "rationales": {
+      "B": "Computer use (52) is lower than borrowing books (84).",
+      "C": "Children's programs (27), not study rooms (37), had the fewest visitors.",
+      "D": "Children's programs (27) were chosen by fewer visitors than study rooms (37)."
+    },
+    "tags": ["quantitative-evidence", "table"]
+  },
+  {
+    "id": "rw-ii-evidence-0003",
+    "difficulty": 1,
+    "type": "mcq",
+    "passage": "In a short story by a contemporary writer, the narrator describes her elderly neighbor, Mr. Abara, who lives on a small pension. Throughout the story, the narrator portrays Mr. Abara as someone who is generous even though he has very little money of his own.",
+    "stem": "Which quotation from the story most effectively illustrates the narrator's portrayal of Mr. Abara?",
+    "choices": [
+      "\"Mr. Abara rose every morning at five, long before the rest of the street was awake.\"",
+      "\"His apartment was small and crowded with books he had collected over many years.\"",
+      "\"He often complained that prices at the corner market rose every month.\"",
+      "\"Though he counted every coin at the market, he never let a child on our street go without a birthday gift.\""
+    ],
+    "answer": "D",
+    "explanation": "The claim has two parts: Mr. Abara has little money, and he is generous anyway. Choice D shows both: he counts every coin (little money) yet gives every child a birthday gift (generosity).",
+    "rationales": {
+      "A": "Waking early describes a habit, not generosity or limited money.",
+      "B": "A small, book-filled apartment doesn't show generosity.",
+      "C": "Complaining about prices suggests limited money but shows nothing about generosity."
+    },
+    "tags": ["textual-evidence", "literary-text"]
+  },
+  {
+    "id": "rw-ii-evidence-0004",
+    "difficulty": 2,
+    "type": "mcq",
+    "passage": "Researchers measured how far the winged seeds of four plant species traveled from the parent plant on a windy day. They hypothesized that seeds with larger wings travel farther.\n\n| Species | Wing area (square millimeters) | Average distance traveled (meters) |\n|---|---|---|\n| W | 12 | 4.1 |\n| X | 30 | 9.6 |\n| Y | 18 | 6.3 |\n| Z | 45 | 14.2 |",
+    "stem": "Which choice best describes data from the table that support the researchers' hypothesis?",
+    "choices": [
+      "The seeds of species W traveled more than 4 meters on average.",
+      "Species Z, whose seeds had the largest wing area, traveled the farthest, while species W, whose seeds had the smallest wing area, traveled the shortest distance.",
+      "The seeds of species X traveled farther on average than the seeds of species Z did.",
+      "The seeds of species Y had a larger wing area than the seeds of species X did."
+    ],
+    "answer": "B",
+    "explanation": "To support the hypothesis, a choice must link wing size to distance. Ordering by wing area (W 12, Y 18, X 30, Z 45) also orders the distances (4.1, 6.3, 9.6, 14.2). Choice B points out the two extremes of this pattern.",
+    "rationales": {
+      "A": "This gives one species' distance without comparing it with wing size, so it can't show a relationship.",
+      "C": "This is false: X traveled 9.6 meters and Z traveled 14.2 meters.",
+      "D": "This is false: Y's wing area (18) is smaller than X's (30), and it says nothing about distance anyway."
+    },
+    "tags": ["quantitative-evidence", "table", "support-claim"]
+  },
+  {
+    "id": "rw-ii-evidence-0005",
+    "difficulty": 2,
+    "type": "mcq",
+    "passage": "A medieval town in central Europe is known for the large stone bridge that spans the river beside it. Some historians claim that the bridge was built mainly to serve merchants, giving carts loaded with goods an easy route across the river to the town's weekly market.",
+    "stem": "Which finding, if true, would most directly weaken the historians' claim?",
+    "choices": [
+      "Records show that the town's weekly market grew larger after the bridge was completed.",
+      "The bridge is wide enough for two carts to pass each other.",
+      "Merchants' guilds paid to repair the bridge several times in later centuries.",
+      "Records from the period show that the bridge was too steep for loaded carts and was used mostly by people walking to a church across the river."
+    ],
+    "answer": "D",
+    "explanation": "The claim is that the bridge was built mainly for merchants' carts. If the bridge was too steep for loaded carts and was mostly used by people walking to church, it could not have served that purpose well. Choice D undercuts the claim.",
+    "rationales": {
+      "A": "A market that grew after the bridge opened is consistent with the claim, so it supports rather than weakens it.",
+      "B": "A bridge wide enough for two carts suggests it was designed for cart traffic, which supports the claim.",
+      "C": "Merchants paying for repairs suggests the bridge mattered to them, which supports the claim."
+    },
+    "tags": ["textual-evidence", "weaken-claim"]
+  },
+  {
+    "id": "rw-ii-evidence-0006",
+    "difficulty": 2,
+    "type": "mcq",
+    "passage": "A city planning office counted the bicycles crossing a downtown bridge on weekdays from 2019 to 2022. A protected bike lane opened on the bridge in January 2021.\n\n| Year | Average daily bicycle crossings |\n|---|---|\n| 2019 | 410 |\n| 2020 | 425 |\n| 2021 | 520 |\n| 2022 | 760 |\n\nA planner claims that since the bike lane opened, bicycle traffic across the bridge has increased every year.",
+    "stem": "Which choice best describes data from the table that support the planner's claim?",
+    "choices": [
+      "Average daily crossings rose from 425 in 2020 to 520 in 2021 and then to 760 in 2022.",
+      "Average daily crossings rose from 410 in 2019 to 425 in 2020.",
+      "Average daily crossings in 2022 were 760.",
+      "Average daily crossings were lower in 2021 than in 2020."
+    ],
+    "answer": "A",
+    "explanation": "The lane opened in 2021, so the claim concerns 2021 and 2022. Choice A shows crossings rising from the last year before the lane (425) to 520 in 2021 and 760 in 2022, an increase in each year since the lane opened.",
+    "rationales": {
+      "B": "Both years are before the lane opened, so this change can't support a claim about the period since it opened.",
+      "C": "A single year's number shows no change over time.",
+      "D": "This is false (520 is higher than 425), and it would contradict the claim if it were true."
+    },
+    "tags": ["quantitative-evidence", "table", "support-claim"]
+  },
+  {
+    "id": "rw-ii-evidence-0007",
+    "difficulty": 3,
+    "type": "mcq",
+    "passage": "Biologists studying a species of songbird have debated whether young birds are born knowing their species' complete song or must learn it. One biologist hypothesizes that young birds learn the full song by listening to adult birds of their species.",
+    "stem": "Which finding, if true, would most directly support the biologist's hypothesis?",
+    "choices": [
+      "Young birds raised near adults of the species eventually sing the full song.",
+      "Adult birds of the species sometimes change their songs slightly from one year to the next.",
+      "Young birds raised apart from adults sing only a simplified version of the song, while those raised near adults sing the full song.",
+      "Young birds raised apart from adults sing the same complete song as young birds raised near adults."
+    ],
+    "answer": "C",
+    "explanation": "To show the song is learned rather than inborn, you need a comparison: birds that can't hear adults should fail to develop the full song. Choice C provides that contrast, which only the learning hypothesis predicts.",
+    "rationales": {
+      "A": "Birds raised near adults would sing the full song whether the song is learned or inborn, so this doesn't distinguish between the two explanations.",
+      "B": "Adults changing their songs says nothing about how young birds acquire the song in the first place.",
+      "D": "If isolated birds still sing the complete song, the song appears to be inborn; this weakens the hypothesis."
+    },
+    "tags": ["textual-evidence", "support-claim"]
+  },
+  {
+    "id": "rw-ii-evidence-0008",
+    "difficulty": 3,
+    "type": "mcq",
+    "passage": "A researcher recorded the average summer water temperature, nutrient level, and number of algae blooms at four lakes. She claims that warmer lakes tend to have more algae blooms but that temperature alone does not explain the pattern, since nutrient levels also matter.\n\n| Lake | Average temperature (°C) | Nutrient level | Algae blooms |\n|---|---|---|---|\n| Alder | 19 | low | 1 |\n| Birch | 24 | low | 3 |\n| Cedar | 19 | high | 4 |\n| Dunmore | 24 | high | 7 |",
+    "stem": "Which choice best describes data from the table that support the researcher's claim?",
+    "choices": [
+      "Dunmore Lake had both the highest temperature and the most algae blooms.",
+      "Each warmer lake had more blooms than the cooler lake with the same nutrient level, and each high-nutrient lake had more blooms than the low-nutrient lake with the same temperature.",
+      "Alder Lake had the fewest algae blooms of the four lakes.",
+      "Cedar Lake had more algae blooms than Birch Lake, even though Birch Lake was warmer."
+    ],
+    "answer": "B",
+    "explanation": "The claim has two parts: warmth is linked to more blooms, and nutrients matter too. Choice B covers both: Birch (3) beats Alder (1) and Dunmore (7) beats Cedar (4) at equal nutrient levels, while Cedar (4) beats Alder (1) and Dunmore (7) beats Birch (3) at equal temperatures.",
+    "rationales": {
+      "A": "This supports only the temperature part, and Birch was equally warm, so Dunmore's extra blooms can't be credited to temperature alone; it ignores nutrients.",
+      "C": "Pointing to one lake's count doesn't show how either temperature or nutrients relate to blooms.",
+      "D": "This shows nutrients matter but, taken alone, cuts against the idea that warmer lakes tend to have more blooms; it supports only half the claim."
+    },
+    "tags": ["quantitative-evidence", "table", "support-claim"]
+  },
+  {
+    "id": "rw-ii-evidence-0009",
+    "difficulty": 3,
+    "type": "mcq",
+    "passage": "In a novel by a contemporary author, Rosalind is a young pianist preparing for her first public recital. In the chapter leading up to the recital, the author portrays Rosalind as someone who appears calm to the people around her even as she privately struggles with anxiety.",
+    "stem": "Which quotation from the novel most effectively illustrates the author's portrayal of Rosalind?",
+    "choices": [
+      "\"Rosalind practiced the sonata every evening for three months, until her fingers could play it in the dark.\"",
+      "\"Rosalind admitted to her sister that she had not slept well in a week and dreaded the recital.\"",
+      "\"When her teacher asked whether she was ready, Rosalind smiled and said she was looking forward to it.\"",
+      "\"Rosalind greeted the other performers with an easy smile, though beneath the folds of her dress her hands would not stop trembling.\""
+    ],
+    "answer": "D",
+    "explanation": "The portrayal has two parts: outward calm and hidden anxiety. Choice D shows both at once: an easy smile for others and trembling hands that no one can see.",
+    "rationales": {
+      "A": "This shows hard work and preparation, not a contrast between outward calm and inner anxiety.",
+      "B": "This shows anxiety, but Rosalind expresses it openly to her sister, so it isn't hidden behind a calm appearance.",
+      "C": "This shows only the calm appearance; nothing in the quotation reveals hidden anxiety."
+    },
+    "tags": ["textual-evidence", "literary-text"]
+  }
+]

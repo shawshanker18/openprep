@@ -1,0 +1,191 @@
+[
+  {
+    "id": "rw-ei-synthesis-0001",
+    "difficulty": 1,
+    "type": "mcq",
+    "passage": "While researching a topic, a student has taken the following notes:\n\n- Mirela Santos is a textile artist.\n- She weaves large tapestries from recycled fishing nets.\n- Her tapestries depict ocean scenes.\n- Her largest tapestry is 12 meters long.\n- It hangs in a public library in her hometown.",
+    "stem": "The student wants to emphasize the size of Santos's largest tapestry. Which choice most effectively uses relevant information from the notes to accomplish this goal?",
+    "choices": [
+      "Santos's largest tapestry, which hangs in a public library in her hometown, is 12 meters long.",
+      "Santos weaves her tapestries from recycled fishing nets.",
+      "Mirela Santos is a textile artist whose tapestries depict ocean scenes.",
+      "A public library in Santos's hometown displays one of her tapestries."
+    ],
+    "answer": "A",
+    "explanation": "The goal is the size of the largest tapestry. Only Choice A includes its measurement, 12 meters long.",
+    "rationales": {
+      "B": "This describes her materials, not the size of any tapestry.",
+      "C": "This introduces Santos and her subject matter but gives no size.",
+      "D": "This tells where a tapestry hangs but not how large it is."
+    },
+    "tags": ["emphasize", "rhetorical-goal"]
+  },
+  {
+    "id": "rw-ei-synthesis-0002",
+    "difficulty": 1,
+    "type": "mcq",
+    "passage": "While researching a topic, a student has taken the following notes:\n\n- The axolotl is a type of salamander.\n- It is native to lakes near Mexico City.\n- Unlike most salamanders, it keeps its gills and lives in water its entire life.\n- It can regrow lost limbs.\n- Scientists study it to learn more about how tissues regenerate.",
+    "stem": "The student wants to explain why scientists study the axolotl. Which choice most effectively uses relevant information from the notes to accomplish this goal?",
+    "choices": [
+      "The axolotl, a type of salamander, is native to lakes near Mexico City.",
+      "Unlike most salamanders, the axolotl keeps its gills its entire life.",
+      "Because the axolotl can regrow lost limbs, scientists study it to learn more about how tissues regenerate.",
+      "The axolotl is a salamander that lives in water its entire life."
+    ],
+    "answer": "C",
+    "explanation": "The goal is the reason scientists study the axolotl. Choice C connects its ability to regrow limbs to scientists' interest in tissue regeneration.",
+    "rationales": {
+      "A": "This identifies the axolotl and its home but says nothing about scientific study.",
+      "B": "This states an unusual trait but doesn't connect it to why scientists study the animal.",
+      "D": "This describes the axolotl's habitat, not the reason it is studied."
+    },
+    "tags": ["explain", "rhetorical-goal"]
+  },
+  {
+    "id": "rw-ei-synthesis-0003",
+    "difficulty": 1,
+    "type": "mcq",
+    "passage": "While researching a topic, a student has taken the following notes:\n\n- Josefa Marquez was a surveyor in the late 1800s.\n- She mapped more than 300 miles of river valleys.\n- Her maps were used to plan new roads.\n- She trained her own team of assistants.\n- Her original maps are now held in a regional archive.",
+    "stem": "The student wants to highlight how Marquez's maps were used. Which choice most effectively uses relevant information from the notes to accomplish this goal?",
+    "choices": [
+      "Marquez trained her own team of assistants.",
+      "Marquez's original maps are now held in a regional archive.",
+      "Josefa Marquez was a surveyor in the late 1800s.",
+      "Marquez's maps, which covered more than 300 miles of river valleys, were used to plan new roads."
+    ],
+    "answer": "D",
+    "explanation": "The goal is how the maps were used. Choice D states their use: they helped plan new roads.",
+    "rationales": {
+      "A": "This is about her assistants, not about the maps.",
+      "B": "This says where the maps are kept today, not how they were used.",
+      "C": "This identifies Marquez's profession but doesn't mention the maps' use."
+    },
+    "tags": ["emphasize", "rhetorical-goal"]
+  },
+  {
+    "id": "rw-ei-synthesis-0004",
+    "difficulty": 2,
+    "type": "mcq",
+    "passage": "While researching a topic, a student has taken the following notes:\n\n- Two main types of solar cookers are in common use.\n- Box cookers are insulated boxes with a glass lid.\n- Box cookers trap heat well and can cook food slowly over several hours.\n- Panel cookers use flat, reflective panels to direct sunlight onto a pot.\n- Panel cookers are lighter and cheaper to make than box cookers.",
+    "stem": "The student wants to emphasize an advantage of panel cookers over box cookers. Which choice most effectively uses relevant information from the notes to accomplish this goal?",
+    "choices": [
+      "Box cookers, which are insulated boxes with a glass lid, trap heat well.",
+      "Panel cookers are lighter and cheaper to make than box cookers are.",
+      "Panel cookers use flat, reflective panels to direct sunlight onto a pot.",
+      "Box cookers and panel cookers are the two main types of solar cookers in common use."
+    ],
+    "answer": "B",
+    "explanation": "An advantage of one type over another requires a comparison that favors panel cookers. Choice B gives one: panel cookers are lighter and cheaper than box cookers.",
+    "rationales": {
+      "A": "This describes a strength of box cookers, not of panel cookers.",
+      "C": "This explains how panel cookers work but doesn't compare them with box cookers.",
+      "D": "This names both types but presents no advantage of either."
+    },
+    "tags": ["compare", "rhetorical-goal"]
+  },
+  {
+    "id": "rw-ei-synthesis-0005",
+    "difficulty": 2,
+    "type": "mcq",
+    "passage": "While researching a topic, a student has taken the following notes:\n\n- Kintsugi is a Japanese technique for repairing broken pottery.\n- Repairers join the broken pieces with lacquer mixed with powdered gold.\n- The repaired cracks remain visible as gold lines.\n- The technique reflects the idea that an object's history, including damage, is part of its beauty.",
+    "stem": "The student wants to introduce kintsugi to an audience unfamiliar with it. Which choice most effectively uses relevant information from the notes to accomplish this goal?",
+    "choices": [
+      "Kintsugi, a Japanese technique for repairing broken pottery, joins the pieces with lacquer mixed with powdered gold, leaving the cracks visible as gold lines.",
+      "Because the repaired cracks remain visible as gold lines, kintsugi reflects the idea that damage is part of an object's beauty.",
+      "Repairers who practice kintsugi mix lacquer with powdered gold.",
+      "Kintsugi reflects the idea that an object's history is part of its beauty."
+    ],
+    "answer": "A",
+    "explanation": "An unfamiliar audience first needs to know what kintsugi is. Choice A identifies it as a Japanese pottery-repair technique and explains how it works and what it looks like.",
+    "rationales": {
+      "B": "This discusses kintsugi's meaning but never says what it is, so it assumes the reader already knows.",
+      "C": "This gives one detail of the process without explaining that kintsugi is a way of repairing pottery.",
+      "D": "This gives the idea behind kintsugi but never tells an unfamiliar reader what the technique is."
+    },
+    "tags": ["introduce", "audience", "rhetorical-goal"]
+  },
+  {
+    "id": "rw-ei-synthesis-0006",
+    "difficulty": 2,
+    "type": "mcq",
+    "passage": "While researching a topic, a student has taken the following notes:\n\n- The Harbor Lantern Festival takes place each autumn in the town of Port Elden.\n- Residents float paper lanterns on the harbor to honor local fishing crews.\n- The Meadow Light Festival takes place each spring in the village of Arnsby.\n- Residents hang paper lanterns in the trees of the village green to celebrate the end of winter.",
+    "stem": "The student wants to emphasize a similarity between the two festivals. Which choice most effectively uses relevant information from the notes to accomplish this goal?",
+    "choices": [
+      "The Harbor Lantern Festival takes place in autumn, while the Meadow Light Festival takes place in spring.",
+      "Residents of Port Elden float paper lanterns on the harbor to honor local fishing crews.",
+      "The Meadow Light Festival celebrates the end of winter, but the Harbor Lantern Festival honors fishing crews.",
+      "At both the Harbor Lantern Festival and the Meadow Light Festival, residents display paper lanterns."
+    ],
+    "answer": "D",
+    "explanation": "A similarity must be something both festivals share. In each one, residents display paper lanterns, which Choice D states using \"both.\"",
+    "rationales": {
+      "A": "This points out a difference in season, not a similarity.",
+      "B": "This describes only one festival, so it can't show what the two have in common.",
+      "C": "\"But\" signals a contrast; this emphasizes a difference in purpose."
+    },
+    "tags": ["compare", "rhetorical-goal"]
+  },
+  {
+    "id": "rw-ei-synthesis-0007",
+    "difficulty": 3,
+    "type": "mcq",
+    "passage": "While researching a topic, a student has taken the following notes:\n\n- A team of researchers studied how city noise affects songbirds.\n- They recorded the songs of birds living near busy roads and in quiet parks.\n- Birds near busy roads sang at higher pitches than birds in quiet parks did.\n- Traffic noise is mostly low-pitched.\n- Higher-pitched songs are easier to hear over low-pitched noise.",
+    "stem": "The student wants to explain the possible significance of the difference in pitch that the researchers observed. Which choice most effectively uses relevant information from the notes to accomplish this goal?",
+    "choices": [
+      "Researchers recorded the songs of birds living near busy roads and of birds living in quiet parks.",
+      "Birds near busy roads sang at higher pitches than birds in quiet parks did.",
+      "Because higher-pitched songs are easier to hear over low-pitched traffic noise, singing at higher pitches may help birds near busy roads be heard.",
+      "The researchers studied how city noise affects songbirds by comparing two groups of birds."
+    ],
+    "answer": "C",
+    "explanation": "Explaining significance means saying why the pitch difference matters, not just that it exists. Choice C connects the higher pitch to being heard over low-pitched traffic noise.",
+    "rationales": {
+      "A": "This describes the study's method, not what the results mean.",
+      "B": "This states the difference itself but doesn't explain why it matters; it repeats the finding without its significance.",
+      "D": "This states the study's purpose and design, not the meaning of the result."
+    },
+    "tags": ["explain", "rhetorical-goal"]
+  },
+  {
+    "id": "rw-ei-synthesis-0008",
+    "difficulty": 3,
+    "type": "mcq",
+    "passage": "While researching a topic, a student has taken the following notes:\n\n- The Open Shelf Project places small, free book exchanges in public spaces.\n- It was started in 2015 by a group of retired teachers.\n- It now operates more than 1,200 book exchanges.\n- Its book exchanges are found in 14 countries.\n- Volunteers restock each exchange every week.",
+    "stem": "The student wants to emphasize how widespread the Open Shelf Project has become. Which choice most effectively uses relevant information from the notes to accomplish this goal?",
+    "choices": [
+      "Started in 2015 by a group of retired teachers, the Open Shelf Project places free book exchanges in public spaces.",
+      "Since its founding in 2015, the Open Shelf Project has grown to more than 1,200 book exchanges in 14 countries.",
+      "Volunteers with the Open Shelf Project restock each of its book exchanges every week.",
+      "The Open Shelf Project places small, free book exchanges in public spaces."
+    ],
+    "answer": "B",
+    "explanation": "\"Widespread\" is about reach. Choice B gives both measures of reach in the notes: more than 1,200 exchanges in 14 countries, and \"grown\" stresses the expansion.",
+    "rationales": {
+      "A": "This describes the project's origin but gives no sense of how far it has spread.",
+      "C": "This emphasizes the volunteers' ongoing effort, not the number or locations of the exchanges.",
+      "D": "This describes what the project does, not how widespread it is."
+    },
+    "tags": ["emphasize", "rhetorical-goal"]
+  },
+  {
+    "id": "rw-ei-synthesis-0009",
+    "difficulty": 3,
+    "type": "mcq",
+    "passage": "While researching a topic, a student has taken the following notes:\n\n- Stalactites and stalagmites are rock formations found in caves.\n- Both form when water containing dissolved minerals drips in a cave.\n- Stalactites hang from the cave ceiling.\n- Stalagmites rise from the cave floor.\n- When a stalactite and a stalagmite meet, they form a column.",
+    "stem": "The student wants to explain how stalactites and stalagmites differ while also noting what they have in common. Which choice most effectively uses relevant information from the notes to accomplish this goal?",
+    "choices": [
+      "Although stalactites and stalagmites both form from dripping water that contains dissolved minerals, stalactites hang from cave ceilings, whereas stalagmites rise from cave floors.",
+      "Stalactites hang from cave ceilings, while stalagmites rise from cave floors.",
+      "Stalactites and stalagmites both form when water containing dissolved minerals drips in a cave.",
+      "When a stalactite and a stalagmite meet, they form a column."
+    ],
+    "answer": "A",
+    "explanation": "The goal has two parts: a difference and a similarity. Choice A gives the similarity (both form from mineral-rich dripping water) and the difference (ceiling versus floor).",
+    "rationales": {
+      "B": "This gives the difference but leaves out what the two formations have in common.",
+      "C": "This gives the similarity but leaves out how the formations differ.",
+      "D": "This describes what happens when the two meet, which is neither the difference nor the shared origin."
+    },
+    "tags": ["compare", "rhetorical-goal"]
+  }
+]

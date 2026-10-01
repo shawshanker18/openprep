@@ -1,0 +1,191 @@
+[
+  {
+    "id": "rw-cs-crosstext-0001",
+    "difficulty": 1,
+    "type": "mcq",
+    "passage": "**Text 1**\n\nSome nutrition researchers argue that eating breakfast is essential for students' concentration. In one study, students who ate breakfast scored higher on morning attention tests than students who skipped it.\n\n**Text 2**\n\nA team of researchers found that the benefits of breakfast depend on what is eaten. Students who ate high-sugar breakfasts performed no better on attention tests than students who ate nothing, while students who ate breakfasts rich in protein and whole grains performed best.",
+    "stem": "Based on the texts, how would the researchers in Text 2 most likely respond to the argument in Text 1?",
+    "choices": [
+      "They would agree that eating any kind of breakfast improves concentration.",
+      "They would say the argument is incomplete, since only certain kinds of breakfast appear to improve concentration.",
+      "They would argue that skipping breakfast improves students' attention.",
+      "They would reject the argument because breakfast has no effect on concentration."
+    ],
+    "answer": "B",
+    "explanation": "Text 1 says eating breakfast helps concentration. Text 2 finds that high-sugar breakfasts didn't help but protein and whole-grain breakfasts did. So the Text 2 researchers would say Text 1's claim needs a qualification about what kind of breakfast, as Choice B states.",
+    "rationales": {
+      "A": "Text 2 found that high-sugar breakfasts gave no benefit, so its researchers would not say any breakfast helps.",
+      "C": "Students who ate nothing did no better than the high-sugar group and worse than the protein group; nothing suggests skipping breakfast helps.",
+      "D": "Text 2 found that some breakfasts led to the best performance, so it doesn't say breakfast has no effect."
+    },
+    "tags": ["author-response", "science"]
+  },
+  {
+    "id": "rw-cs-crosstext-0002",
+    "difficulty": 1,
+    "type": "mcq",
+    "passage": "**Text 1**\n\nCommunity gardens give city residents a place to grow fresh vegetables, which can be hard to find in some urban neighborhoods. For this reason, many cities have set aside public land for gardens.\n\n**Text 2**\n\nBeyond providing food, community gardens bring neighbors together. Residents who garden side by side often get to know one another, and many gardens host shared meals and workshops.",
+    "stem": "Based on the texts, both authors would most likely agree with which statement?",
+    "choices": [
+      "Community gardens are mainly useful for teaching cooking skills.",
+      "Cities should stop setting aside public land for gardens.",
+      "Community gardens offer real benefits to city residents.",
+      "Shared meals are the most important benefit of community gardens."
+    ],
+    "answer": "C",
+    "explanation": "Text 1 highlights fresh food; Text 2 highlights social connection. Different benefits, but both authors present the gardens positively, so both would agree that the gardens benefit residents.",
+    "rationales": {
+      "A": "Neither text mentions teaching cooking skills.",
+      "B": "Both texts describe gardens positively, and Text 1 notes approvingly that cities have set aside land for them.",
+      "D": "Only Text 2 mentions shared meals, and even it doesn't rank them as the most important benefit."
+    },
+    "tags": ["shared-view", "social-studies"]
+  },
+  {
+    "id": "rw-cs-crosstext-0003",
+    "difficulty": 1,
+    "type": "mcq",
+    "passage": "**Text 1**\n\nMany teachers assign summer reading lists made up of classic novels. They believe these challenging books build strong reading skills over the break.\n\n**Text 2**\n\nA school librarian reports that students who choose their own summer books read far more pages than students who are given assigned lists. She argues that letting students pick books they enjoy is the best way to strengthen their reading habits.",
+    "stem": "Based on the texts, how would the librarian in Text 2 most likely respond to the teachers' approach described in Text 1?",
+    "choices": [
+      "She would suggest that letting students choose their own books may do more to encourage reading than assigning classic novels.",
+      "She would agree that classic novels are the only books that build reading skills.",
+      "She would argue that students should not be expected to read during the summer.",
+      "She would point out that students given assigned lists read the most pages."
+    ],
+    "answer": "A",
+    "explanation": "The teachers assign classics; the librarian found that students who choose their own books read more and argues for student choice. She would therefore favor choice over assigned classics, as Choice A says.",
+    "rationales": {
+      "B": "The librarian favors books students enjoy, not classics only.",
+      "C": "The librarian wants students to read more in the summer, not less.",
+      "D": "This reverses her finding: students who chose their own books read more pages."
+    },
+    "tags": ["author-response", "social-studies"]
+  },
+  {
+    "id": "rw-cs-crosstext-0004",
+    "difficulty": 2,
+    "type": "mcq",
+    "passage": "**Text 1**\n\nHistorians have traditionally described the Varenna Canal, completed in 1824, as the main reason the nearby town grew into a busy trading center. Before the canal, goods moved slowly over rough roads; afterward, boats could carry heavy cargo cheaply to the coast.\n\n**Text 2**\n\nTown records show that the town's population and its number of merchants had already doubled in the decade before the canal opened, largely because of a new textile mill. The canal surely helped, but it sped up growth that was already well underway.",
+    "stem": "Based on the texts, how would the author of Text 2 most likely respond to the traditional view described in Text 1?",
+    "choices": [
+      "By agreeing that the town began to grow only after the canal was completed",
+      "By arguing that the canal had no effect on the town's trade",
+      "By claiming that the textile mill was built because of the canal",
+      "By suggesting that the view overstates the canal's role, since the town was already growing before the canal opened"
+    ],
+    "answer": "D",
+    "explanation": "Text 1 calls the canal the main cause of growth. Text 2 shows the town had already doubled before the canal and says the canal only sped up existing growth. That author would say the traditional view gives the canal too much credit.",
+    "rationales": {
+      "A": "Text 2 says the town doubled in the decade before the canal, which contradicts this.",
+      "B": "Text 2 says \"the canal surely helped,\" so it doesn't deny any effect.",
+      "C": "The mill drove growth before the canal opened, so it couldn't have been built because of the canal."
+    },
+    "tags": ["author-response", "social-studies"]
+  },
+  {
+    "id": "rw-cs-crosstext-0005",
+    "difficulty": 2,
+    "type": "mcq",
+    "passage": "**Text 1**\n\nBiologists have long assumed that bird species with larger brains relative to their body size are better problem-solvers. Crows and parrots, which have relatively large brains, perform well on puzzles in laboratory tests.\n\n**Text 2**\n\nA research team gave the same puzzle to several bird species with similar relative brain sizes. Species that search for food in complex environments, such as forests with many hiding places, consistently solved it faster than species that search for food in open grasslands. The team concluded that a species' foraging habits may matter as much as its brain size.",
+    "stem": "Based on the texts, how would the research team in Text 2 most likely respond to the assumption described in Text 1?",
+    "choices": [
+      "By arguing that brain size has no connection to birds' problem-solving ability",
+      "By suggesting that brain size may not be the only factor that affects birds' problem-solving ability",
+      "By claiming that crows and parrots are actually poor problem-solvers",
+      "By agreeing that relative brain size alone explains differences in birds' problem-solving ability"
+    ],
+    "answer": "B",
+    "explanation": "The team held brain size roughly equal and still found differences linked to foraging habits, concluding that habits \"may matter as much as\" brain size. That adds a factor without dismissing brain size, which matches Choice B.",
+    "rationales": {
+      "A": "The team says foraging matters \"as much as\" brain size, which implies brain size still matters; this overstates their position.",
+      "C": "Text 2 doesn't test or comment on crows and parrots.",
+      "D": "The team's findings show differences among birds with similar brain sizes, so brain size alone can't explain them."
+    },
+    "tags": ["author-response", "science"]
+  },
+  {
+    "id": "rw-cs-crosstext-0006",
+    "difficulty": 2,
+    "type": "mcq",
+    "passage": "**Text 1**\n\nSome music critics argue that recordings have harmed classical music by pushing performers toward flawless, identical performances. Because listeners can replay a perfect recording endlessly, critics say, live concerts now feel disappointing if a single note is out of place.\n\n**Text 2**\n\nA conductor counters that recordings have greatly expanded classical music's audience, since many concertgoers first discovered the music through recordings. She also notes that audiences at her concerts respond most warmly to performances that feel spontaneous rather than polished.",
+    "stem": "Based on the texts, how would the conductor in Text 2 most likely respond to the critics' claim that live concerts now feel disappointing if a single note is out of place?",
+    "choices": [
+      "She would question the claim, pointing out that her audiences seem to value spontaneity more than perfection.",
+      "She would agree with the claim, noting that recordings have made audiences more demanding.",
+      "She would argue that recordings should be replaced entirely by live performances.",
+      "She would claim that performers have largely stopped making recordings."
+    ],
+    "answer": "A",
+    "explanation": "The critics say audiences now demand perfection. The conductor reports that her audiences prefer spontaneous over polished performances, which is evidence against that claim. Choice A captures her likely response.",
+    "rationales": {
+      "B": "Her observation about audiences preferring spontaneity contradicts the idea that they've become more demanding of perfection.",
+      "C": "She praises recordings for expanding the audience, so she wouldn't want them replaced.",
+      "D": "Nothing in Text 2 suggests performers have stopped recording."
+    },
+    "tags": ["author-response", "humanities"]
+  },
+  {
+    "id": "rw-cs-crosstext-0007",
+    "difficulty": 3,
+    "type": "mcq",
+    "passage": "**Text 1**\n\nEconomists studying a four-day workweek trial at several companies found that employees reported less stress while productivity stayed about the same. The economists concluded that a shorter workweek can benefit workers without harming businesses.\n\n**Text 2**\n\nThe companies in the trial volunteered to take part, and most were small firms in office-based industries. Whether similar results would occur at hospitals, factories, or other workplaces with round-the-clock demands remains an open question.",
+    "stem": "Based on the texts, how would the author of Text 2 most likely respond to the economists' conclusion in Text 1?",
+    "choices": [
+      "By rejecting it, since productivity in the trial actually fell sharply",
+      "By endorsing it and recommending that all workplaces adopt a four-day workweek",
+      "By cautioning that the conclusion may not apply to all types of workplaces, given the kinds of companies in the trial",
+      "By arguing that employees in the trial exaggerated how much their stress had decreased"
+    ],
+    "answer": "C",
+    "explanation": "Text 2 doesn't dispute the trial's results; it points out that the participants were volunteer, mostly small, office-based firms and calls it an \"open question\" whether other workplaces would see the same benefits. That limits how widely the conclusion applies, as Choice C states.",
+    "rationales": {
+      "A": "Text 2 never challenges the productivity finding; Text 1 says productivity stayed about the same.",
+      "B": "Text 2 explicitly doubts whether the results extend to hospitals and factories, so it wouldn't recommend the change everywhere.",
+      "D": "Text 2 questions which companies took part, not the accuracy of employees' reports."
+    },
+    "tags": ["author-response", "qualify-claim", "social-studies"]
+  },
+  {
+    "id": "rw-cs-crosstext-0008",
+    "difficulty": 3,
+    "type": "mcq",
+    "passage": "**Text 1**\n\nMany readers see the poet Arlen Moss's later poems, which are short and plainly worded, as a decline from the rich, elaborate imagery of his early work. In this view, Moss simply lost the energy that once drove his writing.\n\n**Text 2**\n\nMoss's letters from his later years reveal that he deliberately stripped his poems of ornament, which he had come to see as a way of avoiding difficult subjects. The plainness of the late poems reflects not exhaustion but a new artistic aim.",
+    "stem": "Based on the texts, how would the author of Text 2 most likely respond to the view described in Text 1?",
+    "choices": [
+      "By agreeing that the later poems are weaker but disputing the reason for their weakness",
+      "By arguing that Moss's early poems were actually plain and unadorned",
+      "By claiming that most readers prefer Moss's later poems to his early ones",
+      "By arguing that the change in Moss's style resulted from a deliberate choice rather than a loss of energy"
+    ],
+    "answer": "D",
+    "explanation": "Text 1 explains the plain late style as lost energy. Text 2 uses Moss's letters to show he chose plainness on purpose, \"not exhaustion but a new artistic aim.\" Choice D states this disagreement.",
+    "rationales": {
+      "A": "Text 2 disputes the reason for the change but never agrees that the later poems are weaker; it treats them as a purposeful new direction.",
+      "B": "Both texts treat the early poems as elaborate; Text 2 doesn't challenge that.",
+      "C": "Text 2 says nothing about readers' preferences, and Text 1 says many readers see the late poems as a decline."
+    },
+    "tags": ["author-response", "humanities"]
+  },
+  {
+    "id": "rw-cs-crosstext-0009",
+    "difficulty": 3,
+    "type": "mcq",
+    "passage": "**Text 1**\n\nMany ecologists recommend removing non-native plant species from protected wetlands, arguing that such species crowd out native plants and reduce the variety of wildlife the wetlands can support.\n\n**Text 2**\n\nIn one coastal wetland, a non-native grass has become the main nesting site for a declining native bird species, whose original nesting plants were lost decades ago to rising water. Removing the grass there, a team of ecologists warns, could do more harm than good, at least until suitable native plants can be restored.",
+    "stem": "Based on the texts, how would the ecologists in Text 2 most likely respond to the recommendation in Text 1?",
+    "choices": [
+      "By arguing that non-native plant species never harm wetland ecosystems",
+      "By suggesting that the recommendation may not suit every wetland, since a non-native species can sometimes support native wildlife",
+      "By agreeing that the non-native grass in the coastal wetland should be removed right away",
+      "By claiming that rising water is a greater threat to all wetlands than non-native species are"
+    ],
+    "answer": "B",
+    "explanation": "Text 1 recommends removing non-native plants in general. Text 2 describes one wetland where a non-native grass shelters a declining native bird and warns against removing it there. The Text 2 team would see the recommendation as needing exceptions, as Choice B says.",
+    "rationales": {
+      "A": "Text 2 discusses one specific case and even expects native plants to be restored eventually; it doesn't claim non-native species are never harmful.",
+      "C": "Text 2 warns that removing the grass \"could do more harm than good.\"",
+      "D": "Rising water is mentioned only as the cause of lost nesting plants in one wetland; Text 2 doesn't compare threats across all wetlands."
+    },
+    "tags": ["author-response", "qualify-claim", "science"]
+  }
+]

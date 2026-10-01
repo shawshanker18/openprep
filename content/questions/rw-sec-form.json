@@ -1,0 +1,218 @@
+[
+  {
+    "id": "rw-sec-form-0001",
+    "difficulty": 1,
+    "type": "mcq",
+    "passage": "The collection of rare maps in the university library ______ several that were drawn by hand in the sixteenth century, long before modern surveying tools were available to mapmakers.",
+    "stem": "Which choice completes the text so that it conforms to the conventions of Standard English?",
+    "choices": [
+      "include",
+      "includes",
+      "are including",
+      "have included"
+    ],
+    "answer": "B",
+    "explanation": "The subject is the singular noun \"collection\"; \"of rare maps\" and \"in the university library\" are prepositional phrases that describe it. A singular subject takes the singular verb \"includes.\"",
+    "rationales": {
+      "A": "\"Include\" is plural; it agrees with \"maps,\" which is inside a prepositional phrase and isn't the subject.",
+      "C": "\"Are including\" is plural and doesn't agree with the singular subject \"collection.\"",
+      "D": "\"Have included\" is plural and doesn't agree with the singular subject \"collection.\""
+    },
+    "tags": [
+      "subject-verb-agreement",
+      "intervening-phrase"
+    ]
+  },
+  {
+    "id": "rw-sec-form-0002",
+    "difficulty": 1,
+    "type": "mcq",
+    "passage": "In 1969, after years of planning and testing, the city ______ its first underground subway line, which carried more than fifty thousand passengers on its very first day of service.",
+    "stem": "Which choice completes the text so that it conforms to the conventions of Standard English?",
+    "choices": [
+      "opens",
+      "will open",
+      "has opened",
+      "opened"
+    ],
+    "answer": "D",
+    "explanation": "\"In 1969\" places the action at a specific time in the past, and the rest of the sentence uses the past tense (\"carried\"). The simple past \"opened\" fits.",
+    "rationales": {
+      "A": "\"Opens\" is present tense, but the event happened in 1969.",
+      "B": "\"Will open\" is future tense, but the event is in the past.",
+      "C": "The present perfect \"has opened\" isn't used with a specific past time like \"In 1969.\""
+    },
+    "tags": [
+      "verb-tense",
+      "time-clue"
+    ]
+  },
+  {
+    "id": "rw-sec-form-0003",
+    "difficulty": 1,
+    "type": "mcq",
+    "passage": "When the students in Ms. Ruiz's biology class finished building a model of the human heart, ______ displayed it in the school's front hallway so that visitors could see how blood moves through the heart's four chambers.",
+    "stem": "Which choice completes the text so that it conforms to the conventions of Standard English?",
+    "choices": [
+      "they",
+      "it",
+      "he or she",
+      "one"
+    ],
+    "answer": "A",
+    "explanation": "The pronoun refers to \"the students,\" who built and displayed the model. A plural antecedent needs the plural pronoun \"they.\"",
+    "rationales": {
+      "B": "\"It\" is singular and would seem to refer to the model, which can't display itself.",
+      "C": "\"He or she\" is singular, but \"students\" is plural.",
+      "D": "\"One\" is a singular, general pronoun and doesn't refer clearly to the students."
+    },
+    "tags": [
+      "pronoun-antecedent",
+      "pronoun-number"
+    ]
+  },
+  {
+    "id": "rw-sec-form-0004",
+    "difficulty": 2,
+    "type": "mcq",
+    "passage": "Each spring, the community garden on Elm Street holds a plant sale to raise money. This year, the ______ proceeds will be used to buy new gardening tools and to build a small shed for storing them.",
+    "stem": "Which choice completes the text so that it conforms to the conventions of Standard English?",
+    "choices": [
+      "sales",
+      "sales'",
+      "sale's",
+      "sales's"
+    ],
+    "answer": "C",
+    "explanation": "The proceeds belong to one sale (\"a plant sale\"), so a singular possessive is needed: add an apostrophe and s to \"sale\" to get \"sale's.\"",
+    "rationales": {
+      "A": "\"Sales\" is a plain plural with no apostrophe, so it doesn't show possession.",
+      "B": "\"Sales'\" is a plural possessive, but the text describes only one sale.",
+      "D": "\"Sales's\" isn't a correct form of either the singular or the plural possessive."
+    },
+    "tags": [
+      "possessives",
+      "singular-plural"
+    ]
+  },
+  {
+    "id": "rw-sec-form-0005",
+    "difficulty": 2,
+    "type": "mcq",
+    "passage": "The paintings in the gallery's east wing, which were donated by a local collector in the 1950s, ______ some of the earliest known landscapes created by artists from the region.",
+    "stem": "Which choice completes the text so that it conforms to the conventions of Standard English?",
+    "choices": [
+      "is",
+      "are",
+      "was",
+      "has been"
+    ],
+    "answer": "B",
+    "explanation": "Skip the phrase \"in the gallery's east wing\" and the clause \"which were donated ... 1950s\" to find the subject: \"The paintings.\" A plural subject needs the plural verb \"are.\"",
+    "rationales": {
+      "A": "\"Is\" is singular; it may seem to agree with the nearby \"wing\" or \"collector,\" but the subject is \"paintings.\"",
+      "C": "\"Was\" is singular and also shifts to the past tense.",
+      "D": "\"Has been\" is singular and doesn't agree with the plural subject \"paintings.\""
+    },
+    "tags": [
+      "subject-verb-agreement",
+      "intervening-phrase"
+    ]
+  },
+  {
+    "id": "rw-sec-form-0006",
+    "difficulty": 2,
+    "type": "mcq",
+    "passage": "Having studied the ruins near the river for more than a decade, combining careful ground surveys with aerial photographs taken in different seasons of the year, ______",
+    "stem": "Which choice completes the text so that it conforms to the conventions of Standard English?",
+    "choices": [
+      "the ancient city's layout was finally understood by the archaeologist.",
+      "the archaeologist's understanding of the ancient city's layout was finally complete.",
+      "the ancient city finally revealed its layout to the archaeologist.",
+      "the archaeologist finally understood the layout of the ancient city."
+    ],
+    "answer": "D",
+    "explanation": "The opening phrase \"Having studied the ruins ...\" describes a person who did the studying. The noun that follows the comma must name that person, so the sentence must continue with \"the archaeologist.\"",
+    "rationales": {
+      "A": "This makes \"the ancient city's layout\" the one that studied the ruins, which is illogical.",
+      "B": "This makes \"the archaeologist's understanding\" the one that studied the ruins; the possessive hides the person behind an abstract noun.",
+      "C": "This makes \"the ancient city\" the one that studied the ruins, which is illogical."
+    },
+    "tags": [
+      "modifier-placement",
+      "dangling-modifier"
+    ]
+  },
+  {
+    "id": "rw-sec-form-0007",
+    "difficulty": 3,
+    "type": "mcq",
+    "passage": "Among the artifacts recovered from the shipwreck ______ a bronze navigational instrument and a set of clay jars that were still sealed with wax when divers brought them to the surface.",
+    "stem": "Which choice completes the text so that it conforms to the conventions of Standard English?",
+    "choices": [
+      "were",
+      "was",
+      "has been",
+      "is"
+    ],
+    "answer": "A",
+    "explanation": "This sentence is inverted: the subject comes after the verb. The subject is \"a bronze navigational instrument and a set of clay jars,\" two things joined by \"and,\" so it is plural and needs \"were.\"",
+    "rationales": {
+      "B": "\"Was\" is singular; it may seem to agree with \"a bronze navigational instrument\" alone, but the subject is compound.",
+      "C": "\"Has been\" is singular and doesn't agree with the compound subject.",
+      "D": "\"Is\" is singular and also shifts out of the past tense used elsewhere in the sentence."
+    },
+    "tags": [
+      "subject-verb-agreement",
+      "inverted-sentence"
+    ]
+  },
+  {
+    "id": "rw-sec-form-0008",
+    "difficulty": 3,
+    "type": "mcq",
+    "passage": "By the time the expedition finally reached the summit, the weather ______ dramatically: the clear skies of the early morning had given way to heavy snow and strong winds.",
+    "stem": "Which choice completes the text so that it conforms to the conventions of Standard English?",
+    "choices": [
+      "changes",
+      "has changed",
+      "had changed",
+      "will have changed"
+    ],
+    "answer": "C",
+    "explanation": "\"By the time the expedition finally reached the summit\" sets a point in the past, and the weather changed before that point. An action completed before another past action takes the past perfect, \"had changed,\" which also matches \"had given way\" later in the sentence.",
+    "rationales": {
+      "A": "\"Changes\" is present tense, but the events are in the past.",
+      "B": "\"Has changed\" is present perfect, which links the past to the present, not to an earlier point in the past.",
+      "D": "\"Will have changed\" is future perfect, but the expedition already reached the summit."
+    },
+    "tags": [
+      "verb-tense",
+      "past-perfect"
+    ]
+  },
+  {
+    "id": "rw-sec-form-0009",
+    "difficulty": 3,
+    "type": "mcq",
+    "passage": "Many of the letters ______ by the poet during her travels through southern Europe were never published, but historians have recently located several of them in a private family collection.",
+    "stem": "Which choice completes the text so that it conforms to the conventions of Standard English?",
+    "choices": [
+      "writing",
+      "written",
+      "wrote",
+      "had written"
+    ],
+    "answer": "B",
+    "explanation": "The main verb of the clause is \"were\"; the blank begins a phrase describing \"letters\" (the letters that were written by the poet). Because the letters received the action, the past participle \"written\" is needed.",
+    "rationales": {
+      "A": "\"Writing\" would mean the letters were doing the writing, which is illogical.",
+      "C": "\"Wrote\" is a past-tense verb, not a participle, so it can't describe \"letters\"; it would also make the letters the writers.",
+      "D": "\"Had written\" is a complete verb that would compete with \"were\" and make the letters the writers."
+    },
+    "tags": [
+      "verb-form",
+      "participle"
+    ]
+  }
+]

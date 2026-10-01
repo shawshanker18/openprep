@@ -1,0 +1,146 @@
+[
+  {
+    "id": "rw-cs-words-0001",
+    "difficulty": 1,
+    "type": "mcq",
+    "passage": "Unlike her older brother, who often talked for hours at family dinners, Priya was quite ______ as a child, rarely speaking at the table unless someone asked her a direct question.",
+    "stem": "Which choice completes the text with the most logical and precise word or phrase?",
+    "choices": ["talkative", "curious", "generous", "reserved"],
+    "answer": "D",
+    "explanation": "\"Unlike her older brother,\" who talked a lot, signals that Priya was the opposite, and \"rarely speaking\" confirms it. \"Reserved\" means quiet and slow to share thoughts.",
+    "rationales": {
+      "A": "\"Talkative\" describes the brother; \"Unlike\" tells you Priya is the opposite.",
+      "B": "\"Curious\" doesn't match the clue \"rarely speaking\"; nothing about her interest in things is mentioned.",
+      "C": "\"Generous\" has nothing to do with how much she speaks."
+    },
+    "tags": ["context-clues", "contrast-clue"]
+  },
+  {
+    "id": "rw-cs-words-0002",
+    "difficulty": 1,
+    "type": "mcq",
+    "passage": "The bridge's engineers designed it to ______ strong winds: its flexible steel cables allow the structure to sway slightly during storms instead of cracking under the pressure of a sudden gust.",
+    "stem": "Which choice completes the text with the most logical and precise word or phrase?",
+    "choices": ["create", "withstand", "predict", "invite"],
+    "answer": "B",
+    "explanation": "The second half of the sentence explains that the bridge sways instead of cracking, which means it survives strong winds without damage. \"Withstand\" means to resist or endure.",
+    "rationales": {
+      "A": "A bridge can't \"create\" wind; the text is about how it responds to wind.",
+      "C": "Nothing in the text says the bridge forecasts weather; the cables help it survive wind.",
+      "D": "\"Invite\" suggests the engineers wanted to attract wind, which makes no sense."
+    },
+    "tags": ["context-clues", "precise-meaning"]
+  },
+  {
+    "id": "rw-cs-words-0003",
+    "difficulty": 1,
+    "type": "mcq",
+    "passage": "Because the museum's collection of ancient coins is so ______, visitors can see examples from more than forty different civilizations, spanning nearly three thousand years of history.",
+    "stem": "Which choice completes the text with the most logical and precise word or phrase?",
+    "choices": ["extensive", "fragile", "recent", "uniform"],
+    "answer": "A",
+    "explanation": "\"Because\" signals that the blank explains why visitors can see coins from forty civilizations over three thousand years. That requires a large, wide-ranging collection: \"extensive.\"",
+    "rationales": {
+      "B": "Being \"fragile\" would not explain why the collection covers so many civilizations.",
+      "C": "\"Recent\" conflicts with coins spanning three thousand years of history.",
+      "D": "\"Uniform\" means all alike, which contradicts the great variety described."
+    },
+    "tags": ["context-clues", "precise-meaning"]
+  },
+  {
+    "id": "rw-cs-words-0004",
+    "difficulty": 2,
+    "type": "mcq",
+    "passage": "In her review of the new biography, the critic praised the author for presenting a ______ portrait of the inventor, one that acknowledges his failures and unkind moments as readily as it celebrates his remarkable achievements.",
+    "stem": "Which choice completes the text with the most logical and precise word or phrase?",
+    "choices": ["flattering", "brief", "balanced", "celebratory"],
+    "answer": "C",
+    "explanation": "The phrase after the comma defines the blank: the portrait gives equal weight to failures and achievements. A portrait that weighs both sides fairly is \"balanced.\"",
+    "rationales": {
+      "A": "A \"flattering\" portrait would downplay failures, but this one acknowledges them readily.",
+      "B": "Nothing in the text is about the biography's length.",
+      "D": "\"Celebratory\" captures only the achievements and ignores the failures the portrait also includes."
+    },
+    "tags": ["context-clues", "precise-meaning"]
+  },
+  {
+    "id": "rw-cs-words-0005",
+    "difficulty": 2,
+    "type": "mcq",
+    "passage": "Early astronomers' estimates of the distance between Earth and the Sun varied widely. Later measurements, made with more precise instruments, allowed scientists to ______ those estimates, gradually narrowing the range of possible values.",
+    "stem": "Which choice completes the text with the most logical and precise word or phrase?",
+    "choices": ["abandon", "celebrate", "duplicate", "refine"],
+    "answer": "D",
+    "explanation": "The later measurements \"narrowed the range\" of values, meaning they improved the earlier estimates step by step. \"Refine\" means to make more exact.",
+    "rationales": {
+      "A": "\"Abandon\" means to discard entirely, but narrowing a range builds on the earlier estimates.",
+      "B": "\"Celebrate\" doesn't describe what precise measurements do to estimates.",
+      "C": "\"Duplicate\" means to copy; the new measurements changed the estimates rather than repeating them."
+    },
+    "tags": ["context-clues", "precise-meaning"]
+  },
+  {
+    "id": "rw-cs-words-0006",
+    "difficulty": 2,
+    "type": "mcq",
+    "passage": "The following text is from a story.\n\nAlthough the old farmhouse had stood empty for years, Ruth found it anything but ______: sunlight poured through the tall windows, swallows nested in the eaves, and the overgrown garden was bright with wildflowers.",
+    "stem": "Which choice completes the text with the most logical and precise word or phrase?",
+    "choices": ["peaceful", "lifeless", "spacious", "welcoming"],
+    "answer": "B",
+    "explanation": "\"Anything but\" means \"not at all,\" and the details after the colon (nesting swallows, blooming flowers, sunlight) show the empty house is full of life. So it was anything but \"lifeless.\"",
+    "rationales": {
+      "A": "\"Anything but peaceful\" would need noisy or chaotic details; sunlight, swallows, and flowers don't show a lack of peace.",
+      "C": "The details describe living things, not the size of the house.",
+      "D": "\"Anything but welcoming\" would mean unwelcoming, but the details are pleasant and inviting."
+    },
+    "tags": ["context-clues", "contrast-clue"]
+  },
+  {
+    "id": "rw-cs-words-0007",
+    "difficulty": 3,
+    "type": "mcq",
+    "passage": "Some economists describe the new trade agreement's effects on local manufacturers as ______: although several factories expanded significantly, others were forced to close, and total employment in the region barely changed.",
+    "stem": "Which choice completes the text with the most logical and precise word or phrase?",
+    "choices": ["mixed", "devastating", "negligible", "unprecedented"],
+    "answer": "A",
+    "explanation": "The colon introduces the evidence: some factories expanded while others closed. Results that include both gains and losses are \"mixed.\"",
+    "rationales": {
+      "B": "\"Devastating\" ignores the factories that expanded significantly and the steady overall employment.",
+      "C": "\"Negligible\" is tempting because total employment barely changed, but factories expanding significantly and others closing are large effects, not tiny ones.",
+      "D": "Nothing in the text compares these effects with earlier agreements, so \"unprecedented\" is unsupported."
+    },
+    "tags": ["context-clues", "precise-meaning"]
+  },
+  {
+    "id": "rw-cs-words-0008",
+    "difficulty": 3,
+    "type": "mcq",
+    "passage": "Historians once regarded the merchant's diary as a minor document, but recent scholars consider it ______: its detailed records of prices, weather, and local disputes have made it one of the most frequently cited sources on daily life in the port city.",
+    "stem": "Which choice completes the text with the most logical and precise word or phrase?",
+    "choices": ["ambiguous", "derivative", "indispensable", "ephemeral"],
+    "answer": "C",
+    "explanation": "\"But\" contrasts the old view (minor) with the new one, and the colon explains that the diary is now among the most cited sources. Something essential that scholars can't do without is \"indispensable.\"",
+    "rationales": {
+      "A": "\"Ambiguous\" means unclear, but the diary's records are described as detailed and widely used.",
+      "B": "\"Derivative\" means copied from other sources, which would make it less valuable, not more.",
+      "D": "\"Ephemeral\" means short-lived, which doesn't fit a document that scholars frequently cite today."
+    },
+    "tags": ["context-clues", "contrast-clue"]
+  },
+  {
+    "id": "rw-cs-words-0009",
+    "difficulty": 3,
+    "type": "mcq",
+    "passage": "The architect's design for the new library was ______ the surrounding neighborhood: rather than placing a glass tower among the low brick houses, she used similar brick and kept the building only three stories tall.",
+    "stem": "Which choice completes the text with the most logical and precise word or phrase?",
+    "choices": ["indifferent to", "at odds with", "superior to", "in keeping with"],
+    "answer": "D",
+    "explanation": "The colon explains the blank: the architect matched the neighborhood's brick and low height instead of building something that would stand out. A design that harmonizes with its setting is \"in keeping with\" it.",
+    "rationales": {
+      "A": "Matching the materials and height shows close attention to the neighborhood, not indifference.",
+      "B": "\"At odds with\" means clashing, which describes the glass tower she chose not to build.",
+      "C": "The text describes fitting in with the neighborhood, not outdoing it."
+    },
+    "tags": ["context-clues", "precise-meaning"]
+  }
+]

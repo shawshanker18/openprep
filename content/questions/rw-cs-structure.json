@@ -1,0 +1,191 @@
+[
+  {
+    "id": "rw-cs-structure-0001",
+    "difficulty": 1,
+    "type": "mcq",
+    "passage": "Many people think of deserts as places of constant heat. However, many deserts become surprisingly cold at night. Because dry desert air holds little moisture, the heat absorbed by the ground during the day escapes quickly after sunset, and temperatures can drop by more than 20 degrees Celsius.",
+    "stem": "Which choice best states the main purpose of the text?",
+    "choices": [
+      "To explain why deserts can become cold at night despite a common belief that they are always hot",
+      "To compare the climates of several different deserts",
+      "To argue that deserts are more dangerous to travelers than most people realize",
+      "To describe the plants and animals that survive in deserts"
+    ],
+    "answer": "A",
+    "explanation": "The text opens with a common belief (deserts are always hot), counters it (they get cold at night), and explains why (dry air lets heat escape). Choice A describes this purpose.",
+    "rationales": {
+      "B": "The text discusses deserts in general and never compares specific deserts.",
+      "C": "Danger to travelers is never mentioned; the text explains a temperature pattern.",
+      "D": "No plants or animals are mentioned."
+    },
+    "tags": ["main-purpose", "informational-text"]
+  },
+  {
+    "id": "rw-cs-structure-0002",
+    "difficulty": 1,
+    "type": "mcq",
+    "passage": "In the 1920s, a small group of painters in one European city began creating works that rejected realistic detail in favor of bold colors and simple shapes. At first, critics mocked the paintings as childish and predicted the style would soon be forgotten. Within two decades, however, the same style was being taught in art schools across the continent.",
+    "stem": "Which choice best describes the overall structure of the text?",
+    "choices": [
+      "It presents a criticism of a painting style and then explains why the critics were correct.",
+      "It compares two painting styles and explains why one became more popular.",
+      "It describes how art schools trained painters and then explains why critics disliked their work.",
+      "It describes a new artistic style, presents an early negative reaction to it, and then notes its later widespread acceptance."
+    ],
+    "answer": "D",
+    "explanation": "Sentence 1 introduces the style, sentence 2 gives the critics' mockery, and sentence 3 (\"however\") reports that the style was later taught across the continent. Choice D follows this order.",
+    "rationales": {
+      "A": "The last sentence shows the critics' prediction was wrong, not correct.",
+      "B": "Only one painting style is described; it is contrasted with realistic detail, not compared with a second style.",
+      "C": "This scrambles the order: art schools appear only at the end, as evidence of the style's acceptance."
+    },
+    "tags": ["overall-structure", "humanities"]
+  },
+  {
+    "id": "rw-cs-structure-0003",
+    "difficulty": 1,
+    "type": "mcq",
+    "passage": "Octopuses can change the color of their skin in a fraction of a second. They do this using thousands of tiny pigment sacs, which expand or shrink when the muscles around them contract or relax. For example, when an octopus rests against a patch of reddish coral, it can quickly give its skin a similar reddish tone. This ability helps octopuses hide from predators.",
+    "stem": "Which choice best describes the function of the third sentence in the overall structure of the text?",
+    "choices": [
+      "It introduces a claim that the rest of the text disputes.",
+      "It explains how muscles control the pigment sacs in an octopus's skin.",
+      "It provides a specific example of the color-changing ability described earlier in the text.",
+      "It states the main conclusion that the rest of the text supports."
+    ],
+    "answer": "C",
+    "explanation": "The third sentence begins \"For example\" and describes an octopus matching reddish coral, a concrete case of the color change introduced in the first sentence. Choice C describes this function.",
+    "rationales": {
+      "A": "Nothing in the text disputes the third sentence; all the sentences support one another.",
+      "B": "This is the function of the second sentence, not the third.",
+      "D": "The main point appears in the first sentence; the third is a supporting example."
+    },
+    "tags": ["sentence-function", "informational-text"]
+  },
+  {
+    "id": "rw-cs-structure-0004",
+    "difficulty": 2,
+    "type": "mcq",
+    "passage": "The following text is from a story.\n\nAna's younger brother had promised at breakfast to help her paint the backyard fence. By noon, Ana had finished three sides by herself. It was then that her brother appeared at the gate, holding a brush that was still perfectly dry, and asked brightly whether there was anything left for him to do.",
+    "stem": "Which choice best states the main purpose of the text?",
+    "choices": [
+      "To describe the tools Ana uses to paint the fence",
+      "To show, through a single scene, that Ana's brother did not keep his promise to help her",
+      "To explain why Ana prefers to work alone",
+      "To show how Ana and her brother settle a long-standing disagreement"
+    ],
+    "answer": "B",
+    "explanation": "The brother promised to help, but Ana did three sides alone, and he arrives at noon with a dry brush. The scene is built to show that he didn't keep his promise, as Choice B says.",
+    "rationales": {
+      "A": "Only the brother's brush is mentioned, and it matters because it is dry, not as a description of tools.",
+      "C": "Ana works alone because her brother didn't show up; nothing says she prefers it.",
+      "D": "No long-standing disagreement or resolution is described."
+    },
+    "tags": ["main-purpose", "literary-text"]
+  },
+  {
+    "id": "rw-cs-structure-0005",
+    "difficulty": 2,
+    "type": "mcq",
+    "passage": "Many city planners favor planting trees along streets because trees provide shade and lower summer temperatures. Some residents, however, object that tree roots can crack sidewalks and that falling leaves clog storm drains. Planners in one city have tried to address these concerns by choosing tree species with deep roots and by scheduling extra street cleaning each autumn.",
+    "stem": "Which choice best describes the function of the second sentence in the overall structure of the text?",
+    "choices": [
+      "It presents objections that the final sentence describes efforts to address.",
+      "It provides evidence supporting the planners' preference for street trees.",
+      "It states the main argument that the rest of the text defends.",
+      "It explains in greater detail the benefits of trees mentioned in the first sentence."
+    ],
+    "answer": "A",
+    "explanation": "The second sentence lists residents' complaints (cracked sidewalks, clogged drains). The final sentence answers each one: deep-rooted species for the sidewalks and extra cleaning for the leaves. Choice A captures this link.",
+    "rationales": {
+      "B": "The second sentence raises problems with street trees; it works against the planners' preference, not for it.",
+      "C": "The text doesn't defend the residents' objections; it describes how planners responded to them.",
+      "D": "The second sentence describes drawbacks, not benefits."
+    },
+    "tags": ["sentence-function", "social-studies"]
+  },
+  {
+    "id": "rw-cs-structure-0006",
+    "difficulty": 2,
+    "type": "mcq",
+    "passage": "For many years, scientists believed that a certain species of frog had vanished from the mountain streams where it once lived. Then a team of researchers revisiting the area heard an unfamiliar call one night and, after hours of searching, found a small population of the frogs. The researchers now think the frogs survived by retreating to cooler, higher streams that earlier surveys had never explored.",
+    "stem": "Which choice best describes the overall structure of the text?",
+    "choices": [
+      "It describes a research method and then evaluates its strengths and weaknesses.",
+      "It presents a hypothesis about why frogs disappear and then confirms it with new data.",
+      "It describes a long-held belief, presents a discovery that overturned it, and offers an explanation for that discovery.",
+      "It compares two frog species and explains why only one of them survived."
+    ],
+    "answer": "C",
+    "explanation": "Sentence 1: scientists believed the frog had vanished. Sentence 2: researchers found a population. Sentence 3: they suggest how the frogs survived. Choice C matches this belief-discovery-explanation sequence.",
+    "rationales": {
+      "A": "The search is described briefly, but the text never evaluates a method's strengths and weaknesses.",
+      "B": "The discovery contradicts the idea that the frogs disappeared; nothing is confirmed about why frogs disappear.",
+      "D": "Only one species of frog is discussed."
+    },
+    "tags": ["overall-structure", "informational-text"]
+  },
+  {
+    "id": "rw-cs-structure-0007",
+    "difficulty": 3,
+    "type": "mcq",
+    "passage": "In an essay, a historian of science notes that the telescope is often credited with transforming astronomy almost overnight. She points out, though, that early telescopes produced blurry images and that many astronomers continued to rely on careful naked-eye observation for decades. The telescope's influence, she argues, was real but gradual, growing steadily as lens-making improved.",
+    "stem": "Which choice best states the main purpose of the text?",
+    "choices": [
+      "To argue that the telescope had little lasting effect on astronomy",
+      "To explain how techniques for making lenses improved over time",
+      "To describe the methods astronomers used for naked-eye observation",
+      "To present a historian's view that qualifies a common belief about the telescope's effect on astronomy"
+    ],
+    "answer": "D",
+    "explanation": "The text states a common belief (the telescope transformed astronomy overnight), then presents the historian's adjustment: the influence was real but gradual. Choice D describes this purpose of refining, not rejecting, the belief.",
+    "rationales": {
+      "A": "The historian calls the telescope's influence \"real\"; she disputes only how quickly it came, so \"little lasting effect\" overstates her view.",
+      "B": "Improved lens-making is mentioned only as the reason the influence grew; it isn't the focus.",
+      "C": "Naked-eye observation is mentioned as evidence for the historian's point, but its methods are never described."
+    },
+    "tags": ["main-purpose", "humanities"]
+  },
+  {
+    "id": "rw-cs-structure-0008",
+    "difficulty": 3,
+    "type": "mcq",
+    "passage": "The following text is from a story.\n\nMira had rehearsed the speech for weeks. She knew every pause, every gesture, every place where the audience was supposed to laugh. But when she stepped to the microphone and saw her grandfather in the front row, wearing the same gray suit he had worn to her mother's graduation, the words she had memorized seemed suddenly to belong to someone else.",
+    "stem": "Which choice best describes the function of the first two sentences in the text as a whole?",
+    "choices": [
+      "They reveal that Mira has already delivered the speech to many audiences.",
+      "They establish how thoroughly Mira has prepared, which sets up a contrast with her reaction in the final sentence.",
+      "They explain why Mira's grandfather has come to hear her speak.",
+      "They describe how the audience responds to Mira's speech."
+    ],
+    "answer": "B",
+    "explanation": "The first two sentences stress Mira's complete preparation. The third begins with \"But\" and shows that, on seeing her grandfather, the memorized words suddenly feel foreign. The opening sets up that contrast, as Choice B says.",
+    "rationales": {
+      "A": "Mira \"rehearsed\" the speech; nothing says she has performed it for audiences before.",
+      "C": "The grandfather appears only in the final sentence, and no reason for his presence is given.",
+      "D": "The second sentence mentions where the audience is \"supposed to\" laugh, an expectation from rehearsal, not an actual response."
+    },
+    "tags": ["sentence-function", "literary-text"]
+  },
+  {
+    "id": "rw-cs-structure-0009",
+    "difficulty": 3,
+    "type": "mcq",
+    "passage": "Linguists have observed that when two communities that speak different languages trade regularly, they sometimes develop a simplified shared language in order to communicate. Such languages typically have small vocabularies and few grammatical rules. Yet when children grow up speaking one of these languages as their first language, it often becomes far more complex within a generation, gaining many new words and grammatical structures.",
+    "stem": "Which choice best describes the function of the last sentence in the overall structure of the text?",
+    "choices": [
+      "It describes a development that contrasts with the simplicity described in the previous sentence.",
+      "It provides an example of the limited grammar described in the previous sentence.",
+      "It explains why communities that trade regularly develop shared languages.",
+      "It challenges the linguists' observation presented in the first sentence."
+    ],
+    "answer": "A",
+    "explanation": "The second sentence says these languages are simple; the last sentence, starting with \"Yet,\" says they become far more complex once children learn them as a first language. Choice A identifies this contrast.",
+    "rationales": {
+      "B": "The last sentence describes the language growing more complex, not an example of its limited grammar.",
+      "C": "The reason for developing shared languages appears in the first sentence (to communicate), not the last.",
+      "D": "The last sentence adds to the linguists' observation by describing what happens next; it doesn't dispute that such languages form."
+    },
+    "tags": ["sentence-function", "social-studies"]
+  }
+]

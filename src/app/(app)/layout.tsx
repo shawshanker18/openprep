@@ -24,10 +24,15 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
         ))}
         <div className="mt-auto flex flex-col gap-1 text-sm text-muted-foreground">
           <Link href="/mistakes" className="px-2 py-1 hover:text-foreground">Mistakes</Link>
+          <Link href="/desmos" className="px-2 py-1 hover:text-foreground">Desmos</Link>
+          <Link href="/plan" className="px-2 py-1 hover:text-foreground">Plan</Link>
           <Link href="/settings" className="px-2 py-1 hover:text-foreground">Settings</Link>
           <form action={signOut}><button className="px-2 py-1 hover:text-foreground">Sign out</button></form>
         </div>
       </nav>
+      <div className="flex gap-4 overflow-x-auto border-b px-4 py-2 text-sm text-muted-foreground md:hidden">
+        <Link href="/mistakes">Mistakes</Link><Link href="/plan">Plan</Link><Link href="/desmos">Desmos</Link><Link href="/settings">Settings</Link>
+      </div>
       <main className="mx-auto w-full max-w-4xl flex-1 px-4 pb-24 pt-6 md:pb-8">{children}</main>
       <nav className="fixed inset-x-0 bottom-0 z-10 flex justify-around border-t bg-background py-2 md:hidden">
         {NAV.map((n) => (
