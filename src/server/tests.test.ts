@@ -147,3 +147,15 @@ it("custom test honours sub-topics and difficulty, topping up from the skill whe
   expect(s!.config).toMatchObject({ skillIds: ["m-geo-circles"], tags: ["arc-length"], difficulty: 3, timed: false });
   await T.abandonTest(USER, r.id);
 });
+
+it("a question in a live test can't be answered (and revealed) through practice", async () => {
+  const P = await import("./practice");
+  const r = await T.startTest(USER, { kind: "mini", skillId: SKILLS.find((s) => s.section === "math")!.id });
+  if (!r.ok) throw new Error(r.error);
+  const [m] = await modules(r.id);
+  const [first] = await items(m!.id);
+  expect(await T.inRunningTest(USER, first!.questionId)).toBe(true);
+  expect(await P.submitAnswer(USER, { questionId: first!.questionId, response: "A", timeMs: 5000, confidence: 3 })).toBeNull();
+  await T.abandonTest(USER, r.id);
+  expect(await P.submitAnswer(USER, { questionId: first!.questionId, response: "A", timeMs: 5000, confidence: 3 })).not.toBeNull();
+});

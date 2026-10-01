@@ -5,10 +5,11 @@ import { anthropic } from "@ai-sdk/anthropic";
 import { google } from "@ai-sdk/google";
 import { createOpenAI, openai } from "@ai-sdk/openai";
 import { db } from "@/db";
-import { aiCache, aiMessages, attempts, questions, skillState, testItems, testModules, testSessions, type Question } from "@/db/schema";
+import { aiCache, aiMessages, attempts, questions, skillState, type Question } from "@/db/schema";
 import { SKILL_BY_ID } from "@/content/taxonomy";
 import { masteryPct, status } from "@/engine/mastery";
 import { localDate } from "@/engine/plan";
+import { inRunningTest } from "./tests";
 
 export const MODES = ["hint", "explain", "byhand", "fast", "desmos", "why_wrong", "vocab", "similar", "chat"] as const;
 export type Mode = (typeof MODES)[number];
@@ -37,15 +38,6 @@ export function getModel() {
     case "local": return e.AI_BASE_URL ? createOpenAI({ baseURL: e.AI_BASE_URL, apiKey: "local" }).chat(id || "llama3.2") : null;
     default: return null;
   }
-}
-
-/** Is any of this question's test sessions still running for this user? (No AI help during tests.) */
-async function inRunningTest(userId: string, questionId: string) {
-  const [r] = await db.select({ id: testSessions.id }).from(testItems)
-    .innerJoin(testModules, eq(testModules.id, testItems.moduleId))
-    .innerJoin(testSessions, eq(testSessions.id, testModules.sessionId))
-    .where(and(eq(testItems.questionId, questionId), eq(testSessions.userId, userId), eq(testSessions.status, "in_progress"))).limit(1);
-  return !!r;
 }
 
 export async function checkAccess(userId: string, q: Question, mode: Mode): Promise<string | null> {
