@@ -56,7 +56,7 @@ export function TestResults({ data }: { data: Data }) {
           );
         })()}
         {r.total != null ? (
-          <h1 className="text-3xl font-semibold tabular-nums">Estimated {r.total - r.halfWidth}–{r.total + r.halfWidth}</h1>
+          <h1 className="text-3xl font-semibold tabular-nums">Estimated {r.total - r.halfWidth} to {r.total + r.halfWidth}</h1>
         ) : (
           <h1 className="text-3xl font-semibold tabular-nums">
             {secs.reduce((a, k) => a + r.sections[k]!.correct, 0)} / {secs.reduce((a, k) => a + r.sections[k]!.total, 0)} correct
@@ -67,13 +67,13 @@ export function TestResults({ data }: { data: Data }) {
             const x = r.sections[k]!;
             return (
               <span key={k}>
-                {k === "rw" ? "Reading & Writing" : "Math"}: {x.score != null ? `${x.score - 30}–${x.score + 30}` : `${x.correct}/${x.total}`}
+                {k === "rw" ? "Reading & Writing" : "Math"}: {x.score != null ? `${x.score - 30} to ${x.score + 30}` : `${x.correct}/${x.total}`}
                 {x.score != null && ` · ${x.correct}/${x.total}`} {ROUTE[x.route] && <span className="text-muted-foreground">· {ROUTE[x.route]}</span>}
               </span>
             );
           })}
         </div>
-        {scored && <p className="text-xs text-muted-foreground">Estimated score — real SAT scoring differs. See <Link className="underline" href="/about">how estimates work</Link>.</p>}
+        {scored && <p className="text-xs text-muted-foreground">This is an estimate. Real SAT scoring works differently. See <Link className="underline" href="/about">how estimates work</Link>.</p>}
       </div>
 
       {(() => {

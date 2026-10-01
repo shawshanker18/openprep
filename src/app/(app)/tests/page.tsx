@@ -12,7 +12,7 @@ import { abandon } from "@/app/test/[sessionId]/actions";
 import { startTestAction } from "./actions";
 
 const KIND = { full: "Full practice test", section: "Section test", module: "Single module", mini: "Mini test", weakness: "Weakness test", custom: "Custom test", diagnostic: "Diagnostic" } as Record<string, string>;
-const ERR: Record<string, string> = { empty: "There aren't enough questions for that test yet.", invalid: "Please check the test options.", rate: "You've started a lot of tests in the last hour — finish one or try again later." };
+const ERR: Record<string, string> = { empty: "There aren't enough questions for that test yet.", invalid: "Please check the test options.", rate: "You've started a lot of tests in the last hour. Finish one, or try again a bit later." };
 const control = "h-9 rounded-md border bg-background px-2 text-sm";
 
 function StartCard({ title, time, children, fields }: { title: string; time: string; children: React.ReactNode; fields: React.ReactNode }) {
@@ -57,13 +57,13 @@ export default async function TestsPage({ searchParams }: PageProps<"/tests">) {
         <StartCard title="Full practice test" time="2 h 14 min · 98 questions + 10-min break" fields={<input type="hidden" name="kind" value="full" />}>
           Both sections, adaptive like the real test: how you do in each first module sets the difficulty of the second.
         </StartCard>
-        <StartCard title="Section test" time="64–70 min · two adaptive modules" fields={<><input type="hidden" name="kind" value="section" />{sectionPick}</>}>
+        <StartCard title="Section test" time="64 to 70 min · two adaptive modules" fields={<><input type="hidden" name="kind" value="section" />{sectionPick}</>}>
           One full section with routing to an easier or harder second module.
         </StartCard>
-        <StartCard title="Single module" time="32–35 min" fields={<><input type="hidden" name="kind" value="module" />{sectionPick}</>}>
+        <StartCard title="Single module" time="32 to 35 min" fields={<><input type="hidden" name="kind" value="module" />{sectionPick}</>}>
           One timed module at mixed difficulty. Raw score only.
         </StartCard>
-        <StartCard title="Mini test" time="12–15 min · 10 questions" fields={<>
+        <StartCard title="Mini test" time="12 to 15 min · 10 questions" fields={<>
           <input type="hidden" name="kind" value="mini" />
           <select name="skillId" className={`${control} max-w-full`} required>{skills.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}</select>
         </>}>
@@ -98,7 +98,7 @@ export default async function TestsPage({ searchParams }: PageProps<"/tests">) {
                 const label = t.status !== "completed" ? t.status.replace("_", " ")
                   : t.kind === "diagnostic" ? "Profile"
                   : typeof r?.total === "number" ? `≈ ${r.total}`
-                  : r?.sections ? Object.values(r.sections).map((x) => `${x!.correct}/${x!.total}`).join(" · ") : "—";
+                  : r?.sections ? Object.values(r.sections).map((x) => `${x!.correct}/${x!.total}`).join(" · ") : "Not scored";
                 return (
                   <tr key={t.id} className="border-t">
                     <td className="py-2 tabular-nums">{t.startedAt.toLocaleDateString()}</td>

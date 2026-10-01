@@ -23,8 +23,8 @@ export default async function OnboardingPage() {
         </h1>
         <p className="text-muted-foreground">
           {step === "survey" && "About a minute. Everything can be changed later in Settings."}
-          {step === "self" && "Your honest guess is enough — the diagnostic checks it next. Skip anything you're unsure about."}
-          {step === "diagnostic" && "Up to 24 questions, about 25 minutes, no timer. It's fine not to know — use “I don't know” instead of guessing."}
+          {step === "self" && "Your honest guess is enough, because the diagnostic checks it next. Skip anything you're unsure about."}
+          {step === "diagnostic" && "Up to 24 questions, about 25 minutes, no timer. It's fine not to know. Use “I don't know” instead of guessing."}
         </p>
       </div>
       {step === "survey" && <SurveyForm />}

@@ -1,4 +1,4 @@
-export const metadata = { title: "Privacy — OpenPrep" };
+export const metadata = { title: "Privacy at OpenPrep" };
 
 // Plain-English draft (spec 05 §6). The project owner should review before public launch.
 export default function Privacy() {

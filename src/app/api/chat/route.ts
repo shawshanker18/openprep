@@ -47,7 +47,7 @@ export async function POST(req: Request) {
   const [profile] = await db.select({ tz: profiles.timezone }).from(profiles).where(eq(profiles.id, userId));
   const limit = Number(process.env.AI_DAILY_LIMIT) || 30;
   if ((await usedToday(userId, profile?.tz ?? "UTC")) >= limit)
-    return text("You've used today's tutor questions — the written explanations and methods are always available.", 429);
+    return text("You've used today's tutor questions. The written explanations and methods are always here for you.", 429);
 
   const prompt = mode === "chat" ? lastUser!.content : `Help me with this question (${mode}).`;
   await logMessage(userId, q.id, "user", prompt);

@@ -56,7 +56,7 @@ function checkReminder() {
   if (!reminderDue(now, s.hour, s.lastFired)) return;
   writeState({ ...s, lastFired: localDay(now) });
   if (!Notification.isSupported()) return;
-  const n = new Notification({ title: "Time for SAT practice", body: "Your plan for today is ready — keep your streak going.", icon: ICON });
+  const n = new Notification({ title: "Time for SAT practice", body: "Your plan for today is ready. Keep your streak going!", icon: ICON });
   n.on("click", () => { showWindow(); win?.loadURL(`${SITE}/plan`); });
   n.show();
 }

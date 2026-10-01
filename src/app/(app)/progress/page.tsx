@@ -83,7 +83,7 @@ export default async function ProgressPage() {
           return (
             <div key={d} className="grid grid-cols-[minmax(8rem,14rem)_1fr_4rem] items-center gap-3 text-sm">
               <span>{DOMAINS[d].name}</span><MasteryBar pct={avg} measured={ks.length > 0} />
-              <span className="text-right tabular-nums text-muted-foreground">{ks.length ? `${avg}%` : "—"}</span>
+              <span className="text-right tabular-nums text-muted-foreground">{ks.length ? `${avg}%` : "Not yet"}</span>
             </div>
           );
         })}

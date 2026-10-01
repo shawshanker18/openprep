@@ -9,7 +9,7 @@ import { addPlanBlock, resetPlan } from "./actions";
 
 const control = "h-9 rounded-md border bg-background px-2 text-sm";
 const ERRORS: Record<string, string> = {
-  block: "Pick a skill for practice, learn and check-in blocks, and 5–60 minutes.",
+  block: "Pick a skill for practice, learn and check-in blocks, and between 5 and 60 minutes.",
   desmos: "You've opened every Desmos lesson already.",
 };
 
@@ -60,7 +60,7 @@ export default async function PlanPage({ searchParams }: PageProps<"/plan">) {
         <ul className="flex flex-col gap-2 text-sm">
           {d.focusMastery.map((f) => (
             <li key={f.id}>
-              <Link className="font-medium underline" href={`/skills/${f.id}`}>{f.name}</Link> — {f.mastery}% now. Among the biggest gaps to your target
+              <Link className="font-medium underline" href={`/skills/${f.id}`}>{f.name}</Link>: {f.mastery}% now. Among the biggest gaps to your target
               in {DOMAINS[SKILL_BY_ID[f.id]!.domain].name}, weighted by how often it&apos;s tested.
             </li>
           ))}

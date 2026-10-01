@@ -1,4 +1,4 @@
-export const metadata = { title: "About — OpenPrep" };
+export const metadata = { title: "About OpenPrep" };
 
 export default function About() {
   return (<>
@@ -12,10 +12,10 @@ export default function About() {
     </p>
     <p>
       We always show a <b>range</b>, never a single number. The range is wide when we have little evidence and narrows as you practise. Practice-test scores
-      use a simple, transparent approximation — the College Board&apos;s real scoring is different and not public.
+      use a simple, transparent approximation. The College Board&apos;s real scoring is different and not public.
     </p>
     <p><b>Estimates are based on our own questions and a simple model. They are not official scores.</b></p>
     <h2>Questions</h2>
-    <p>Every question is original and reviewed by a person. If you find a mistake, use the flag button on the question — thank you.</p>
+    <p>Every question is original and reviewed by a person. If you find a mistake, use the flag button on the question. Thank you!</p>
   </>);
 }

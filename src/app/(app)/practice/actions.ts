@@ -71,7 +71,7 @@ export async function reportQuestion(input: z.input<typeof Report>) {
   if (!p.success) return { ok: false as const, error: "Invalid report." };
   const [{ c }] = (await db.select({ c: count() }).from(questionReports)
     .where(and(eq(questionReports.userId, userId), gte(questionReports.createdAt, new Date(Date.now() - 86_400_000))))) as [{ c: number }];
-  if (c >= 20) return { ok: false as const, error: "You've sent a lot of reports today — thank you! Try again tomorrow." };
+  if (c >= 20) return { ok: false as const, error: "You've sent a lot of reports today. Thank you! You can send more tomorrow." };
   const [q] = await db.select({ id: questions.id }).from(questions).where(eq(questions.id, p.data.questionId));
   if (!q) return { ok: false as const, error: "Question not found." };
   await db.insert(questionReports).values({ userId, ...p.data });

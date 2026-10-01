@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "OpenPrep — free adaptive SAT prep",
+    name: "OpenPrep: free adaptive SAT prep",
     short_name: "OpenPrep",
     description: "Free, open-source adaptive SAT practice.",
     start_url: "/dashboard",

@@ -92,7 +92,7 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block, set }:
   // Today's plan block is done once enough questions are answered.
   useEffect(() => {
     if (block && s.answered === block.target) {
-      setBlockDone(block.index, true).then(() => toast.success("Plan block complete — keep going or head back to your dashboard."));
+      setBlockDone(block.index, true).then(() => toast.success("Plan block complete. Keep going, or head back to your dashboard."));
     }
   }, [block, s.answered]);
 
@@ -181,7 +181,7 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block, set }:
           <Button variant="ghost" size="sm" aria-label="Report question" onClick={async () => {
             const note = window.prompt("What's wrong with this question? (optional)") ?? undefined;
             const res = await reportQuestion({ questionId: s.q.id, reason: "other", note });
-            toast[res.ok ? "success" : "error"](res.ok ? "Thanks — we'll take a look." : res.error);
+            toast[res.ok ? "success" : "error"](res.ok ? "Thanks, we'll take a look." : res.error);
           }}><Flag /></Button>
         </div>
       </div>
@@ -209,7 +209,7 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block, set }:
         <div className="flex flex-col gap-4 rounded-lg border p-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className={cn("font-semibold", r.correct ? "text-emerald-700" : "text-red-700")}>
-              {r.correct ? "✓ Correct" : `✗ Not quite${"accepted" in r.revealed.answer ? ` — accepted answer: ${r.revealed.answer.accepted.join(" or ")}` : ""}`}
+              {r.correct ? "✓ Correct" : `✗ Not quite${"accepted" in r.revealed.answer ? `. The accepted answer is ${r.revealed.answer.accepted.join(" or ")}` : ""}`}
             </p>
             <span className="rounded-full bg-muted px-2 py-0.5 text-xs tabular-nums">
               {r.skillName}: {r.masteryBefore}% → {r.masteryAfter}%

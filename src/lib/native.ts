@@ -26,7 +26,7 @@ export async function setNativeReminder(hour: number | null): Promise<boolean> {
   if (hour == null) return true;
   if ((await ln.requestPermissions()).display !== "granted") return true;
   await ln.schedule({ notifications: [{
-    id: REMINDER_ID, title: "Time for SAT practice", body: "Your plan for today is ready — keep your streak going.",
+    id: REMINDER_ID, title: "Time for SAT practice", body: "Your plan for today is ready. Keep your streak going!",
     schedule: { on: { hour, minute: 0 }, allowWhileIdle: true },
   }] });
   return true;

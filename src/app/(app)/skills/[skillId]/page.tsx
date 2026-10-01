@@ -107,24 +107,24 @@ export default async function SkillPage({ params, searchParams }: PageProps<"/sk
         <div className="flex flex-col gap-6">
           <dl className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             {[
-              ["You said", s.selfRating != null ? SELF[s.selfRating] : "—"],
-              ["Estimate certainty", measured ? `${certaintyPct(s.n)}% (${certaintyLabel(s.n)})` : "—"],
+              ["You said", s.selfRating != null ? SELF[s.selfRating] : "Not yet"],
+              ["Estimate certainty", measured ? `${certaintyPct(s.n)}% (${certaintyLabel(s.n)})` : "Not yet"],
               ["Your confidence", confTotal ? stats.confidence.toSorted((a, b) => a.confidence - b.confidence)
-                .map((r) => `${CONF[r.confidence]} ${Math.round((100 * r.n) / confTotal)}%`).join(" · ") : "—"],
-              ["Accuracy", s.accuracy != null ? `${s.accuracy}%` : "—"],
-              ["Recent accuracy", stats.recent.n ? `${Math.round((100 * stats.recent.correct) / stats.recent.n)}% (last ${stats.recent.n})` : "—"],
+                .map((r) => `${CONF[r.confidence]} ${Math.round((100 * r.n) / confTotal)}%`).join(" · ") : "Not yet"],
+              ["Accuracy", s.accuracy != null ? `${s.accuracy}%` : "Not yet"],
+              ["Recent accuracy", stats.recent.n ? `${Math.round((100 * stats.recent.correct) / stats.recent.n)}% (last ${stats.recent.n})` : "Not yet"],
               ["Answered", `${s.n}`],
-              ["Last practiced", s.lastPracticedAt ? s.lastPracticedAt.toLocaleDateString() : "—"],
-              ["Diagnostic", stats.diagnostic.n ? `${stats.diagnostic.c}/${stats.diagnostic.n} correct` : "—"],
-              ["Average time", s.avgMs != null ? fmt(s.avgMs) : "—"],
-              ["Pace", s.pace ?? "—"],
-              ["Trend", detail.trend ?? "—"],
-              ["Hardest handled", detail.highestHandled ? DIFF[detail.highestHandled] : "—"],
+              ["Last practiced", s.lastPracticedAt ? s.lastPracticedAt.toLocaleDateString() : "Not yet"],
+              ["Diagnostic", stats.diagnostic.n ? `${stats.diagnostic.c}/${stats.diagnostic.n} correct` : "Not yet"],
+              ["Average time", s.avgMs != null ? fmt(s.avgMs) : "Not yet"],
+              ["Pace", s.pace ?? "Not yet"],
+              ["Trend", detail.trend ?? "Not yet"],
+              ["Hardest handled", detail.highestHandled ? DIFF[detail.highestHandled] : "Not yet"],
             ].map(([k, v]) => (
               <div key={k}><dt className="text-xs text-muted-foreground">{k}</dt><dd className="font-medium first-letter:uppercase">{v}</dd></div>
             ))}
           </dl>
-          {s.calibration === "overestimated" && <p className="text-sm">You rated this higher than your results so far — worth a closer look.</p>}
+          {s.calibration === "overestimated" && <p className="text-sm">You rated this higher than your results show so far, so it is worth a closer look.</p>}
           {s.calibration === "underestimated" && <p className="text-sm">You&apos;re doing better here than you expected.</p>}
           <Sparkline points={detail.masteryHistory} />
           <div>
