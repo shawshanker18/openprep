@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Markdown } from "@/components/markdown";
 import { QuestionView } from "@/components/question-view";
+import { TutorPanel } from "@/components/tutor-panel";
 import { MISTAKE_LABEL, MISTAKE_TYPES } from "@/engine/mistakes";
 import { cn } from "@/lib/utils";
 import type { RevealedQuestion } from "@/server/questions";
@@ -26,6 +27,7 @@ export function ReviewItem({ n, q, response, correct, attemptId, mistakeType }: 
         {rationale && <p className="text-sm"><b>Why {response} is wrong:</b> {rationale}</p>}
         <Markdown className="text-sm">{q.explanationMd}</Markdown>
         {q.fastMethodMd && <Markdown className="text-sm text-muted-foreground">{`**Fastest:** ${q.fastMethodMd}`}</Markdown>}
+        <div><TutorPanel questionId={q.id} answered isMath={q.section === "math"} wrongChoice={!correct && q.type === "mcq" ? response : null} /></div>
         {!correct && attemptId && (
           <div className="flex flex-wrap gap-1.5">
             {MISTAKE_TYPES.map((m) => (

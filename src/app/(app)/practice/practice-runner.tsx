@@ -7,6 +7,8 @@ import { Bookmark, Flag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Markdown } from "@/components/markdown";
 import { QuestionView } from "@/components/question-view";
+import { DesmosCalculator, DesmosToggle } from "@/components/desmos-panel";
+import { TutorPanel } from "@/components/tutor-panel";
 import { MISTAKE_LABEL, MISTAKE_TYPES, type MistakeType } from "@/engine/mistakes";
 import { cn } from "@/lib/utils";
 import type { PublicQuestion, RevealedQuestion } from "@/server/questions";
@@ -142,6 +144,10 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block }: {
 
       {s.phase === "answering" && (
         <div className="flex flex-col gap-2">
+          <div className="flex flex-wrap items-start gap-2">
+            <TutorPanel questionId={s.q.id} answered={false} isMath={s.q.section === "math"} />
+            {s.q.section === "math" && <DesmosToggle />}
+          </div>
           <span className="text-sm text-muted-foreground">How sure are you? (this submits your answer)</span>
           <div className="flex flex-wrap gap-2">
             {CONFIDENCE.map((c) => (
@@ -178,7 +184,10 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block }: {
               </div>
             </div>
           )}
-          <div><Button size="lg" onClick={() => dispatch({ type: "next" })}>Next</Button></div>
+          <div className="flex flex-wrap gap-2">
+            <Button size="lg" onClick={() => dispatch({ type: "next" })}>Next</Button>
+            <TutorPanel questionId={s.q.id} answered isMath={s.q.section === "math"} wrongChoice={!r.correct && s.q.type === "mcq" ? s.value : null} />
+          </div>
         </div>
       )}
     </div>
@@ -188,7 +197,7 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block }: {
 function Explanation({ q }: { q: RevealedQuestion }) {
   const tabs = [
     { id: "hand", label: "By hand", md: q.explanationMd },
-    q.desmos && { id: "desmos", label: "Desmos", md: `${q.desmos.stepsMd}\n\n${q.desmos.expressions.map((e) => `- \`${e}\``).join("\n")}` },
+    q.desmos && { id: "desmos", label: "Desmos", md: q.desmos.stepsMd },
     q.fastMethodMd && { id: "fast", label: "Fastest", md: q.fastMethodMd },
   ].filter(Boolean) as { id: string; label: string; md: string }[];
   const [tab, setTab] = useReducer((_: string, t: string) => t, "hand");
@@ -204,6 +213,7 @@ function Explanation({ q }: { q: RevealedQuestion }) {
         </div>
       )}
       <Markdown className="text-sm">{cur.md}</Markdown>
+      {cur.id === "desmos" && q.desmos && <DesmosCalculator expressions={q.desmos.expressions} className="h-72" />}
     </div>
   );
 }
