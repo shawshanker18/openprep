@@ -6,7 +6,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db";
 import { profiles, satAttempts, skillState } from "@/db/schema";
-import { SKILLS, TOPICS } from "@/content/taxonomy";
+import { SKILLS, SUBJECTS, TOPICS, boardTopics } from "@/content/taxonomy";
 import { priorTheta, type SelfRating } from "@/engine/prior";
 import { requireUser, type ActionResult } from "@/server/auth";
 import { startDiagnostic } from "@/server/diagnostic";
@@ -17,6 +17,7 @@ const Survey = z.object({
   grade: z.number().int().min(8).max(13),
   curriculum: z.enum(["cbse", "icse", "ib", "gcse", "american", "other"]),
   topicsStudied: z.array(z.enum(TOPICS.map((t) => t.id) as [string, ...string[]])),
+  subjects: z.array(z.enum(SUBJECTS)).default([]),
   englishBackground: z.enum(["first_language", "fluent", "learning"]),
   prior: z.object({ math: sectionScore, rw: sectionScore, takenOn: z.iso.date() }).nullable(),
   targetScore: z.number().int().min(400).max(1600).multipleOf(10),
@@ -34,7 +35,7 @@ export async function submitSurvey(input: z.input<typeof Survey>): Promise<Actio
   const s = parsed.data;
   await db.transaction(async (tx) => {
     await tx.update(profiles).set({
-      grade: s.grade, curriculum: s.curriculum, topicsStudied: s.topicsStudied, englishBackground: s.englishBackground,
+      grade: s.grade, curriculum: s.curriculum, topicsStudied: s.topicsStudied, subjects: s.subjects, englishBackground: s.englishBackground,
       priorMath: s.prior?.math ?? null, priorRw: s.prior?.rw ?? null, targetScore: s.targetScore, testDate: s.testDate,
       minutesPerDay: s.minutesPerDay, daysPerWeek: s.daysPerWeek, timezone: s.timezone, onboardingStep: "self",
     }).where(eq(profiles.id, userId));
@@ -52,12 +53,13 @@ export async function submitSelfAssessment(input: z.input<typeof Ratings>): Prom
   const parsed = Ratings.safeParse(input);
   if (!parsed.success) return { ok: false, error: "Invalid ratings." };
   const studied = new Set(TOPICS.filter((t) => profile.topicsStudied.includes(t.id)).flatMap((t) => t.skills));
+  const implied = new Set(TOPICS.filter((t) => boardTopics(profile.curriculum, profile.grade).includes(t.id)).flatMap((t) => t.skills));
   const rows = SKILLS.map((s) => {
     const selfRating = (parsed.data[s.id] ?? null) as SelfRating | null;
     return {
       userId, skillId: s.id, selfRating,
       theta: priorTheta({
-        selfRating, topicStudied: studied.has(s.id),
+        selfRating, topicStudied: studied.has(s.id), boardImplied: implied.has(s.id),
         priorSectionScore: s.section === "math" ? profile.priorMath : profile.priorRw,
       }),
     };

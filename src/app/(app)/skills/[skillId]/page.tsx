@@ -4,17 +4,20 @@ import { Button } from "@/components/ui/button";
 import { Markdown } from "@/components/markdown";
 import { MasteryBar } from "@/components/mastery-bar";
 import { DOMAINS, SKILL_BY_ID } from "@/content/taxonomy";
-import { certaintyLabel } from "@/engine/mastery";
+import { certaintyLabel, certaintyPct } from "@/engine/mastery";
 import { MISTAKE_LABEL, type MistakeType } from "@/engine/mistakes";
 import { cn } from "@/lib/utils";
 import { requireUser } from "@/server/auth";
 import { getSkillDetail, getSkillSummary } from "@/server/analytics";
 import { getLesson } from "@/server/lessons";
+import { skillStats, tagsBySkill } from "@/server/practice";
+import { startTestAction } from "../../tests/actions";
 import { markLessonDone } from "./actions";
 
 const TABS = ["learn", "practice", "performance", "mistakes"] as const;
 const SELF = ["Don't know", "A little", "Know it", "Very confident"];
 const DIFF = ["", "Easy", "Medium", "Hard"];
+const CONF = ["", "Guessed", "Unsure", "Sure"];
 const fmt = (ms: number) => `${Math.floor(ms / 60000)}m ${Math.round((ms % 60000) / 1000)}s`;
 
 function Sparkline({ points }: { points: number[] }) {
@@ -36,7 +39,10 @@ export default async function SkillPage({ params, searchParams }: PageProps<"/sk
   const sp = await searchParams;
   const tab = TABS.includes(sp.tab as never) ? (sp.tab as (typeof TABS)[number]) : "learn";
   const { userId } = await requireUser();
-  const [{ skills }, detail, lesson] = await Promise.all([getSkillSummary(userId), getSkillDetail(userId, skillId), getLesson(skillId)]);
+  const [{ skills }, detail, lesson, stats, tags] = await Promise.all([
+    getSkillSummary(userId), getSkillDetail(userId, skillId), getLesson(skillId), skillStats(userId, skillId), tagsBySkill(),
+  ]);
+  const confTotal = stats.confidence.reduce((a, r) => a + r.n, 0);
   const s = skills.find((k) => k.id === skillId)!;
   const measured = s.status !== "unknown";
 
@@ -81,10 +87,19 @@ export default async function SkillPage({ params, searchParams }: PageProps<"/sk
           <Button size="lg" className="self-start" render={<Link href={`/practice?skill=${skillId}`} />}>Practise (adaptive)</Button>
           <div className="flex flex-wrap gap-2">
             {[1, 2, 3].map((d) => (
-              <Button key={d} variant="outline" render={<Link href={`/practice?skill=${skillId}&difficulty=${d}`} />}>{DIFF[d]} only</Button>
+              <Button key={d} variant="outline" render={<Link href={`/practice?skill=${skillId}&difficulty=${d}`} />}>{DIFF[d]}</Button>
             ))}
+            <Button variant="outline" render={<Link href={`/practice?mode=set&skills=${skillId}&difficulty=mixed&timing=on`} />}>SAT-level</Button>
+            {tags[skillId]?.includes("desmos") && (
+              <Button variant="outline" render={<Link href={`/practice?mode=set&skills=${skillId}&tags=desmos`} />}>Desmos-based</Button>
+            )}
+            <Button variant="outline" render={<Link href={`/practice?mode=review&skill=${skillId}`} />}>Review mistakes</Button>
+            <form action={startTestAction}>
+              <input type="hidden" name="kind" value="mini" /><input type="hidden" name="skillId" value={skillId} />
+              <Button type="submit" variant="outline">Take a mini test</Button>
+            </form>
           </div>
-          <p className="text-sm text-muted-foreground">Mini tests arrive with the test runner.</p>
+          <p className="text-sm text-muted-foreground">SAT-level mixes difficulties with a countdown at real test pace.</p>
         </div>
       )}
 
@@ -93,9 +108,14 @@ export default async function SkillPage({ params, searchParams }: PageProps<"/sk
           <dl className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             {[
               ["You said", s.selfRating != null ? SELF[s.selfRating] : "—"],
-              ["Estimate confidence", measured ? certaintyLabel(s.n) : "—"],
+              ["Estimate certainty", measured ? `${certaintyPct(s.n)}% (${certaintyLabel(s.n)})` : "—"],
+              ["Your confidence", confTotal ? stats.confidence.toSorted((a, b) => a.confidence - b.confidence)
+                .map((r) => `${CONF[r.confidence]} ${Math.round((100 * r.n) / confTotal)}%`).join(" · ") : "—"],
               ["Accuracy", s.accuracy != null ? `${s.accuracy}%` : "—"],
+              ["Recent accuracy", stats.recent.n ? `${Math.round((100 * stats.recent.correct) / stats.recent.n)}% (last ${stats.recent.n})` : "—"],
               ["Answered", `${s.n}`],
+              ["Last practiced", s.lastPracticedAt ? s.lastPracticedAt.toLocaleDateString() : "—"],
+              ["Diagnostic", stats.diagnostic.n ? `${stats.diagnostic.c}/${stats.diagnostic.n} correct` : "—"],
               ["Average time", s.avgMs != null ? fmt(s.avgMs) : "—"],
               ["Pace", s.pace ?? "—"],
               ["Trend", detail.trend ?? "—"],
@@ -107,6 +127,23 @@ export default async function SkillPage({ params, searchParams }: PageProps<"/sk
           {s.calibration === "overestimated" && <p className="text-sm">You rated this higher than your results so far — worth a closer look.</p>}
           {s.calibration === "underestimated" && <p className="text-sm">You&apos;re doing better here than you expected.</p>}
           <Sparkline points={detail.masteryHistory} />
+          <div>
+            <h3 className="mb-2 text-sm font-medium">Sub-skills</h3>
+            {stats.byTag.length === 0 ? <p className="text-sm text-muted-foreground">Answer a few questions to see how you do on each sub-topic.</p> : (
+              <table className="w-full text-left text-sm">
+                <thead className="text-muted-foreground"><tr><th className="py-1 font-normal">Sub-topic</th><th className="font-normal">Attempts</th><th className="font-normal">Accuracy</th></tr></thead>
+                <tbody>
+                  {stats.byTag.map((t) => (
+                    <tr key={t.tag} className="border-t">
+                      <td className="py-2 first-letter:uppercase">{t.tag.replace(/-/g, " ")}</td>
+                      <td className="tabular-nums">{t.n}</td>
+                      <td className="tabular-nums">{Math.round((100 * t.c) / t.n)}%</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
         </div>
       )}
 

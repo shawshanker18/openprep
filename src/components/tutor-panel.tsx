@@ -6,12 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Markdown } from "@/components/markdown";
 
-type Mode = "hint" | "explain" | "byhand" | "fast" | "desmos" | "why_wrong" | "chat";
+type Mode = "hint" | "explain" | "byhand" | "fast" | "desmos" | "why_wrong" | "vocab" | "similar" | "chat";
 type Msg = { role: "user" | "assistant"; content: string };
 
 const LABEL: Record<Exclude<Mode, "chat">, string> = {
   hint: "Give me a hint", explain: "Explain it differently", byhand: "Show every step", fast: "Fastest SAT method",
   desmos: "Solve it with Desmos", why_wrong: "Why is my answer wrong?",
+  vocab: "Explain the vocabulary/grammar", similar: "Give me a similar question",
 };
 
 /** Slide-over AI tutor for one question (spec 04 §8). `answered=false` → hint mode only. */
@@ -49,7 +50,8 @@ export function TutorPanel({ questionId, answered, isMath, wrongChoice }: {
   };
 
   const modes: Exclude<Mode, "chat">[] = !answered ? ["hint"]
-    : ["explain", "byhand", "fast", ...(isMath ? ["desmos" as const] : []), ...(wrongChoice ? ["why_wrong" as const] : [])];
+    : ["explain", "byhand", "fast", ...(isMath ? ["desmos" as const] : []), ...(wrongChoice ? ["why_wrong" as const] : []),
+      ...(isMath ? [] : ["vocab" as const]), "similar"];
 
   return (
     <Sheet onOpenChange={(open) => { if (!open) abort.current?.abort(); }}>

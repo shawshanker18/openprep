@@ -15,7 +15,7 @@ import { toPublic, toRevealed } from "./questions";
 
 export type TestKind = "full" | "section" | "module" | "mini" | "weakness" | "custom";
 type Section = "rw" | "math";
-type Config = { sections: Section[]; adaptive: boolean; timed: boolean; skillIds?: string[]; count?: number };
+type Config = { sections: Section[]; adaptive: boolean; timed: boolean; skillIds?: string[]; count?: number; tags?: string[]; difficulty?: Difficulty | "mixed" };
 const GRACE_MS = 10_000;
 
 /** Active questions matching a filter, with when this user last saw each. */
@@ -38,16 +38,25 @@ async function insertModule(tx: Tx, sessionId: string, idx: number, section: str
   return m!;
 }
 
-/** Module for a single skill set: count split across skills, difficulty mix given. */
+/**
+ * Module for a single skill set: count split across skills, difficulty mix given.
+ * `tags` narrows each skill's pool to those sub-topics; a thin tagged pool is topped up from the rest of the skill.
+ */
 async function skillSetModule(tx: Tx, userId: string, sessionId: string, idx: number, skillIds: string[], count: number,
-  mix: (skillId: string) => Record<Difficulty, number>, timeLimitS: number | null) {
+  mix: (skillId: string) => Record<Difficulty, number>, timeLimitS: number | null, tags: string[] = []) {
   const used = await usedIds(tx, sessionId);
   const split = largestRemainder(count, skillIds.map(() => 1));
   const picked: PoolQ[] = [];
   for (const [i, skillId] of skillIds.entries()) {
     const skill = SKILL_BY_ID[skillId]!;
     const bp: Blueprint = { section: skill.section, count: split[i]!, timeLimitS, domainCounts: { [skill.domain]: split[i]! }, difficultyCounts: mix(skillId) };
-    picked.push(...assembleModule(bp, await pool(tx, userId, eq(questions.skillId, skillId)), new Set([...used, ...picked.map((p) => p.id)]), Math.random));
+    const all = await pool(tx, userId, eq(questions.skillId, skillId));
+    const tagged = tags.length ? all.filter((q) => q.tags.some((t) => tags.includes(t))) : all;
+    const got = assembleModule(bp, tagged, new Set([...used, ...picked.map((p) => p.id)]), Math.random);
+    const short = bp.count - got.length;
+    if (short > 0 && tagged !== all)
+      got.push(...assembleModule({ ...bp, count: short, domainCounts: { [skill.domain]: short } }, all, new Set([...used, ...picked.map((p) => p.id), ...got.map((g) => g.id)]), Math.random));
+    picked.push(...got);
   }
   const sections = new Set(skillIds.map((s) => SKILL_BY_ID[s]!.section));
   return insertModule(tx, sessionId, idx, sections.size === 1 ? [...sections][0]! : "mixed", "base", timeLimitS, picked);
@@ -55,6 +64,7 @@ async function skillSetModule(tx: Tx, userId: string, sessionId: string, idx: nu
 
 export async function startTest(userId: string, input: {
   kind: TestKind; section?: Section; skillId?: string; skillIds?: string[]; count?: number; timed?: boolean; focus?: string[];
+  tags?: string[]; difficulty?: Difficulty | "mixed";
 }): Promise<{ ok: true; id: string } | { ok: false; error: string; resumeId?: string }> {
   if (input.kind === "full" || input.kind === "section") {
     const [open] = await db.select({ id: testSessions.id }).from(testSessions)
@@ -65,6 +75,7 @@ export async function startTest(userId: string, input: {
   return db.transaction(async (tx) => {
     const sections: Section[] = input.kind === "full" ? ["rw", "math"] : input.section ? [input.section] : [];
     const config: Config = { sections, adaptive: input.kind === "full" || input.kind === "section", timed };
+    if (input.kind === "custom") Object.assign(config, { skillIds: input.skillIds, count: input.count, tags: input.tags ?? [], difficulty: input.difficulty ?? "mixed" });
     const [s] = await tx.insert(testSessions).values({ userId, kind: input.kind, config }).returning({ id: testSessions.id });
     const id = s!.id;
 
@@ -88,7 +99,10 @@ export async function startTest(userId: string, input: {
       const count = Math.min(30, Math.max(5, input.count ?? 10));
       const secs = skills.map((x) => SKILL_BY_ID[x]!.section);
       const limit = timed ? Math.round((count * secs.reduce((a, s) => a + (s === "rw" ? 71 : 95), 0)) / secs.length) : null;
-      await skillSetModule(tx, userId, id, 0, skills, count, () => ({ 1: 1, 2: 1, 3: 1 }), limit);
+      const d = input.difficulty;
+      // A single difficulty borrows the adjacent ones when the bank is thin (assembleModule never throws).
+      const mix = d && d !== "mixed" ? { 1: d === 1 ? 1 : 0, 2: d === 2 ? 1 : 0, 3: d === 3 ? 1 : 0 } : { 1: 1, 2: 1, 3: 1 };
+      await skillSetModule(tx, userId, id, 0, skills, count, () => mix, limit, input.tags ?? []);
     }
     const [{ n }] = (await tx.select({ n: sql<number>`count(*)::int` }).from(testItems)
       .innerJoin(testModules, eq(testModules.id, testItems.moduleId)).where(eq(testModules.sessionId, id))) as [{ n: number }];

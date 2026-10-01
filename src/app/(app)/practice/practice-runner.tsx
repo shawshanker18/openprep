@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useReducer, useRef, useTransition } from "react";
+import { useCallback, useEffect, useReducer, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Bookmark, Flag } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -15,49 +15,71 @@ import type { PublicQuestion, RevealedQuestion } from "@/server/questions";
 import { setBlockDone } from "../plan/actions";
 import { nextQuestion, reportQuestion, setMistakeType, submitAnswer, toggleBookmark } from "./actions";
 
-type Mode = "skill" | "smart" | "review";
+type Mode = "skill" | "smart" | "review" | "set";
+type SetConfig = { skillIds: string[]; tags: string[]; count: number; timing: "auto" | "off" | "on" };
 type Result = {
   correct: boolean; attemptId: string; revealed: RevealedQuestion; masteryBefore: number; masteryAfter: number;
   mistakeGuess: string | null; skillName: string;
 };
+// `correct` / `ms` = running totals for the end-of-set summary.
+type Base = { seen: string[]; answered: number; correct: number; ms: number };
 type State =
-  | { phase: "loading"; seen: string[]; answered: number }
-  | { phase: "done"; seen: string[]; answered: number }
-  | { phase: "answering"; seen: string[]; answered: number; q: PublicQuestion; value: string | null }
-  | { phase: "revealed"; seen: string[]; answered: number; q: PublicQuestion; value: string | null; r: Result; mistake: string | null };
+  | ({ phase: "loading" } & Base)
+  | ({ phase: "done" } & Base)
+  | ({ phase: "answering"; q: PublicQuestion; value: string | null; limitS: number | null } & Base)
+  | ({ phase: "revealed"; q: PublicQuestion; value: string | null; limitS: number | null; r: Result; mistake: string | null } & Base);
 type Action =
-  | { type: "loaded"; q: PublicQuestion } | { type: "done" } | { type: "select"; value: string | null }
-  | { type: "revealed"; r: Result } | { type: "mistake"; m: string } | { type: "next" };
+  | { type: "loaded"; q: PublicQuestion; limitS: number | null } | { type: "done" } | { type: "select"; value: string | null }
+  | { type: "revealed"; r: Result; timeMs: number } | { type: "mistake"; m: string } | { type: "next" };
 
+const base = (s: State): Base => ({ seen: s.seen, answered: s.answered, correct: s.correct, ms: s.ms });
 function reducer(s: State, a: Action): State {
   switch (a.type) {
-    case "loaded": return { phase: "answering", seen: [...s.seen, a.q.id], answered: s.answered, q: a.q, value: null };
-    case "done": return { phase: "done", seen: s.seen, answered: s.answered };
+    case "loaded": return { ...base(s), phase: "answering", seen: [...s.seen, a.q.id], q: a.q, value: null, limitS: a.limitS };
+    case "done": return { ...base(s), phase: "done" };
     case "select": return s.phase === "answering" ? { ...s, value: a.value } : s;
-    case "revealed": return s.phase === "answering" ? { ...s, phase: "revealed", r: a.r, mistake: a.r.mistakeGuess, answered: s.answered + 1 } : s;
+    case "revealed": return s.phase === "answering" ? {
+      ...s, phase: "revealed", r: a.r, mistake: a.r.mistakeGuess, answered: s.answered + 1,
+      correct: s.correct + (a.r.correct ? 1 : 0), ms: s.ms + a.timeMs,
+    } : s;
     case "mistake": return s.phase === "revealed" ? { ...s, mistake: a.m } : s;
-    case "next": return { phase: "loading", seen: s.seen, answered: s.answered };
+    case "next": return { ...base(s), phase: "loading" };
   }
 }
 
 const elapsedMs = (since: number, hidden: number) => Math.round(performance.now() - since - hidden);
 const CONFIDENCE = [{ v: 1, label: "Guessed" }, { v: 2, label: "Unsure" }, { v: 3, label: "Sure" }] as const;
+const clock = (sec: number) => `${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, "0")}`;
 
-export function PracticeRunner({ mode, skillId, difficulty, title, block }: {
-  mode: Mode; skillId?: string; difficulty?: 1 | 2 | 3; title: string; block?: { index: number; target: number } | null;
+/** Per-question countdown at SAT pace. Runs into overtime rather than cutting the student off. */
+function Countdown({ limitS }: { limitS: number }) {
+  const [left, setLeft] = useState(limitS);
+  useEffect(() => {
+    const t0 = performance.now();
+    const id = setInterval(() => setLeft(limitS - (performance.now() - t0) / 1000), 1000);
+    return () => clearInterval(id);
+  }, [limitS]);
+  return <span className={cn("tabular-nums", left <= 0 && "text-red-700")}>{left > 0 ? clock(left) : `Time's up +${clock(-left)}`}</span>;
+}
+
+export function PracticeRunner({ mode, skillId, difficulty, title, block, set }: {
+  mode: Mode; skillId?: string; difficulty?: 1 | 2 | 3 | "mixed"; title: string; block?: { index: number; target: number } | null;
+  set?: SetConfig;
 }) {
-  const [s, dispatch] = useReducer(reducer, { phase: "loading", seen: [], answered: 0 });
+  const [s, dispatch] = useReducer(reducer, { phase: "loading", seen: [], answered: 0, correct: 0, ms: 0 });
   const [pending, start] = useTransition();
   const shownAt = useRef(0);
   const hiddenMs = useRef(0);
   const hiddenSince = useRef<number | null>(null);
 
   const load = useCallback((exclude: string[]) => start(async () => {
-    const res = await nextQuestion({ mode, skillId, difficulty, exclude });
+    const res = await nextQuestion({ mode, skillId, difficulty, exclude, skillIds: set?.skillIds, tags: set?.tags, timing: set?.timing });
     if (!res.ok) { toast.error(res.error); return; }
     if ("done" in res.data) dispatch({ type: "done" });
-    else { dispatch({ type: "loaded", q: res.data.question }); shownAt.current = performance.now(); hiddenMs.current = 0; }
-  }), [mode, skillId, difficulty]);
+    else { dispatch({ type: "loaded", q: res.data.question, limitS: res.data.timeLimitS }); shownAt.current = performance.now(); hiddenMs.current = 0; }
+  }), [mode, skillId, difficulty, set]);
+  // A set stops after `count` answers.
+  const next = useCallback(() => dispatch({ type: set && s.answered >= set.count ? "done" : "next" }), [set, s.answered]);
 
   useEffect(() => { if (s.phase === "loading") load(s.seen); }, [s.phase, s.seen, load]);
 
@@ -84,7 +106,7 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block }: {
     start(async () => {
       const res = await submitAnswer({ questionId: s.q.id, response: s.value, timeMs, confidence });
       if (!res.ok) toast.error(res.error);
-      else dispatch({ type: "revealed", r: res.data });
+      else dispatch({ type: "revealed", r: res.data, timeMs });
     });
   };
 
@@ -96,13 +118,27 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block }: {
         const i = "1234".indexOf(e.key) >= 0 ? "1234".indexOf(e.key) : "abcd".indexOf(e.key.toLowerCase());
         if (i >= 0) dispatch({ type: "select", value: "ABCD"[i]! });
       }
-      if (s.phase === "revealed" && e.key === "Enter") dispatch({ type: "next" });
+      if (s.phase === "revealed" && e.key === "Enter") next();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [s]);
+  }, [s, next]);
 
   if (s.phase === "loading") return <p className="text-muted-foreground">Loading…</p>;
+  if (s.phase === "done" && set) {
+    return (
+      <div className="flex flex-col items-start gap-3">
+        <h1 className="text-xl font-semibold">{s.answered >= set.count ? "Set complete" : "No more matching questions"}</h1>
+        <p className="text-muted-foreground tabular-nums">
+          {s.answered > 0 ? `${s.correct}/${s.answered} correct · average ${Math.round(s.ms / s.answered / 1000)}s per question.` : "Try other skills or sub-topics."}
+        </p>
+        <div className="flex flex-wrap gap-2">
+          <Button render={<Link href="/practice/custom" />}>New custom set</Button>
+          <Button variant="outline" render={<Link href="/dashboard" />}>Back to dashboard</Button>
+        </div>
+      </div>
+    );
+  }
   if (s.phase === "done") {
     return (
       <div className="flex flex-col items-start gap-3">
@@ -125,8 +161,12 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block }: {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between gap-2 text-sm text-muted-foreground">
-        <span>{title} · {s.answered} answered{block && s.answered < block.target && ` · ${block.target - s.answered} to finish this block`}</span>
-        <div className="flex gap-1">
+        <span>
+          {title} · {set ? `${s.answered}/${set.count}` : s.answered} answered{block && s.answered < block.target && ` · ${block.target - s.answered} to finish this block`}
+          {mode === "smart" && <> · <Link href="/practice/custom" className="underline">Customize practice</Link></>}
+        </span>
+        <div className="flex items-center gap-1">
+          {s.phase === "answering" && s.limitS && <Countdown key={s.q.id} limitS={s.limitS} />}
           <Button variant="ghost" size="sm" aria-label="Bookmark" onClick={async () => {
             const res = await toggleBookmark({ questionId: s.q.id });
             if (res.ok) toast(res.data.bookmarked ? "Bookmarked" : "Bookmark removed");
@@ -185,7 +225,7 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block }: {
             </div>
           )}
           <div className="flex flex-wrap gap-2">
-            <Button size="lg" onClick={() => dispatch({ type: "next" })}>Next</Button>
+            <Button size="lg" onClick={next}>{set && s.answered >= set.count ? "See summary" : "Next"}</Button>
             <TutorPanel questionId={s.q.id} answered isMath={s.q.section === "math"} wrongChoice={!r.correct && s.q.type === "mcq" ? s.value : null} />
           </div>
         </div>

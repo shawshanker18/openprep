@@ -1,12 +1,14 @@
 // Daily plan: generated once per local day, never rearranged (spec 03 §10).
 import { POINTS_PER_STUDY_HOUR, READY_BUFFER_WEEKS, TARGET_SECONDS } from "./constants";
 
-export type PlanBlock =
+/** `custom` marks blocks of a plan the student edited by hand (today only). */
+export type PlanBlock = (
   | { kind: "review"; minutes: number; done: boolean }
   | { kind: "learn"; minutes: number; skillId: string; done: boolean }
   | { kind: "practice"; minutes: number; skillId: string; done: boolean }
   | { kind: "desmos"; minutes: number; lessonSlug: string; done: boolean }
-  | { kind: "mini"; minutes: number; skillId: string; done: boolean };
+  | { kind: "mini"; minutes: number; skillId: string; done: boolean }
+) & { custom?: true };
 
 export type PlanFocus = {
   skillId: string; section: "rw" | "math"; masteryPct: number; lessonDone: boolean; attemptsThisWeek: number;
@@ -14,7 +16,11 @@ export type PlanFocus = {
 
 export function buildDailyPlan(x: {
   minutes: number; dueReviews: number; focus: PlanFocus[]; nextDesmosLesson: string | null; dayOfWeekIndex: number;
+  /** Days until the test (plan §16); null/negative = no upcoming test. */
+  daysToTest?: number | null;
 }): PlanBlock[] {
+  const near = x.daysToTest != null && x.daysToTest >= 0;
+  const within28 = near && x.daysToTest! <= 28, within7 = near && x.daysToTest! <= 7;
   const blocks: PlanBlock[] = [];
   let left = x.minutes;
   const round5 = (m: number) => Math.max(5, Math.round(m / 5) * 5);
@@ -30,12 +36,16 @@ export function buildDailyPlan(x: {
   }
   const shares = [0.5, 0.3, 0.2];
   const pool = left;
+  let miniDone = false;
   x.focus.slice(0, 3).forEach((f, i) => {
     const m = round5(pool * shares[i]!);
     if (m > left) return;
+    // Final week: no new lessons, practise and check in instead.
+    let kind: "learn" | "practice" | "mini" = !within7 && !f.lessonDone && f.masteryPct < 45 ? "learn" : "practice";
     // A mini test needs 15 minutes; below that, practise instead (keeps the plan inside the budget).
-    const kind = !f.lessonDone && f.masteryPct < 45 ? "learn"
-      : f.attemptsThisWeek >= 20 && i === 0 && m >= 15 ? "mini" : "practice";
+    // Within 4 weeks of the test the first practice block always becomes a timed check-in.
+    if (kind === "practice" && !miniDone && m >= 15 && (within28 || (i === 0 && f.attemptsThisWeek >= 20))) kind = "mini";
+    if (kind === "mini") miniDone = true;
     blocks.push({ kind, minutes: m, skillId: f.skillId, done: false });
     left -= m;
   });

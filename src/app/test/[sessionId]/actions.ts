@@ -11,6 +11,7 @@ const Answer = z.object({
   questionId: z.string().min(1).max(64),
   response: z.string().max(8).nullable(),
   timeMs: z.number().int().min(0).max(24 * 3_600_000),
+  confidence: z.union([z.literal(1), z.literal(2), z.literal(3)]).nullable().optional(),
 });
 
 export async function answerDiagnostic(input: z.input<typeof Answer>) {

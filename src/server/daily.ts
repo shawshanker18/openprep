@@ -20,6 +20,35 @@ async function desmosSlugs(): Promise<string[]> {
   } catch { return []; }
 }
 
+const DAY = 86_400_000;
+/** Whole days until the test date (negative once it's past), or null when none is set. */
+export const daysToTest = (profile: Profile, now = new Date()) =>
+  profile.testDate ? Math.ceil((new Date(`${profile.testDate}T00:00:00Z`).getTime() - now.getTime()) / DAY) : null;
+
+/** First Desmos lesson the student hasn't opened yet. */
+export async function nextDesmosLesson(userId: string): Promise<string | null> {
+  const [opened, slugs] = await Promise.all([
+    db.select({ skillId: lessonProgress.skillId }).from(lessonProgress)
+      .where(and(eq(lessonProgress.userId, userId), like(lessonProgress.skillId, "desmos:%"))),
+    desmosSlugs(),
+  ]);
+  return slugs.find((s) => !opened.some((o) => o.skillId === `desmos:${s}`)) ?? null;
+}
+
+/** A full mock is due 14 days after the last one (7 inside the final 4 weeks), or a week after the diagnostic. */
+export async function isMockDue(userId: string, daysLeft: number | null, now = new Date()) {
+  const [[lastMock], [diag]] = await Promise.all([
+    db.select().from(testSessions).where(and(eq(testSessions.userId, userId), eq(testSessions.kind, "full"), eq(testSessions.status, "completed")))
+      .orderBy(desc(testSessions.completedAt)).limit(1),
+    db.select().from(testSessions).where(and(eq(testSessions.userId, userId), eq(testSessions.kind, "diagnostic"), eq(testSessions.status, "completed"))).limit(1),
+  ]);
+  const mockGap = daysLeft != null && daysLeft <= 28 ? 7 : 14;
+  const due = lastMock?.completedAt
+    ? now.getTime() - lastMock.completedAt.getTime() >= mockGap * DAY
+    : !!diag?.completedAt && now.getTime() - diag.completedAt.getTime() >= 7 * DAY;
+  return { due, lastMock };
+}
+
 export async function ensureDaily(userId: string, profile: Profile, now = new Date()) {
   const day = localDate(now, profile.timezone);
   const focus = await ensureWeeklyFocus(userId, profile, now);
@@ -27,14 +56,12 @@ export async function ensureDaily(userId: string, profile: Profile, now = new Da
   let [plan] = await db.select().from(dailyPlans).where(and(eq(dailyPlans.userId, userId), eq(dailyPlans.day, day)));
   if (!plan) {
     const weekStart = new Date(`${weekOf(day)}T00:00:00Z`);
-    const [states, done, weekCounts, opened, slugs, dueReviews, hasLesson] = await Promise.all([
+    const [states, done, weekCounts, nextDesmos, dueReviews, hasLesson] = await Promise.all([
       db.select().from(skillState).where(and(eq(skillState.userId, userId), inArray(skillState.skillId, focus.length ? focus : [""]))),
       db.select({ skillId: lessonProgress.skillId }).from(lessonProgress).where(eq(lessonProgress.userId, userId)),
       db.select({ skillId: attempts.skillId, n: sql<number>`count(*)::int` }).from(attempts)
         .where(and(eq(attempts.userId, userId), gte(attempts.createdAt, weekStart))).groupBy(attempts.skillId),
-      db.select({ skillId: lessonProgress.skillId }).from(lessonProgress)
-        .where(and(eq(lessonProgress.userId, userId), like(lessonProgress.skillId, "desmos:%"))),
-      desmosSlugs(),
+      nextDesmosLesson(userId),
       countDueReviews(userId, now),
       Promise.all(focus.map(lessonExists)),
     ]);
@@ -48,8 +75,9 @@ export async function ensureDaily(userId: string, profile: Profile, now = new Da
         lessonDone: done.some((d) => d.skillId === skillId) || !hasLesson[focus.indexOf(skillId)],
         attemptsThisWeek: weekCounts.find((w) => w.skillId === skillId)?.n ?? 0,
       })),
-      nextDesmosLesson: slugs.find((s) => !opened.some((o) => o.skillId === `desmos:${s}`)) ?? null,
+      nextDesmosLesson: nextDesmos,
       dayOfWeekIndex: dayOfWeekIndex(day),
+      daysToTest: daysToTest(profile, now),
     });
     [plan] = await db.insert(dailyPlans).values({ userId, day, blocks }).onConflictDoNothing().returning();
     plan ??= (await db.select().from(dailyPlans).where(and(eq(dailyPlans.userId, userId), eq(dailyPlans.day, day))))[0]!;
@@ -71,13 +99,11 @@ export async function ensureDaily(userId: string, profile: Profile, now = new Da
 
 export async function getDashboard(userId: string, profile: Profile, now = new Date()) {
   const daily = await ensureDaily(userId, profile, now);
-  const DAY = 86_400_000;
-  const [states, dueReviews, [lastMock], [diag], week] = await Promise.all([
+  const daysLeft = daysToTest(profile, now);
+  const [states, dueReviews, { due: mockDue, lastMock }, week] = await Promise.all([
     db.select().from(skillState).where(eq(skillState.userId, userId)),
     countDueReviews(userId, now),
-    db.select().from(testSessions).where(and(eq(testSessions.userId, userId), eq(testSessions.kind, "full"), eq(testSessions.status, "completed")))
-      .orderBy(desc(testSessions.completedAt)).limit(1),
-    db.select().from(testSessions).where(and(eq(testSessions.userId, userId), eq(testSessions.kind, "diagnostic"), eq(testSessions.status, "completed"))).limit(1),
+    isMockDue(userId, daysLeft, now),
     db.select({ n: sql<number>`count(*)::int`, c: sql<number>`count(*) filter (where ${attempts.correct})::int`, ms: sql<number>`coalesce(sum(${attempts.timeMs}),0)::bigint` })
       .from(attempts).where(and(eq(attempts.userId, userId), gte(attempts.createdAt, new Date(now.getTime() - 7 * DAY)))),
   ]);
@@ -88,11 +114,6 @@ export async function getDashboard(userId: string, profile: Profile, now = new D
     ? (lastMock.result as { total?: number; halfWidth?: number } | null) : null;
   const headline = headlineEstimate(model, mockResult?.total ? { total: mockResult.total, half: mockResult.halfWidth ?? 40 } : null);
 
-  const daysLeft = profile.testDate ? Math.ceil((new Date(`${profile.testDate}T00:00:00Z`).getTime() - now.getTime()) / DAY) : null;
-  const mockGap = daysLeft != null && daysLeft <= 28 ? 7 : 14;
-  const mockDue = lastMock?.completedAt
-    ? now.getTime() - lastMock.completedAt.getTime() >= mockGap * DAY
-    : !!diag?.completedAt && now.getTime() - diag.completedAt.getTime() >= 7 * DAY;
   const stretch = profile.targetScore && daysLeft && daysLeft > 0
     ? paceCheck(headline.total, profile.targetScore, daysLeft) === "stretch" : false;
 
@@ -119,4 +140,44 @@ export async function getTodayBlock(userId: string, profile: Profile, index: num
   if (!b || b.done) return null;
   const section = "skillId" in b ? SKILL_BY_ID[b.skillId]?.section ?? "rw" : "rw";
   return { index, target: questionsForBlock(b.minutes, section) };
+}
+
+/** Today's plan row, without generating one. */
+export async function getTodayPlan(userId: string, profile: Profile) {
+  const day = localDate(new Date(), profile.timezone);
+  const [plan] = await db.select().from(dailyPlans).where(and(eq(dailyPlans.userId, userId), eq(dailyPlans.day, day)));
+  return plan ? (plan.blocks as PlanBlock[]) : null;
+}
+
+/** Hand-edit today's plan (it stays frozen for the day). Every block is marked custom so the UI can say so. */
+export async function editTodayPlan(userId: string, profile: Profile, edit: (blocks: PlanBlock[]) => PlanBlock[]) {
+  const { day, blocks } = await ensureDaily(userId, profile);
+  const next = edit(blocks).map((b) => ({ ...b, custom: true as const }));
+  await db.update(dailyPlans).set({ blocks: next }).where(and(eq(dailyPlans.userId, userId), eq(dailyPlans.day, day)));
+}
+
+/** Back to the automatic plan: drop today's row so ensureDaily regenerates it. */
+export async function resetTodayPlan(userId: string, profile: Profile) {
+  const day = localDate(new Date(), profile.timezone);
+  await db.delete(dailyPlans).where(and(eq(dailyPlans.userId, userId), eq(dailyPlans.day, day)));
+}
+
+export const DASHBOARD_CARDS = [
+  { id: "score", label: "Your score" },
+  { id: "countdown", label: "SAT countdown" },
+  { id: "today", label: "Today's plan" },
+  { id: "focus", label: "Focus this week" },
+  { id: "mock-due", label: "Full mock due" },
+  { id: "pace", label: "Pace check" },
+  { id: "mistakes", label: "Mistakes to review" },
+  { id: "week", label: "Last 7 days" },
+] as const;
+export type DashboardCardId = (typeof DASHBOARD_CARDS)[number]["id"];
+
+/** The saved layout with any cards added since appended (visible); null = automatic default. */
+export function dashboardLayout(profile: Profile): { id: DashboardCardId; visible: boolean }[] | null {
+  if (!profile.dashboardLayout) return null;
+  const ids = DASHBOARD_CARDS.map((c) => c.id) as string[];
+  const saved = profile.dashboardLayout.filter((c) => ids.includes(c.id)) as { id: DashboardCardId; visible: boolean }[];
+  return [...saved, ...DASHBOARD_CARDS.filter((c) => !saved.some((s) => s.id === c.id)).map((c) => ({ id: c.id, visible: true }))];
 }

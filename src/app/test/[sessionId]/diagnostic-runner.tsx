@@ -21,8 +21,8 @@ export function DiagnosticRunner({ sessionId, initial, initialIndex }: {
   const shownAt = useRef(0);
   useEffect(() => { shownAt.current = performance.now(); }, [q.id]);
 
-  const submit = (response: string | null) => start(async () => {
-    const res = await answerDiagnostic({ sessionId, questionId: q.id, response, timeMs: Math.round(performance.now() - shownAt.current) });
+  const submit = (response: string | null, confidence: 1 | 2 | 3 | null = null) => start(async () => {
+    const res = await answerDiagnostic({ sessionId, questionId: q.id, response, confidence, timeMs: Math.round(performance.now() - shownAt.current) });
     if (!res.ok) { toast.error(res.error); router.refresh(); return; }
     if (res.data.done) { router.push(`/test/${sessionId}/results`); return; }
     setQ(res.data.question); setIndex(res.data.index); setValue(null);
@@ -39,9 +39,14 @@ export function DiagnosticRunner({ sessionId, initial, initialIndex }: {
         <div className="h-full bg-primary transition-all" style={{ width: `${(100 * index) / DIAGNOSTIC_LENGTH}%` }} />
       </div>
       <QuestionView key={q.id} question={q} value={value} onChange={setValue} disabled={pending} />
-      <div className="flex gap-2">
-        <Button size="lg" disabled={pending || value === null} onClick={() => submit(value)}>Next</Button>
-        <Button size="lg" variant="ghost" disabled={pending} onClick={() => submit(null)}>I don&apos;t know</Button>
+      <div className="flex flex-col gap-2">
+        <span className="text-sm text-muted-foreground">How sure are you? (this submits your answer)</span>
+        <div className="flex flex-wrap gap-2">
+          {([[1, "Guessed"], [2, "Unsure"], [3, "Sure"]] as const).map(([c, label]) => (
+            <Button key={c} size="lg" variant={c === 3 ? "default" : "outline"} disabled={pending || value === null} onClick={() => submit(value, c)}>{label}</Button>
+          ))}
+          <Button size="lg" variant="ghost" disabled={pending} onClick={() => submit(null)}>I don&apos;t know</Button>
+        </div>
       </div>
     </div>
   );

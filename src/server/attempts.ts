@@ -5,7 +5,7 @@ import { and, eq, inArray } from "drizzle-orm";
 import type { Tx } from "@/db";
 import { attempts, reviewItems, skillState, type Question } from "@/db/schema";
 import { skillsIn } from "@/content/taxonomy";
-import { GUESSED_CORRECT_WEIGHT, MAX_ATTEMPT_MS, REVIEW_WEIGHT, SIBLING_MAX_N, SIBLING_SHARE, type Difficulty } from "@/engine/constants";
+import { GUESSED_CORRECT_WEIGHT, MAX_ATTEMPT_MS, REVIEW_INTERVAL_DAYS, REVIEW_WEIGHT, SIBLING_MAX_N, SIBLING_SHARE, type Difficulty } from "@/engine/constants";
 import { applyDelta, thetaDelta } from "@/engine/mastery";
 import { grade } from "@/engine/grade";
 import { guessMistakeType, type MistakeType } from "@/engine/mistakes";
@@ -54,7 +54,12 @@ export async function recordAttempt(tx: Tx, userId: string, q: Question, a: {
   }).returning({ id: attempts.id });
 
   const key = and(eq(reviewItems.userId, userId), eq(reviewItems.questionId, q.id));
-  if (a.context === "review") {
+  if (correct && a.confidence === 1) {
+    // Guessed right isn't mastered (plan §13): (re)queue at stage 0 instead of advancing or clearing.
+    const next = { stage: 0, dueAt: new Date(a.now.getTime() + REVIEW_INTERVAL_DAYS[1]! * 86_400_000) };
+    await tx.insert(reviewItems).values({ userId, questionId: q.id, ...next })
+      .onConflictDoUpdate({ target: [reviewItems.userId, reviewItems.questionId], set: next });
+  } else if (a.context === "review") {
     const [item] = await tx.select().from(reviewItems).where(key);
     const next = afterReview(item?.stage ?? 0, correct, a.now);
     if (next === "done") await tx.delete(reviewItems).where(key);

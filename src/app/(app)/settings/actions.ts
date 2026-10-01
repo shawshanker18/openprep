@@ -7,7 +7,9 @@ import { z } from "zod";
 import { db } from "@/db";
 import { profiles, satAttempts, testSessions } from "@/db/schema";
 import { createClient } from "@/lib/supabase/server";
+import { SUBJECTS, TOPICS } from "@/content/taxonomy";
 import { requireUser } from "@/server/auth";
+import { DASHBOARD_CARDS } from "@/server/daily";
 import { startDiagnostic } from "@/server/diagnostic";
 
 const Settings = z.object({
@@ -24,6 +26,55 @@ export async function updateSettings(form: FormData) {
   await db.update(profiles).set({ ...p.data, testDate: p.data.testDate || null }).where(eq(profiles.id, userId));
   revalidatePath("/", "layout");
   redirect("/settings?saved=1");
+}
+
+const ProfileForm = z.object({
+  grade: z.coerce.number().int().min(8).max(13),
+  curriculum: z.enum(["cbse", "icse", "ib", "gcse", "american", "other"]),
+  subjects: z.array(z.enum(SUBJECTS)),
+  topicsStudied: z.array(z.enum(TOPICS.map((t) => t.id) as [string, ...string[]])),
+  englishBackground: z.enum(["first_language", "fluent", "learning"]),
+});
+
+export async function updateProfile(form: FormData) {
+  const { userId } = await requireUser();
+  const p = ProfileForm.safeParse({
+    grade: form.get("grade"), curriculum: form.get("curriculum"), englishBackground: form.get("englishBackground"),
+    subjects: form.getAll("subjects"), topicsStudied: form.getAll("topicsStudied"),
+  });
+  if (!p.success) redirect("/settings?error=profile");
+  await db.update(profiles).set(p.data).where(eq(profiles.id, userId));
+  revalidatePath("/settings");
+  redirect("/settings?saved=1");
+}
+
+const CARD_IDS = DASHBOARD_CARDS.map((c) => c.id) as [string, ...string[]];
+/** One form: hidden `order` inputs, `visible` checkboxes, and ▲/▼ buttons that submit `move=<id>:<-1|1>`. */
+export async function saveDashboard(form: FormData) {
+  const { userId } = await requireUser();
+  const p = z.object({
+    order: z.array(z.enum(CARD_IDS)).length(CARD_IDS.length).refine((a) => new Set(a).size === a.length),
+    visible: z.array(z.enum(CARD_IDS)),
+    move: z.string().regex(/^[a-z-]+:(-1|1)$/).nullable(),
+  }).safeParse({ order: form.getAll("order"), visible: form.getAll("visible"), move: form.get("move") });
+  if (!p.success) redirect("/settings?error=dashboard");
+  const order = [...p.data.order];
+  if (p.data.move) {
+    const [id, dir] = p.data.move.split(":");
+    const i = order.indexOf(id!), j = i + Number(dir);
+    if (i >= 0 && j >= 0 && j < order.length) [order[i], order[j]] = [order[j]!, order[i]!];
+  }
+  const layout = order.map((id) => ({ id, visible: p.data.visible.includes(id) }));
+  await db.update(profiles).set({ dashboardLayout: layout }).where(eq(profiles.id, userId));
+  revalidatePath("/settings");
+  revalidatePath("/dashboard");
+}
+
+export async function resetDashboard() {
+  const { userId } = await requireUser();
+  await db.update(profiles).set({ dashboardLayout: null }).where(eq(profiles.id, userId));
+  revalidatePath("/settings");
+  revalidatePath("/dashboard");
 }
 
 const score = z.coerce.number().int().min(200).max(800).multipleOf(10);

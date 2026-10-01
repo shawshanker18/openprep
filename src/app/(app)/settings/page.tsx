@@ -2,13 +2,20 @@ import { eq } from "drizzle-orm";
 import { Button } from "@/components/ui/button";
 import { db } from "@/db";
 import { satAttempts } from "@/db/schema";
+import { SUBJECTS, TOPICS } from "@/content/taxonomy";
 import { requireUser } from "@/server/auth";
+import { DASHBOARD_CARDS, dashboardLayout } from "@/server/daily";
 import { signOut } from "@/app/auth/actions";
-import { addOfficialScore, deleteAccount, removeOfficialScore, retakeDiagnostic, updateSettings } from "./actions";
+import { ThemeSelect } from "@/components/theme";
+import {
+  addOfficialScore, deleteAccount, removeOfficialScore, resetDashboard, retakeDiagnostic, saveDashboard, updateProfile, updateSettings,
+} from "./actions";
 
 const control = "h-9 rounded-md border bg-background px-2 text-sm";
 const ERRORS: Record<string, string> = {
   settings: "Please check your settings and try again.",
+  profile: "Please check your profile and try again.",
+  dashboard: "Couldn't save the dashboard layout — please try again.",
   score: "Scores must be 200–800 in steps of 10, with a date.",
   retake: "You can retake the diagnostic once every 30 days.",
   delete: "Type DELETE in capitals to confirm.",
@@ -17,11 +24,20 @@ const ERRORS: Record<string, string> = {
 export default async function SettingsPage({ searchParams }: PageProps<"/settings">) {
   const sp = await searchParams;
   const { userId, profile } = await requireUser();
+  const layout = dashboardLayout(profile);
+  const cards = layout ?? DASHBOARD_CARDS.map((c) => ({ id: c.id, visible: true }));
+  const cardLabel = (id: string) => DASHBOARD_CARDS.find((c) => c.id === id)!.label;
   const scores = await db.select().from(satAttempts).where(eq(satAttempts.userId, userId)).orderBy(satAttempts.takenOn);
 
   return (
     <div className="flex max-w-xl flex-col gap-10">
       <h1 className="text-2xl font-semibold">Settings</h1>
+
+      <section className="flex flex-col gap-2">
+        <h2 className="font-medium">Appearance</h2>
+        <ThemeSelect />
+        <p className="text-xs text-muted-foreground">System follows your device. Saved in this browser.</p>
+      </section>
       {typeof sp.error === "string" && ERRORS[sp.error] && <p role="alert" className="rounded-md border border-destructive p-3 text-sm text-destructive">{ERRORS[sp.error]}</p>}
       {sp.saved && <p role="status" className="rounded-md border p-3 text-sm">Saved.</p>}
 
@@ -43,6 +59,74 @@ export default async function SettingsPage({ searchParams }: PageProps<"/setting
         </div>
         <p className="text-xs text-muted-foreground">Changes apply from tomorrow&apos;s plan — today&apos;s stays as it is.</p>
         <Button type="submit" className="self-start">Save</Button>
+      </form>
+
+      <form action={updateProfile} className="flex flex-col gap-4">
+        <h2 className="font-medium">Profile</h2>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <label className="flex flex-col gap-1 text-sm">Grade
+            <select name="grade" defaultValue={profile.grade ?? 11} className={control}>
+              {[8, 9, 10, 11, 12].map((g) => <option key={g} value={g}>Grade {g}</option>)}
+              <option value="13">Other / gap year</option>
+            </select></label>
+          <label className="flex flex-col gap-1 text-sm">School curriculum
+            <select name="curriculum" defaultValue={profile.curriculum ?? "cbse"} className={control}>
+              <option value="cbse">CBSE</option><option value="icse">ICSE</option><option value="ib">IB</option>
+              <option value="gcse">GCSE / A-Levels</option><option value="american">American</option><option value="other">Other</option>
+            </select></label>
+          <label className="flex flex-col gap-1 text-sm">English is my…
+            <select name="englishBackground" defaultValue={profile.englishBackground ?? "fluent"} className={control}>
+              <option value="first_language">First language</option>
+              <option value="fluent">Fluent second language</option>
+              <option value="learning">Still learning</option>
+            </select></label>
+        </div>
+        <fieldset className="flex flex-col gap-2 text-sm">
+          <legend className="mb-2">Subjects you&apos;re studying now</legend>
+          <div className="flex flex-wrap gap-x-4 gap-y-2">
+            {SUBJECTS.map((s) => (
+              <label key={s} className="flex items-center gap-2">
+                <input type="checkbox" name="subjects" value={s} defaultChecked={profile.subjects.includes(s)} /> {s}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+        <fieldset className="flex flex-col gap-2 text-sm">
+          <legend className="mb-2">Math chapters you&apos;ve studied</legend>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {TOPICS.map((t) => (
+              <label key={t.id} className="flex items-center gap-2">
+                <input type="checkbox" name="topicsStudied" value={t.id} defaultChecked={profile.topicsStudied.includes(t.id)} /> {t.label}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+        <Button type="submit" className="self-start">Save profile</Button>
+      </form>
+
+      <form action={saveDashboard} className="flex flex-col gap-3">
+        <h2 className="font-medium">Dashboard</h2>
+        <p className="text-sm text-muted-foreground">
+          {layout ? "Custom layout." : "Automatic layout (recommended)."} Choose which cards show and their order.
+        </p>
+        <ul className="flex flex-col gap-1 text-sm">
+          {cards.map((c, i) => (
+            <li key={c.id} className="flex items-center justify-between gap-2">
+              <input type="hidden" name="order" value={c.id} />
+              <label className="flex items-center gap-2">
+                <input type="checkbox" name="visible" value={c.id} defaultChecked={c.visible} /> {cardLabel(c.id)}
+              </label>
+              <span className="flex gap-1">
+                <Button size="sm" variant="ghost" type="submit" name="move" value={`${c.id}:-1`} disabled={i === 0} aria-label={`Move ${cardLabel(c.id)} up`}>▲</Button>
+                <Button size="sm" variant="ghost" type="submit" name="move" value={`${c.id}:1`} disabled={i === cards.length - 1} aria-label={`Move ${cardLabel(c.id)} down`}>▼</Button>
+              </span>
+            </li>
+          ))}
+        </ul>
+        <div className="flex gap-2">
+          <Button type="submit" variant="outline">Save layout</Button>
+          {layout && <Button type="submit" variant="ghost" formAction={resetDashboard}>Reset to automatic</Button>}
+        </div>
       </form>
 
       <section className="flex flex-col gap-3">
