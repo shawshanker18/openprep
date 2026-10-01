@@ -7,6 +7,7 @@ import { Flag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { QuestionView } from "@/components/question-view";
 import { ReferenceSheet } from "@/components/reference-sheet";
+import { DesmosToggle } from "@/components/desmos-panel";
 import { cn } from "@/lib/utils";
 import type { PublicQuestion } from "@/server/questions";
 import { abandon, saveResponse, startModule, submitModule } from "./actions";
@@ -155,6 +156,7 @@ export function TestRunner({ sessionId, module: m, items: initial, serverNow, br
                 <Flag className={cn(it.flagged && "fill-current")} /> {it.flagged ? "Flagged" : "Flag for review"}
               </Button>
             </div>
+            {it.question.section === "math" && <DesmosToggle />}
             <QuestionView key={it.question.id} question={it.question} value={it.response} onChange={(v) => update({ response: v })} disabled={pending} />
           </div>
         ) : (

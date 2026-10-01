@@ -42,7 +42,9 @@ async function pickInSkill(userId: string, skillId: string, exclude: string[], n
   ]);
   const lastSeen = new Map(seen.map((s) => [s.id, new Date(s.at)]));
   const blocked = new Set([...exclude, ...queued.map((r) => r.id)]);
-  const candidates = pool.filter((q) => !blocked.has(q.id))
+  // Review-queue questions are held back for review — unless that would leave nothing to practise (thin bank).
+  const open = pool.filter((q) => !blocked.has(q.id));
+  const candidates = (open.length ? open : pool.filter((q) => !exclude.includes(q.id)))
     .map((q) => ({ ...q, difficulty: q.difficulty as Difficulty, lastSeenAt: lastSeen.get(q.id) ?? null }));
 
   // Missed the previous question in this session → one similar question (same difficulty, shared tag).
