@@ -6,12 +6,14 @@ export default function Privacy() {
     <h1>Privacy</h1>
     <h2>What we store</h2>
     <ul>
-      <li>Your email address, from Google or the sign-in link.</li>
+      <li>Your email address, from Google or the sign-in link. If you sign in with Google, your Google account name is used to greet you.</li>
       <li>Your answers to the short onboarding survey (grade, curriculum, goals, study time).</li>
       <li>Your answers to practice and test questions, and how long they took.</li>
       <li>Messages you send to the AI tutor.</li>
+      <li>If you turn on study reminders: your chosen time, and a push address for each device you turn them on for. Turning reminders off on a device deletes its address.</li>
+      <li>On tests: how many times you left the test window, shown only to you on your results.</li>
     </ul>
-    <p>We don&apos;t ask for your name, school, phone number, or address. We don&apos;t take payments.</p>
+    <p>We don&apos;t ask for your school, phone number, or address. We don&apos;t take payments.</p>
     <h2>What we don&apos;t do</h2>
     <ul>
       <li>No advertising and no third-party ad trackers.</li>
