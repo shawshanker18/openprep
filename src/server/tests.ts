@@ -123,19 +123,20 @@ async function submitModuleTx(tx: Tx, userId: string, sessionId: string, moduleI
 
   const cfg = s.config as Config;
   const section = m.section as Section;
-  let next: { section: Section; route: "base" | "hard" | "easy" } | null = null;
+  // Candidate next modules in order: routed module 2 of this section, then module 1 of the next section.
+  // A candidate with no questions left (thin bank) is skipped rather than ending the whole test.
+  const next: { section: Section; route: "base" | "hard" | "easy" }[] = [];
   if (cfg.adaptive && m.route === "base") {
     const its = await moduleItems(tx, m.id);
     const correct = its.filter((i) => i.item.response !== null && grade(i.q, i.item.response)).length;
-    next = { section, route: routeFor(section, correct, its.length) };
-  } else if (cfg.adaptive) {
-    const i = cfg.sections.indexOf(section);
-    if (i >= 0 && i + 1 < cfg.sections.length) next = { section: cfg.sections[i + 1]!, route: "base" };
+    next.push({ section, route: routeFor(section, correct, its.length) });
   }
-  if (next) {
-    const bp = moduleBlueprint(next.section, next.route, cfg.timed);
-    const qs = assembleModule(bp, await pool(tx, userId, eq(questions.section, next.section)), await usedIds(tx, sessionId), Math.random);
-    if (qs.length) { await insertModule(tx, sessionId, m.idx + 1, next.section, next.route, bp.timeLimitS, qs); return; }
+  const si = cfg.sections.indexOf(section);
+  if (cfg.adaptive && si >= 0 && si + 1 < cfg.sections.length) next.push({ section: cfg.sections[si + 1]!, route: "base" });
+  for (const n of next) {
+    const bp = moduleBlueprint(n.section, n.route, cfg.timed);
+    const qs = assembleModule(bp, await pool(tx, userId, eq(questions.section, n.section)), await usedIds(tx, sessionId), Math.random);
+    if (qs.length) { await insertModule(tx, sessionId, m.idx + 1, n.section, n.route, bp.timeLimitS, qs); return; }
   }
   await finishSession(tx, userId, s, now);
 }
@@ -184,7 +185,7 @@ export async function getTestState(userId: string, sessionId: string) {
       return {
         kind: "module" as const, session: { id: s.id, kind: s.kind },
         module: { id: cur.id, idx: cur.idx, section: cur.section, route: cur.route, timeLimitS: cur.timeLimitS,
-          startedAt: cur.startedAt?.toISOString() ?? null, deadlineAt: cur.deadlineAt?.toISOString() ?? null, total: mods.length },
+          startedAt: cur.startedAt?.toISOString() ?? null, deadlineAt: cur.deadlineAt?.toISOString() ?? null, adaptive: (s.config as Config).adaptive },
         breakBefore: s.kind === "full" && !cur.startedAt && prev?.section === "rw" && cur.section === "math",
         items: items.map(({ item, q }) => ({ position: item.position, question: toPublic(q), response: item.response, flagged: item.flagged })),
         serverNow: now.toISOString(),
