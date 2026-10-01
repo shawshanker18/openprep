@@ -70,9 +70,16 @@ export async function submitSelfAssessment(input: z.input<typeof Ratings>): Prom
   return { ok: true, data: undefined };
 }
 
+export async function skipDiagnostic() {
+  const { userId, profile } = await requireUser();
+  if (profile.onboardingStep === "diagnostic")
+    await db.update(profiles).set({ onboardingStep: "diagnostic_skipped" }).where(eq(profiles.id, userId));
+  redirect("/dashboard");
+}
+
 export async function beginDiagnostic() {
   const { userId, profile } = await requireUser();
-  if (profile.onboardingStep !== "diagnostic") redirect("/onboarding");
+  if (profile.onboardingStep !== "diagnostic" && profile.onboardingStep !== "diagnostic_skipped") redirect("/onboarding");
   const id = await startDiagnostic(userId);
   redirect(`/test/${id}`);
 }

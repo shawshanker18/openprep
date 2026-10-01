@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { PlanBlocks } from "@/components/plan-blocks";
 import { DOMAINS, SKILL_BY_ID } from "@/content/taxonomy";
-import { requireUser } from "@/server/auth";
+import { DiagnosticGate } from "@/components/diagnostic-gate";
+import { diagnosticPending, requireUser } from "@/server/auth";
 import { getDashboard } from "@/server/daily";
 
 export default async function PlanPage() {
   const { userId, profile } = await requireUser();
+  if (diagnosticPending(profile)) return <DiagnosticGate />;
   const d = await getDashboard(userId, profile);
   return (
     <div className="flex max-w-2xl flex-col gap-8">

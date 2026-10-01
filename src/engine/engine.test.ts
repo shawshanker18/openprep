@@ -281,3 +281,13 @@ describe("misc", () => {
   it("sigma shrinks with evidence", () => expect(sigma(20)).toBeLessThan(sigma(0)));
   it("every domain id in DOMAIN_ORDER exists", () => DOMAIN_ORDER.forEach((d) => expect(DOMAINS[d as DomainId]).toBeDefined()));
 });
+
+describe("readyBy", () => {
+  const now = new Date("2026-10-01T00:00:00Z");
+  it("already at target → just the buffer; 45 min × 5 days for +300 → about 22 weeks", async () => {
+    const { readyBy } = await import("./plan");
+    expect(readyBy({ estimate: 1400, target: 1400, minutesPerDay: 45, daysPerWeek: 5, now })!.weeks).toBe(2);
+    expect(readyBy({ estimate: 1100, target: 1400, minutesPerDay: 45, daysPerWeek: 5, now })!.weeks).toBe(22);
+    expect(readyBy({ estimate: 400, target: 1600, minutesPerDay: 15, daysPerWeek: 3, now })).toBeNull(); // > 2 years
+  });
+});

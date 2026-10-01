@@ -2,7 +2,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { SKILLS } from "@/content/taxonomy";
 import type { TestResult } from "@/engine/score";
-import { requireUser } from "@/server/auth";
+import { DiagnosticGate } from "@/components/diagnostic-gate";
+import { diagnosticPending, requireUser } from "@/server/auth";
 import { skillsWithQuestions } from "@/server/plan";
 import { listTests } from "@/server/tests";
 import { abandon } from "@/app/test/[sessionId]/actions";
@@ -25,7 +26,8 @@ function StartCard({ title, time, children, fields }: { title: string; time: str
 
 export default async function TestsPage({ searchParams }: PageProps<"/tests">) {
   const sp = await searchParams;
-  const { userId } = await requireUser();
+  const { userId, profile } = await requireUser();
+  if (diagnosticPending(profile)) return <DiagnosticGate />;
   const [history, available] = await Promise.all([listTests(userId), skillsWithQuestions()]);
   const open = history.filter((t) => t.status === "in_progress" && t.kind !== "diagnostic");
   const skills = SKILLS.filter((s) => available.has(s.id));

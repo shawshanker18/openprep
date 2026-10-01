@@ -23,4 +23,7 @@ export const requireUser = cache(async () => {
   return { userId, profile: profile! };
 });
 
+/** True while the student has skipped the diagnostic: practice, tests and the plan stay locked. */
+export const diagnosticPending = (p: { onboardingStep: string }) => p.onboardingStep === "diagnostic_skipped";
+
 export type ActionResult<T = undefined> = { ok: true; data: T } | { ok: false; error: string };
