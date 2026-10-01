@@ -28,7 +28,7 @@ await db.transaction(async (tx) => {
           .map((c) => [c.replace(/_([a-z])/g, (_, x: string) => x.toUpperCase()), sql.raw(`excluded.${c}`)]),
       ),
     }).returning({ isNew: sql<boolean>`(xmax = 0)` });
-    for (const r of res) r.isNew ? inserted++ : updated++;
+    for (const r of res) if (r.isNew) inserted++; else updated++;
   }
   const ids = rows.map((r) => r.id);
   const gone = await tx.update(questions).set({ status: "retired" })
