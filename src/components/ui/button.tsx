@@ -1,3 +1,4 @@
+import * as React from "react"
 import { Button as ButtonPrimitive } from "@base-ui/react/button"
 import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "cn"
@@ -45,6 +46,11 @@ function Button({
   size = "default",
   ...props
 }: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
+  // render={<Link />}: style the link as a button but keep real link semantics (no role="button").
+  if (React.isValidElement(props.render)) {
+    const { render, ...rest } = props as { render: React.ReactElement<Record<string, unknown>> } & Record<string, unknown>;
+    return React.cloneElement(render, { ...rest, "data-slot": "button", className: cn(buttonVariants({ variant, size, className })) });
+  }
   return (
     <ButtonPrimitive
       data-slot="button"
