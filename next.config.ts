@@ -1,7 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Lessons are read from disk at request time; make sure they ship with the server bundle.
+  outputFileTracingIncludes: {
+    "/skills/*": ["./content/lessons/**/*.md"],
+    "/desmos/*": ["./content/desmos/**/*.md"],
+  },
 };
 
 export default nextConfig;
