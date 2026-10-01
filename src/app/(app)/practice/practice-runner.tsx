@@ -10,6 +10,7 @@ import { QuestionView } from "@/components/question-view";
 import { MISTAKE_LABEL, MISTAKE_TYPES, type MistakeType } from "@/engine/mistakes";
 import { cn } from "@/lib/utils";
 import type { PublicQuestion, RevealedQuestion } from "@/server/questions";
+import { setBlockDone } from "../plan/actions";
 import { nextQuestion, reportQuestion, setMistakeType, submitAnswer, toggleBookmark } from "./actions";
 
 type Mode = "skill" | "smart" | "review";
@@ -40,8 +41,8 @@ function reducer(s: State, a: Action): State {
 const elapsedMs = (since: number, hidden: number) => Math.round(performance.now() - since - hidden);
 const CONFIDENCE = [{ v: 1, label: "Guessed" }, { v: 2, label: "Unsure" }, { v: 3, label: "Sure" }] as const;
 
-export function PracticeRunner({ mode, skillId, difficulty, title }: {
-  mode: Mode; skillId?: string; difficulty?: 1 | 2 | 3; title: string;
+export function PracticeRunner({ mode, skillId, difficulty, title, block }: {
+  mode: Mode; skillId?: string; difficulty?: 1 | 2 | 3; title: string; block?: { index: number; target: number } | null;
 }) {
   const [s, dispatch] = useReducer(reducer, { phase: "loading", seen: [], answered: 0 });
   const [pending, start] = useTransition();
@@ -57,6 +58,13 @@ export function PracticeRunner({ mode, skillId, difficulty, title }: {
   }), [mode, skillId, difficulty]);
 
   useEffect(() => { if (s.phase === "loading") load(s.seen); }, [s.phase, s.seen, load]);
+
+  // Today's plan block is done once enough questions are answered.
+  useEffect(() => {
+    if (block && s.answered === block.target) {
+      setBlockDone(block.index, true).then(() => toast.success("Plan block complete — keep going or head back to your dashboard."));
+    }
+  }, [block, s.answered]);
 
   // Pause the silent timer while the tab is hidden.
   useEffect(() => {
@@ -115,7 +123,7 @@ export function PracticeRunner({ mode, skillId, difficulty, title }: {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between gap-2 text-sm text-muted-foreground">
-        <span>{title} · {s.answered} answered</span>
+        <span>{title} · {s.answered} answered{block && s.answered < block.target && ` · ${block.target - s.answered} to finish this block`}</span>
         <div className="flex gap-1">
           <Button variant="ghost" size="sm" aria-label="Bookmark" onClick={async () => {
             const res = await toggleBookmark({ questionId: s.q.id });

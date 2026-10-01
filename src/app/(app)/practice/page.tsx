@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
 import { SKILL_BY_ID } from "@/content/taxonomy";
+import { requireUser } from "@/server/auth";
+import { getTodayBlock } from "@/server/daily";
 import { PracticeRunner } from "./practice-runner";
 
 export default async function PracticePage({ searchParams }: PageProps<"/practice">) {
@@ -9,6 +11,9 @@ export default async function PracticePage({ searchParams }: PageProps<"/practic
   const difficulty = d === 1 || d === 2 || d === 3 ? d : undefined;
   if (skillId && !SKILL_BY_ID[skillId]) notFound();
   const mode = sp.mode === "review" ? "review" : skillId ? "skill" : "smart";
+  const { userId, profile } = await requireUser();
+  const bi = Number(sp.block);
+  const block = Number.isInteger(bi) && bi >= 0 ? await getTodayBlock(userId, profile, bi) : null;
   const title = mode === "review" ? "Review" : skillId ? SKILL_BY_ID[skillId]!.name : "Smart practice";
-  return <PracticeRunner key={`${mode}-${skillId}-${difficulty}`} mode={mode} skillId={skillId} difficulty={difficulty} title={title} />;
+  return <PracticeRunner key={`${mode}-${skillId}-${difficulty}`} mode={mode} skillId={skillId} difficulty={difficulty} title={title} block={block} />;
 }

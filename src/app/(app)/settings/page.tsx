@@ -1,0 +1,87 @@
+import { eq } from "drizzle-orm";
+import { Button } from "@/components/ui/button";
+import { db } from "@/db";
+import { satAttempts } from "@/db/schema";
+import { requireUser } from "@/server/auth";
+import { signOut } from "@/app/auth/actions";
+import { addOfficialScore, deleteAccount, removeOfficialScore, retakeDiagnostic, updateSettings } from "./actions";
+
+const control = "h-9 rounded-md border bg-background px-2 text-sm";
+const ERRORS: Record<string, string> = {
+  settings: "Please check your settings and try again.",
+  score: "Scores must be 200–800 in steps of 10, with a date.",
+  retake: "You can retake the diagnostic once every 30 days.",
+  delete: "Type DELETE in capitals to confirm.",
+};
+
+export default async function SettingsPage({ searchParams }: PageProps<"/settings">) {
+  const sp = await searchParams;
+  const { userId, profile } = await requireUser();
+  const scores = await db.select().from(satAttempts).where(eq(satAttempts.userId, userId)).orderBy(satAttempts.takenOn);
+
+  return (
+    <div className="flex max-w-xl flex-col gap-10">
+      <h1 className="text-2xl font-semibold">Settings</h1>
+      {typeof sp.error === "string" && ERRORS[sp.error] && <p role="alert" className="rounded-md border border-destructive p-3 text-sm text-destructive">{ERRORS[sp.error]}</p>}
+      {sp.saved && <p role="status" className="rounded-md border p-3 text-sm">Saved.</p>}
+
+      <form action={updateSettings} className="flex flex-col gap-4">
+        <h2 className="font-medium">Goal and schedule</h2>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <label className="flex flex-col gap-1 text-sm">Target score
+            <input name="targetScore" type="number" min={400} max={1600} step={10} defaultValue={profile.targetScore ?? 1400} className={control} /></label>
+          <label className="flex flex-col gap-1 text-sm">Test date
+            <input name="testDate" type="date" defaultValue={profile.testDate ?? ""} className={control} /></label>
+          <label className="flex flex-col gap-1 text-sm">Minutes per day
+            <select name="minutesPerDay" defaultValue={profile.minutesPerDay} className={control}>
+              {[15, 30, 45, 60, 90, 120].map((m) => <option key={m} value={m}>{m} minutes</option>)}
+            </select></label>
+          <label className="flex flex-col gap-1 text-sm">Days per week
+            <select name="daysPerWeek" defaultValue={profile.daysPerWeek} className={control}>
+              {[3, 4, 5, 6, 7].map((d) => <option key={d} value={d}>{d} days</option>)}
+            </select></label>
+        </div>
+        <p className="text-xs text-muted-foreground">Changes apply from tomorrow&apos;s plan — today&apos;s stays as it is.</p>
+        <Button type="submit" className="self-start">Save</Button>
+      </form>
+
+      <section className="flex flex-col gap-3">
+        <h2 className="font-medium">Official SAT scores</h2>
+        {scores.length ? (
+          <ul className="flex flex-col gap-1 text-sm">
+            {scores.map((s) => (
+              <li key={s.id} className="flex items-center justify-between gap-2">
+                <span className="tabular-nums">{s.takenOn} · Math {s.math} · R&amp;W {s.rw} · Total {s.math + s.rw}</span>
+                <form action={removeOfficialScore.bind(null, s.id)}><Button size="sm" variant="ghost" type="submit">Remove</Button></form>
+              </li>
+            ))}
+          </ul>
+        ) : <p className="text-sm text-muted-foreground">None yet.</p>}
+        <form action={addOfficialScore} className="flex flex-wrap items-end gap-2">
+          <label className="flex flex-col gap-1 text-sm">Date<input name="takenOn" type="date" required className={control} /></label>
+          <label className="flex flex-col gap-1 text-sm">Math<input name="math" type="number" min={200} max={800} step={10} required className={`${control} w-24`} /></label>
+          <label className="flex flex-col gap-1 text-sm">R&amp;W<input name="rw" type="number" min={200} max={800} step={10} required className={`${control} w-24`} /></label>
+          <Button type="submit" variant="outline">Add</Button>
+        </form>
+      </section>
+
+      <section className="flex flex-col gap-2">
+        <h2 className="font-medium">Diagnostic</h2>
+        <p className="text-sm text-muted-foreground">Retaking adds new evidence to your profile; it doesn&apos;t reset anything. Once every 30 days.</p>
+        <form action={retakeDiagnostic}><Button type="submit" variant="outline">Retake the diagnostic</Button></form>
+      </section>
+
+      <section className="flex flex-col gap-2">
+        <h2 className="font-medium">Account</h2>
+        <form action={signOut}><Button type="submit" variant="outline">Sign out</Button></form>
+        <form action={deleteAccount} className="mt-4 flex flex-col gap-2 rounded-lg border border-destructive/40 p-4">
+          <h3 className="text-sm font-medium">Delete my account</h3>
+          <p className="text-sm text-muted-foreground">Permanently deletes your account and all your answers, scores and plans. This can&apos;t be undone.</p>
+          <label className="flex flex-col gap-1 text-sm">Type DELETE to confirm
+            <input name="confirm" autoComplete="off" required className={`${control} w-40`} /></label>
+          <Button type="submit" variant="destructive" className="self-start">Delete account</Button>
+        </form>
+      </section>
+    </div>
+  );
+}
