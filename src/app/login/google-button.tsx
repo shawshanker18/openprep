@@ -45,7 +45,7 @@ export function GoogleButton({ enabled }: { enabled: boolean }) {
           router.refresh();
         },
       });
-      g.renderButton(el.current, { theme: "outline", size: "large", text: "continue_with", shape: "rectangular", width: 320 });
+      g.renderButton(el.current, { theme: "outline", size: "large", text: "continue_with", shape: "rectangular", width: 320, locale: "en" });
     };
     if (window.google?.accounts?.id) void render();
     else {
