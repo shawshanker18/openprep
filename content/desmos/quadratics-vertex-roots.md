@@ -1,5 +1,5 @@
 ---
-title: Quadratics — vertex and roots
+title: Vertex and roots of a quadratic
 order: 4
 expressions: ["y=-2x^2+8x-6"]
 ---

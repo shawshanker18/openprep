@@ -29,6 +29,16 @@ Run `npm run content:validate` before opening a PR.
 | `tags` | 3–8 kebab-case sub-skill tags per skill; keep the vocabulary consistent with the lesson's frontmatter. |
 | `version` | Bump when the answer or meaning changes (invalidates cached AI explanations). Typos don't need a bump. |
 
+## Voice: write like a tutor sitting next to the student
+
+Explanations are where students learn, so they must read like a patient person explaining, not like an answer key.
+
+- **Start with what to notice**: the idea or clue that unlocks the question ("The goal is to get $x$ by itself...", "Look at the word Yet...").
+- **Give each step with its reason.** "Add $9$ to both sides" becomes "First undo the subtraction by adding $9$ to both sides."
+- **End with a check or a takeaway** the student can reuse ("Whenever you see infinitely many solutions, think both sides are identical.").
+- **Wrong answer notes speak to the student**: name the slip they probably made and the fix ("You subtracted $9$ instead of adding it. To undo a subtraction, add.").
+- Plain, warm sentences. Short paragraphs (blank line between them). No dashes used as punctuation (no "—", "–" or " - " outside math), no filler, no praise padding. `content:validate` does not check tone, so reviewers must.
+
 **Markdown:** `$…$` for inline math, `$$…$$` for display math. Write a literal dollar sign as `\$` (in JSON: `"\\$5"`),
 otherwise it is parsed as math. No raw HTML.
 
@@ -60,7 +70,7 @@ Rules:
 - Math: all numbers must work out exactly; vary which letter is correct.
 - R&W: write a fresh 25–150 word passage per question; vary subject area
   (science, history/social studies, humanities, literature).
-- "explanation" shows the by-hand method step by step.
+- "explanation" teaches like a tutor: what to notice first, each step with its reason, then a check or takeaway. No dashes as punctuation.
 - Add "desmos" only when graphing is genuinely a faster route.
 - Write literal dollar signs as \$.
 ```

@@ -62,4 +62,4 @@ Desmos regressions answer "which equation fits the data?" directly:
 - **Exponential fit:** type $y_1 \sim a \cdot b^{x_1}$ and read $a$ and $b$. If $b$ is close to $3$, the data triples each step.
 - **Predictions and residuals:** after a regression, type the model with your $x$-value, such as $2.5(16) + 8$, and subtract from the actual value.
 
-Algebra is faster for single predictions from a given equation — it is one substitution. For model-type questions with a short table, dividing consecutive $y$-values takes seconds and needs no typing.
+Algebra is faster for single predictions from a given equation, since it is one substitution. For model-type questions with a short table, dividing consecutive $y$-values takes seconds and needs no typing.

@@ -10,4 +10,4 @@ When a question gives a table of values, Desmos can find the equation that fits 
 - Type `~` (tilde) for a regression. Use $a \cdot b^{x_1}$ for exponential data or $a x_1^2 + b x_1 + c$ for quadratic data.
 - You can also add a table from the **+** menu and type the values in.
 
-**On the test:** "which equation models the data in the table?" — run the regression and match the coefficients to the choices.
+**On the test:** "which equation models the data in the table?" Run the regression and match the coefficients to the choices.

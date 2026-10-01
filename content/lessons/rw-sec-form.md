@@ -76,4 +76,4 @@ Desmos is not used for Reading and Writing questions. The fastest approach is:
 4. **Modifier:** ask "who or what is doing this?" and pick the choice that puts it right after the comma.
 5. **Pronoun / possessive:** find the noun it refers to; decide singular or plural, then possession or not.
 
-Most of these take 30–45 seconds once you know which rule is being tested.
+Most of these take 30 to 45 seconds once you know which rule is being tested.

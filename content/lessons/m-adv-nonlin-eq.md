@@ -12,7 +12,7 @@ Nonlinear equations are equations where the variable is squared, under a root, i
 - A quadratic equation can have zero, one, or two real solutions. Graphically, these are the places where the parabola crosses the $x$-axis.
 - If a product equals zero, at least one factor equals zero. This is why factoring works: $(x - a)(x - b) = 0$ means $x = a$ or $x = b$.
 - The **discriminant** $b^2 - 4ac$ tells you how many real solutions there are without solving.
-- Squaring both sides of an equation can create **extraneous solutions** — values that solve the squared equation but not the original. Always check them.
+- Squaring both sides of an equation can create **extraneous solutions**: values that solve the squared equation but not the original. Always check them.
 - Solving a system of a line and a parabola means setting the two expressions equal. The number of intersection points equals the number of solutions.
 
 ## Formulas and rules
@@ -57,7 +57,7 @@ Check: $x^2 - 8x + 16 = (x - 4)^2$, which is zero only at $x = 4$. One solution,
 - **Forgetting the negative root.** $x^2 = 25$ has two solutions, $5$ and $-5$, unless the question restricts $x$.
 - **Not checking radical equations.** After squaring $\sqrt{x + 7} = x - 5$, you get $x = 2$ and $x = 9$, but only $9$ works.
 - **Answering the wrong quantity.** If the question asks for $y$, or for $k$, or for the *positive* solution, re-read before you bubble.
-- **Mixing up $b$ in the discriminant.** In $2x^2 - 4x + 5$, $b = -4$, so $b^2 = 16$ (positive) — and the discriminant is $16 - 40$, not $16 + 40$.
+- **Mixing up $b$ in the discriminant.** In $2x^2 - 4x + 5$, $b = -4$, so $b^2 = 16$ (positive), and the discriminant is $16 - 40$, not $16 + 40$.
 
 ## The fast way (and when to use Desmos)
 
@@ -67,4 +67,4 @@ Desmos is often the fastest route on this skill:
 - **Count solutions:** graph both sides as separate equations and count intersections.
 - **Find a constant:** replace the constant with a slider (type $c$ and click "add slider"), then drag until the graph does what the question describes, such as touching the $x$-axis exactly once.
 
-Use algebra instead when the numbers are clean and the factoring is obvious — it can be faster than typing. And when the answer choices are numbers, plugging them into the original equation is a quick check that also catches extraneous solutions.
+Use algebra instead when the numbers are clean and the factoring is obvious, since that can be faster than typing. And when the answer choices are numbers, plugging them into the original equation is a quick check that also catches extraneous solutions.

@@ -38,7 +38,7 @@ B) Similarly,
 C) Specifically,
 D) Instead,
 
-Relationship: the second sentence describes a particular adaptation that helps with the cold air just mentioned — a specific detail.
+Relationship: the second sentence describes a particular adaptation that helps with the cold air just mentioned, so it is a specific detail.
 
 1. A (contrast): the sentences don't disagree.
 2. B (addition): the second sentence isn't a separate, similar fact; it explains how the leopards cope with the first one.
@@ -54,7 +54,7 @@ B) Similarly,
 C) For instance,
 D) Even so,
 
-1. Sentence 2 raises a concern; sentence 3 keeps the glass anyway. That is "despite the concern" — a **concession**.
+1. Sentence 2 raises a concern; sentence 3 keeps the glass anyway. That is "despite the concern," which is a **concession**.
 2. A (cause): the worry didn't *cause* keeping the glass.
 3. B (addition): keeping the glass is not similar to the worry.
 4. C (example): sentence 3 isn't an example of the worry.
@@ -74,6 +74,6 @@ Desmos is not used for Reading and Writing questions. The fastest approach is:
 
 1. Cover the choices. Read the text and say the relationship in plain words.
 2. Name the category from the table above.
-3. Pick the choice in that category. If two choices share a category, re-check — the answer usually stands alone.
+3. Pick the choice in that category. If two choices share a category, check again, because the answer usually stands alone.
 
-Transitions are among the fastest R&W questions: aim for 30–45 seconds each, and bank the time for inference and cross-text questions.
+Transitions are among the fastest R&W questions: aim for 30 to 45 seconds each, and bank the time for inference and cross-text questions.

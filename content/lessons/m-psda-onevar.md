@@ -61,7 +61,7 @@ Check: the frequencies add to $4 + 7 + 5 + 3 + 1 = 20$. The mean exceeds the med
 - **Averaging the values column in a table.** The mean is not $\frac{0 + 1 + 2 + 3 + 4}{5} = 2$; each value must be weighted by its frequency.
 - **Forgetting to sort** before finding the median.
 - **Averaging two averages.** When groups have different sizes, the combined mean is not the midpoint of the two means; use totals.
-- **Assuming the median changes when an extreme value changes.** Making the largest value larger, or the smallest value smaller, leaves the median of an odd-sized list unchanged — but it does increase the range and the standard deviation.
+- **Assuming the median changes when an extreme value changes.** Making the largest value larger, or the smallest value smaller, leaves the median of an odd sized list unchanged. It does, however, increase the range and the standard deviation.
 - **Confusing spread with center.** The lists $40, 45, 50, 55, 60$ and $48, 49, 50, 51, 52$ have the same mean and median, but the first has a much larger standard deviation.
 
 ## The fast way (and when to use Desmos)
@@ -72,4 +72,4 @@ Desmos does list statistics in one line:
 - **Frequency tables:** type the values and frequencies as two lists, $V = [0, 1, 2, 3, 4]$ and $F = [4, 7, 5, 3, 1]$, then $\operatorname{total}(V \cdot F) / \operatorname{total}(F)$ gives the mean, $1.5$.
 - **Outlier questions:** delete the outlier from the list and watch which measure changes.
 
-Use reasoning instead for "which must be true" questions about spread and outliers — they rarely need a calculation. For a missing value with a known mean, totals are fastest: if $6$ numbers average $15$, they sum to $90$; subtract the known ones.
+Use reasoning instead for "which must be true" questions about spread and outliers, because they rarely need a calculation. For a missing value with a known mean, totals are fastest: if $6$ numbers average $15$, they sum to $90$; subtract the known ones.

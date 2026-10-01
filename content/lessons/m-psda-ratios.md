@@ -63,4 +63,4 @@ This skill is mostly arithmetic, so the fastest tool is a clean setup:
 - **Chain conversions in one line:** type the whole product into Desmos, such as $\frac{6}{15} \cdot 60 \cdot 60 \cdot 24 \div 1000$, and read $34.56$. No rounding along the way.
 - **Ratio change problems:** for "red to blue is $7 : 4$, and after adding $6$ blue it becomes $7 : 5$," let red $= 7k$ and blue $= 4k$, then solve $\frac{7k}{4k + 6} = \frac{7}{5}$. In Desmos, graph $y = \frac{7x}{4x + 6}$ and $y = \frac{7}{5}$ and click the intersection ($x = k = 6$, so there are $42$ red).
 
-Use mental math for simple unit rates and scales — they are one multiplication. Write units on every number; if the units in your answer do not match the question, the setup is wrong.
+Use mental math for simple unit rates and scales, since they are just one multiplication. Write units on every number; if the units in your answer do not match the question, the setup is wrong.

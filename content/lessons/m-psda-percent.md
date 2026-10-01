@@ -11,7 +11,7 @@ Percent means "per hundred." The SAT tests four kinds of percent questions: find
 
 - Convert a percent to a decimal by dividing by $100$: 35% is $0.35$.
 - Increasing by 20% is multiplying by $1.20$. Decreasing by 20% is multiplying by $0.80$. Think in **multipliers**, not in "add the percent."
-- Successive changes multiply: a 20% increase then a 25% decrease is $1.20 \times 0.75 = 0.90$, a 10% net decrease — not a 5% decrease.
+- Successive changes multiply: a 20% increase then a 25% decrease is $1.20 \times 0.75 = 0.90$, a 10% net decrease, not a 5% decrease.
 - Percent change always uses the **original** value as the base.
 - To undo a change, **divide** by the multiplier. If a price after a 15% discount is \$68, the original is $68 \div 0.85 = 80$, so \$80.
 - In mixture questions, the amount of the ingredient (salt, juice) stays fixed when only water is added.
@@ -49,7 +49,7 @@ Check forward: $45 \times 1.6 = 72$ (marked price), and $72 \times 0.75 = 54$. C
 - **Adding or subtracting percents.** A 60% markup then a 25% discount is not a 35% increase; using $1.35$ gives \$40, which is wrong.
 - **Taking the percent of the new value when undoing a change.** If \$68 is after a 15% discount, adding 15% of \$68 gives \$78.20, not the correct \$80.
 - **Using the wrong base for percent change.** From \$80 to \$100 is a $\frac{20}{80} = 0.25$, or 25%, increase. Dividing by $100$ gives 20%, a trap answer.
-- **Answering the complement.** If $18$ of $48$ students are in a club, 37.5% are in it and 62.5% are *not* — read which one the question wants.
+- **Answering the complement.** If $18$ of $48$ students are in a club, 37.5% are in it and 62.5% are *not*. Read carefully to see which one the question wants.
 - **Percent vs. percentage points.** Going from 40% to 50% is a 10-percentage-point increase but a 25% relative increase.
 
 ## The fast way (and when to use Desmos)

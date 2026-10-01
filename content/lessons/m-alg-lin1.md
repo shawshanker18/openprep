@@ -5,7 +5,7 @@ tags: [solving-equations, distributing, fractions, word-problems, solution-count
 ---
 ## What this skill is
 
-A linear equation in one variable has a single unknown, usually $x$, that is never squared, square-rooted, or in a denominator. You solve it by undoing operations until $x$ is alone. The SAT also asks you to build the equation from a short story, and to decide whether an equation has **one solution, no solution, or infinitely many solutions** — often with a missing constant you must find.
+A linear equation in one variable has a single unknown, usually $x$, that is never squared, square-rooted, or in a denominator. You solve it by undoing operations until $x$ is alone. The SAT also asks you to build the equation from a short story, and to decide whether an equation has **one solution, no solution, or infinitely many solutions**, often with a missing constant you must find.
 
 ## Key ideas
 
@@ -47,7 +47,7 @@ Check: $7(5) + 4 = 39$ and $3(5) + 24 = 39$. Correct.
 
 Check: with $k = -6$ the equation becomes $-2x - 3 = -2x + 3$, which simplifies to $-3 = 3$. That is never true, so there is no solution, as required.
 
-If the question had said *infinitely many* solutions, you would need the constants to match too — which is impossible here, so no value of $k$ would work.
+If the question had said *infinitely many* solutions, you would need the constants to match too. That is impossible here, so no value of $k$ would work.
 
 ## Common traps
 

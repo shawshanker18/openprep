@@ -49,14 +49,14 @@ Check: at $x = 6$, $y = 4 - 5 = -1$. The line passes through $(6, -1)$, as requi
 ## Common traps
 
 - **Reading the slope of $Ax + By = C$ as $\frac{A}{B}$.** The slope is $-\frac{A}{B}$; in $2x + 5y = 20$ it is $-\frac{2}{5}$.
-- **Half a negative reciprocal.** The perpendicular slope to $\frac{2}{5}$ is $-\frac{5}{2}$ — flip the fraction *and* change the sign.
+- **Half a negative reciprocal.** The perpendicular slope to $\frac{2}{5}$ is $-\frac{5}{2}$. Flip the fraction *and* change the sign.
 - **Swapping intercepts.** In $4x - 3y = 24$, the $y$-intercept is $\frac{24}{-3} = -8$, not $6$ (that is the $x$-intercept).
 - **Wrong axis in a context.** If $n$ is on the horizontal axis, the horizontal intercept is the value of $n$ when the other variable is $0$.
 - **Forgetting to find a constant first.** If a line $3x + ky = 21$ passes through a given point, plug the point in to get $k$ before computing anything else.
 
 ## The fast way (and when to use Desmos)
 
-Desmos graphs standard form directly — no rearranging needed:
+Desmos graphs standard form directly, with no rearranging needed:
 
 - **Intercepts:** type $6x - 3y = 12$ and click the grey dots on the axes.
 - **Is a point on the line?** Type the point, such as $(6, -1)$, and see whether it sits on the graph.

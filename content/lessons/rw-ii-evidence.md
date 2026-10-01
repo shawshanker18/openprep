@@ -77,7 +77,7 @@ D) Penn Street had 280 riders per day in 2021.
 
 ## The fast way (and when to use Desmos)
 
-Desmos is not used for Reading and Writing questions, including table and graph questions — the data comparisons are simple enough to do by eye. The fastest approach is:
+Desmos is not used for Reading and Writing questions, including table and graph questions. The data comparisons are simple enough to do by eye. The fastest approach is:
 
 1. Read the last sentence of the text to find the claim.
 2. Write a one-line prediction in your head.

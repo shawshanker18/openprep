@@ -59,7 +59,7 @@ Check: with the same base, a cone needs $3$ times the cylinder's height to hold 
 
 ## The fast way (and when to use Desmos)
 
-Most of these questions are one formula plus careful arithmetic, so a clear setup beats any tool. Write the formula, substitute, then simplify — and leave $\pi$ in until the end, since answers are often written as $k\pi$.
+Most of these questions are one formula plus careful arithmetic, so a clear setup beats any tool. Write the formula, substitute, then simplify. Leave $\pi$ in until the end, since answers are often written as $k\pi$.
 
 Desmos helps in two spots:
 

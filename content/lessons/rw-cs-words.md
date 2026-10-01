@@ -24,7 +24,7 @@ Words in Context questions give you a sentence or short text with a blank and as
 | "because," "since," "so," "thus" | be logically connected to the cause or effect |
 | "and," "also," "similarly" | match the tone of the nearby idea |
 
-Rule: **fill the blank with your own word first** — even a rough one like "quiet" or "not lasting." Then find the choice that means that.
+Rule: **fill the blank with your own word first**, even a rough one like "quiet" or "not lasting." Then find the choice that means that.
 
 ## Worked example 1 (easy)
 
@@ -53,7 +53,7 @@ D) ambitious
 1. The clue follows the comma: "nearly every melody seemed borrowed." Your own word: "copied."
 2. A, "chaotic," means disorderly; borrowing melodies is not disorder.
 3. C, "incomplete," is not supported; nothing is described as unfinished.
-4. D, "ambitious," is positive, but the reviewers "dismissed" the work — a negative judgment.
+4. D, "ambitious," is positive, but the reviewers "dismissed" the work, which is a negative judgment.
 5. **B**, "imitative," means copying others. It fits both the borrowing and the negative tone. Answer: B.
 
 The last sentence is a distraction: it describes later critics, not the early reviewers whose view the blank describes.
@@ -75,4 +75,4 @@ Desmos is not used for Reading and Writing questions. The fastest approach is:
 3. Eliminate choices that are the wrong direction (positive vs. negative) first.
 4. Among the rest, pick the one that matches your prediction most precisely.
 
-If you don't know a choice's meaning, judge the choices you *do* know. If all three known words are clearly wrong, the unknown word is the answer. These questions should take 45–60 seconds.
+If you don't know a choice's meaning, judge the choices you *do* know. If all three known words are clearly wrong, the unknown word is the answer. These questions should take 45 to 60 seconds.
