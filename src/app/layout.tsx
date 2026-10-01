@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "katex/dist/katex.min.css";
 import "./globals.css";
@@ -12,6 +12,14 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 export const metadata: Metadata = {
   title: "OpenPrep — free adaptive SAT prep",
   description: "Find where you are, practise what matters, and track your way to your target SAT score. Free and open source.",
+  applicationName: "OpenPrep",
+  appleWebApp: { capable: true, title: "OpenPrep", statusBarStyle: "default" },
+  icons: { icon: "/icon.svg", apple: "/apple-icon.png" },
+};
+
+export const viewport: Viewport = {
+  viewportFit: "cover",
+  themeColor: [{ media: "(prefers-color-scheme: light)", color: "#ffffff" }, { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" }],
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
