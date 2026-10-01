@@ -14,7 +14,7 @@ if (errors.length) {
   process.exit(1);
 }
 
-const client = postgres(process.env.MIGRATE_DATABASE_URL ?? process.env.DATABASE_URL!, { prepare: false, max: 1 });
+const client = postgres(process.env.MIGRATE_DATABASE_URL || process.env.DATABASE_URL!, { prepare: false, max: 1 });
 const db = drizzle(client);
 let inserted = 0, updated = 0, retired = 0;
 

@@ -10,9 +10,9 @@
     "lint": "eslint",
     "test": "vitest run",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate && tsx scripts/enable-rls.ts",
+    "db:migrate": "drizzle-kit migrate && tsx scripts/enable-rls.mts",
     "content:validate": "tsx scripts/content-validate.ts",
-    "content:seed": "tsx scripts/content-seed.ts",
+    "content:seed": "tsx scripts/content-seed.mts",
     "vercel-build": "npm run db:migrate && npm run content:seed && next build"
   },
   "dependencies": {
