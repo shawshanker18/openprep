@@ -1,8 +1,10 @@
 "use server";
 
+import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireUser } from "@/server/auth";
 import { answerDiagnostic as answer } from "@/server/diagnostic";
+import { abandonTest, saveResponse as save, startModule as start, submitModule as submit } from "@/server/tests";
 
 const Answer = z.object({
   sessionId: z.uuid(),
@@ -16,4 +18,33 @@ export async function answerDiagnostic(input: z.input<typeof Answer>) {
   const parsed = Answer.safeParse(input);
   if (!parsed.success) return { ok: false as const, error: "Invalid answer." };
   return answer(userId, parsed.data);
+}
+
+export async function startModule(moduleId: string) {
+  const { userId } = await requireUser();
+  if (!z.uuid().safeParse(moduleId).success) return false;
+  return start(userId, moduleId);
+}
+
+const Save = z.object({
+  moduleId: z.uuid(), position: z.number().int().min(0).max(100),
+  response: z.string().max(8).nullable(), flagged: z.boolean(), timeMsDelta: z.number().int().min(0).max(3_600_000),
+});
+export async function saveResponse(input: z.input<typeof Save>) {
+  const { userId } = await requireUser();
+  const p = Save.safeParse(input);
+  if (!p.success) return { ok: false as const, error: "Invalid answer." };
+  return save(userId, p.data);
+}
+
+export async function submitModule(moduleId: string) {
+  const { userId } = await requireUser();
+  if (!z.uuid().safeParse(moduleId).success) return false;
+  return submit(userId, moduleId);
+}
+
+export async function abandon(sessionId: string) {
+  const { userId } = await requireUser();
+  if (z.uuid().safeParse(sessionId).success) await abandonTest(userId, sessionId);
+  redirect("/tests");
 }

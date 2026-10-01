@@ -6,6 +6,8 @@ import { db } from "@/db";
 import { testSessions } from "@/db/schema";
 import { requireUser } from "@/server/auth";
 import { getSkillSummary, type SkillSummary } from "@/server/analytics";
+import { getTestResult } from "@/server/tests";
+import { TestResults } from "./test-results";
 
 const SELF = ["Don't know", "A little", "Know it", "Very confident"];
 
@@ -24,7 +26,7 @@ function SkillList({ title, skills }: { title: string; skills: SkillSummary[] })
   );
 }
 
-// Diagnostic "profile mode" (spec 04 §2). Phase F adds results for the other test kinds.
+// Diagnostic → starting-profile view (spec 04 §2); every other kind → test results (spec 04 §5.3).
 export default async function ResultsPage({ params }: PageProps<"/test/[sessionId]/results">) {
   const { sessionId } = await params;
   const { userId } = await requireUser();
@@ -32,6 +34,7 @@ export default async function ResultsPage({ params }: PageProps<"/test/[sessionI
   const [s] = await db.select().from(testSessions).where(and(eq(testSessions.id, sessionId), eq(testSessions.userId, userId)));
   if (!s) notFound();
   if (s.status === "in_progress") redirect(`/test/${sessionId}`);
+  if (s.kind !== "diagnostic") return <TestResults data={(await getTestResult(userId, sessionId))!} />;
 
   const { skills, estimate } = await getSkillSummary(userId);
   const measured = skills.filter((k) => k.status !== "unknown").sort((a, b) => b.mastery - a.mastery);
