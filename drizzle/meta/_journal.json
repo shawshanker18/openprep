@@ -36,6 +36,13 @@
       "when": 1790877142414,
       "tag": "0004_push_reminders",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1790883233975,
+      "tag": "0005_user_indexes",
+      "breakpoints": true
     }
   ]
 }

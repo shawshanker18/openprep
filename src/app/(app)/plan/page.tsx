@@ -29,7 +29,7 @@ export default async function PlanPage({ searchParams }: PageProps<"/plan">) {
           rearrange itself; tomorrow&apos;s reflects what you did today.
         </p>
       </div>
-      {typeof sp.error === "string" && ERRORS[sp.error] && <p role="alert" className="rounded-md border border-destructive p-3 text-sm text-destructive">{ERRORS[sp.error]}</p>}
+      {typeof sp.error === "string" && Object.hasOwn(ERRORS, sp.error) && <p role="alert" className="rounded-md border border-destructive p-3 text-sm text-destructive">{ERRORS[sp.error]}</p>}
       <section className="flex flex-col gap-2">
         <h2 className="font-medium">{custom ? "Your custom plan" : "Auto (recommended)"}</h2>
         {custom && (

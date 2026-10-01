@@ -34,7 +34,7 @@ export const satAttempts = pgTable("sat_attempts", {
   takenOn: date("taken_on").notNull(),
   math: smallint("math").notNull(),
   rw: smallint("rw").notNull(),
-});
+}, (t) => [index("sat_user").on(t.userId)]);
 
 /* ───────── content ───────── */
 export const questions = pgTable("questions", {
@@ -166,7 +166,7 @@ export const questionReports = pgTable("question_reports", {
   reason: text("reason").notNull(), // wrong_answer | unclear | typo | other
   note: text("note"),
   createdAt: ts("created_at").notNull().defaultNow(),
-});
+}, (t) => [index("qr_user_time").on(t.userId, t.createdAt)]);
 
 export const aiMessages = pgTable("ai_messages", {
   id: uuid("id").primaryKey().defaultRandom(),

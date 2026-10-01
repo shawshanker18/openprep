@@ -40,7 +40,7 @@ export default async function TestsPage({ searchParams }: PageProps<"/tests">) {
   return (
     <div className="flex flex-col gap-8">
       <h1 className="text-2xl font-semibold">Tests</h1>
-      {typeof sp.error === "string" && ERR[sp.error] && <p role="alert" className="rounded-md border border-destructive p-3 text-sm text-destructive">{ERR[sp.error]}</p>}
+      {typeof sp.error === "string" && Object.hasOwn(ERR, sp.error) && <p role="alert" className="rounded-md border border-destructive p-3 text-sm text-destructive">{ERR[sp.error]}</p>}
       {sp.resume && <p role="alert" className="rounded-md border p-3 text-sm">Finish or abandon your test in progress before starting another full or section test.</p>}
 
       {open.map((t) => (
