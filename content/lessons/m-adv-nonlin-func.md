@@ -63,4 +63,4 @@ Desmos is strong on this skill:
 - **When does an exponential reach a value?** Graph $y = 45000(0.8)^x$ and $y = 20000$, then click the intersection ($x \approx 3.63$). Round as the context requires.
 - **Evaluate:** define $f(x)$ once, then type $f(-1)$ to get the value.
 
-Use algebra when the quadratic is already in vertex or factored form — the answer is sitting in the expression. For "interpret the model" questions, Desmos cannot help: name what $a$ and $b$ mean in words, then match.
+Use algebra when the quadratic is already in vertex or factored form, because the answer is sitting right there in the expression. For "interpret the model" questions, Desmos cannot help: name what $a$ and $b$ mean in words, then match.

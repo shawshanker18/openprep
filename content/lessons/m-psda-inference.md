@@ -12,7 +12,7 @@ Inference means using a **sample** to say something about a whole **population**
 - A **random sample** represents the population it was drawn from. That is what lets you scale its results up.
 - To estimate a count in the population, multiply the sample proportion by the population size.
 - A sample result is an **estimate**. The **margin of error** gives a range of plausible values: estimate $\pm$ margin of error.
-- **Larger random samples** give smaller margins of error. Sample size does not fix bias, though — a large biased sample is still biased.
+- **Larger random samples** give smaller margins of error. Sample size does not fix bias, though. A large biased sample is still biased.
 - A confidence interval is about a **population parameter** (such as the mean or the percent), not about individual members.
 - If two intervals overlap, the data do not clearly show which population value is larger. If they do not overlap, there is convincing evidence of a difference.
 

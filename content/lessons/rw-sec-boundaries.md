@@ -79,4 +79,4 @@ Desmos is not used for Reading and Writing questions. The fastest approach is:
 4. Not both → usually a comma or nothing. Check for a nonessential element that needs a matching mark.
 5. Eliminate choices that are grammatically identical: if a period and a semicolon would both work, neither is the answer.
 
-Aim for 30–45 seconds per question.
+Aim for 30 to 45 seconds per question.

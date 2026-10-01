@@ -45,7 +45,7 @@ Check in the second: $2(5) - 3(2) = 10 - 6 = 4$. Correct. The solution is $(5, 2
 3. Apply it to the rest: $k = -9 \cdot \frac{2}{3} = -6$ and $c = 15 \cdot \frac{2}{3} = 10$.
 4. So $k + c = -6 + 10 = 4$.
 
-Check: $\frac{2}{3}(6x - 9y) = 4x - 6y$ and $\frac{2}{3}(15) = 10$, so the second equation is $4x - 6y = 10$ — the same line. Correct.
+Check: $\frac{2}{3}(6x - 9y) = 4x - 6y$ and $\frac{2}{3}(15) = 10$, so the second equation is $4x - 6y = 10$. That's the same line, so it checks out.
 
 ## Common traps
 
@@ -64,4 +64,4 @@ Desmos is often fastest here, especially with decimals:
 - **Solution count:** parallel lines mean no solution; one line drawn on top of the other means infinitely many.
 - **Unknown constant:** type $k$ as a letter, add a slider, and drag until the lines become parallel (no solution) or coincide (infinitely many).
 
-Use algebra when the coefficients already cancel, as in example 1 — adding the equations takes seconds. For constant-finding questions, the ratio table above is usually quicker than dragging a slider to an exact fraction.
+Use algebra when the coefficients already cancel, as in example 1, because adding the equations takes seconds. For constant-finding questions, the ratio table above is usually quicker than dragging a slider to an exact fraction.

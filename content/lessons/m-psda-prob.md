@@ -57,7 +57,7 @@ Check: $P(\text{cherry}) = \frac{9}{20}$, and $1 - \frac{9}{20} = \frac{11}{20}$
 2. Under 30 and online: $48$.
 3. Probability: $\frac{48}{75} = \frac{16}{25} = 0.64$.
 
-Compare: the probability that a customer under 30 shops online is $\frac{48}{80} = 0.6$. Same cell, different denominator — a favorite SAT trap.
+Compare: the probability that a customer under 30 shops online is $\frac{48}{80} = 0.6$. Same cell, different denominator. That is a favorite SAT trap.
 
 ## Common traps
 

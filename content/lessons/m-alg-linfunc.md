@@ -58,8 +58,8 @@ Check: $C(8) = 40 + 32 = 72$. Correct.
 
 Desmos helps when there are two functions or messy numbers:
 
-- **Evaluate:** type $f(x) = 7 - 2x$ on one line, then $f(-3)$ on the next — Desmos prints the value.
+- **Evaluate:** type $f(x) = 7 - 2x$ on one line, then $f(-3)$ on the next, and Desmos prints the value.
 - **Solve $f(x) = g(x)$:** define both functions and click the intersection of their graphs.
 - **Line from two points:** type $x_1 = [3, 8]$ and $y_1 = [47, 72]$, then $y_1 \sim m x_1 + b$. Desmos reports $m = 5$ and $b = 32$.
 
-Use algebra instead when the slope comes from two clean points — the slope formula and one substitution are faster than typing lists. For interpretation questions, Desmos cannot help: translate each number into words ("per session," "starting fee") and match.
+Use algebra instead when the slope comes from two clean points, because the slope formula and one substitution are faster than typing lists. For interpretation questions, Desmos cannot help: translate each number into words ("per session," "starting fee") and match.

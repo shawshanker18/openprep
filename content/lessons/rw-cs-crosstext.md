@@ -46,7 +46,7 @@ Connection: "Text 2 shows a cooling benefit Text 1 ignores."
 
 1. A contradicts Text 2, which shows a second benefit.
 2. C and D are not supported; Text 2 says nothing about attractiveness or visitors.
-3. **B** — Text 2 adds a benefit without denying Text 1's point. Answer: B.
+3. **B**: Text 2 adds a benefit without denying Text 1's point. Answer: B.
 
 ## Worked example 2 (SAT-level)
 
@@ -75,7 +75,7 @@ D) By arguing that office workers experience more stress than factory workers
 - **Too extreme.** "Reject entirely" when Text 2 only qualifies. Match the strength of Text 2's language.
 - **Answering from Text 1's perspective.** Re-read who is responding to whom.
 - **Agreeing on the topic, not the view.** Both texts discussing gardens doesn't mean both hold the same opinion about them.
-- **Responding to the wrong part.** Text 2 may accept Text 1's data but reject its conclusion — the answer must target the conclusion.
+- **Responding to the wrong part.** Text 2 may accept Text 1's data but reject its conclusion. The answer must target the conclusion.
 - **Using details only one text mentions** in a "both would agree" question.
 
 ## The fast way (and when to use Desmos)

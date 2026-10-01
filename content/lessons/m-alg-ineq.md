@@ -55,7 +55,7 @@ Check: $a = 5$ gives $4 \ge 2$ and $4 < 6$, both true. $a = 6$ gives $4 < 4$, wh
 
 ## The fast way (and when to use Desmos)
 
-For one-variable inequalities, algebra is fastest — two steps and a sign check. Desmos shines for systems:
+For one-variable inequalities, algebra is fastest: two steps and a sign check. Desmos shines for systems:
 
 - **Shade the system:** type each inequality, such as $y \ge x - 3$ and $y < -2x + 16$. The overlap is the solution region; dashed boundaries are excluded.
 - **Test answer choices:** type each point, like $(5, 4)$, and see whether it lands in the overlap.

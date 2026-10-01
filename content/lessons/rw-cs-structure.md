@@ -66,7 +66,7 @@ Labels: (1) old view, (2) "complicates" announced, (3) evidence, (4) revised con
 ## Common traps
 
 - **Describing content instead of purpose.** "To describe tax records" lists a topic; the purpose is what the author does with them.
-- **One wrong step in a structure answer.** If any part of the description is off — or out of order — eliminate it.
+- **One wrong step in a structure answer.** If any part of the description is off, or out of order, eliminate it.
 - **Too strong a verb.** "To argue" or "to criticize" when the author only explains or describes.
 - **Confusing the sentence with the text.** Sentence function asks about *one* sentence; don't pick the text's overall purpose.
 - **Literary purpose answers about plot details.** For a story excerpt, the purpose is usually what the scene reveals, not the actions themselves.
@@ -80,4 +80,4 @@ Desmos is not used for Reading and Writing questions. The fastest approach is:
 3. Check each choice word by word against your labels; one mismatch eliminates it.
 4. For purpose, check that the verb matches the author's tone (neutral explaining vs. arguing).
 
-Expect about 60–75 seconds per question.
+Expect about 60 to 75 seconds per question.

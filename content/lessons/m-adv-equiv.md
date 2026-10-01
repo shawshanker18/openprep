@@ -13,7 +13,7 @@ Two expressions are **equivalent** if they give the same value for every allowed
 - Factoring is expanding in reverse. For $ax^2 + bx + c$, find two numbers that multiply to $ac$ and add to $b$, then split the middle term.
 - If two polynomials are equal for all $x$, their matching coefficients are equal. This lets you solve for unknown constants.
 - Radicals are fractional exponents: $\sqrt[n]{x^m} = x^{m/n}$. Convert, then use exponent rules.
-- To simplify a rational expression, factor top and bottom and cancel common **factors** — never individual terms.
+- To simplify a rational expression, factor top and bottom and cancel common **factors**. Never cancel individual terms.
 
 ## Formulas and rules
 
@@ -65,4 +65,4 @@ Desmos is a reliable equivalence checker:
 - **Spot-check with a value:** in Desmos or by hand, evaluate the original and each choice at a test value like $x = 2$. Wrong choices almost always give different numbers. Avoid $x = 0$ and $x = 1$, where different powers can tie.
 - **Factors:** graph the polynomial and click its $x$-intercepts. An intercept at $x = \frac{4}{3}$ means $(3x - 4)$ is a factor.
 
-Use algebra when the rewrite is a single expansion or one exponent rule — that is faster than typing five expressions. Note that Desmos does not draw the "hole" where a canceled factor was zero, so read domain restrictions from the question.
+Use algebra when the rewrite is a single expansion or one exponent rule, because that is faster than typing five expressions. Note that Desmos does not draw the "hole" where a canceled factor was zero, so read domain restrictions from the question.

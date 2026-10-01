@@ -57,11 +57,11 @@ Check: $J$ and $L$ are complementary, so $\cos L = \sin J = \frac{8}{17}$. Corre
 
 ## The fast way (and when to use Desmos)
 
-Know the triples and special triangles cold — most questions are then a ten-second sketch. Desmos is useful for checking:
+Know the triples and special triangles by heart, and most questions become a quick ten second sketch. Desmos is useful for checking:
 
 - **Set the angle mode first.** Desmos uses radians by default; open the settings (wrench) and choose Degrees for degree questions.
 - **Check a ratio:** type $\cos(25)$ and $\sin(65)$ in degree mode and confirm they match, or compare a decimal like $\frac{8}{17} \approx 0.47$ against the choices.
 - **Radian values:** in radian mode, type $\sin\left(\frac{11\pi}{6}\right)$ and read $-0.5$.
 - **Unknown side with an angle:** compute directly: a $12$-foot ramp at $30^\circ$ rises $12\sin(30) = 6$ feet (degree mode).
 
-Use the special-triangle ratios instead of the calculator when the answer choices contain $\sqrt{2}$ or $\sqrt{3}$ — the decimals are harder to match than the exact forms.
+Use the special-triangle ratios instead of the calculator when the answer choices contain $\sqrt{2}$ or $\sqrt{3}$, because the decimals are harder to match than the exact forms.

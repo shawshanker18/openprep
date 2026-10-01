@@ -37,7 +37,7 @@ B) Some ancient engineers used planned testing rather than guesswork.
 C) Roman engineers built model arches from stone.
 D) Most ancient bridges collapsed within a century.
 
-Your summary: "Romans tested models first — not trial and error."
+Your summary: "Romans tested models first, not trial and error."
 
 1. A is off-topic: modern bridges are never mentioned.
 2. C is too narrow, and "from stone" is not stated.
@@ -79,4 +79,4 @@ Desmos is not used for Reading and Writing questions. The fastest approach is:
 3. For main idea, say a ten-word summary in your head. For detail, find the exact line.
 4. Eliminate choices that are too narrow, too broad, or unsupported. Between two survivors, pick the one you can prove line by line.
 
-Aim for about 60–75 seconds per question.
+Aim for about 60 to 75 seconds per question.

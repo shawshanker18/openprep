@@ -54,7 +54,7 @@ Check: the scale factor from the small triangle to the large one is $\frac{10}{6
 - **Using the piece instead of the whole side.** In example 2, comparing $PS$ to $SQ$ gives $\frac{9}{QR} = \frac{6}{4}$ and the wrong answer $6$.
 - **Mismatching corresponding sides.** Write the similarity in vertex order ($\triangle PST \sim \triangle PQR$) and read sides in the same order.
 - **Assuming same-side interior angles are equal.** They add to $180^\circ$; only alternate and corresponding angles are equal.
-- **Picking the wrong equal angles in an isosceles triangle.** The equal angles are opposite the equal sides — the angle *between* the equal sides is the different one.
+- **Picking the wrong equal angles in an isosceles triangle.** The equal angles are opposite the equal sides. The angle *between* the equal sides is the different one.
 - **Answering $x$ instead of the angle.** After solving for $x$, substitute back if the question asks for an angle measure.
 
 ## The fast way (and when to use Desmos)

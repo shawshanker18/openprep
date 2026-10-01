@@ -11,7 +11,7 @@ Rhetorical Synthesis questions show a bulleted list of a student's research note
 
 - **The goal is everything.** The notes are just a pool of facts; the goal tells you which facts matter.
 - Read the goal **before** the notes. Often you can answer without reading the notes closely.
-- All four choices are usually true. Don't eliminate for accuracy — eliminate for **not meeting the goal**.
+- All four choices are usually true. Don't eliminate for accuracy. Eliminate for **not meeting the goal**.
 - Watch each part of a multi-part goal: "explain how they differ *while also noting* what they have in common" needs both a difference and a similarity.
 - **Audience** matters. For an audience unfamiliar with a topic, the sentence should say what the thing *is*. For an audience that already knows it, a definition is unnecessary.
 
@@ -85,4 +85,4 @@ Desmos is not used for Reading and Writing questions. The fastest approach is:
 3. Check each choice against the checklist and eliminate any that miss a part.
 4. Glance at the notes only if two choices both seem to fit.
 
-Most synthesis questions take 30–45 seconds with this approach, even though the notes look long.
+Most synthesis questions take 30 to 45 seconds with this approach, even though the notes look long.

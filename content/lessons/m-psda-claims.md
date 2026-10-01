@@ -9,7 +9,7 @@ These questions describe a study and ask which conclusion it supports. Two desig
 
 ## Key ideas
 
-- **Random selection** from a population lets you generalize the results to that population — and only that one.
+- **Random selection** from a population lets you generalize the results to that population, and only that one.
 - **Random assignment** of treatments in an experiment lets you conclude cause and effect.
 - An **observational study** (no assigned treatment) can show an association, never causation. People who choose a behavior may differ in other ways.
 - **Sampling bias** happens when the method favors certain people: volunteers, people who visit one website, customers at one store, or only those easy to reach.
@@ -31,7 +31,7 @@ Comparing groups: subtract the percents or rates, and report the result in **per
 A researcher randomly selected $300$ members of a grocery chain's loyalty program and found that 62% prefer evening hours. To which group can this result be generalized?
 
 1. The sample was chosen at random, so it represents the group it was drawn from.
-2. That group is the **loyalty program members** of this chain — not all shoppers, and not all residents of the area.
+2. That group is the **loyalty program members** of this chain. Not all shoppers, and not all residents of the area.
 
 ## Worked example 2 (SAT-level)
 
@@ -53,7 +53,7 @@ The best choice says that standing desks likely reduce back pain for people simi
 
 ## The fast way (and when to use Desmos)
 
-Desmos is no help here — this skill is reasoning, not computing. The fast way is a two-question checklist for every study:
+Desmos is no help here, because this skill is about reasoning, not computing. The fast way is a two question checklist for every study:
 
 1. **Who was selected, and how?** If randomly from a population, the conclusion can apply to that population. Otherwise, only to the participants.
 2. **Were treatments randomly assigned?** If yes, causal language ("causes," "leads to," "is effective") is allowed. If no, only "is associated with."
