@@ -12,11 +12,11 @@
       "They would reject the argument because breakfast has no effect on concentration."
     ],
     "answer": "B",
-    "explanation": "Text 1 says eating breakfast helps concentration. Text 2 finds that high-sugar breakfasts didn't help but protein and whole-grain breakfasts did. So the Text 2 researchers would say Text 1's claim needs a qualification about what kind of breakfast, as Choice B states.",
+    "explanation": "With two texts, first sum up each one's position in a few words.\n\nText 1: eating breakfast helps students concentrate. Text 2: it depends on the breakfast. Sugary ones didn't help, while protein and whole grain ones helped most.\n\nSo the Text 2 researchers wouldn't call Text 1 wrong. They'd say it's missing something: only some kinds of breakfast help. That's choice B.",
     "rationales": {
-      "A": "Text 2 found that high-sugar breakfasts gave no benefit, so its researchers would not say any breakfast helps.",
-      "C": "Students who ate nothing did no better than the high-sugar group and worse than the protein group; nothing suggests skipping breakfast helps.",
-      "D": "Text 2 found that some breakfasts led to the best performance, so it doesn't say breakfast has no effect."
+      "A": "Text 2 found sugary breakfasts gave no benefit, so its researchers wouldn't say any breakfast helps.",
+      "C": "Students who ate nothing didn't do better than anyone. Nothing suggests skipping breakfast helps.",
+      "D": "Text 2 found that some breakfasts led to the best scores, so it doesn't say breakfast has no effect."
     },
     "tags": ["author-response", "science"]
   },
@@ -33,11 +33,11 @@
       "Shared meals are the most important benefit of community gardens."
     ],
     "answer": "C",
-    "explanation": "Text 1 highlights fresh food; Text 2 highlights social connection. Different benefits, but both authors present the gardens positively, so both would agree that the gardens benefit residents.",
+    "explanation": "For \"both would agree\" questions, find the common ground beneath the different details.\n\nText 1 praises community gardens for fresh food. Text 2 praises them for bringing neighbors together. Different benefits, but both writers think the gardens are good for city residents. That's choice C.\n\nThe wrong choices usually take a detail that only one text mentions, or that neither does.",
     "rationales": {
-      "A": "Neither text mentions teaching cooking skills.",
-      "B": "Both texts describe gardens positively, and Text 1 notes approvingly that cities have set aside land for them.",
-      "D": "Only Text 2 mentions shared meals, and even it doesn't rank them as the most important benefit."
+      "A": "Neither text mentions teaching cooking.",
+      "B": "Both texts are positive about gardens, and Text 1 approves of cities setting land aside.",
+      "D": "Only Text 2 mentions shared meals, and even it doesn't call them the most important benefit."
     },
     "tags": ["shared-view", "social-studies"]
   },
@@ -54,11 +54,11 @@
       "She would point out that students given assigned lists read the most pages."
     ],
     "answer": "A",
-    "explanation": "The teachers assign classics; the librarian found that students who choose their own books read more and argues for student choice. She would therefore favor choice over assigned classics, as Choice A says.",
+    "explanation": "Sum up each side. Teachers: assign classic novels to build reading skills. Librarian: students who choose their own books read far more, so choice is the best way to build reading habits.\n\nShe'd gently push back on the teachers' approach and suggest that letting students choose may do more. That's choice A.",
     "rationales": {
-      "B": "The librarian favors books students enjoy, not classics only.",
-      "C": "The librarian wants students to read more in the summer, not less.",
-      "D": "This reverses her finding: students who chose their own books read more pages."
+      "B": "The librarian supports books students enjoy, not only classics.",
+      "C": "She wants students reading more over the summer, not less.",
+      "D": "This flips her finding. Students who chose their own books read more pages."
     },
     "tags": ["author-response", "social-studies"]
   },
@@ -75,11 +75,11 @@
       "By suggesting that the view overstates the canal's role, since the town was already growing before the canal opened"
     ],
     "answer": "D",
-    "explanation": "Text 1 calls the canal the main cause of growth. Text 2 shows the town had already doubled before the canal and says the canal only sped up existing growth. That author would say the traditional view gives the canal too much credit.",
+    "explanation": "Text 1: the canal was the main reason the town grew. Text 2: the town had already doubled before the canal opened, thanks to a textile mill. The canal \"surely helped\" but only sped up growth that had already started.\n\nSo Text 2's author would say the traditional view gives the canal too much credit. Notice she doesn't deny the canal mattered; she just shrinks its role. That's choice D.",
     "rationales": {
-      "A": "Text 2 says the town doubled in the decade before the canal, which contradicts this.",
-      "B": "Text 2 says \"the canal surely helped,\" so it doesn't deny any effect.",
-      "C": "The mill drove growth before the canal opened, so it couldn't have been built because of the canal."
+      "A": "Text 2 says the town doubled in the ten years before the canal, so growth didn't start with it.",
+      "B": "Text 2 says \"the canal surely helped,\" so the author doesn't deny any effect.",
+      "C": "The mill was already driving growth before the canal opened, so it couldn't have been built because of the canal."
     },
     "tags": ["author-response", "social-studies"]
   },
@@ -96,11 +96,11 @@
       "By agreeing that relative brain size alone explains differences in birds' problem-solving ability"
     ],
     "answer": "B",
-    "explanation": "The team held brain size roughly equal and still found differences linked to foraging habits, concluding that habits \"may matter as much as\" brain size. That adds a factor without dismissing brain size, which matches Choice B.",
+    "explanation": "Text 1 assumes bigger brains (for body size) mean better problem solving. Text 2's team tested birds with similar brain sizes and still found big differences, linked to where they search for food. They concluded that foraging habits \"may matter as much as\" brain size.\n\nThat adds a second factor without throwing out the first. So they'd say brain size may not be the only thing that matters. That's choice B.\n\nOn cross text questions, watch for choices that make the response more extreme than the text supports.",
     "rationales": {
-      "A": "The team says foraging matters \"as much as\" brain size, which implies brain size still matters; this overstates their position.",
-      "C": "Text 2 doesn't test or comment on crows and parrots.",
-      "D": "The team's findings show differences among birds with similar brain sizes, so brain size alone can't explain them."
+      "A": "\"As much as\" brain size implies brain size still matters. Saying it has no connection overstates their view.",
+      "C": "Text 2 never tests or mentions crows and parrots.",
+      "D": "Their birds had similar brain sizes but different results, so brain size alone can't explain the differences."
     },
     "tags": ["author-response", "science"]
   },
@@ -117,11 +117,11 @@
       "She would claim that performers have largely stopped making recordings."
     ],
     "answer": "A",
-    "explanation": "The critics say audiences now demand perfection. The conductor reports that her audiences prefer spontaneous over polished performances, which is evidence against that claim. Choice A captures her likely response.",
+    "explanation": "Focus on the specific claim in the question: audiences now find concerts disappointing if a single note is wrong, because recordings trained them to expect perfection.\n\nThe conductor reports that her audiences respond most warmly to performances that feel spontaneous rather than polished. That's evidence against the idea that audiences demand perfection.\n\nSo she'd question the critics' claim. That's choice A.",
     "rationales": {
-      "B": "Her observation about audiences preferring spontaneity contradicts the idea that they've become more demanding of perfection.",
-      "C": "She praises recordings for expanding the audience, so she wouldn't want them replaced.",
-      "D": "Nothing in Text 2 suggests performers have stopped recording."
+      "B": "Her audiences prefer spontaneity over polish, which goes against the idea that they've become more demanding.",
+      "C": "She praises recordings for growing the audience, so she wouldn't want them gone.",
+      "D": "Nothing in Text 2 says performers stopped recording."
     },
     "tags": ["author-response", "humanities"]
   },
@@ -138,11 +138,11 @@
       "By arguing that employees in the trial exaggerated how much their stress had decreased"
     ],
     "answer": "C",
-    "explanation": "Text 2 doesn't dispute the trial's results; it points out that the participants were volunteer, mostly small, office-based firms and calls it an \"open question\" whether other workplaces would see the same benefits. That limits how widely the conclusion applies, as Choice C states.",
+    "explanation": "Text 2 doesn't argue with the trial's results. Instead it points out who was in the trial: volunteer companies, mostly small, office based firms. It then calls it an \"open question\" whether hospitals or factories would see the same benefits.\n\nThat's a caution about how far the conclusion stretches, not a rejection of it. That's choice C.",
     "rationales": {
-      "A": "Text 2 never challenges the productivity finding; Text 1 says productivity stayed about the same.",
-      "B": "Text 2 explicitly doubts whether the results extend to hospitals and factories, so it wouldn't recommend the change everywhere.",
-      "D": "Text 2 questions which companies took part, not the accuracy of employees' reports."
+      "A": "Text 2 never questions the productivity results. Text 1 says productivity stayed about the same.",
+      "B": "Text 2 openly doubts whether the results apply to hospitals and factories, so it wouldn't recommend the change everywhere.",
+      "D": "Text 2 questions which companies took part, not whether employees reported honestly."
     },
     "tags": ["author-response", "qualify-claim", "social-studies"]
   },
@@ -159,11 +159,11 @@
       "By arguing that the change in Moss's style resulted from a deliberate choice rather than a loss of energy"
     ],
     "answer": "D",
-    "explanation": "Text 1 explains the plain late style as lost energy. Text 2 uses Moss's letters to show he chose plainness on purpose, \"not exhaustion but a new artistic aim.\" Choice D states this disagreement.",
+    "explanation": "Both texts agree Moss's late poems are short and plain. They disagree about why.\n\nText 1: he lost energy, so his work declined. Text 2: his letters show he chose plainness on purpose, \"not exhaustion but a new artistic aim.\"\n\nSo Text 2's author would say the change was a deliberate choice, not a loss of energy. That's choice D.",
     "rationales": {
-      "A": "Text 2 disputes the reason for the change but never agrees that the later poems are weaker; it treats them as a purposeful new direction.",
-      "B": "Both texts treat the early poems as elaborate; Text 2 doesn't challenge that.",
-      "C": "Text 2 says nothing about readers' preferences, and Text 1 says many readers see the late poems as a decline."
+      "A": "Text 2 disagrees about the reason, but it never says the late poems are weaker. It treats them as a purposeful new direction.",
+      "B": "Both texts describe the early poems as rich and elaborate. Text 2 doesn't dispute that.",
+      "C": "Text 2 says nothing about which poems readers prefer."
     },
     "tags": ["author-response", "humanities"]
   },
@@ -180,11 +180,11 @@
       "By claiming that rising water is a greater threat to all wetlands than non-native species are"
     ],
     "answer": "B",
-    "explanation": "Text 1 recommends removing non-native plants in general. Text 2 describes one wetland where a non-native grass shelters a declining native bird and warns against removing it there. The Text 2 team would see the recommendation as needing exceptions, as Choice B says.",
+    "explanation": "Text 1 gives a general rule: remove non-native plants from protected wetlands. Text 2 describes one wetland where a non-native grass is now the main nesting site for a struggling native bird, and warns that removing it there could do more harm than good.\n\nSo the Text 2 team would say the rule doesn't fit every case. That's choice B.\n\nA single counterexample usually means \"there are exceptions,\" not \"the rule is always wrong.\"",
     "rationales": {
-      "A": "Text 2 discusses one specific case and even expects native plants to be restored eventually; it doesn't claim non-native species are never harmful.",
+      "A": "Text 2 discusses one specific wetland and even hopes native plants will be restored. It doesn't claim non-native plants never cause harm.",
       "C": "Text 2 warns that removing the grass \"could do more harm than good.\"",
-      "D": "Rising water is mentioned only as the cause of lost nesting plants in one wetland; Text 2 doesn't compare threats across all wetlands."
+      "D": "Rising water is mentioned only as why the birds lost their original nesting plants in one wetland. Text 2 doesn't compare threats."
     },
     "tags": ["author-response", "qualify-claim", "science"]
   }
