@@ -145,3 +145,11 @@ export async function testPush(): Promise<ActionResult<{ devices: number; delive
   const { userId } = await requireUser();
   return { ok: true, data: await sendTest(userId) };
 }
+
+/** Keeps the profile's time zone in step with the device (daily plans and reminders use it). */
+export async function syncTimezone(tz: unknown) {
+  const { userId, profile } = await requireUser();
+  if (typeof tz !== "string" || tz.length > 64 || tz === profile.timezone) return;
+  try { new Intl.DateTimeFormat("en", { timeZone: tz }); } catch { return; }
+  await db.update(profiles).set({ timezone: tz }).where(eq(profiles.id, userId));
+}
