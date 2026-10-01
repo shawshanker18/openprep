@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Flag } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import type { PublicQuestion } from "@/server/questions";
 import { abandon, saveResponse, startModule, submitModule } from "./actions";
 
 type Item = { position: number; question: PublicQuestion; response: string | null; flagged: boolean };
-type Mod = { id: string; idx: number; section: string; route: string; timeLimitS: number | null; startedAt: string | null; deadlineAt: string | null; total: number };
+type Mod = { id: string; idx: number; section: string; route: string; timeLimitS: number | null; startedAt: string | null; deadlineAt: string | null; adaptive: boolean };
 
 const SECTION = { rw: "Reading and Writing", math: "Math", mixed: "Mixed practice" } as Record<string, string>;
 const now = () => performance.now();
@@ -29,7 +29,9 @@ export function TestRunner({ sessionId, module: m, items: initial, serverNow, br
   const [left, setLeft] = useState<number | null>(null);
   const [showTimer, setShowTimer] = useState(true);
   const [saving, setSaving] = useState<"saved" | "saving" | "error">("saved");
-  const [pending, start] = useTransition();
+  // Explicit flags, not a transition: a slow page refresh must never block answering.
+  const [starting, setStarting] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   // Server-authoritative clock: remaining = deadline − (server time at load + elapsed since load).
   const loadedAt = useRef(0);
@@ -75,11 +77,9 @@ export function TestRunner({ sessionId, module: m, items: initial, serverNow, br
   const submit = useCallback(() => {
     if (submitted.current) return;
     submitted.current = true;
-    start(async () => {
-      if (debounce.current) clearTimeout(debounce.current);
-      await submitModule(m.id);
-      router.refresh();
-    });
+    setSubmitting(true);
+    if (debounce.current) clearTimeout(debounce.current);
+    void submitModule(m.id).then(() => router.refresh());
   }, [m.id, router]);
 
   // Countdown; auto-submit at zero.
@@ -111,7 +111,7 @@ export function TestRunner({ sessionId, module: m, items: initial, serverNow, br
     return () => window.removeEventListener("keydown", onKey);
   });
 
-  const title = `${SECTION[m.section] ?? m.section}${m.total > 1 ? ` · Module ${(m.idx % 2) + 1}` : ""}`;
+  const title = `${SECTION[m.section] ?? m.section}${m.adaptive ? ` · Module ${m.route === "base" ? 1 : 2}` : ""}`;
 
   if (screen === "break") return <Break onDone={() => setScreen("intro")} />;
   if (screen === "intro") {
@@ -122,9 +122,10 @@ export function TestRunner({ sessionId, module: m, items: initial, serverNow, br
           {items.length} questions{m.timeLimitS ? ` · ${Math.round(m.timeLimitS / 60)} minutes` : " · untimed"}. You can move between questions and flag
           any to revisit. Answers are revealed after the whole test.
         </p>
-        <Button size="lg" className="self-center" disabled={pending} onClick={() => start(async () => {
-          if (await startModule(m.id)) { setScreen("question"); router.refresh(); } else toast.error("Couldn't start this module.");
-        })}>Start</Button>
+        <Button size="lg" className="self-center" disabled={starting} onClick={async () => {
+          setStarting(true);
+          if (await startModule(m.id)) { setScreen("question"); router.refresh(); } else { toast.error("Couldn't start this module."); setStarting(false); }
+        }}>Start</Button>
         <form action={abandon.bind(null, sessionId)}><Button variant="ghost" size="sm" type="submit">Abandon test</Button></form>
       </div>
     );
@@ -157,15 +158,15 @@ export function TestRunner({ sessionId, module: m, items: initial, serverNow, br
               </Button>
             </div>
             {it.question.section === "math" && <DesmosToggle />}
-            <QuestionView key={it.question.id} question={it.question} value={it.response} onChange={(v) => update({ response: v })} disabled={pending} />
+            <QuestionView key={it.question.id} question={it.question} value={it.response} onChange={(v) => update({ response: v })} disabled={submitting} />
           </div>
         ) : (
           <div className="mx-auto flex max-w-xl flex-col gap-4">
             <h2 className="text-xl font-semibold">Check your work</h2>
             <p className="text-sm text-muted-foreground">{answered} of {items.length} answered. Select a question to go back to it.</p>
             <Navigator items={items} current={-1} onPick={go} />
-            <Button size="lg" className="self-start" disabled={pending} onClick={submit}>
-              {pending ? "Submitting…" : "Submit module"}
+            <Button size="lg" className="self-start" disabled={submitting} onClick={submit}>
+              {submitting ? "Submitting…" : "Submit module"}
             </Button>
           </div>
         )}

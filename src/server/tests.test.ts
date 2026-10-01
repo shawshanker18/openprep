@@ -104,6 +104,25 @@ it("a closed tab past the deadline is auto-submitted on the next load; late save
   expect((s!.result as { sections: { math: { score: number | null } } }).sections.math.score).toBeNull(); // single module: raw only
 });
 
+it("full test on a thin bank: an empty routed R&W module is skipped and Math still runs", async () => {
+  await db.insert(schema.questions).values(Array.from({ length: 5 }, (_, i) => ({
+    id: `rw-ei-transitions-${String(i).padStart(4, "0")}`, skillId: "rw-ei-transitions", section: "rw", domain: "rw-ei",
+    difficulty: (i % 3) + 1, type: "mcq", passageMd: "p", stemMd: "s", choices: [], answer: { choice: "A" }, explanationMd: "e",
+    choiceRationales: null, fastMethodMd: null, desmos: null, tags: [], status: "active", version: 1,
+  })));
+  const r = await T.startTest(USER, { kind: "full" });
+  if (!r.ok) throw new Error(r.error);
+  const [rw1] = await modules(r.id);
+  expect(rw1).toMatchObject({ section: "rw", route: "base" });
+  expect(await items(rw1!.id)).toHaveLength(5); // the whole R&W bank
+  await T.startModule(USER, rw1!.id);
+  await T.submitModule(USER, rw1!.id);
+  const mods = await modules(r.id);
+  expect(mods).toHaveLength(2);
+  expect(mods[1]).toMatchObject({ section: "math", route: "base" }); // not finished early
+  await T.abandonTest(USER, r.id);
+});
+
 it("mini test for a skill with no questions fails cleanly", async () => {
   expect(await T.startTest(USER, { kind: "mini", skillId: "rw-ii-central" })).toMatchObject({ ok: false });
 });

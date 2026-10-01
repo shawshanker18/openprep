@@ -8,6 +8,18 @@ const nextConfig: NextConfig = {
     "/plan": ["./content/**/*.md"],
     "/desmos/*": ["./content/desmos/**/*.md"],
   },
+  // Security headers (spec 05 §5). ponytail: no CSP yet — add one in report-only mode first when needed.
+  async headers() {
+    return [{
+      source: "/(.*)",
+      headers: [
+        { key: "X-Content-Type-Options", value: "nosniff" },
+        { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+        { key: "X-Frame-Options", value: "DENY" },
+        { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+      ],
+    }];
+  },
 };
 
 export default nextConfig;

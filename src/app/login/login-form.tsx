@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase/client";
 
-export function LoginForm() {
+export function LoginForm({ google: showGoogle }: { google: boolean }) {
   const [age, setAge] = useState(false);
   const [email, setEmail] = useState("");
   const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
@@ -32,8 +32,10 @@ export function LoginForm() {
           <Link className="underline" href="/privacy">Privacy policy</Link>.
         </span>
       </label>
-      <Button onClick={google} disabled={!age} size="lg">Continue with Google</Button>
-      <div className="text-center text-xs text-muted-foreground">or</div>
+      {showGoogle && <>
+        <Button onClick={google} disabled={!age} size="lg">Continue with Google</Button>
+        <div className="text-center text-xs text-muted-foreground">or</div>
+      </>}
       {state === "sent" ? (
         <p className="rounded-lg border p-3 text-sm">Check your inbox — we sent a sign-in link to <b>{email}</b>.</p>
       ) : (
