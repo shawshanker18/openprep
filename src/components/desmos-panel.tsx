@@ -15,7 +15,7 @@ function loadDesmos(): Promise<void> {
   if (window.Desmos) return Promise.resolve();
   loading ??= new Promise((resolve, reject) => {
     const s = document.createElement("script");
-    s.src = `https://www.desmos.com/api/v1.11/calculator.js?apiKey=${KEY}`;
+    s.src = `https://www.desmos.com/api/v1.12/calculator.js?apiKey=${KEY}`;
     s.onload = () => resolve();
     s.onerror = () => { loading = null; reject(new Error("desmos")); };
     document.head.appendChild(s);
