@@ -50,7 +50,8 @@ export const SKILLS: Skill[] = [
   s("m-geo-circles",     "m-geo",  "Circles", 4),
 ];
 
-export const SKILL_BY_ID: Record<string, Skill> = Object.fromEntries(SKILLS.map((k) => [k.id, k]));
+// Null prototype: ids come from URLs and forms, so "constructor" / "toString" must not resolve to anything.
+export const SKILL_BY_ID: Record<string, Skill | undefined> = Object.assign(Object.create(null), Object.fromEntries(SKILLS.map((k) => [k.id, k])));
 export const skillsIn = (domain: string) => SKILLS.filter((k) => k.domain === domain);
 export const skillWeight = (k: Skill) => DOMAINS[k.domain].weight / skillsIn(k.domain).length;
 

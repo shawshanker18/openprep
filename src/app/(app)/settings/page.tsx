@@ -39,7 +39,7 @@ export default async function SettingsPage({ searchParams }: PageProps<"/setting
         <ThemeSelect />
         <p className="text-xs text-muted-foreground">System follows your device. Saved in this browser.</p>
       </section>
-      {typeof sp.error === "string" && ERRORS[sp.error] && <p role="alert" className="rounded-md border border-destructive p-3 text-sm text-destructive">{ERRORS[sp.error]}</p>}
+      {typeof sp.error === "string" && Object.hasOwn(ERRORS, sp.error) && <p role="alert" className="rounded-md border border-destructive p-3 text-sm text-destructive">{ERRORS[sp.error]}</p>}
       {sp.saved && <p role="status" className="rounded-md border p-3 text-sm">Saved.</p>}
 
       <form action={updateSettings} className="flex flex-col gap-4">
