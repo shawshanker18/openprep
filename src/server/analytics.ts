@@ -1,10 +1,10 @@
 // Read-side numbers for the student model (spec 03 §11–12). Plain SQL over indexed columns.
 import "server-only";
-import { eq, sql } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { attempts, skillState } from "@/db/schema";
+import { attempts, lessonProgress, questions, reviewItems, skillState } from "@/db/schema";
 import { SKILLS, SKILL_BY_ID } from "@/content/taxonomy";
-import { masteryPct, pace, status, type Status } from "@/engine/mastery";
+import { masteryPct, pace, status, trend, type Status } from "@/engine/mastery";
 import { calibration, type SelfRating } from "@/engine/prior";
 import { sectionEstimate, totalEstimate } from "@/engine/score";
 
@@ -35,3 +35,35 @@ export async function getSkillSummary(userId: string) {
 }
 
 export type SkillSummary = Awaited<ReturnType<typeof getSkillSummary>>["skills"][number];
+
+/** Everything a skill page shows beyond getSkillSummary (spec 03 §12, 04 §4). */
+export async function getSkillDetail(userId: string, skillId: string) {
+  const mine = and(eq(attempts.userId, userId), eq(attempts.skillId, skillId));
+  const [history, byDiff, byType, byTag, missed, [lesson]] = await Promise.all([
+    db.select({ correct: attempts.correct, thetaAfter: attempts.thetaAfter }).from(attempts)
+      .where(mine).orderBy(desc(attempts.createdAt)).limit(60),
+    db.select({ d: questions.difficulty, n: sql<number>`count(*)::int`, c: sql<number>`count(*) filter (where ${attempts.correct})::int` })
+      .from(attempts).innerJoin(questions, eq(questions.id, attempts.questionId)).where(mine).groupBy(questions.difficulty),
+    db.select({ type: attempts.mistakeType, n: sql<number>`count(*)::int` }).from(attempts)
+      .where(and(mine, eq(attempts.correct, false))).groupBy(attempts.mistakeType),
+    db.select({ tag: sql<string>`t.tag`, n: sql<number>`count(*)::int` })
+      .from(attempts).innerJoin(questions, eq(questions.id, attempts.questionId))
+      .innerJoin(sql`jsonb_array_elements_text(${questions.tags}) as t(tag)`, sql`true`)
+      .where(and(mine, eq(attempts.correct, false))).groupBy(sql`t.tag`).orderBy(sql`count(*) desc`),
+    db.selectDistinctOn([attempts.questionId], { id: attempts.questionId, stem: questions.stemMd, at: attempts.createdAt, dueAt: reviewItems.dueAt })
+      .from(attempts).innerJoin(questions, eq(questions.id, attempts.questionId))
+      .leftJoin(reviewItems, and(eq(reviewItems.userId, userId), eq(reviewItems.questionId, attempts.questionId)))
+      .where(and(mine, eq(attempts.correct, false))).orderBy(attempts.questionId, desc(attempts.createdAt)),
+    db.select().from(lessonProgress).where(and(eq(lessonProgress.userId, userId), eq(lessonProgress.skillId, skillId))),
+  ]);
+  const handled = byDiff.filter((r) => r.n >= 3 && r.c / r.n >= 0.6).map((r) => r.d);
+  return {
+    masteryHistory: history.map((h) => masteryPct(h.thetaAfter)).reverse(),
+    trend: trend(history.map((h) => h.correct)),
+    highestHandled: handled.length ? Math.max(...handled) : null,
+    mistakesByType: byType.filter((r) => r.type),
+    mistakesByTag: byTag,
+    missed: missed.sort((a, b) => +b.at - +a.at),
+    lessonDone: !!lesson,
+  };
+}
