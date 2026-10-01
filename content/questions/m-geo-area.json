@@ -6,11 +6,11 @@
     "stem": "A rectangle has a perimeter of $34$ inches and a length of $12$ inches. What is the area of the rectangle, in square inches?",
     "choices": ["$60$", "$132$", "$264$", "$408$"],
     "answer": "A",
-    "explanation": "The perimeter is $2(\\ell + w)$: $2(12 + w) = 34$, so $12 + w = 17$ and $w = 5$. The area is $12 \\times 5 = 60$ square inches.",
+    "explanation": "You need the width before you can find the area, and the perimeter gives it to you.\n\nA rectangle's perimeter goes around all four sides: two lengths and two widths. So $2(12) + 2w = 34$, which means $24 + 2w = 34$, so $2w = 10$ and $w = 5$.\n\nNow the area is length times width: $12 \\times 5 = 60$ square inches.\n\nA picture helps: sketch the rectangle and label all four sides before writing anything.",
     "rationales": {
-      "B": "This subtracts the length only once from the perimeter: $2w = 34 - 12$, so $w = 11$.",
-      "C": "This subtracts the length from the perimeter and treats the result, $22$, as the width.",
-      "D": "This multiplies the perimeter by the length."
+      "B": "The perimeter includes the length twice, so subtract $2 \\times 12 = 24$, not just $12$. That leaves $10$ for two widths.",
+      "C": "$34 - 12 = 22$ still contains the other length and both widths. Subtract both lengths, then split what's left between the two widths.",
+      "D": "Perimeter times length doesn't give an area. Find the width first, then multiply length by width."
     },
     "tags": ["area"]
   },
@@ -21,11 +21,11 @@
     "stem": "A right circular cylinder has a radius of $3$ centimeters and a height of $10$ centimeters. What is the volume of the cylinder, in cubic centimeters?",
     "choices": ["$30\\pi$", "$60\\pi$", "$90\\pi$", "$360\\pi$"],
     "answer": "C",
-    "explanation": "The volume of a cylinder is $V = \\pi r^2 h = \\pi (3)^2 (10) = 90\\pi$ cubic centimeters.",
+    "explanation": "A cylinder's volume is the area of its circular base times its height: $V = \\pi r^2 h$.\n\nBase area: $\\pi(3)^2 = 9\\pi$. Times the height of $10$: $90\\pi$ cubic centimeters.\n\nThe formula is on the SAT reference sheet, so the real skill is plugging in carefully, especially squaring the radius.",
     "rationales": {
-      "A": "This forgets to square the radius: $\\pi(3)(10)$.",
-      "B": "This is the lateral surface area, $2\\pi r h$, not the volume.",
-      "D": "This uses the diameter, $6$, in place of the radius: $\\pi(6)^2(10)$."
+      "A": "The radius has to be squared: $3^2 = 9$. Then $9\\pi \\times 10 = 90\\pi$.",
+      "B": "$2\\pi r h$ is the area of the curved side, not the volume. Volume is $\\pi r^2 h$.",
+      "D": "$6$ is the diameter. The formula uses the radius, $3$."
     },
     "tags": ["volume"]
   },
@@ -35,7 +35,7 @@
     "type": "spr",
     "stem": "A cube has a volume of $343$ cubic centimeters. What is the total surface area of the cube, in square centimeters?",
     "answer": ["294"],
-    "explanation": "The edge length is $\\sqrt[3]{343} = 7$ centimeters. A cube has $6$ square faces, each with area $7^2 = 49$, so the surface area is $6 \\times 49 = 294$ square centimeters.",
+    "explanation": "Start from the volume to find the edge length. A cube's volume is edge times edge times edge, so the edge is the cube root of $343$. Since $7 \\times 7 \\times 7 = 343$, the edge is $7$ cm.\n\nThe surface is $6$ square faces, each $7 \\times 7 = 49$ square cm.\n\nTotal surface area: $6 \\times 49 = 294$ square centimeters.",
     "tags": ["surface-area", "volume"]
   },
   {
@@ -45,11 +45,11 @@
     "stem": "A right circular cone has a volume of $40$ cubic inches. If the radius of the cone is halved and the height is tripled, what is the volume of the new cone, in cubic inches?",
     "choices": ["$10$", "$15$", "$30$", "$60$"],
     "answer": "C",
-    "explanation": "The volume $V = \\frac{1}{3}\\pi r^2 h$ is proportional to $r^2 h$. Halving $r$ multiplies $r^2$ by $\\frac{1}{4}$, and tripling $h$ multiplies by $3$. The new volume is $40 \\times \\frac{1}{4} \\times 3 = 30$ cubic inches.",
+    "explanation": "You don't need to know the actual radius or height. Just track how each change scales the volume.\n\nThe volume formula is $V = \\frac{1}{3}\\pi r^2 h$. The radius is squared, so halving it multiplies the volume by $\\left(\\frac{1}{2}\\right)^2 = \\frac{1}{4}$. Tripling the height multiplies the volume by $3$.\n\nNew volume: $40 \\times \\frac{1}{4} \\times 3 = 30$ cubic inches.",
     "rationales": {
-      "A": "This applies the $\\frac{1}{4}$ factor from the radius but ignores the change in height.",
-      "B": "This cubes the radius factor, using $\\frac{1}{8}$ instead of $\\frac{1}{4}$.",
-      "D": "This forgets that the radius is squared, multiplying by $\\frac{1}{2}$ instead of $\\frac{1}{4}$."
+      "A": "You handled the radius but forgot the height. Tripling the height multiplies the volume by $3$ too.",
+      "B": "The radius is squared in the formula, not cubed, so halving it gives a factor of $\\frac{1}{4}$, not $\\frac{1}{8}$.",
+      "D": "The radius is squared, so halving it cuts the volume to a quarter, not a half."
     },
     "tags": ["scaling", "volume"]
   },
@@ -60,11 +60,11 @@
     "stem": "A figure is made of a rectangle that is $10$ feet long and $6$ feet wide, with a semicircle attached to one of its $6$-foot sides so that the side is the diameter of the semicircle. What is the total area of the figure, in square feet?",
     "choices": ["$60 + 3\\pi$", "$60 + 4.5\\pi$", "$60 + 9\\pi$", "$60 + 18\\pi$"],
     "answer": "B",
-    "explanation": "The rectangle's area is $10 \\times 6 = 60$. The semicircle has diameter $6$, so its radius is $3$ and its area is $\\frac{1}{2}\\pi(3)^2 = 4.5\\pi$. The total is $60 + 4.5\\pi$ square feet.",
+    "explanation": "Split the figure into pieces you know, find each area, and add.\n\nRectangle: $10 \\times 6 = 60$ square feet.\n\nSemicircle: the $6$ foot side is its diameter, so the radius is $3$. A full circle would be $\\pi(3)^2 = 9\\pi$, and half of that is $4.5\\pi$.\n\nTotal: $60 + 4.5\\pi$ square feet.",
     "rationales": {
-      "A": "This takes half of $\\pi$ times the diameter, $\\frac{1}{2}\\pi(6)$, instead of half of $\\pi r^2$.",
-      "C": "This uses the area of a full circle instead of a semicircle.",
-      "D": "This uses the diameter, $6$, as the radius: $\\frac{1}{2}\\pi(6)^2$."
+      "A": "Area of a circle uses $\\pi r^2$, not $\\pi$ times the diameter. Half of $\\pi(3)^2$ is $4.5\\pi$.",
+      "C": "$9\\pi$ is a full circle. Only half a circle is attached, so use $4.5\\pi$.",
+      "D": "$6$ is the diameter. The radius is $3$, so the semicircle's area is $\\frac{1}{2}\\pi(3)^2$."
     },
     "tags": ["area"]
   },
@@ -74,7 +74,7 @@
     "type": "spr",
     "stem": "A rectangular fish tank is $50$ centimeters long, $40$ centimeters wide, and $30$ centimeters tall. It contains water to a depth of $18$ centimeters. How many liters of water must be added to fill the tank completely? ($1$ liter $= 1{,}000$ cubic centimeters)",
     "answer": ["24"],
-    "explanation": "The unfilled height is $30 - 18 = 12$ centimeters. The empty volume is $50 \\times 40 \\times 12 = 24{,}000$ cubic centimeters, which is $\\frac{24{,}000}{1{,}000} = 24$ liters.",
+    "explanation": "You only need the volume of the empty part of the tank.\n\nThe water is $18$ cm deep in a $30$ cm tank, so the empty space is $30 - 18 = 12$ cm tall.\n\nEmpty volume: $50 \\times 40 \\times 12 = 24{,}000$ cubic centimeters.\n\nEach liter is $1{,}000$ cubic centimeters, so that's $24{,}000 \\div 1{,}000 = 24$ liters.",
     "tags": ["volume"]
   },
   {
@@ -84,11 +84,11 @@
     "stem": "A sphere has the same volume as a right circular cylinder with radius $6$ and height $8$. What is the radius of the sphere?",
     "choices": ["$6$", "$6\\sqrt{2}$", "$6\\sqrt{6}$", "$12$"],
     "answer": "A",
-    "explanation": "The cylinder's volume is $\\pi(6)^2(8) = 288\\pi$. Set the sphere's volume equal: $\\frac{4}{3}\\pi r^3 = 288\\pi$, so $r^3 = 288 \\cdot \\frac{3}{4} = 216$ and $r = 6$.",
+    "explanation": "Find the cylinder's volume, then set the sphere's volume equal to it.\n\nCylinder: $\\pi r^2 h = \\pi(6)^2(8) = 288\\pi$.\n\nSphere: $\\frac{4}{3}\\pi r^3 = 288\\pi$. Divide both sides by $\\pi$ and multiply by $\\frac{3}{4}$: $r^3 = 216$.\n\nSince $6 \\times 6 \\times 6 = 216$, the radius is $6$.",
     "rationales": {
-      "B": "This uses the sphere's surface area formula, $4\\pi r^2 = 288\\pi$, which gives $r^2 = 72$.",
-      "C": "This uses $r^2$ instead of $r^3$ in the volume formula, giving $r^2 = 216$.",
-      "D": "This is the diameter of the sphere, not the radius."
+      "B": "$4\\pi r^2$ is the sphere's surface area. For volume, use $\\frac{4}{3}\\pi r^3$.",
+      "C": "Sphere volume uses $r^3$, not $r^2$. Then $r^3 = 216$ gives $r = 6$.",
+      "D": "$12$ is the sphere's diameter. The question asks for the radius."
     },
     "tags": ["volume"]
   },
@@ -99,11 +99,11 @@
     "stem": "Two square pyramids are similar. The surface areas of the smaller and larger pyramids are $48$ and $108$ square units, respectively. The volume of the smaller pyramid is $64$ cubic units. What is the volume of the larger pyramid, in cubic units?",
     "choices": ["$96$", "$124$", "$144$", "$216$"],
     "answer": "D",
-    "explanation": "The ratio of surface areas is $\\frac{108}{48} = \\frac{9}{4}$, which is the square of the scale factor, so the scale factor is $\\frac{3}{2}$. Volumes scale by the cube: $\\left(\\frac{3}{2}\\right)^3 = \\frac{27}{8}$. The larger volume is $64 \\times \\frac{27}{8} = 216$.",
+    "explanation": "For similar shapes, lengths, areas and volumes scale in different ways. If lengths are multiplied by $k$, areas are multiplied by $k^2$ and volumes by $k^3$.\n\nThe surface areas give you $k^2$: $\\frac{108}{48} = \\frac{9}{4}$. So $k = \\frac{3}{2}$.\n\nVolumes scale by $k^3 = \\frac{27}{8}$.\n\nThe larger volume is $64 \\times \\frac{27}{8} = 216$ cubic units.",
     "rationales": {
-      "A": "This multiplies by the length scale factor, $\\frac{3}{2}$, instead of its cube.",
-      "B": "This adds the difference in surface areas ($108 - 48 = 60$) to the volume.",
-      "C": "This multiplies by the area ratio, $\\frac{9}{4}$, instead of the volume ratio."
+      "A": "$\\frac{3}{2}$ is the scale for lengths. Volumes scale by the cube of that, $\\frac{27}{8}$.",
+      "B": "Adding the difference in surface area doesn't work. Areas and volumes scale by multiplying.",
+      "C": "$\\frac{9}{4}$ is how areas scale. Volumes scale by $\\left(\\frac{3}{2}\\right)^3 = \\frac{27}{8}$."
     },
     "tags": ["scaling", "volume"]
   },
@@ -113,7 +113,7 @@
     "type": "spr",
     "stem": "A right circular cone has a height of $12$ centimeters and a slant height of $13$ centimeters. The volume of the cone is $k\\pi$ cubic centimeters. What is the value of $k$?",
     "answer": ["100"],
-    "explanation": "The radius, height, and slant height form a right triangle: $r^2 + 12^2 = 13^2$, so $r^2 = 25$ and $r = 5$. The volume is $\\frac{1}{3}\\pi(5)^2(12) = 100\\pi$, so $k = 100$.",
+    "explanation": "To use the cone volume formula you need the radius, and it's hidden in a right triangle.\n\nPicture slicing the cone straight down the middle. The height, the radius, and the slant height form a right triangle, with the slant height as the hypotenuse.\n\n$r^2 + 12^2 = 13^2$, so $r^2 = 169 - 144 = 25$ and $r = 5$. (This is the familiar $5$, $12$, $13$ triangle.)\n\nVolume: $\\frac{1}{3}\\pi(5)^2(12) = \\frac{1}{3} \\cdot 25 \\cdot 12 \\cdot \\pi = 100\\pi$. So $k = 100$.",
     "tags": ["volume"]
   }
 ]

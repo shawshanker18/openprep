@@ -6,11 +6,11 @@
     "stem": "A circle has a diameter of $12$ meters. What is the area of the circle, in square meters?",
     "choices": ["$12\\pi$", "$24\\pi$", "$36\\pi$", "$144\\pi$"],
     "answer": "C",
-    "explanation": "The radius is half the diameter: $r = 6$. The area is $\\pi r^2 = \\pi(6)^2 = 36\\pi$ square meters.",
+    "explanation": "The area formula, $\\pi r^2$, uses the radius, but the question gives the diameter. The radius is half of it: $r = 6$.\n\nArea: $\\pi(6)^2 = 36\\pi$ square meters.\n\nWhenever a circle question gives a diameter, halve it first so you don't forget.",
     "rationales": {
-      "A": "This is the circumference, $\\pi d$, not the area.",
-      "B": "This uses the diameter as the radius in the circumference formula, $2\\pi(12)$.",
-      "D": "This uses the diameter as the radius in the area formula: $\\pi(12)^2$."
+      "A": "$12\\pi$ is $\\pi$ times the diameter, which is the circumference. Area is $\\pi r^2$.",
+      "B": "$2\\pi \\times 12$ is a circumference formula, and it uses the diameter as if it were the radius. Area is $\\pi r^2$ with $r = 6$.",
+      "D": "$12$ is the diameter. Use the radius, $6$, in $\\pi r^2$."
     },
     "tags": ["circle-measurements"]
   },
@@ -26,11 +26,11 @@
       "Center $(3, 5)$, radius $7$"
     ],
     "answer": "A",
-    "explanation": "The equation $(x - h)^2 + (y - k)^2 = r^2$ has center $(h, k)$ and radius $r$. Here $y + 5 = y - (-5)$, so the center is $(3, -5)$, and $r^2 = 49$ gives $r = 7$.",
+    "explanation": "A circle's equation looks like $(x - h)^2 + (y - k)^2 = r^2$, with center $(h, k)$ and radius $r$.\n\nThe signs inside are the tricky part. $(x - 3)$ means $h = 3$. $(y + 5)$ is the same as $(y - (-5))$, so $k = -5$. The center is $(3, -5)$.\n\nThe right side is $r^2 = 49$, so the radius is $7$.\n\nA quick way to remember: the center's coordinates are the values that make each bracket equal zero.",
     "rationales": {
-      "B": "This flips the signs of both coordinates of the center.",
-      "C": "This uses $r^2 = 49$ as the radius instead of taking the square root.",
-      "D": "This copies the $+5$ as the $y$-coordinate; $(y + 5)^2$ means $k = -5$."
+      "B": "Both signs are flipped. The center is the point that makes each bracket zero: $x = 3$ and $y = -5$.",
+      "C": "$49$ is the radius squared. The radius is $\\sqrt{49} = 7$.",
+      "D": "$(y + 5)$ equals zero when $y = -5$, so the center's $y$ value is $-5$, not $5$."
     },
     "tags": ["circle-equations"]
   },
@@ -40,7 +40,7 @@
     "type": "spr",
     "stem": "A circle has an area of $81\\pi$ square inches. What is the diameter of the circle, in inches?",
     "answer": ["18"],
-    "explanation": "Set $\\pi r^2 = 81\\pi$, so $r^2 = 81$ and $r = 9$. The diameter is $2r = 18$ inches.",
+    "explanation": "Work backward from the area. $\\pi r^2 = 81\\pi$ means $r^2 = 81$, so $r = 9$.\n\nThe diameter is twice the radius: $2 \\times 9 = 18$ inches.",
     "tags": ["circle-measurements"]
   },
   {
@@ -50,11 +50,11 @@
     "stem": "A circle has a radius of $10$ centimeters. What is the length of an arc of the circle intercepted by a central angle of $72^\\circ$, in centimeters?",
     "choices": ["$2\\pi$", "$4\\pi$", "$20\\pi$", "$720$"],
     "answer": "B",
-    "explanation": "The arc is $\\frac{72}{360} = \\frac{1}{5}$ of the circle. The circumference is $2\\pi(10) = 20\\pi$, so the arc length is $\\frac{1}{5}(20\\pi) = 4\\pi$ centimeters.",
+    "explanation": "An arc is a slice of the circle's edge. Find what fraction of the full circle it is, then take that fraction of the circumference.\n\nFraction: $\\frac{72}{360} = \\frac{1}{5}$ of the circle.\n\nCircumference: $2\\pi(10) = 20\\pi$.\n\nArc length: $\\frac{1}{5} \\times 20\\pi = 4\\pi$ centimeters.",
     "rationales": {
-      "A": "This uses $\\pi r = 10\\pi$ as the circumference instead of $2\\pi r$.",
-      "C": "This is the area of the sector, $\\frac{1}{5}(100\\pi)$, not the arc length.",
-      "D": "This multiplies the angle in degrees by the radius, a rule that only works with radians."
+      "A": "The circumference is $2\\pi r = 20\\pi$, not $\\pi r = 10\\pi$.",
+      "C": "$20\\pi$ is the whole circumference. The arc is only $\\frac{1}{5}$ of it.",
+      "D": "Multiplying the angle by the radius only works when the angle is in radians. With degrees, use the fraction of the circle."
     },
     "tags": ["arcs-sectors"]
   },
@@ -65,11 +65,11 @@
     "stem": "Points $A$, $B$, and $C$ lie on a circle. Inscribed angle $ABC$ intercepts arc $AC$, which measures $110^\\circ$. What is the measure of angle $ABC$?",
     "choices": ["$55^\\circ$", "$110^\\circ$", "$125^\\circ$", "$220^\\circ$"],
     "answer": "A",
-    "explanation": "An inscribed angle measures half of its intercepted arc: $\\frac{110^\\circ}{2} = 55^\\circ$.",
+    "explanation": "An inscribed angle has its corner on the circle itself. It always measures half of the arc it opens onto.\n\nThe arc is $110^\\circ$, so the angle is $110 \\div 2 = 55^\\circ$.\n\nCompare with a central angle, whose corner is at the center. That one equals its arc. The farther the corner is from the arc, the smaller the angle.",
     "rationales": {
-      "B": "This is the measure of a central angle intercepting the arc; an inscribed angle is half as large.",
-      "C": "This subtracts $55^\\circ$ from $180^\\circ$, treating the inscribed angle as the supplement.",
-      "D": "This doubles the arc instead of halving it."
+      "B": "An angle equal to the arc has its corner at the center. This angle's corner is on the circle, so it's half: $55^\\circ$.",
+      "C": "There's no straight line here to make supplementary angles. An inscribed angle is simply half its arc.",
+      "D": "An inscribed angle is half its arc, not double."
     },
     "tags": ["angles-in-circles"]
   },
@@ -79,10 +79,10 @@
     "type": "spr",
     "stem": "A circle in the $xy$-plane has equation $x^2 + y^2 - 8x + 6y = 11$. What is the radius of the circle?",
     "answer": ["6"],
-    "explanation": "Complete the square for each variable: $(x^2 - 8x + 16) + (y^2 + 6y + 9) = 11 + 16 + 9$, so $(x - 4)^2 + (y + 3)^2 = 36$. The radius is $\\sqrt{36} = 6$.",
+    "explanation": "To read the radius, the equation needs to look like $(x - h)^2 + (y - k)^2 = r^2$. Completing the square gets it there.\n\nFor the $x$ terms, $x^2 - 8x$: take half of $-8$, which is $-4$, and square it to get $16$. For the $y$ terms, $y^2 + 6y$: half of $6$ is $3$, squared is $9$.\n\nAdd $16$ and $9$ to both sides: $(x^2 - 8x + 16) + (y^2 + 6y + 9) = 11 + 16 + 9$.\n\nThat becomes $(x - 4)^2 + (y + 3)^2 = 36$, so the radius is $6$.",
     "desmos": {
       "expressions": ["x^2+y^2-8x+6y=11"],
-      "steps": "Type the equation as written. The circle is centered at $(4, -3)$ and reaches $(10, -3)$ on the right, so the radius is $10 - 4 = 6$."
+      "steps": "Type the equation as written. The circle is centered at $(4, -3)$ and reaches $(10, -3)$ on its right side, so the radius is $10 - 4 = 6$."
     },
     "tags": ["circle-equations", "desmos"]
   },
@@ -93,11 +93,11 @@
     "stem": "A sector of a circle with radius $8$ has a central angle of $\\frac{3\\pi}{4}$ radians. What is the area of the sector?",
     "choices": ["$3\\pi$", "$6\\pi$", "$24\\pi$", "$48\\pi$"],
     "answer": "C",
-    "explanation": "The sector is $\\frac{3\\pi/4}{2\\pi} = \\frac{3}{8}$ of the circle. The circle's area is $\\pi(8)^2 = 64\\pi$, so the sector's area is $\\frac{3}{8}(64\\pi) = 24\\pi$. (Equivalently, $\\frac{1}{2}r^2\\theta = \\frac{1}{2}(64)\\left(\\frac{3\\pi}{4}\\right) = 24\\pi$.)",
+    "explanation": "A full circle is $2\\pi$ radians. So a sector with angle $\\frac{3\\pi}{4}$ is $\\frac{3\\pi/4}{2\\pi} = \\frac{3}{8}$ of the circle.\n\nThe whole circle's area is $\\pi(8)^2 = 64\\pi$.\n\nThe sector is $\\frac{3}{8}$ of that: $\\frac{3}{8} \\times 64\\pi = 24\\pi$.\n\nIf you like formulas, the sector area in radians is $\\frac{1}{2}r^2\\theta = \\frac{1}{2}(64)\\left(\\frac{3\\pi}{4}\\right) = 24\\pi$. Same answer.",
     "rationales": {
-      "A": "This uses $r$ instead of $r^2$ in the sector formula: $\\frac{1}{2}(8)\\left(\\frac{3\\pi}{4}\\right)$.",
-      "B": "This is the arc length, $r\\theta = 8 \\cdot \\frac{3\\pi}{4}$, not the area.",
-      "D": "This reads $\\frac{3\\pi}{4}$ as $\\frac{3}{4}$ of the circle instead of $\\frac{3}{8}$ (a full circle is $2\\pi$ radians, not $\\pi$)."
+      "A": "The sector formula squares the radius: $\\frac{1}{2}r^2\\theta$, so use $64$, not $8$.",
+      "B": "$r\\theta = 6\\pi$ is the length of the curved edge. The question asks for the area inside.",
+      "D": "A full circle is $2\\pi$ radians, not $\\pi$. So $\\frac{3\\pi}{4}$ is $\\frac{3}{8}$ of the circle, not $\\frac{3}{4}$."
     },
     "tags": ["arcs-sectors", "radians"]
   },
@@ -113,11 +113,11 @@
       "$(x + 2)^2 + (y - 1)^2 = 25$"
     ],
     "answer": "D",
-    "explanation": "The radius is the distance from the center to the point: $r^2 = (1 - (-2))^2 + (5 - 1)^2 = 9 + 16 = 25$. With center $(-2, 1)$, the equation is $(x + 2)^2 + (y - 1)^2 = 25$.",
+    "explanation": "You know the center. The radius is the distance from the center to any point on the circle, so use $(1, 5)$.\n\nThe point is $3$ to the right ($1 - (-2)$) and $4$ up ($5 - 1$) from the center. So $r^2 = 3^2 + 4^2 = 25$.\n\nWith center $(-2, 1)$: $(x - (-2))^2 + (y - 1)^2 = 25$, which is $(x + 2)^2 + (y - 1)^2 = 25$.",
     "rationales": {
-      "A": "This flips the signs of the center's coordinates, giving a center of $(2, -1)$.",
-      "B": "This uses the radius, $5$, on the right side instead of $r^2 = 25$.",
-      "C": "This uses the point on the circle as the center."
+      "A": "The signs are flipped. A center at $x = -2$ gives $(x + 2)$, because that bracket is zero when $x = -2$.",
+      "B": "The right side of a circle equation is $r^2$. The radius is $5$, so the right side is $25$.",
+      "C": "$(1, 5)$ is a point on the circle, not its center. The center is $(-2, 1)$."
     },
     "tags": ["circle-equations"]
   },
@@ -127,7 +127,7 @@
     "type": "spr",
     "stem": "In a circle with radius $12$, an arc has length $5\\pi$. What is the measure, in degrees, of the central angle that intercepts the arc?",
     "answer": ["75"],
-    "explanation": "The circumference is $2\\pi(12) = 24\\pi$. The arc is $\\frac{5\\pi}{24\\pi} = \\frac{5}{24}$ of the circle, so the central angle is $\\frac{5}{24} \\times 360^\\circ = 75^\\circ$.",
+    "explanation": "Compare the arc to the whole circumference to see what fraction of the circle it covers.\n\nCircumference: $2\\pi(12) = 24\\pi$.\n\nFraction: $\\frac{5\\pi}{24\\pi} = \\frac{5}{24}$.\n\nThe central angle is that same fraction of $360^\\circ$: $\\frac{5}{24} \\times 360 = 75^\\circ$.",
     "tags": ["arcs-sectors"]
   }
 ]
