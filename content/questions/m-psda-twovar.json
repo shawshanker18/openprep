@@ -11,11 +11,11 @@
       "The plant is predicted to take $2.4$ weeks to grow $1$ centimeter."
     ],
     "answer": "C",
-    "explanation": "In a linear model $h = mw + b$, the slope $m$ is the change in $h$ for each increase of $1$ in $w$. Here the slope is $2.4$, so the model predicts the plant grows $2.4$ centimeters per week.",
+    "explanation": "In a line like $h = 2.4w + 5.1$, the number multiplied by $w$ is the slope: how much $h$ changes each time $w$ goes up by $1$.\n\nHere $w$ is weeks and $h$ is height in centimeters. So $2.4$ means the model predicts the plant grows $2.4$ cm each week.\n\nThe $5.1$ on its own is the starting point: the predicted height at week $0$, when it was planted.",
     "rationales": {
-      "A": "The predicted height at planting is the $h$-intercept, $5.1$ centimeters, not the slope.",
-      "B": "The predicted height after $1$ week is $2.4(1) + 5.1 = 7.5$ centimeters.",
-      "D": "This inverts the rate: $2.4$ is centimeters per week, not weeks per centimeter."
+      "A": "The height at planting is when $w = 0$, which gives $5.1$ cm. That's the number on its own, not $2.4$.",
+      "B": "After $1$ week the model gives $2.4(1) + 5.1 = 7.5$ cm. The $2.4$ is how much it grows each week.",
+      "D": "This flips the rate. $2.4$ is centimeters per week, not weeks per centimeter."
     },
     "tags": ["slope-interpretation", "line-of-best-fit"]
   },
@@ -26,11 +26,11 @@
     "stem": "The line of best fit for a scatterplot is $y = -1.5x + 40$. What value of $y$ does the line of best fit predict when $x = 12$?",
     "choices": ["$-18$", "$22$", "$28$", "$58$"],
     "answer": "B",
-    "explanation": "Substitute $12$ for $x$: $y = -1.5(12) + 40 = -18 + 40 = 22$.",
+    "explanation": "A line of best fit makes predictions by plugging in $x$.\n\n$y = -1.5(12) + 40$. First the multiplication: $-1.5 \\times 12 = -18$. Then add: $-18 + 40 = 22$.",
     "rationales": {
-      "A": "This computes $-1.5(12)$ but forgets to add the $y$-intercept, $40$.",
-      "C": "This subtracts $12$ from $40$, ignoring the slope.",
-      "D": "This drops the negative sign on the slope: $18 + 40$."
+      "A": "You found $-1.5 \\times 12 = -18$ but stopped there. Add the $40$ to finish.",
+      "C": "This subtracts $12$ from $40$, but the $12$ has to be multiplied by the slope first.",
+      "D": "The slope is negative, so $-1.5 \\times 12 = -18$. Then $-18 + 40 = 22$, not $58$."
     },
     "tags": ["line-of-best-fit"]
   },
@@ -40,7 +40,7 @@
     "type": "spr",
     "stem": "A line of best fit for a set of data is $y = 3x + 7$. What value of $y$ does the line predict for $x = 9$?",
     "answer": ["34"],
-    "explanation": "Substitute $9$ for $x$: $y = 3(9) + 7 = 27 + 7 = 34$.",
+    "explanation": "Plug $x = 9$ into the line: $y = 3(9) + 7 = 27 + 7 = 34$.\n\nThat is the line's prediction for $x = 9$.",
     "tags": ["line-of-best-fit"]
   },
   {
@@ -50,11 +50,11 @@
     "stem": "The table shows four values of $x$ and their corresponding values of $y$.\n\n| $x$ | $y$ |\n|---|---|\n| $0$ | $6$ |\n| $1$ | $12$ |\n| $2$ | $24$ |\n| $3$ | $48$ |\n\nWhich equation fits all of the data in the table?",
     "choices": ["$y = 6x + 6$", "$y = 2(6)^x$", "$y = 12(2)^x$", "$y = 6(2)^x$"],
     "answer": "D",
-    "explanation": "Each time $x$ increases by $1$, $y$ doubles ($6, 12, 24, 48$), so the relationship is exponential with growth factor $2$. When $x = 0$, $y = 6$, so the initial value is $6$: $y = 6(2)^x$.",
+    "explanation": "Look at how $y$ changes as $x$ goes up by $1$: $6, 12, 24, 48$. It isn't adding the same amount each time; it is doubling. Doubling means an exponential model with growth factor $2$.\n\nThe starting value is $y$ when $x = 0$, which is $6$.\n\nPut them together: $y = 6(2)^x$. Check one more row: at $x = 3$, $6 \\cdot 8 = 48$.\n\nA quick test for any table: if $y$ goes up by the same amount, it's linear. If it goes up by the same factor, it's exponential.",
     "rationales": {
-      "A": "This linear model fits only the first two rows; at $x = 2$ it gives $18$, not $24$.",
-      "B": "This swaps the initial value and the growth factor; at $x = 0$ it gives $2$.",
-      "C": "This uses the $y$-value at $x = 1$ as the initial value; at $x = 0$ it gives $12$."
+      "A": "This works for the first two rows but gives $18$ at $x = 2$, not $24$. The values double, so the model is exponential, not linear.",
+      "B": "The $2$ and the $6$ are in each other's places. At $x = 0$ this gives $2$, but the table says $6$.",
+      "C": "$12$ is the value at $x = 1$. The starting value is the value at $x = 0$, which is $6$."
     },
     "tags": ["model-types"]
   },
@@ -65,11 +65,11 @@
     "stem": "A scatterplot shows the price of a ticket, $x$, and the number of tickets sold, $y$, for $25$ events. The points fall from the upper left to the lower right and lie close to a straight line. Which of the following best describes the association between $x$ and $y$?",
     "choices": ["A strong negative linear association", "A weak negative linear association", "A strong positive linear association", "No association"],
     "answer": "A",
-    "explanation": "Points that fall from left to right show a negative association: as price increases, tickets sold decreases. Points lying close to a line show that the linear association is strong.",
+    "explanation": "Two things to decide: the direction and the strength.\n\nDirection: the points fall from upper left to lower right. As price goes up, ticket sales go down. That is a negative association.\n\nStrength: the points lie close to a straight line, so the pattern is strong.\n\nTogether: a strong negative linear association.",
     "rationales": {
-      "B": "The points lie close to the line, which means the association is strong, not weak.",
-      "C": "A positive association would rise from lower left to upper right.",
-      "D": "The points follow a clear downward trend, so there is an association."
+      "B": "The points sit close to a line, which makes the association strong. Weak would mean a loose, scattered cloud.",
+      "C": "Positive would mean the points rise from lower left to upper right. These fall.",
+      "D": "There is a clear downward pattern, so there is an association."
     },
     "tags": ["scatterplots"]
   },
@@ -80,13 +80,13 @@
     "stem": "A line of best fit for a scatterplot passes through the points $(2, 10)$ and $(8, 31)$. What value of $y$ does the line predict when $x = 14$?",
     "choices": ["$35.2$", "$52$", "$59$", "$66$"],
     "answer": "B",
-    "explanation": "Slope: $\\frac{31 - 10}{8 - 2} = \\frac{21}{6} = 3.5$. Intercept: $10 = 3.5(2) + b$, so $b = 3$. The line is $y = 3.5x + 3$, and at $x = 14$: $y = 49 + 3 = 52$.",
+    "explanation": "Build the line from the two points, then use it to predict.\n\nSlope: $\\frac{31 - 10}{8 - 2} = \\frac{21}{6} = 3.5$.\n\nIntercept: plug in $(2, 10)$. $10 = 3.5(2) + b = 7 + b$, so $b = 3$. The line is $y = 3.5x + 3$.\n\nPrediction at $x = 14$: $3.5(14) + 3 = 49 + 3 = 52$.",
     "rationales": {
-      "A": "This adds the $x$-values in the slope instead of subtracting: $\\frac{21}{10} = 2.1$, which gives $y = 2.1x + 5.8$.",
-      "C": "This uses $10$, the $y$-value of a given point, as the $y$-intercept: $3.5(14) + 10$.",
-      "D": "This makes a sign error finding the intercept, using $b = 10 + 7 = 17$."
+      "A": "In the slope, subtract the $x$ values: $8 - 2 = 6$. Adding them gives the wrong slope.",
+      "C": "$10$ is the $y$ value at $x = 2$, not at $x = 0$, so it isn't the intercept. Solving gives $b = 3$.",
+      "D": "From $10 = 7 + b$, subtract $7$ to get $b = 3$. Adding $7$ gives the wrong intercept."
     },
-    "fastMethod": "From $x = 8$ to $x = 14$ is $6$ more units, the same horizontal gap as between the two points, so $y$ rises another $21$: $31 + 21 = 52$.",
+    "fastMethod": "Notice the steps. Going from $x = 2$ to $x = 8$ is $6$ units, and $y$ rose $21$. Going from $x = 8$ to $x = 14$ is another $6$ units, so $y$ rises another $21$: $31 + 21 = 52$.",
     "tags": ["line-of-best-fit"]
   },
   {
@@ -96,11 +96,11 @@
     "stem": "A biologist observes that a population of beetles starts at $500$ and triples every $4$ years. Which equation models the population $y$ after $x$ years?",
     "choices": ["$y = 500(3)^{\\frac{x}{4}}$", "$y = 500(3)^{4x}$", "$y = 500(4)^{\\frac{x}{3}}$", "$y = 500 + 250x$"],
     "answer": "A",
-    "explanation": "The population is multiplied by $3$ once every $4$ years, so after $x$ years it has tripled $\\frac{x}{4}$ times: $y = 500(3)^{\\frac{x}{4}}$. Check: at $x = 4$, $y = 500(3) = 1{,}500$.",
+    "explanation": "\"Triples\" tells you the growth factor is $3$. \"Every $4$ years\" tells you how often that tripling happens.\n\nAfter $x$ years, the population has tripled $\\frac{x}{4}$ times. For example, after $8$ years it has tripled twice. So the exponent is $\\frac{x}{4}$: $y = 500(3)^{\\frac{x}{4}}$.\n\nCheck: at $x = 4$, $y = 500 \\cdot 3 = 1{,}500$. Exactly one tripling, as expected.",
     "rationales": {
-      "B": "This puts the $4$ in the wrong place, so the population would triple $4$ times every year.",
-      "C": "This swaps the growth factor and the time period; at $x = 4$ it does not give $1{,}500$.",
-      "D": "This is linear: it adds the first $4$ years' increase of $1{,}000$ evenly ($250$ per year) instead of multiplying."
+      "B": "With $4x$ in the exponent, the population would triple $4$ times every single year. It triples once every $4$ years, so divide by $4$.",
+      "C": "The factor and the time period got swapped. The population triples, so the base is $3$.",
+      "D": "This adds the same number of beetles each year. Tripling multiplies, so the model must be exponential."
     },
     "tags": ["model-types"]
   },
@@ -111,11 +111,11 @@
     "stem": "The table shows four data points.\n\n| $x$ | $y$ |\n|---|---|\n| $2$ | $5.1$ |\n| $4$ | $8.9$ |\n| $6$ | $13.2$ |\n| $8$ | $16.8$ |\n\nWhich of the following equations is the most appropriate linear model for the data?",
     "choices": ["$y = 0.5x + 4$", "$y = 2x + 5$", "$y = 2x + 1$", "$y = -2x + 21$"],
     "answer": "C",
-    "explanation": "The $y$-values rise by about $4$ for every increase of $2$ in $x$, so the slope is about $2$. With slope $2$, the point $(2, 5.1)$ gives an intercept of about $5.1 - 4 = 1.1$. The model $y = 2x + 1$ predicts $5, 9, 13, 17$, all close to the data.",
+    "explanation": "First get the direction and rough size of the slope from the table. Each time $x$ goes up by $2$, $y$ goes up by about $4$. So the slope is about $4 \\div 2 = 2$, and it is positive.\n\nThat narrows it to B or C. Now test one point. At $x = 2$: B predicts $9$ and C predicts $5$. The real value is $5.1$, so C fits.\n\nCheck the rest: C predicts $5, 9, 13, 17$, and the data are $5.1, 8.9, 13.2, 16.8$. Very close.",
     "rationales": {
-      "A": "This uses the reciprocal of the slope: $y$ rises about $2$ per unit of $x$, not $0.5$.",
-      "B": "This uses $5.1$, the $y$-value at $x = 2$, as the $y$-intercept; its predictions are about $4$ too high.",
-      "D": "This has a negative slope, but $y$ increases as $x$ increases."
+      "A": "$y$ rises about $2$ for every $1$ in $x$, so the slope is about $2$, not $0.5$.",
+      "B": "$5.1$ is the $y$ value at $x = 2$, not at $x = 0$. This model's predictions come out about $4$ too high.",
+      "D": "$y$ increases as $x$ increases, so the slope must be positive."
     },
     "tags": ["line-of-best-fit"]
   },
@@ -125,7 +125,7 @@
     "type": "spr",
     "stem": "The line of best fit for a scatterplot passes through the points $(0, 8)$ and $(12, 23)$. One data point in the scatterplot is $(20, 31.5)$. What is the residual for this data point (actual $y$-value minus predicted $y$-value)?",
     "answer": ["-1.5"],
-    "explanation": "Slope: $\\frac{23 - 8}{12 - 0} = 1.25$, and the $y$-intercept is $8$, so the line is $y = 1.25x + 8$. At $x = 20$ it predicts $1.25(20) + 8 = 33$. Residual: $31.5 - 33 = -1.5$. The point lies below the line.",
+    "explanation": "A residual measures how far a real data point is from what the line predicted: actual minus predicted.\n\nFirst build the line. The slope is $\\frac{23 - 8}{12 - 0} = \\frac{15}{12} = 1.25$, and the point $(0, 8)$ gives an intercept of $8$. So $y = 1.25x + 8$.\n\nPredicted at $x = 20$: $1.25(20) + 8 = 25 + 8 = 33$.\n\nResidual: $31.5 - 33 = -1.5$. A negative residual means the point sits below the line.",
     "tags": ["line-of-best-fit"]
   }
 ]
