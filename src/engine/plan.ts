@@ -14,6 +14,8 @@ export type PlanFocus = {
   skillId: string; section: "rw" | "math"; masteryPct: number; lessonDone: boolean; attemptsThisWeek: number;
 };
 
+const LEARN_MAX = 15;
+
 export function buildDailyPlan(x: {
   minutes: number; dueReviews: number; focus: PlanFocus[]; nextDesmosLesson: string | null; dayOfWeekIndex: number;
   /** Days until the test (plan §16); null/negative = no upcoming test. */
@@ -36,17 +38,23 @@ export function buildDailyPlan(x: {
   }
   const shares = [0.5, 0.3, 0.2];
   const pool = left;
+  const picks = x.focus.slice(0, 3);
   let miniDone = false;
-  x.focus.slice(0, 3).forEach((f, i) => {
-    const m = round5(pool * shares[i]!);
-    if (m > left) return;
+  picks.forEach((f, i) => {
+    // The last focus skill takes whatever is left, so the day adds up to exactly the student's minutes.
+    const m = i === picks.length - 1 ? left : Math.min(left, round5(pool * shares[i]!));
+    if (m < 5) return;
     // Final week: no new lessons, practise and check in instead.
     let kind: "learn" | "practice" | "mini" = !within7 && !f.lessonDone && f.masteryPct < 45 ? "learn" : "practice";
     // A mini test needs 15 minutes; below that, practise instead (keeps the plan inside the budget).
     // Within 4 weeks of the test the first practice block always becomes a timed check-in.
     if (kind === "practice" && !miniDone && m >= 15 && (within28 || (i === 0 && f.attemptsThisWeek >= 20))) kind = "mini";
     if (kind === "mini") miniDone = true;
-    blocks.push({ kind, minutes: m, skillId: f.skillId, done: false });
+    if (kind === "learn" && m >= LEARN_MAX + 10) {
+      // A lesson takes ~15 minutes; use the rest of the slot to practise the same skill straight away.
+      blocks.push({ kind, minutes: LEARN_MAX, skillId: f.skillId, done: false });
+      blocks.push({ kind: "practice", minutes: m - LEARN_MAX, skillId: f.skillId, done: false });
+    } else blocks.push({ kind, minutes: m, skillId: f.skillId, done: false });
     left -= m;
   });
   return blocks;

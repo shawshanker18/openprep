@@ -278,9 +278,15 @@ describe("plan", () => {
   it("stays within budget for all budgets", () => {
     for (const minutes of [15, 30, 45, 60, 90, 120]) for (const due of [0, 5]) for (const dow of [0, 1]) {
       const p = buildDailyPlan({ minutes, dueReviews: due, focus: focus(3), nextDesmosLesson: "graphing-basics", dayOfWeekIndex: dow });
-      expect(p.reduce((a, b) => a + b.minutes, 0)).toBeLessThanOrEqual(minutes + 5);
+      expect(p.reduce((a, b) => a + b.minutes, 0)).toBe(minutes); // exactly the student's time, never over or under
       expect(p.length).toBeGreaterThan(0);
+      expect(p.every((b) => b.minutes >= 5)).toBe(true);
     }
+  });
+  it("a long learn slot is split into the lesson + practice on the same skill", () => {
+    const p = buildDailyPlan({ minutes: 60, dueReviews: 0, focus: focus(3).map((f) => ({ ...f, lessonDone: false, masteryPct: 20 })), nextDesmosLesson: null, dayOfWeekIndex: 1 });
+    expect(p[0]).toMatchObject({ kind: "learn", minutes: 15 });
+    expect(p[1]).toMatchObject({ kind: "practice", skillId: p[0]!.kind === "learn" ? p[0]!.skillId : "" });
   });
   it("no review block when nothing is due; deterministic", () => {
     const input = { minutes: 45, dueReviews: 0, focus: focus(3), nextDesmosLesson: null, dayOfWeekIndex: 2 };
@@ -318,7 +324,7 @@ describe("plan near the test date", () => {
     for (const minutes of [15, 30, 45, 60, 90, 120]) for (const daysToTest of [null, 40, 28, 7, 0]) {
       const input = { ...base, minutes, focus: focus(true), daysToTest };
       const p = buildDailyPlan(input);
-      expect(p.reduce((a, b) => a + b.minutes, 0)).toBeLessThanOrEqual(minutes + 5);
+      expect(p.reduce((a, b) => a + b.minutes, 0)).toBe(minutes);
       expect(buildDailyPlan(input)).toEqual(p);
       const minis = p.filter((b) => b.kind === "mini");
       const firstPractice = p.find((b) => b.kind === "practice" || b.kind === "mini");
