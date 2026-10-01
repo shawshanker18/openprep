@@ -1,0 +1,139 @@
+[
+  {
+    "id": "m-psda-inference-0001",
+    "difficulty": 1,
+    "type": "mcq",
+    "stem": "In a random sample of $400$ residents of a town, 35% said they support building a new park. The town has $12{,}000$ residents. Based on the sample, which of the following is the best estimate of the number of residents who support building the park?",
+    "choices": ["$140$", "$420$", "$4{,}200$", "$7{,}800$"],
+    "answer": "C",
+    "explanation": "Apply the sample percent to the whole population: $0.35 \\times 12{,}000 = 4{,}200$.",
+    "rationales": {
+      "A": "This is the number of supporters in the sample, $0.35 \\times 400$, not in the town.",
+      "B": "This uses 3.5% instead of 35%.",
+      "D": "This estimates the residents who do not support the park (65%)."
+    },
+    "tags": ["population-estimates"]
+  },
+  {
+    "id": "m-psda-inference-0002",
+    "difficulty": 1,
+    "type": "mcq",
+    "stem": "A poll of randomly selected voters estimates that 58% of all voters favor a proposal, with a margin of error of $4$ percentage points. Which of the following is the most plausible range for the percent of all voters who favor the proposal?",
+    "choices": ["54% to 62%", "56% to 60%", "58% to 62%", "50% to 66%"],
+    "answer": "A",
+    "explanation": "The margin of error extends the same distance on both sides of the estimate: $58 - 4 = 54$ and $58 + 4 = 62$. So the plausible range is 54% to 62%.",
+    "rationales": {
+      "B": "This uses half the margin of error on each side.",
+      "C": "This adds the margin of error but forgets to subtract it.",
+      "D": "This uses twice the margin of error on each side."
+    },
+    "tags": ["margin-of-error"]
+  },
+  {
+    "id": "m-psda-inference-0003",
+    "difficulty": 1,
+    "type": "spr",
+    "stem": "An inspector selects a random sample of $50$ boxes from a shipment of $3{,}000$ boxes and finds that $2$ of the sampled boxes are damaged. Based on the sample, how many boxes in the whole shipment are expected to be damaged?",
+    "answer": ["120"],
+    "explanation": "The sample rate of damage is $\\frac{2}{50} = 0.04$. Apply it to the shipment: $0.04 \\times 3{,}000 = 120$ boxes.",
+    "tags": ["population-estimates"]
+  },
+  {
+    "id": "m-psda-inference-0004",
+    "difficulty": 2,
+    "type": "mcq",
+    "stem": "A researcher wants to estimate the average number of hours of sleep per night for the $1{,}600$ students at a high school. Which method of choosing $100$ students to survey is most likely to give an unbiased estimate?",
+    "choices": [
+      "Survey the first $100$ students who arrive at school one morning.",
+      "Survey $100$ students from the school's sports teams.",
+      "Survey $100$ students chosen at random from a list of all students at the school.",
+      "Post an online survey and use the first $100$ responses."
+    ],
+    "answer": "C",
+    "explanation": "A random sample from the full list of students gives every student the same chance of being chosen, so the sample is likely to represent the whole school.",
+    "rationales": {
+      "A": "Students who arrive earliest may have different sleep habits than other students, so this sample may be biased.",
+      "B": "Athletes are only one group of students and may sleep differently from the rest of the school.",
+      "D": "Students choose whether to respond, and those who respond quickly may differ from others; this is a voluntary sample."
+    },
+    "tags": ["sampling"]
+  },
+  {
+    "id": "m-psda-inference-0005",
+    "difficulty": 2,
+    "type": "mcq",
+    "stem": "Two polls of the same population used the same method, except that Poll A surveyed $500$ randomly selected people and Poll B surveyed $2{,}000$ randomly selected people. Which of the following is most likely true?",
+    "choices": [
+      "Poll A has a smaller margin of error than Poll B.",
+      "Poll B has a smaller margin of error than Poll A.",
+      "The two polls have the same margin of error.",
+      "Poll B's margin of error is exactly one-fourth of Poll A's."
+    ],
+    "answer": "B",
+    "explanation": "With the same method, a larger random sample gives a more precise estimate, so its margin of error is smaller. Poll B's sample is four times as large, so Poll B has the smaller margin of error.",
+    "rationales": {
+      "A": "This reverses the relationship: larger samples have smaller margins of error.",
+      "C": "Sample size affects the margin of error, so the polls would not be expected to match.",
+      "D": "The margin of error shrinks with the square root of the sample size, so quadrupling the sample roughly halves it; it does not divide it by $4$."
+    },
+    "tags": ["margin-of-error", "sampling"]
+  },
+  {
+    "id": "m-psda-inference-0006",
+    "difficulty": 2,
+    "type": "spr",
+    "stem": "Based on a random sample, a researcher reports that the plausible values for the mean weight of apples in an orchard are from $12.6$ ounces to $15.4$ ounces. The interval was found as the sample mean plus or minus the margin of error. What is the margin of error, in ounces?",
+    "answer": ["1.4"],
+    "explanation": "The interval is centered at the sample mean, so the margin of error is half the interval's width: $\\frac{15.4 - 12.6}{2} = \\frac{2.8}{2} = 1.4$ ounces.",
+    "tags": ["margin-of-error", "confidence-intervals"]
+  },
+  {
+    "id": "m-psda-inference-0007",
+    "difficulty": 3,
+    "type": "mcq",
+    "stem": "Based on a random sample of $200$ adults in a city, a 95% confidence interval for the mean daily commute time of adults in the city is $24.5$ minutes to $29.5$ minutes. Which of the following is the most appropriate conclusion?",
+    "choices": [
+      "About 95% of adults in the city have a daily commute between $24.5$ and $29.5$ minutes.",
+      "The mean daily commute time of all adults in the country is plausibly between $24.5$ and $29.5$ minutes.",
+      "The mean daily commute time of all adults in the city is exactly $27$ minutes.",
+      "The mean daily commute time of all adults in the city is plausibly between $24.5$ and $29.5$ minutes."
+    ],
+    "answer": "D",
+    "explanation": "A confidence interval gives plausible values for a population parameter, here the mean commute of all adults in the city, which is the population the sample was drawn from.",
+    "rationales": {
+      "A": "The interval estimates the mean, not the commute times of individual adults; many individuals may commute much more or less.",
+      "B": "The sample was drawn only from the city, so the results cannot be extended to the whole country.",
+      "C": "$27$ is the center of the interval (the sample mean), but the true mean is only estimated, not known exactly."
+    },
+    "tags": ["confidence-intervals"]
+  },
+  {
+    "id": "m-psda-inference-0008",
+    "difficulty": 3,
+    "type": "mcq",
+    "stem": "Two random samples estimated the percent of households that compost. In Town X, the estimate was 62% with a margin of error of $3$ percentage points. In Town Y, the estimate was 55% with a margin of error of $5$ percentage points. Which conclusion is best supported?",
+    "choices": [
+      "The percent of households that compost is definitely greater in Town X than in Town Y.",
+      "It is plausible that the two towns have the same percent of households that compost.",
+      "Fewer than 50% of households in Town Y compost.",
+      "Exactly 62% of households in Town X compost."
+    ],
+    "answer": "B",
+    "explanation": "Town X's plausible range is 59% to 65%. Town Y's is 50% to 60%. The ranges overlap from 59% to 60%, so the two towns could have the same true percent. The data do not show a definite difference.",
+    "rationales": {
+      "A": "The plausible ranges overlap (59% to 60%), so a difference is not certain.",
+      "C": "Town Y's plausible range is 50% to 60%; nothing supports a value below 50%.",
+      "D": "62% is only the sample estimate; the true percent is plausibly anywhere from 59% to 65%."
+    },
+    "tags": ["margin-of-error"]
+  },
+  {
+    "id": "m-psda-inference-0009",
+    "difficulty": 3,
+    "type": "spr",
+    "stem": "A forester examines a random sample of $80$ of the $2{,}400$ trees in a forest and finds that $18$ of the sampled trees are infected with a fungus. Based on the sample, how many trees in the forest are estimated to be NOT infected?",
+    "answer": ["1860"],
+    "explanation": "Sampled trees not infected: $80 - 18 = 62$. The sample proportion is $\\frac{62}{80} = 0.775$. Apply it to the forest: $0.775 \\times 2{,}400 = 1{,}860$ trees.",
+    "tags": ["population-estimates"]
+  }
+]

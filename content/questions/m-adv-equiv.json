@@ -1,0 +1,129 @@
+[
+  {
+    "id": "m-adv-equiv-0001",
+    "difficulty": 1,
+    "type": "mcq",
+    "stem": "Which of the following is equivalent to $(3x + 2)(x - 5)$?",
+    "choices": ["$3x^2 - 13x - 10$", "$3x^2 - 10$", "$3x^2 - 17x - 10$", "$4x - 3$"],
+    "answer": "A",
+    "explanation": "Multiply each term in the first binomial by each term in the second: $3x \\cdot x = 3x^2$, $3x \\cdot (-5) = -15x$, $2 \\cdot x = 2x$, and $2 \\cdot (-5) = -10$. Combine the middle terms: $3x^2 - 13x - 10$.",
+    "rationales": {
+      "B": "This multiplies only the first terms and the last terms and skips the two middle products.",
+      "C": "This uses $-2x$ instead of $+2x$ for the inner product, so the middle term becomes $-17x$.",
+      "D": "This adds the two binomials instead of multiplying them."
+    },
+    "tags": ["expanding"]
+  },
+  {
+    "id": "m-adv-equiv-0002",
+    "difficulty": 1,
+    "type": "mcq",
+    "stem": "Which of the following is equivalent to $(2x^3)^4$?",
+    "choices": ["$8x^7$", "$8x^{12}$", "$16x^7$", "$16x^{12}$"],
+    "answer": "D",
+    "explanation": "Raise each factor to the fourth power: $2^4 = 16$ and $(x^3)^4 = x^{3 \\cdot 4} = x^{12}$. So $(2x^3)^4 = 16x^{12}$.",
+    "rationales": {
+      "A": "This multiplies $2$ by $4$ instead of raising it to the fourth power, and adds the exponents $3 + 4$ instead of multiplying them.",
+      "B": "This multiplies the coefficient $2$ by $4$ instead of computing $2^4$.",
+      "C": "This adds the exponents $3 + 4$ instead of multiplying them."
+    },
+    "tags": ["exponent-rules"]
+  },
+  {
+    "id": "m-adv-equiv-0003",
+    "difficulty": 1,
+    "type": "spr",
+    "stem": "The expression $4(2x - 3) - 3(x - 5)$ is equivalent to $ax + b$, where $a$ and $b$ are constants. What is the value of $a + b$?",
+    "answer": ["8"],
+    "explanation": "Distribute: $8x - 12 - 3x + 15$. Combine like terms: $5x + 3$. So $a = 5$, $b = 3$, and $a + b = 8$.",
+    "tags": ["expanding"]
+  },
+  {
+    "id": "m-adv-equiv-0004",
+    "difficulty": 2,
+    "type": "mcq",
+    "stem": "Which of the following is a factor of $6x^2 + 7x - 20$?",
+    "choices": ["$2x - 5$", "$3x + 4$", "$3x - 4$", "$6x - 5$"],
+    "answer": "C",
+    "explanation": "Find two numbers that multiply to $6 \\cdot (-20) = -120$ and add to $7$: $15$ and $-8$. Split the middle term: $6x^2 + 15x - 8x - 20 = 3x(2x + 5) - 4(2x + 5) = (3x - 4)(2x + 5)$. So $3x - 4$ is a factor.",
+    "rationales": {
+      "A": "This comes from the factorization $(3x + 4)(2x - 5)$, whose product is $6x^2 - 7x - 20$; the sign of the middle term is wrong.",
+      "B": "This also comes from $(3x + 4)(2x - 5) = 6x^2 - 7x - 20$, which has the opposite middle term.",
+      "D": "This comes from trying $(6x - 5)(x + 4)$, whose product is $6x^2 + 19x - 20$."
+    },
+    "desmos": {
+      "expressions": ["y=6x^2+7x-20"],
+      "steps": "Graph the expression. Its $x$-intercepts are $x = -2.5$ and $x \\approx 1.333$ (that is, $\\frac{4}{3}$). The zero $x = \\frac{4}{3}$ matches the factor $3x - 4$."
+    },
+    "tags": ["factoring", "desmos"]
+  },
+  {
+    "id": "m-adv-equiv-0005",
+    "difficulty": 2,
+    "type": "mcq",
+    "stem": "Which of the following is equivalent to $\\frac{x^2 - 9}{x^2 + 5x + 6}$ for $x \\ne -2$ and $x \\ne -3$?",
+    "choices": ["$\\frac{x + 3}{x + 2}$", "$\\frac{x - 3}{x + 2}$", "$\\frac{-9}{5x + 6}$", "$\\frac{x - 3}{x + 3}$"],
+    "answer": "B",
+    "explanation": "Factor the numerator as a difference of squares: $x^2 - 9 = (x - 3)(x + 3)$. Factor the denominator: $x^2 + 5x + 6 = (x + 2)(x + 3)$. Cancel the common factor $x + 3$: $\\frac{x - 3}{x + 2}$.",
+    "rationales": {
+      "A": "This factors $x^2 - 9$ as $(x + 3)(x + 3)$ instead of $(x - 3)(x + 3)$.",
+      "C": "This cancels the $x^2$ terms, but only common factors can be canceled, not terms.",
+      "D": "This factors the denominator as $(x + 3)^2$ instead of $(x + 2)(x + 3)$."
+    },
+    "desmos": {
+      "expressions": ["y=\\frac{x^2-9}{x^2+5x+6}", "y=\\frac{x-3}{x+2}"],
+      "steps": "Graph the original expression, then graph each choice one at a time. Only choice B lies exactly on top of the original graph."
+    },
+    "tags": ["rational-expressions", "factoring", "desmos"]
+  },
+  {
+    "id": "m-adv-equiv-0006",
+    "difficulty": 2,
+    "type": "spr",
+    "stem": "The expression $(x + 4)^2 - (x - 2)^2$ is equivalent to $ax + b$, where $a$ and $b$ are constants. What is the value of $a$?",
+    "answer": ["12"],
+    "explanation": "Expand: $(x^2 + 8x + 16) - (x^2 - 4x + 4)$. Distribute the subtraction: $x^2 + 8x + 16 - x^2 + 4x - 4 = 12x + 12$. So $a = 12$.",
+    "fastMethod": "Use the difference of squares: $[(x + 4) - (x - 2)][(x + 4) + (x - 2)] = 6(2x + 2) = 12x + 12$.",
+    "tags": ["expanding"]
+  },
+  {
+    "id": "m-adv-equiv-0007",
+    "difficulty": 3,
+    "type": "mcq",
+    "stem": "The expression $\\frac{5x + 1}{x - 2}$ can be rewritten as $5 + \\frac{A}{x - 2}$, where $A$ is a constant. What is the value of $A$?",
+    "choices": ["$-9$", "$1$", "$3$", "$11$"],
+    "answer": "D",
+    "explanation": "Rewrite the numerator using $x - 2$: $5x + 1 = 5(x - 2) + 10 + 1 = 5(x - 2) + 11$. Then $\\frac{5x + 1}{x - 2} = \\frac{5(x - 2)}{x - 2} + \\frac{11}{x - 2} = 5 + \\frac{11}{x - 2}$. So $A = 11$.",
+    "rationales": {
+      "A": "This subtracts $10$ instead of adding it: $5(x - 2) = 5x - 10$, so the remainder is $1 + 10$, not $1 - 10$.",
+      "B": "This takes the constant term of the numerator without accounting for the $-2$ in $x - 2$.",
+      "C": "This distributes the $5$ only to $x$, writing $5(x - 2)$ as $5x - 2$, so the remainder is $1 + 2$."
+    },
+    "fastMethod": "Combine the right side over $x - 2$: $\\frac{5(x - 2) + A}{x - 2} = \\frac{5x - 10 + A}{x - 2}$. Match constants: $-10 + A = 1$, so $A = 11$.",
+    "tags": ["rational-expressions"]
+  },
+  {
+    "id": "m-adv-equiv-0008",
+    "difficulty": 3,
+    "type": "mcq",
+    "stem": "For $x > 0$, which of the following is equivalent to $\\frac{\\sqrt[3]{x^2} \\cdot x^2}{\\sqrt{x}}$?",
+    "choices": ["$x^{\\frac{5}{6}}$", "$x^{\\frac{13}{6}}$", "$x^{\\frac{19}{6}}$", "$x^3$"],
+    "answer": "B",
+    "explanation": "Write the radicals as exponents: $\\sqrt[3]{x^2} = x^{\\frac{2}{3}}$ and $\\sqrt{x} = x^{\\frac{1}{2}}$. Multiplying adds exponents and dividing subtracts them: $\\frac{2}{3} + 2 - \\frac{1}{2} = \\frac{4}{6} + \\frac{12}{6} - \\frac{3}{6} = \\frac{13}{6}$.",
+    "rationales": {
+      "A": "This multiplies the exponents $\\frac{2}{3}$ and $2$ instead of adding them, giving $\\frac{4}{3} - \\frac{1}{2} = \\frac{5}{6}$.",
+      "C": "This adds the exponent of $\\sqrt{x}$ instead of subtracting it: $\\frac{2}{3} + 2 + \\frac{1}{2}$.",
+      "D": "This writes $\\sqrt[3]{x^2}$ as $x^{\\frac{3}{2}}$, flipping the fraction: $\\frac{3}{2} + 2 - \\frac{1}{2} = 3$."
+    },
+    "tags": ["exponent-rules"]
+  },
+  {
+    "id": "m-adv-equiv-0009",
+    "difficulty": 3,
+    "type": "spr",
+    "stem": "If $(ax + 3)(2x - b) = 10x^2 + x - 3$ for all values of $x$, where $a$ and $b$ are constants, what is the value of $a + b$?",
+    "answer": ["6"],
+    "explanation": "Expand the left side: $2ax^2 - abx + 6x - 3b = 2ax^2 + (6 - ab)x - 3b$. Match coefficients. $x^2$: $2a = 10$, so $a = 5$. Constant: $-3b = -3$, so $b = 1$. Check the $x$-term: $6 - 5(1) = 1$, which matches. So $a + b = 6$.",
+    "tags": ["expanding"]
+  }
+]

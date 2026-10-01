@@ -1,0 +1,120 @@
+[
+  {
+    "id": "m-psda-prob-0001",
+    "difficulty": 1,
+    "type": "mcq",
+    "stem": "A bag contains $5$ red marbles, $7$ blue marbles, and $8$ green marbles. If one marble is chosen at random, what is the probability that it is blue?",
+    "choices": ["$\\frac{1}{3}$", "$\\frac{7}{20}$", "$\\frac{7}{13}$", "$\\frac{13}{20}$"],
+    "answer": "B",
+    "explanation": "There are $5 + 7 + 8 = 20$ marbles, and $7$ are blue. The probability is $\\frac{7}{20}$.",
+    "rationales": {
+      "A": "This treats the three colors as equally likely, but the colors have different numbers of marbles.",
+      "C": "This divides by the number of marbles that are not blue ($13$) instead of the total ($20$).",
+      "D": "This is the probability that the marble is not blue."
+    },
+    "tags": ["simple-probability"]
+  },
+  {
+    "id": "m-psda-prob-0002",
+    "difficulty": 1,
+    "type": "mcq",
+    "stem": "The table summarizes whether students in two grades at a school play a sport.\n\n| | Plays a sport | Does not play a sport | Total |\n|---|---|---|---|\n| 9th grade | $42$ | $38$ | $80$ |\n| 10th grade | $54$ | $66$ | $120$ |\n| Total | $96$ | $104$ | $200$ |\n\nIf one of these $200$ students is selected at random, what is the probability that the student is in 10th grade and plays a sport?",
+    "choices": ["$\\frac{27}{100}$", "$\\frac{9}{20}$", "$\\frac{12}{25}$", "$\\frac{9}{16}$"],
+    "answer": "A",
+    "explanation": "$54$ students are both in 10th grade and play a sport, out of $200$ students total: $\\frac{54}{200} = \\frac{27}{100}$.",
+    "rationales": {
+      "B": "This divides by the number of 10th graders ($\\frac{54}{120}$), which answers a different question: the probability a 10th grader plays a sport.",
+      "C": "This is the probability that a student plays a sport, $\\frac{96}{200}$, regardless of grade.",
+      "D": "This divides by the number of students who play a sport ($\\frac{54}{96}$) instead of all $200$ students."
+    },
+    "tags": ["two-way-tables"]
+  },
+  {
+    "id": "m-psda-prob-0003",
+    "difficulty": 1,
+    "type": "spr",
+    "stem": "A fair $8$-sided die has faces numbered $1$ through $8$. If the die is rolled once, what is the probability that the result is greater than $5$?",
+    "answer": ["3/8"],
+    "explanation": "The results greater than $5$ are $6$, $7$, and $8$: $3$ outcomes out of $8$ equally likely outcomes. The probability is $\\frac{3}{8}$.",
+    "tags": ["simple-probability"]
+  },
+  {
+    "id": "m-psda-prob-0004",
+    "difficulty": 2,
+    "type": "mcq",
+    "stem": "The table summarizes whether students in two grades at a school play a sport.\n\n| | Plays a sport | Does not play a sport | Total |\n|---|---|---|---|\n| 9th grade | $42$ | $38$ | $80$ |\n| 10th grade | $54$ | $66$ | $120$ |\n| Total | $96$ | $104$ | $200$ |\n\nIf a student who plays a sport is selected at random, what is the probability that the student is in 9th grade?",
+    "choices": ["$\\frac{21}{100}$", "$\\frac{7}{16}$", "$\\frac{12}{25}$", "$\\frac{21}{40}$"],
+    "answer": "B",
+    "explanation": "The selection is only from students who play a sport, so the denominator is $96$. Of those, $42$ are in 9th grade: $\\frac{42}{96} = \\frac{7}{16}$.",
+    "rationales": {
+      "A": "This divides by all $200$ students instead of only the $96$ who play a sport.",
+      "C": "This is the probability that a student plays a sport, $\\frac{96}{200}$.",
+      "D": "This conditions on the wrong group: $\\frac{42}{80}$ is the probability that a 9th grader plays a sport."
+    },
+    "tags": ["two-way-tables", "conditional-probability"]
+  },
+  {
+    "id": "m-psda-prob-0005",
+    "difficulty": 2,
+    "type": "mcq",
+    "stem": "A spinner is divided into $4$ equal sections numbered $1$, $2$, $3$, and $4$. The spinner is spun twice. What is the probability that at least one of the two spins lands on an even number?",
+    "choices": ["$\\frac{1}{4}$", "$\\frac{1}{2}$", "$\\frac{3}{4}$", "$1$"],
+    "answer": "C",
+    "explanation": "Use the complement. The probability that a spin is odd is $\\frac{1}{2}$, so the probability that both spins are odd is $\\frac{1}{2} \\cdot \\frac{1}{2} = \\frac{1}{4}$. The probability of at least one even spin is $1 - \\frac{1}{4} = \\frac{3}{4}$.",
+    "rationales": {
+      "A": "This is the probability that both spins are even (or both odd), not at least one even.",
+      "B": "This is the probability for a single spin and ignores the second spin.",
+      "D": "This adds $\\frac{1}{2} + \\frac{1}{2}$, counting the outcomes where both spins are even twice."
+    },
+    "tags": ["compound-events"]
+  },
+  {
+    "id": "m-psda-prob-0006",
+    "difficulty": 2,
+    "type": "spr",
+    "stem": "In a survey of $250$ people, 40% said they prefer tea to coffee. Of the people who prefer tea, 30% said they add honey. If one of the $250$ people is selected at random, what is the probability that the person prefers tea and adds honey? (Express your answer as a decimal or fraction.)",
+    "answer": ["0.12"],
+    "explanation": "People who prefer tea: $0.40 \\times 250 = 100$. Of those, $0.30 \\times 100 = 30$ add honey. The probability is $\\frac{30}{250} = 0.12$.",
+    "fastMethod": "Multiply the percents directly: $0.40 \\times 0.30 = 0.12$.",
+    "tags": ["compound-events"]
+  },
+  {
+    "id": "m-psda-prob-0007",
+    "difficulty": 3,
+    "type": "mcq",
+    "stem": "A committee has $6$ seniors and $4$ juniors. Two members are chosen at random, one after the other, without replacement. What is the probability that both members chosen are juniors?",
+    "choices": ["$\\frac{2}{15}$", "$\\frac{4}{25}$", "$\\frac{8}{45}$", "$\\frac{2}{5}$"],
+    "answer": "A",
+    "explanation": "The first pick is a junior with probability $\\frac{4}{10}$. After one junior is chosen, $3$ juniors remain among $9$ members, so the second pick is a junior with probability $\\frac{3}{9}$. Multiply: $\\frac{4}{10} \\cdot \\frac{3}{9} = \\frac{12}{90} = \\frac{2}{15}$.",
+    "rationales": {
+      "B": "This treats the picks as with replacement: $\\frac{4}{10} \\cdot \\frac{4}{10}$.",
+      "C": "This reduces the total to $9$ for the second pick but forgets to reduce the number of juniors: $\\frac{4}{10} \\cdot \\frac{4}{9}$.",
+      "D": "This is the probability for only one pick, $\\frac{4}{10}$."
+    },
+    "tags": ["compound-events"]
+  },
+  {
+    "id": "m-psda-prob-0008",
+    "difficulty": 3,
+    "type": "spr",
+    "stem": "A factory made $2{,}000$ parts on two machines. Machine A made 60% of the parts, and Machine B made the rest. Of the parts made by Machine A, 5% are defective; of the parts made by Machine B, 2% are defective. If a defective part is selected at random, what is the probability that it was made by Machine A?",
+    "answer": ["15/19"],
+    "explanation": "Machine A made $0.60 \\times 2{,}000 = 1{,}200$ parts, and $0.05 \\times 1{,}200 = 60$ are defective. Machine B made $800$ parts, and $0.02 \\times 800 = 16$ are defective. There are $60 + 16 = 76$ defective parts, so the probability is $\\frac{60}{76} = \\frac{15}{19}$.",
+    "tags": ["conditional-probability"]
+  },
+  {
+    "id": "m-psda-prob-0009",
+    "difficulty": 3,
+    "type": "mcq",
+    "stem": "In a group of $150$ people, $90$ have a library card. Of the people with a library card, 60% read e-books. Of the people without a library card, $20$ read e-books. If a person who reads e-books is selected at random from the group, what is the probability that the person has a library card?",
+    "choices": ["$\\frac{9}{25}$", "$\\frac{37}{75}$", "$\\frac{3}{5}$", "$\\frac{27}{37}$"],
+    "answer": "D",
+    "explanation": "Card holders who read e-books: $0.60 \\times 90 = 54$. Total e-book readers: $54 + 20 = 74$. Given that the person reads e-books, the probability of having a card is $\\frac{54}{74} = \\frac{27}{37}$.",
+    "rationales": {
+      "A": "This divides by the whole group of $150$ instead of only the $74$ e-book readers: $\\frac{54}{150}$.",
+      "B": "This is the probability that a person in the group reads e-books, $\\frac{74}{150}$.",
+      "C": "This is the probability that a card holder reads e-books, which reverses the condition."
+    },
+    "tags": ["conditional-probability"]
+  }
+]

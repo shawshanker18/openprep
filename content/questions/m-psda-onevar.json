@@ -1,0 +1,134 @@
+[
+  {
+    "id": "m-psda-onevar-0001",
+    "difficulty": 1,
+    "type": "mcq",
+    "stem": "What is the median of the data set $4, 7, 7, 9, 12, 15$?",
+    "choices": ["$7$", "$8$", "$9$", "$11$"],
+    "answer": "B",
+    "explanation": "The data are already in order and there are $6$ values, so the median is the mean of the $3$rd and $4$th values: $\\frac{7 + 9}{2} = 8$.",
+    "rationales": {
+      "A": "This is the mode (the value that appears most often), not the median.",
+      "C": "This is the mean: $\\frac{54}{6} = 9$.",
+      "D": "This is the range: $15 - 4 = 11$."
+    },
+    "tags": ["mean-median"]
+  },
+  {
+    "id": "m-psda-onevar-0002",
+    "difficulty": 1,
+    "type": "mcq",
+    "stem": "The mean of five numbers is $16$. Four of the numbers are $12$, $20$, $15$, and $25$. What is the fifth number?",
+    "choices": ["$8$", "$16$", "$18$", "$72$"],
+    "answer": "A",
+    "explanation": "The five numbers sum to $5 \\times 16 = 80$. The four known numbers sum to $12 + 20 + 15 + 25 = 72$. The fifth number is $80 - 72 = 8$.",
+    "rationales": {
+      "B": "This is the mean itself; the fifth number need not equal the mean.",
+      "C": "This is the mean of the four known numbers, $\\frac{72}{4}$.",
+      "D": "This is the sum of the four known numbers."
+    },
+    "tags": ["mean-median"]
+  },
+  {
+    "id": "m-psda-onevar-0003",
+    "difficulty": 1,
+    "type": "spr",
+    "stem": "The table shows how many pets each of $20$ students has.\n\n| Number of pets | Number of students |\n|---|---|\n| $0$ | $5$ |\n| $1$ | $8$ |\n| $2$ | $4$ |\n| $3$ | $3$ |\n\nWhat is the mean number of pets per student?",
+    "answer": ["1.25"],
+    "explanation": "Total pets: $0(5) + 1(8) + 2(4) + 3(3) = 0 + 8 + 8 + 9 = 25$. Divide by the $20$ students: $\\frac{25}{20} = 1.25$.",
+    "tags": ["frequency-tables", "mean-median"]
+  },
+  {
+    "id": "m-psda-onevar-0004",
+    "difficulty": 2,
+    "type": "mcq",
+    "stem": "A data set consists of the values $22, 25, 27, 28, 30, 31, 95$. If the value $95$ is removed, which of the following is true?",
+    "choices": [
+      "The mean decreases and the median stays the same.",
+      "The mean and the median both increase.",
+      "The mean and the median both decrease.",
+      "The mean stays the same and the median decreases."
+    ],
+    "answer": "C",
+    "explanation": "Removing the largest value lowers the mean (from $\\frac{258}{7} \\approx 36.9$ to $\\frac{163}{6} \\approx 27.2$). The original median is the $4$th value, $28$. With $6$ values left, the median is $\\frac{27 + 28}{2} = 27.5$, so it also decreases, though only slightly.",
+    "rationales": {
+      "A": "With an even number of values left, the median becomes the average of $27$ and $28$, so it drops from $28$ to $27.5$.",
+      "B": "Removing the largest value cannot raise the mean or the median.",
+      "D": "Removing an outlier far above the rest changes the mean a lot."
+    },
+    "tags": ["outliers", "mean-median"]
+  },
+  {
+    "id": "m-psda-onevar-0005",
+    "difficulty": 2,
+    "type": "mcq",
+    "stem": "Data set X consists of the values $10, 20, 30, 40, 50$. Data set Y consists of the values $28, 29, 30, 31, 32$. Which of the following is true?",
+    "choices": [
+      "The data sets have the same mean, and Y has the greater standard deviation.",
+      "X has the greater mean, and the data sets have the same standard deviation.",
+      "The data sets have the same mean and the same standard deviation.",
+      "The data sets have the same mean, and X has the greater standard deviation."
+    ],
+    "answer": "D",
+    "explanation": "Both data sets are symmetric around $30$, so both means are $30$. Standard deviation measures how spread out values are from the mean. X's values are $10$ to $20$ away from $30$, while Y's are at most $2$ away, so X has the greater standard deviation.",
+    "rationales": {
+      "A": "This reverses the spread: Y's values are tightly clustered around $30$, so Y has the smaller standard deviation.",
+      "B": "Both means are $30$. Having larger values at the ends does not raise the mean when the data are symmetric about $30$.",
+      "C": "The means match, but X is far more spread out, so the standard deviations differ."
+    },
+    "tags": ["spread"]
+  },
+  {
+    "id": "m-psda-onevar-0006",
+    "difficulty": 2,
+    "type": "spr",
+    "stem": "The mean of a student's first $8$ test scores is $84$. After a ninth test, the mean of all $9$ scores is $85$. What was the student's score on the ninth test?",
+    "answer": ["93"],
+    "explanation": "The first $8$ scores total $8 \\times 84 = 672$. All $9$ scores total $9 \\times 85 = 765$. The ninth score is $765 - 672 = 93$.",
+    "tags": ["mean-median"]
+  },
+  {
+    "id": "m-psda-onevar-0007",
+    "difficulty": 3,
+    "type": "mcq",
+    "stem": "Class A has $20$ students with a mean test score of $78$. Class B has $30$ students with a mean test score of $88$. What is the mean test score of all $50$ students combined?",
+    "choices": ["$82$", "$83$", "$84$", "$88$"],
+    "answer": "C",
+    "explanation": "Find each class's total: $20 \\times 78 = 1{,}560$ and $30 \\times 88 = 2{,}640$. The combined total is $4{,}200$, and $\\frac{4{,}200}{50} = 84$.",
+    "rationales": {
+      "A": "This swaps the class sizes, weighting $78$ by $30$ and $88$ by $20$.",
+      "B": "This averages the two means without weighting by class size; the larger class should count more.",
+      "D": "This uses only the larger class's mean."
+    },
+    "tags": ["mean-median"]
+  },
+  {
+    "id": "m-psda-onevar-0008",
+    "difficulty": 3,
+    "type": "mcq",
+    "stem": "A data set of $11$ different values has a median of $40$. The largest value is increased by $20$, and the smallest value is decreased by $5$. Which of the following must be true about the new data set?",
+    "choices": [
+      "The median is $40$, and the range is $25$ greater than before.",
+      "The median is greater than $40$, and the range is $25$ greater than before.",
+      "The median is $40$, and the range is $15$ greater than before.",
+      "The median is $40$, and the range is the same as before."
+    ],
+    "answer": "A",
+    "explanation": "The median of $11$ values is the $6$th value in order. Raising the largest value and lowering the smallest keeps them at the ends, so the $6$th value is still $40$. The range is largest minus smallest: $(\\text{max} + 20) - (\\text{min} - 5) = (\\text{max} - \\text{min}) + 25$.",
+    "rationales": {
+      "B": "Changing only the extreme values does not move the middle value, so the median is still $40$.",
+      "C": "This subtracts the $5$ instead of adding it; lowering the minimum makes the range larger.",
+      "D": "The range depends on the largest and smallest values, which both changed."
+    },
+    "tags": ["spread", "mean-median"]
+  },
+  {
+    "id": "m-psda-onevar-0009",
+    "difficulty": 3,
+    "type": "spr",
+    "stem": "The table shows the number of hours that students in a group spent volunteering last week.\n\n| Hours | Number of students |\n|---|---|\n| $1$ | $3$ |\n| $2$ | $6$ |\n| $3$ | $6$ |\n| $4$ | $k$ |\n\nThe mean number of hours for the group is $2.65$. What is the value of $k$?",
+    "answer": ["5"],
+    "explanation": "Total hours: $1(3) + 2(6) + 3(6) + 4k = 33 + 4k$. Number of students: $15 + k$. Set the mean equal to $2.65$: $33 + 4k = 2.65(15 + k) = 39.75 + 2.65k$. So $1.35k = 6.75$ and $k = 5$.",
+    "tags": ["frequency-tables", "mean-median"]
+  }
+]

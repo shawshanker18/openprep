@@ -1,0 +1,119 @@
+[
+  {
+    "id": "m-psda-ratios-0001",
+    "difficulty": 1,
+    "type": "mcq",
+    "stem": "A bread recipe uses $3$ cups of flour for every $2$ cups of milk. How many cups of flour are needed for $8$ cups of milk?",
+    "choices": ["$\\frac{16}{3}$", "$9$", "$12$", "$24$"],
+    "answer": "C",
+    "explanation": "Set up a proportion: $\\frac{3}{2} = \\frac{f}{8}$. Cross-multiply: $2f = 24$, so $f = 12$.",
+    "rationales": {
+      "A": "This flips the ratio, using $\\frac{2}{3}$ cup of flour per cup of milk.",
+      "B": "This keeps the difference constant (flour is $1$ cup more than milk) instead of the ratio.",
+      "D": "This multiplies $8$ by $3$ but forgets to divide by $2$."
+    },
+    "tags": ["proportions"]
+  },
+  {
+    "id": "m-psda-ratios-0002",
+    "difficulty": 1,
+    "type": "mcq",
+    "stem": "A cyclist rides at a constant speed of $18$ kilometers per hour. What is this speed in meters per minute? ($1$ kilometer $= 1{,}000$ meters)",
+    "choices": ["$30$", "$300$", "$1{,}080$", "$18{,}000$"],
+    "answer": "B",
+    "explanation": "Convert kilometers to meters: $18 \\times 1{,}000 = 18{,}000$ meters per hour. Convert hours to minutes by dividing by $60$: $\\frac{18{,}000}{60} = 300$ meters per minute.",
+    "rationales": {
+      "A": "This uses $100$ meters per kilometer instead of $1{,}000$.",
+      "C": "This multiplies by $60$ instead of dividing, and never converts kilometers to meters.",
+      "D": "This converts kilometers to meters but leaves the time in hours."
+    },
+    "tags": ["unit-conversion"]
+  },
+  {
+    "id": "m-psda-ratios-0003",
+    "difficulty": 1,
+    "type": "spr",
+    "stem": "On a map, $1$ centimeter represents $2.5$ kilometers. Two towns are $14$ centimeters apart on the map. What is the actual distance, in kilometers, between the towns?",
+    "answer": ["35"],
+    "explanation": "Each centimeter is $2.5$ kilometers, so $14$ centimeters is $14 \\times 2.5 = 35$ kilometers.",
+    "tags": ["scale"]
+  },
+  {
+    "id": "m-psda-ratios-0004",
+    "difficulty": 2,
+    "type": "mcq",
+    "stem": "A printer prints $42$ pages in $3$ minutes. At this rate, how many seconds will it take the printer to print $98$ pages?",
+    "choices": ["$7$", "$420$", "$700$", "$1{,}372$"],
+    "answer": "B",
+    "explanation": "The rate is $\\frac{42}{3} = 14$ pages per minute. Printing $98$ pages takes $\\frac{98}{14} = 7$ minutes, which is $7 \\times 60 = 420$ seconds.",
+    "rationales": {
+      "A": "This is the time in minutes; the question asks for seconds.",
+      "C": "This treats $3$ minutes as $300$ seconds instead of $180$ seconds.",
+      "D": "This multiplies $98$ pages by $14$ pages per minute instead of dividing."
+    },
+    "tags": ["rates", "unit-conversion"]
+  },
+  {
+    "id": "m-psda-ratios-0005",
+    "difficulty": 2,
+    "type": "mcq",
+    "stem": "A metal block has a density of $7.8$ grams per cubic centimeter and a mass of $3.12$ kilograms. What is the volume of the block, in cubic centimeters? ($1$ kilogram $= 1{,}000$ grams)",
+    "choices": ["$0.4$", "$24.336$", "$40$", "$400$"],
+    "answer": "D",
+    "explanation": "Convert the mass to grams: $3.12 \\times 1{,}000 = 3{,}120$ grams. Volume equals mass divided by density: $\\frac{3{,}120}{7.8} = 400$ cubic centimeters.",
+    "rationales": {
+      "A": "This divides $3.12$ by $7.8$ without converting kilograms to grams.",
+      "B": "This multiplies the mass by the density instead of dividing, and skips the unit conversion.",
+      "C": "This converts $3.12$ kilograms to $312$ grams, using $100$ grams per kilogram."
+    },
+    "tags": ["rates", "unit-conversion"]
+  },
+  {
+    "id": "m-psda-ratios-0006",
+    "difficulty": 2,
+    "type": "spr",
+    "stem": "One gallon of paint covers $350$ square feet. A wall has an area of $1{,}225$ square feet and needs $2$ coats of paint. How many gallons of paint are needed?",
+    "answer": ["7"],
+    "explanation": "Two coats cover $2 \\times 1{,}225 = 2{,}450$ square feet. Divide by the coverage per gallon: $\\frac{2{,}450}{350} = 7$ gallons.",
+    "tags": ["rates"]
+  },
+  {
+    "id": "m-psda-ratios-0007",
+    "difficulty": 3,
+    "type": "mcq",
+    "stem": "A pump moves water at a rate of $15$ gallons per minute. A tank holds $20{,}520$ liters. If $1$ gallon is $3.8$ liters, how many hours will it take the pump to fill the empty tank?",
+    "choices": ["$6$", "$22.8$", "$86.64$", "$360$"],
+    "answer": "A",
+    "explanation": "Convert the tank's capacity to gallons: $\\frac{20{,}520}{3.8} = 5{,}400$ gallons. Time in minutes: $\\frac{5{,}400}{15} = 360$ minutes. Convert to hours: $\\frac{360}{60} = 6$ hours.",
+    "rationales": {
+      "B": "This skips the liter-to-gallon conversion, treating $20{,}520$ liters as $20{,}520$ gallons.",
+      "C": "This multiplies by $3.8$ when converting liters to gallons instead of dividing.",
+      "D": "This is the time in minutes, not hours."
+    },
+    "tags": ["unit-conversion", "rates"]
+  },
+  {
+    "id": "m-psda-ratios-0008",
+    "difficulty": 3,
+    "type": "spr",
+    "stem": "A bag contains red and blue marbles in a ratio of $5 : 3$. After $12$ blue marbles are added to the bag, the ratio of red to blue marbles becomes $5 : 4$. How many red marbles are in the bag?",
+    "answer": ["60"],
+    "explanation": "Let the bag start with $5k$ red and $3k$ blue marbles. After adding $12$ blue: $\\frac{5k}{3k + 12} = \\frac{5}{4}$. Cross-multiply: $20k = 15k + 60$, so $k = 12$. Red marbles: $5(12) = 60$. Check: $60 : 48 = 5 : 4$.",
+    "tags": ["proportions"]
+  },
+  {
+    "id": "m-psda-ratios-0009",
+    "difficulty": 3,
+    "type": "mcq",
+    "stem": "Machine A fills $600$ bottles per hour. Machine B fills $600$ bottles in $1.5$ hours. Working together at these rates, how many hours will the two machines take to fill $1{,}500$ bottles?",
+    "choices": ["$1$", "$1.5$", "$3$", "$90$"],
+    "answer": "B",
+    "explanation": "Machine B's rate is $\\frac{600}{1.5} = 400$ bottles per hour. Together the machines fill $600 + 400 = 1{,}000$ bottles per hour. Time: $\\frac{1{,}500}{1{,}000} = 1.5$ hours.",
+    "rationales": {
+      "A": "This multiplies instead of dividing for Machine B, using $600 \\times 1.5 = 900$ bottles per hour, so the combined rate is $1{,}500$.",
+      "C": "This averages the two rates ($500$ bottles per hour) instead of adding them.",
+      "D": "This is the time in minutes, not hours."
+    },
+    "tags": ["rates"]
+  }
+]

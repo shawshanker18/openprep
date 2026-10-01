@@ -1,0 +1,129 @@
+[
+  {
+    "id": "m-alg-lin1-0001",
+    "difficulty": 1,
+    "type": "mcq",
+    "stem": "If $4x - 9 = 23$, what is the value of $x$?",
+    "choices": ["$3.5$", "$5.75$", "$8$", "$128$"],
+    "answer": "C",
+    "explanation": "Add $9$ to both sides: $4x = 32$. Divide both sides by $4$: $x = 8$.",
+    "rationales": {
+      "A": "This subtracts $9$ from $23$ instead of adding it, giving $4x = 14$.",
+      "B": "This divides $23$ by $4$ and ignores the $-9$.",
+      "D": "This multiplies $32$ by $4$ instead of dividing by $4$."
+    },
+    "tags": ["solving-equations"]
+  },
+  {
+    "id": "m-alg-lin1-0002",
+    "difficulty": 1,
+    "type": "mcq",
+    "stem": "What value of $x$ satisfies $3(x + 5) = 27$?",
+    "choices": ["$4$", "$\\frac{22}{3}$", "$9$", "$19$"],
+    "answer": "A",
+    "explanation": "Divide both sides by $3$: $x + 5 = 9$. Subtract $5$: $x = 4$. (Or distribute: $3x + 15 = 27$, so $3x = 12$ and $x = 4$.)",
+    "rationales": {
+      "B": "This distributes the $3$ to $x$ only, writing $3x + 5 = 27$.",
+      "C": "This is the value of $x + 5$, not $x$.",
+      "D": "This subtracts $3$ from both sides instead of dividing by $3$: $x + 5 = 24$."
+    },
+    "tags": ["distributing", "solving-equations"]
+  },
+  {
+    "id": "m-alg-lin1-0003",
+    "difficulty": 1,
+    "type": "spr",
+    "stem": "A plumber charges a \\$45 service fee plus \\$30 for each hour of work. A customer's bill for one repair was \\$165. For how many hours did the plumber work?",
+    "answer": ["4"],
+    "explanation": "Let $h$ be the number of hours. Then $45 + 30h = 165$. Subtract $45$: $30h = 120$. Divide by $30$: $h = 4$.",
+    "tags": ["word-problems"]
+  },
+  {
+    "id": "m-alg-lin1-0004",
+    "difficulty": 2,
+    "type": "mcq",
+    "stem": "What is the solution to $\\frac{2x}{3} - 4 = \\frac{x}{6} + 5$?",
+    "choices": ["$2$", "$3$", "$10.8$", "$18$"],
+    "answer": "D",
+    "explanation": "Multiply every term by $6$ to clear the fractions: $4x - 24 = x + 30$. Subtract $x$ from both sides: $3x - 24 = 30$. Add $24$: $3x = 54$, so $x = 18$.",
+    "rationales": {
+      "A": "When moving $-24$ to the other side, this subtracts instead of adding: $3x = 30 - 24 = 6$.",
+      "B": "This multiplies only the fraction terms by $6$, not the constants: $4x - 4 = x + 5$.",
+      "C": "This adds $x$ to both sides instead of subtracting it, getting $5x = 54$."
+    },
+    "fastMethod": "Check the choices: with $x = 18$, the left side is $12 - 4 = 8$ and the right side is $3 + 5 = 8$.",
+    "desmos": {
+      "expressions": ["y=\\frac{2x}{3}-4", "y=\\frac{x}{6}+5"],
+      "steps": "Graph each side as its own line. They intersect at $(18, 8)$, so $x = 18$."
+    },
+    "tags": ["fractions", "solving-equations", "desmos"]
+  },
+  {
+    "id": "m-alg-lin1-0005",
+    "difficulty": 2,
+    "type": "mcq",
+    "stem": "In the equation $5(2x - 3) + 4 = 10x + k$, $k$ is a constant. If the equation has infinitely many solutions, what is the value of $k$?",
+    "choices": ["$1$", "$-11$", "$-15$", "$-19$"],
+    "answer": "B",
+    "explanation": "Simplify the left side: $10x - 15 + 4 = 10x - 11$. An equation has infinitely many solutions when both sides are identical, so $10x - 11 = 10x + k$ gives $k = -11$.",
+    "rationales": {
+      "A": "This multiplies only the $2x$ by $5$, getting $10x - 3 + 4 = 10x + 1$.",
+      "C": "This drops the $+4$ term after distributing.",
+      "D": "This subtracts $4$ instead of adding it: $-15 - 4 = -19$."
+    },
+    "tags": ["solution-count", "distributing"]
+  },
+  {
+    "id": "m-alg-lin1-0006",
+    "difficulty": 2,
+    "type": "spr",
+    "stem": "If $\\frac{x + 4}{3} = \\frac{2x - 1}{5}$, what is the value of $x$?",
+    "answer": ["23"],
+    "explanation": "Cross-multiply: $5(x + 4) = 3(2x - 1)$, so $5x + 20 = 6x - 3$. Subtract $5x$ from both sides and add $3$: $23 = x$.",
+    "tags": ["fractions", "solving-equations"]
+  },
+  {
+    "id": "m-alg-lin1-0007",
+    "difficulty": 3,
+    "type": "mcq",
+    "stem": "In the equation $a(3x - 2) = 12x + b$, $a$ and $b$ are constants. If the equation has no solution, which of the following could be the values of $a$ and $b$?",
+    "choices": ["$a = 4$ and $b = -8$", "$a = 12$ and $b = -24$", "$a = -4$ and $b = 8$", "$a = 4$ and $b = 8$"],
+    "answer": "D",
+    "explanation": "The left side is $3ax - 2a$. A linear equation has no solution when the $x$-coefficients are equal but the constants are different. Equal coefficients: $3a = 12$, so $a = 4$. Then the left side is $12x - 8$, so the constants differ as long as $b \\ne -8$. Only $a = 4$, $b = 8$ fits.",
+    "rationales": {
+      "A": "With these values both sides are $12x - 8$, so every $x$ works: infinitely many solutions, not none.",
+      "B": "This sets $a$ equal to $12$ without dividing by $3$. Then the left side is $36x - 24$, the $x$-coefficients differ, and there is exactly one solution.",
+      "C": "With $a = -4$ the left side is $-12x + 8$. The $x$-coefficients are opposites, not equal, so there is exactly one solution."
+    },
+    "tags": ["solution-count"]
+  },
+  {
+    "id": "m-alg-lin1-0008",
+    "difficulty": 3,
+    "type": "spr",
+    "stem": "Maya has \\$300 in savings and adds \\$30 each week. Leo has \\$600 in savings and spends \\$15 of it each week. After how many weeks will Maya have exactly twice as much money as Leo?",
+    "answer": ["15"],
+    "explanation": "After $w$ weeks Maya has $300 + 30w$ dollars and Leo has $600 - 15w$ dollars. Set Maya's amount equal to twice Leo's: $300 + 30w = 2(600 - 15w) = 1200 - 30w$. Add $30w$ and subtract $300$: $60w = 900$, so $w = 15$. Check: Maya has \\$750 and Leo has \\$375.",
+    "tags": ["word-problems"]
+  },
+  {
+    "id": "m-alg-lin1-0009",
+    "difficulty": 3,
+    "type": "mcq",
+    "stem": "What value of $x$ satisfies $0.4(5x - 15) = 1.2x - 2(0.3x + 1.6)$?",
+    "choices": ["$2$", "$-\\frac{13}{7}$", "$\\frac{38}{7}$", "$\\frac{46}{7}$"],
+    "answer": "A",
+    "explanation": "Left side: $0.4(5x - 15) = 2x - 6$. Right side: $1.2x - 0.6x - 3.2 = 0.6x - 3.2$. So $2x - 6 = 0.6x - 3.2$. Subtract $0.6x$ and add $6$: $1.4x = 2.8$, so $x = 2$.",
+    "rationales": {
+      "B": "This computes $0.4 \\cdot 15$ as $0.6$, giving $2x - 0.6 = 0.6x - 3.2$ and $1.4x = -2.6$.",
+      "C": "This multiplies only the $0.3x$ by $-2$ and adds $1.6$, giving $0.6x + 1.6$ on the right and $1.4x = 7.6$.",
+      "D": "This distributes $-2$ with a sign error, getting $-0.6x + 3.2$, so the right side is $0.6x + 3.2$ and $1.4x = 9.2$."
+    },
+    "fastMethod": "Plug in $x = 2$: the left side is $0.4(-5) = -2$ and the right side is $2.4 - 2(2.2) = -2$.",
+    "desmos": {
+      "expressions": ["y=0.4(5x-15)", "y=1.2x-2(0.3x+1.6)"],
+      "steps": "Graph each side as a line. They intersect at $(2, -2)$, so $x = 2$."
+    },
+    "tags": ["distributing", "solving-equations", "desmos"]
+  }
+]
