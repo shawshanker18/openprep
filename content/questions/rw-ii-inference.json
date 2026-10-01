@@ -12,11 +12,11 @@
       "tomato plants grown without basil will not produce any fruit."
     ],
     "answer": "A",
-    "explanation": "Tomatoes beside basil produced about 20 percent more fruit than tomatoes grown alone, so the logical conclusion is that basil nearby may increase the tomatoes' yield. Choice A states this and is appropriately cautious.",
+    "explanation": "For \"most logically completes\" questions, the answer should follow directly from what the text just said, without adding anything new.\n\nThe experiment showed tomatoes next to basil made about 20 percent more fruit than tomatoes grown alone. The natural conclusion is that basil nearby may boost the tomato harvest.\n\nChoice A says that, and it uses the careful word \"may,\" which fits a small experiment.",
     "rationales": {
-      "B": "This reverses the relationship: the experiment measured the tomatoes' fruit, not the size of the basil.",
-      "C": "The experiment compared two groups of tomatoes, not tomatoes with basil.",
-      "D": "The tomatoes grown alone still produced fruit, just about 20 percent less."
+      "B": "The experiment measured the tomatoes' fruit, not how big the basil grew.",
+      "C": "The comparison was between two groups of tomatoes, not between tomatoes and basil.",
+      "D": "Tomatoes grown alone still made fruit, just about 20 percent less. \"Will not produce any\" goes much too far."
     },
     "tags": ["logical-completion", "science"]
   },
@@ -33,11 +33,11 @@
       "the residents traded their fishhooks to farmers in distant regions."
     ],
     "answer": "C",
-    "explanation": "Abundant fishing gear and fish bones, few farming tools, and a lakeside location all point to fishing as a major food source. Choice C follows directly from this evidence.",
+    "explanation": "Line up the clues: lots of fishhooks, fish bones and net weights; very few farming tools; and the settlement sits on a big lake.\n\nEvery clue points the same way. The people here relied heavily on fishing for food. That's choice C.\n\nA good inference is the conclusion that all the evidence agrees on.",
     "rationales": {
-      "A": "Very few farming tools were found, which argues against the residents growing most of their grain.",
-      "B": "Nothing in the text suggests the lake dried up; the fishing evidence suggests the opposite.",
-      "D": "The text gives no evidence of trade; the fish bones show the residents used the hooks themselves."
+      "A": "Very few farming tools turned up, which points away from growing most of their own grain.",
+      "B": "Nothing suggests the lake dried up. All the fishing gear suggests it was in steady use.",
+      "D": "There's no evidence of trade. The fish bones show the residents used the hooks themselves."
     },
     "tags": ["logical-completion", "social-studies"]
   },
@@ -54,11 +54,11 @@
       "photographs took longer to produce than painted portraits did."
     ],
     "answer": "B",
-    "explanation": "The text sets up a contrast: portraits were costly, while photographs were cheap and quick. The logical result is that more families, including those who couldn't afford paintings, could now have images made. Choice B states this.",
+    "explanation": "The text sets up a contrast. Painted portraits were expensive and slow. Photographs were cheap and quick.\n\n\"As a result\" asks what that change led to. If images suddenly cost far less, many more families could afford them, including families who never could have paid for a painting. That's choice B.\n\nWhen you see \"as a result,\" look for the effect that grows directly out of the cause just described.",
     "rationales": {
-      "A": "The text gives no information about painters' prices after photography arrived.",
-      "C": "Cheaper images would make it easier, not less appealing, to preserve family images.",
-      "D": "The text says photographs required only a short sitting, so this contradicts it."
+      "A": "The text says nothing about what painters charged after photography arrived.",
+      "C": "Cheaper images would make preserving family images easier, not less wanted.",
+      "D": "The text says photographs needed only a short sitting, so this contradicts it."
     },
     "tags": ["logical-completion", "social-studies"]
   },
@@ -75,11 +75,11 @@
       "switching to lights that attract fewer moths may help protect pollination near towns."
     ],
     "answer": "D",
-    "explanation": "Step 1: white lights pull moths away from plants. Step 2: amber lights attract moths less, and more moths visited flowers near amber lights. So replacing white lights with less attractive ones may help preserve pollination. Choice D draws this conclusion.",
+    "explanation": "Follow the chain of reasoning one link at a time.\n\nWhite lights pull moths away from the plants they pollinate. Amber lights attract moths much less. Near amber lights, more moths visited flowers.\n\nPut together: using lights that attract fewer moths may help keep pollination going near towns. That's choice D.",
     "rationales": {
-      "A": "This reverses the text, which says moths find amber lights \"far less attractive.\"",
-      "B": "The text never mentions fragrance; it attributes the difference to how the lights affect moths.",
-      "C": "The text doesn't compare town sizes, so nothing supports a preference for larger towns."
+      "A": "This is backward. The text says moths find amber lights \"far less attractive.\"",
+      "B": "Fragrance is never mentioned. The difference comes from how the lights affect the moths.",
+      "C": "The text doesn't compare towns of different sizes."
     },
     "tags": ["logical-completion", "science"]
   },
@@ -96,11 +96,11 @@
       "lent more books overall than the branches in other neighborhoods did."
     ],
     "answer": "B",
-    "explanation": "Branches where children borrowed many picture books responded by giving more space to children's books. That shows the branches shaping their collections around local demand, as Choice B says.",
+    "explanation": "Notice the cause and response. Branches where lots of young children lived lent many more picture books, and over time those branches gave more shelf space to children's books.\n\nIn other words, each branch shaped its collection around who was actually using it. That's choice B.",
     "rationales": {
-      "A": "Giving more space to children's books doesn't mean adults lost access; this goes far beyond the evidence.",
-      "C": "The text says the city opened a branch in each of its neighborhoods, not only in those with many children.",
-      "D": "The records show these branches lent more picture books, not more books of all kinds."
+      "A": "Adding space for children's books doesn't mean adults were turned away. That goes far beyond the evidence.",
+      "C": "The text says the city opened a branch in every neighborhood, not only in ones with many children.",
+      "D": "The records show these branches lent more picture books, not more books overall."
     },
     "tags": ["logical-completion", "social-studies"]
   },
@@ -117,11 +117,11 @@
       "blue pigments were widely used by artists before 1650."
     ],
     "answer": "A",
-    "explanation": "The pigment didn't exist until the early 1700s, and it appears in the painting's original layers, so the painting was likely made after 1700. An artist who died in 1650 could not have made it. Choice A follows.",
+    "explanation": "This works like a time puzzle. The blue pigment didn't exist until the early 1700s. It's found throughout the painting's original paint, so the painting was made after that.\n\nThe artist credited with it died in 1650, decades before the pigment existed. So that artist probably didn't paint it. That's choice A.\n\nThe phrase \"original layers\" matters: it rules out the idea that someone added the blue later.",
     "rationales": {
-      "B": "The pigment was not manufactured until decades after this artist died, so the artist couldn't have invented it.",
-      "C": "A later repair would explain the pigment only in added paint, but it appears throughout the original layers.",
-      "D": "The text discusses one blue pigment's date of manufacture, not how common blue pigments were before 1650."
+      "B": "The pigment wasn't made until decades after this artist died, so the artist couldn't have invented it.",
+      "C": "A later repair would put the pigment only in the repaired spots. It's throughout the original layers.",
+      "D": "The text is about when one particular blue was first made, not how common blue paints were before 1650."
     },
     "tags": ["logical-completion", "humanities"]
   },
@@ -138,11 +138,11 @@
       "the chemical signals likely reach neighboring plants by traveling through the air."
     ],
     "answer": "D",
-    "explanation": "With open air between them, neighbors responded to the signals; when only airflow was blocked, they didn't respond. The simplest explanation is that the signals travel through the air. Choice D draws this conclusion.",
+    "explanation": "Compare the two setups. With open air between them, the healthy plants responded to the signals. With only the airflow blocked, they didn't respond.\n\nThe one thing that changed was the air path, so the signals most likely travel through the air. That's choice D.\n\nThis is how experiments reveal causes: change one thing, and see what stops happening.",
     "rationales": {
-      "A": "The study measured the response of undamaged plants; it doesn't compare compound levels in damaged and undamaged plants.",
-      "B": "Insect behavior toward signaling plants is never tested or described.",
-      "C": "The text says the plants did not increase production, not that they stopped producing the compounds; this overstates the result."
+      "A": "The study looked at how healthy neighbors responded. It never compares compound levels between damaged and healthy plants.",
+      "B": "How insects react to signaling plants is never tested.",
+      "C": "The plants didn't increase production, but the text never says they stopped making the compounds entirely."
     },
     "tags": ["logical-completion", "science"]
   },
@@ -159,11 +159,11 @@
       "the distant paper mill produced lower-quality paper than historians had believed."
     ],
     "answer": "C",
-    "explanation": "Only some copies use paper from a mill that supplied printers in the distant city, and printers bought paper locally. So those copies were probably printed there, even though they carry the first city's printer's mark. Choice C states this with appropriate caution.",
+    "explanation": "Here is the reasoning chain. Printers usually bought paper from nearby mills. Some copies use paper from a mill that only supplied printers in a distant city. So those copies were probably printed in that distant city, even though they carry the first city's printer's mark.\n\nChoice C says this and stays careful: \"some copies\" and \"may have been.\"\n\nOn hard inference questions, the right answer often matches the evidence's scope exactly. Watch for choices that say \"all\" when the evidence only covers \"some.\"",
     "rationales": {
-      "A": "Only one of the two mills is linked to the distant city, so the evidence points to some copies, not all of them.",
-      "B": "Nothing in the text suggests the marks were added later; that is an unsupported explanation.",
-      "D": "The scholar used the watermarks to trace where the paper came from, not to judge its quality."
+      "A": "Only one of the two mills connects to the distant city, so the evidence covers some copies, not all.",
+      "B": "Nothing suggests the printer's mark was added later. That's a new explanation the text never offers.",
+      "D": "The watermarks show where the paper came from. They say nothing about its quality."
     },
     "tags": ["logical-completion", "humanities"]
   },
@@ -180,11 +180,11 @@
       "the fourth novel is more disorganized than any of Vass's earlier novels."
     ],
     "answer": "B",
-    "explanation": "The scholar says the multiple perspectives \"reflect\" the theme that no one person can grasp a community's history. If so, the structure the reviewers disliked is purposeful, as Choice B says.",
+    "explanation": "Start from the scholar's argument: the novel's many viewpoints \"reflect\" its theme that no single person can fully understand a community's history.\n\nIf that's right, the shifting viewpoints were intentional and meaningful, not a mess. So what the reviewers called disorganized was really a deliberate choice that serves the theme. That's choice B.\n\n\"If the scholar is correct\" tells you to accept the scholar's view and follow where it leads.",
     "rationales": {
-      "A": "The text says the earlier novels recalled the narrators' childhoods; nothing says they concerned community histories.",
-      "C": "The text mentions criticism only of the fourth novel, which came after the first-person novels, so it can't explain the change.",
-      "D": "This accepts the reviewers' judgment, which is the view the scholar argues against."
+      "A": "The first three novels were about narrators remembering their childhoods. Nothing says they were about community histories.",
+      "C": "The criticism mentioned was of the fourth novel, which came after the change. It can't explain why she changed.",
+      "D": "This sides with the reviewers, which is the view the scholar argues against."
     },
     "tags": ["logical-completion", "humanities"]
   }

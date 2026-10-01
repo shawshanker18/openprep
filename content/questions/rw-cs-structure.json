@@ -12,10 +12,10 @@
       "To describe the plants and animals that survive in deserts"
     ],
     "answer": "A",
-    "explanation": "The text opens with a common belief (deserts are always hot), counters it (they get cold at night), and explains why (dry air lets heat escape). Choice A describes this purpose.",
+    "explanation": "For purpose questions, ask: why did the writer write this? Tracing what each sentence does helps.\n\nSentence 1 states a common belief: deserts are always hot. Sentence 2 pushes back with \"However\": they get cold at night. Sentence 3 explains why: dry air lets the day's heat escape.\n\nSo the purpose is to explain why deserts get cold at night, despite what people assume. That's choice A.",
     "rationales": {
-      "B": "The text discusses deserts in general and never compares specific deserts.",
-      "C": "Danger to travelers is never mentioned; the text explains a temperature pattern.",
+      "B": "The text talks about deserts in general. It never compares particular deserts.",
+      "C": "Danger to travelers never comes up. The text explains a temperature pattern.",
       "D": "No plants or animals are mentioned."
     },
     "tags": ["main-purpose", "informational-text"]
@@ -33,11 +33,11 @@
       "It describes a new artistic style, presents an early negative reaction to it, and then notes its later widespread acceptance."
     ],
     "answer": "D",
-    "explanation": "Sentence 1 introduces the style, sentence 2 gives the critics' mockery, and sentence 3 (\"however\") reports that the style was later taught across the continent. Choice D follows this order.",
+    "explanation": "For structure questions, label each sentence's job in a few words, then find the choice that lists those jobs in order.\n\nSentence 1: a new style appears. Sentence 2: critics mock it. Sentence 3, with \"however\": it ends up taught everywhere.\n\nNew style, early rejection, later acceptance. That's choice D.",
     "rationales": {
-      "A": "The last sentence shows the critics' prediction was wrong, not correct.",
-      "B": "Only one painting style is described; it is contrasted with realistic detail, not compared with a second style.",
-      "C": "This scrambles the order: art schools appear only at the end, as evidence of the style's acceptance."
+      "A": "The last sentence proves the critics wrong, not right. The style wasn't forgotten.",
+      "B": "Only one style is described. It's set against realistic detail, not against a second named style.",
+      "C": "This jumbles the order. Art schools only appear at the end, as proof the style caught on."
     },
     "tags": ["overall-structure", "humanities"]
   },
@@ -54,11 +54,11 @@
       "It states the main conclusion that the rest of the text supports."
     ],
     "answer": "C",
-    "explanation": "The third sentence begins \"For example\" and describes an octopus matching reddish coral, a concrete case of the color change introduced in the first sentence. Choice C describes this function.",
+    "explanation": "Signal words often reveal a sentence's job. The third sentence starts with \"For example,\" so it's giving a specific case of something said earlier.\n\nThe example is an octopus turning reddish to match coral, which is a concrete case of the color changing ability from the first sentence. That's choice C.",
     "rationales": {
-      "A": "Nothing in the text disputes the third sentence; all the sentences support one another.",
-      "B": "This is the function of the second sentence, not the third.",
-      "D": "The main point appears in the first sentence; the third is a supporting example."
+      "A": "Nothing in the text argues against the third sentence. All the sentences support each other.",
+      "B": "That's what the second sentence does. The third gives an example.",
+      "D": "The main point comes in the first sentence. The third one supports it with an example."
     },
     "tags": ["sentence-function", "informational-text"]
   },
@@ -75,11 +75,11 @@
       "To show how Ana and her brother settle a long-standing disagreement"
     ],
     "answer": "B",
-    "explanation": "The brother promised to help, but Ana did three sides alone, and he arrives at noon with a dry brush. The scene is built to show that he didn't keep his promise, as Choice B says.",
+    "explanation": "Stories make their point through what happens, so look at how the details fit together.\n\nThe brother promises to help. By noon Ana has done three sides alone. He finally shows up with a brush that's still perfectly dry and cheerfully asks if anything is left.\n\nThat dry brush is the key detail: he never helped at all. The scene exists to show he broke his promise. That's choice B.",
     "rationales": {
-      "A": "Only the brother's brush is mentioned, and it matters because it is dry, not as a description of tools.",
-      "C": "Ana works alone because her brother didn't show up; nothing says she prefers it.",
-      "D": "No long-standing disagreement or resolution is described."
+      "A": "The only tool mentioned is the brother's brush, and it matters because it's dry, not to describe painting tools.",
+      "C": "Ana worked alone because her brother didn't show up, not because she likes working alone.",
+      "D": "There's no long running disagreement and no resolution in the scene."
     },
     "tags": ["main-purpose", "literary-text"]
   },
@@ -96,11 +96,11 @@
       "It explains in greater detail the benefits of trees mentioned in the first sentence."
     ],
     "answer": "A",
-    "explanation": "The second sentence lists residents' complaints (cracked sidewalks, clogged drains). The final sentence answers each one: deep-rooted species for the sidewalks and extra cleaning for the leaves. Choice A captures this link.",
+    "explanation": "Track how the sentences talk to each other.\n\nSentence 1: planners like street trees for shade. Sentence 2, with \"however\": residents complain about cracked sidewalks and clogged drains. Sentence 3: planners respond with deep rooted trees (for the sidewalks) and extra cleaning (for the leaves).\n\nSo the second sentence raises the problems that the last sentence answers. That's choice A.",
     "rationales": {
-      "B": "The second sentence raises problems with street trees; it works against the planners' preference, not for it.",
-      "C": "The text doesn't defend the residents' objections; it describes how planners responded to them.",
-      "D": "The second sentence describes drawbacks, not benefits."
+      "B": "The second sentence raises problems with street trees, so it works against the planners' view, not for it.",
+      "C": "The text doesn't defend the complaints. It shows how planners responded to them.",
+      "D": "The second sentence is about drawbacks, not benefits."
     },
     "tags": ["sentence-function", "social-studies"]
   },
@@ -117,11 +117,11 @@
       "It compares two frog species and explains why only one of them survived."
     ],
     "answer": "C",
-    "explanation": "Sentence 1: scientists believed the frog had vanished. Sentence 2: researchers found a population. Sentence 3: they suggest how the frogs survived. Choice C matches this belief-discovery-explanation sequence.",
+    "explanation": "Label each sentence's job.\n\nSentence 1: scientists believed the frog had vanished. Sentence 2: researchers found some. Sentence 3: they suggest how the frogs survived.\n\nOld belief, a discovery that overturned it, and an explanation. That's choice C.",
     "rationales": {
-      "A": "The search is described briefly, but the text never evaluates a method's strengths and weaknesses.",
-      "B": "The discovery contradicts the idea that the frogs disappeared; nothing is confirmed about why frogs disappear.",
-      "D": "Only one species of frog is discussed."
+      "A": "The search is mentioned briefly, but no method is weighed for strengths and weaknesses.",
+      "B": "The discovery shows the frogs didn't disappear, so nothing about why frogs disappear is confirmed.",
+      "D": "Only one kind of frog is discussed."
     },
     "tags": ["overall-structure", "informational-text"]
   },
@@ -138,11 +138,11 @@
       "To present a historian's view that qualifies a common belief about the telescope's effect on astronomy"
     ],
     "answer": "D",
-    "explanation": "The text states a common belief (the telescope transformed astronomy overnight), then presents the historian's adjustment: the influence was real but gradual. Choice D describes this purpose of refining, not rejecting, the belief.",
+    "explanation": "The text starts with what people often say: the telescope changed astronomy almost overnight. The historian doesn't reject that completely. She agrees the effect was real but says it was gradual, because early telescopes were blurry and old methods lasted for decades.\n\nAdjusting a belief without throwing it out is called qualifying it. That's choice D.\n\nOn hard purpose questions, notice whether the writer flatly rejects an idea or just refines it.",
     "rationales": {
-      "A": "The historian calls the telescope's influence \"real\"; she disputes only how quickly it came, so \"little lasting effect\" overstates her view.",
-      "B": "Improved lens-making is mentioned only as the reason the influence grew; it isn't the focus.",
-      "C": "Naked-eye observation is mentioned as evidence for the historian's point, but its methods are never described."
+      "A": "She calls the telescope's influence \"real.\" She only questions how fast it came, so \"little lasting effect\" goes too far.",
+      "B": "Better lenses are mentioned only as the reason the influence grew. They aren't the focus.",
+      "C": "Naked eye observation is mentioned as evidence for her point, but its methods are never described."
     },
     "tags": ["main-purpose", "humanities"]
   },
@@ -159,11 +159,11 @@
       "They describe how the audience responds to Mira's speech."
     ],
     "answer": "B",
-    "explanation": "The first two sentences stress Mira's complete preparation. The third begins with \"But\" and shows that, on seeing her grandfather, the memorized words suddenly feel foreign. The opening sets up that contrast, as Choice B says.",
+    "explanation": "The first two sentences pile up how prepared Mira is: weeks of practice, every pause, every gesture. Then \"But\" turns everything around. When she sees her grandfather, the words she memorized suddenly feel like someone else's.\n\nThe opening builds up her preparation so the ending can contrast with it. That's choice B.\n\nWhen a story spends lines on one feeling and then says \"But,\" the opening is usually there to set up a contrast.",
     "rationales": {
-      "A": "Mira \"rehearsed\" the speech; nothing says she has performed it for audiences before.",
-      "C": "The grandfather appears only in the final sentence, and no reason for his presence is given.",
-      "D": "The second sentence mentions where the audience is \"supposed to\" laugh, an expectation from rehearsal, not an actual response."
+      "A": "She \"rehearsed\" the speech. Nothing says she has given it to audiences before.",
+      "C": "The grandfather appears only in the last sentence, and no reason for his visit is given.",
+      "D": "\"Supposed to laugh\" describes what she planned for in rehearsal, not how a real audience reacted."
     },
     "tags": ["sentence-function", "literary-text"]
   },
@@ -180,11 +180,11 @@
       "It challenges the linguists' observation presented in the first sentence."
     ],
     "answer": "A",
-    "explanation": "The second sentence says these languages are simple; the last sentence, starting with \"Yet,\" says they become far more complex once children learn them as a first language. Choice A identifies this contrast.",
+    "explanation": "Look at the word \"Yet\" at the start of the last sentence. It signals a turn.\n\nThe second sentence says these shared languages are simple, with few words and few rules. The last sentence says that once children grow up speaking them, they quickly become much more complex.\n\nSo the last sentence describes a change that contrasts with the simplicity just described. That's choice A.",
     "rationales": {
-      "B": "The last sentence describes the language growing more complex, not an example of its limited grammar.",
-      "C": "The reason for developing shared languages appears in the first sentence (to communicate), not the last.",
-      "D": "The last sentence adds to the linguists' observation by describing what happens next; it doesn't dispute that such languages form."
+      "B": "The last sentence is about the language becoming richer, not an example of its limited grammar.",
+      "C": "Why communities form these languages (to communicate) appears in the first sentence.",
+      "D": "The last sentence adds what happens next. It doesn't question that these languages form."
     },
     "tags": ["sentence-function", "social-studies"]
   }

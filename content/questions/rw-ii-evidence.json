@@ -12,11 +12,11 @@
       "A few weeds managed to grow even in fields where clover had been planted."
     ],
     "answer": "C",
-    "explanation": "The hypothesis predicts fewer weeds where clover covers the soil between rows. Choice C reports exactly that comparison: clover fields had far fewer weeds than bare-soil fields.",
+    "explanation": "Start by stating the hypothesis simply: clover between the rows means fewer weeds.\n\nSupport for it would show exactly that: fewer weeds where there's clover than where there isn't. Choice C reports that comparison directly.\n\nFor \"which finding supports\" questions, the right answer usually matches the hypothesis's own subject (here, weeds) and makes a fair comparison.",
     "rationales": {
-      "A": "Corn height is not what the hypothesis is about; it concerns the number of weeds.",
-      "B": "How fast clover grows in rainy fields says nothing about whether clover reduces weeds.",
-      "D": "Weeds growing despite the clover does not support the hypothesis; if anything, it slightly works against it."
+      "A": "Corn height is a different question. The hypothesis is about the number of weeds.",
+      "B": "How fast clover grows in rain doesn't tell you whether clover keeps weeds down.",
+      "D": "A few weeds still growing doesn't support the idea. If anything, it nudges slightly against it."
     },
     "tags": ["textual-evidence", "support-claim"]
   },
@@ -33,11 +33,11 @@
       "more visitors chose children's programs than chose study rooms."
     ],
     "answer": "A",
-    "explanation": "Borrowing books has the highest count in the table (84), more than computer use (52), study rooms (37), or children's programs (27). Choice A states this accurately.",
+    "explanation": "With data questions, check each choice against the numbers and keep only the one that is true.\n\nBorrowing books has $84$ visitors, more than computer use ($52$), study rooms ($37$), or children's programs ($27$). So choice A is accurate.\n\nThe wrong choices here each misread the table, so a careful line by line check is all you need.",
     "rationales": {
-      "B": "Computer use (52) is lower than borrowing books (84).",
-      "C": "Children's programs (27), not study rooms (37), had the fewest visitors.",
-      "D": "Children's programs (27) were chosen by fewer visitors than study rooms (37)."
+      "B": "Computer use has $52$, which is less than the $84$ for borrowing books.",
+      "C": "The smallest number is children's programs at $27$, not study rooms at $37$.",
+      "D": "Children's programs ($27$) are below study rooms ($37$), not above."
     },
     "tags": ["quantitative-evidence", "table"]
   },
@@ -54,11 +54,11 @@
       "\"Though he counted every coin at the market, he never let a child on our street go without a birthday gift.\""
     ],
     "answer": "D",
-    "explanation": "The claim has two parts: Mr. Abara has little money, and he is generous anyway. Choice D shows both: he counts every coin (little money) yet gives every child a birthday gift (generosity).",
+    "explanation": "Break the claim into parts and find the quote that shows all of them. Here there are two parts: Mr. Abara has very little money, and he is generous anyway.\n\nChoice D shows both in one sentence. \"Counted every coin\" shows he has little money. \"Never let a child go without a birthday gift\" shows generosity.\n\nA quote that shows only one part isn't enough.",
     "rationales": {
-      "A": "Waking early describes a habit, not generosity or limited money.",
-      "B": "A small, book-filled apartment doesn't show generosity.",
-      "C": "Complaining about prices suggests limited money but shows nothing about generosity."
+      "A": "Getting up early is a habit. It shows neither generosity nor a lack of money.",
+      "B": "A small apartment full of books doesn't show him being generous.",
+      "C": "This hints that money is tight, but it shows nothing generous. It covers only half the claim."
     },
     "tags": ["textual-evidence", "literary-text"]
   },
@@ -75,11 +75,11 @@
       "The seeds of species Y had a larger wing area than the seeds of species X did."
     ],
     "answer": "B",
-    "explanation": "To support the hypothesis, a choice must link wing size to distance. Ordering by wing area (W 12, Y 18, X 30, Z 45) also orders the distances (4.1, 6.3, 9.6, 14.2). Choice B points out the two extremes of this pattern.",
+    "explanation": "The hypothesis links two things: wing size and distance. So the supporting evidence has to mention both and show that they rise together.\n\nPut the species in order of wing area: W ($12$), Y ($18$), X ($30$), Z ($45$). Their distances follow the same order: $4.1$, $6.3$, $9.6$, $14.2$.\n\nChoice B points to the two ends of that pattern: the biggest wings went farthest, and the smallest went shortest.",
     "rationales": {
-      "A": "This gives one species' distance without comparing it with wing size, so it can't show a relationship.",
-      "C": "This is false: X traveled 9.6 meters and Z traveled 14.2 meters.",
-      "D": "This is false: Y's wing area (18) is smaller than X's (30), and it says nothing about distance anyway."
+      "A": "This gives one species' distance but says nothing about wing size, so it can't show a link between them.",
+      "C": "Check the table: X went $9.6$ meters and Z went $14.2$. The statement is false.",
+      "D": "This is false too, since Y's wings ($18$) are smaller than X's ($30$). It also leaves out distance."
     },
     "tags": ["quantitative-evidence", "table", "support-claim"]
   },
@@ -96,10 +96,10 @@
       "Records from the period show that the bridge was too steep for loaded carts and was used mostly by people walking to a church across the river."
     ],
     "answer": "D",
-    "explanation": "The claim is that the bridge was built mainly for merchants' carts. If the bridge was too steep for loaded carts and was mostly used by people walking to church, it could not have served that purpose well. Choice D undercuts the claim.",
+    "explanation": "To weaken a claim, find the choice that makes it less likely to be true.\n\nThe claim is that the bridge was built mainly for merchants' carts heading to market. Choice D says the bridge was too steep for loaded carts and was used mostly by people walking to church. A bridge that carts can't use well probably wasn't built for carts.\n\nCheck the other choices with one question: would this make you believe the claim more or less? All three others make it more believable.",
     "rationales": {
-      "A": "A market that grew after the bridge opened is consistent with the claim, so it supports rather than weakens it.",
-      "B": "A bridge wide enough for two carts suggests it was designed for cart traffic, which supports the claim.",
+      "A": "A market growing after the bridge opened fits the claim. That supports it rather than weakening it.",
+      "B": "Being wide enough for two carts suggests it was designed for carts, which supports the claim.",
       "C": "Merchants paying for repairs suggests the bridge mattered to them, which supports the claim."
     },
     "tags": ["textual-evidence", "weaken-claim"]
@@ -117,11 +117,11 @@
       "Average daily crossings were lower in 2021 than in 2020."
     ],
     "answer": "A",
-    "explanation": "The lane opened in 2021, so the claim concerns 2021 and 2022. Choice A shows crossings rising from the last year before the lane (425) to 520 in 2021 and 760 in 2022, an increase in each year since the lane opened.",
+    "explanation": "Read the claim carefully: since the lane opened, traffic has gone up every year. The lane opened in January 2021, so the years that matter are 2021 and 2022, compared with 2020 just before.\n\nChoice A follows exactly that stretch: $425$ in 2020, up to $520$ in 2021, up again to $760$ in 2022. That's an increase every year since the lane opened.",
     "rationales": {
-      "B": "Both years are before the lane opened, so this change can't support a claim about the period since it opened.",
-      "C": "A single year's number shows no change over time.",
-      "D": "This is false (520 is higher than 425), and it would contradict the claim if it were true."
+      "B": "Both of these years are before the lane opened, so they can't support a claim about what happened since.",
+      "C": "One year's number can't show a change from year to year.",
+      "D": "This is false, since $520$ is more than $425$. It would also go against the claim."
     },
     "tags": ["quantitative-evidence", "table", "support-claim"]
   },
@@ -138,11 +138,11 @@
       "Young birds raised apart from adults sing the same complete song as young birds raised near adults."
     ],
     "answer": "C",
-    "explanation": "To show the song is learned rather than inborn, you need a comparison: birds that can't hear adults should fail to develop the full song. Choice C provides that contrast, which only the learning hypothesis predicts.",
+    "explanation": "The debate has two sides: the song is inborn, or it's learned from adults. Strong support for \"learned\" has to be something the inborn idea can't explain.\n\nThe best test is a comparison. If birds that never hear adults sing only a simple version, while birds raised near adults sing the full song, hearing adults clearly matters. That's choice C.\n\nChoice A sounds supportive, but birds raised near adults would sing the full song under either explanation, so it doesn't settle anything.",
     "rationales": {
-      "A": "Birds raised near adults would sing the full song whether the song is learned or inborn, so this doesn't distinguish between the two explanations.",
-      "B": "Adults changing their songs says nothing about how young birds acquire the song in the first place.",
-      "D": "If isolated birds still sing the complete song, the song appears to be inborn; this weakens the hypothesis."
+      "A": "Birds raised near adults would sing the full song whether it's learned or inborn. Without a comparison group, this can't tell the two ideas apart.",
+      "B": "Adults changing their songs says nothing about how young birds pick the song up in the first place.",
+      "D": "If birds raised alone still sing the complete song, it looks inborn. That weakens the hypothesis."
     },
     "tags": ["textual-evidence", "support-claim"]
   },
@@ -159,11 +159,11 @@
       "Cedar Lake had more algae blooms than Birch Lake, even though Birch Lake was warmer."
     ],
     "answer": "B",
-    "explanation": "The claim has two parts: warmth is linked to more blooms, and nutrients matter too. Choice B covers both: Birch (3) beats Alder (1) and Dunmore (7) beats Cedar (4) at equal nutrient levels, while Cedar (4) beats Alder (1) and Dunmore (7) beats Birch (3) at equal temperatures.",
+    "explanation": "The claim has two parts: warmer lakes tend to have more blooms, and nutrients matter too. The best support shows each factor's effect while the other one is held the same.\n\nSame nutrients, different temperature: Birch ($3$) beats Alder ($1$), and Dunmore ($7$) beats Cedar ($4$). So warmth adds blooms.\n\nSame temperature, different nutrients: Cedar ($4$) beats Alder ($1$), and Dunmore ($7$) beats Birch ($3$). So nutrients add blooms too.\n\nChoice B describes both of these comparisons.",
     "rationales": {
-      "A": "This supports only the temperature part, and Birch was equally warm, so Dunmore's extra blooms can't be credited to temperature alone; it ignores nutrients.",
-      "C": "Pointing to one lake's count doesn't show how either temperature or nutrients relate to blooms.",
-      "D": "This shows nutrients matter but, taken alone, cuts against the idea that warmer lakes tend to have more blooms; it supports only half the claim."
+      "A": "Dunmore is warm and high in nutrients, so you can't tell which one causes its blooms. This leaves out the nutrient part of the claim.",
+      "C": "One lake's count on its own doesn't show how temperature or nutrients affect blooms.",
+      "D": "This shows nutrients matter, but on its own it makes temperature look unimportant. It supports only half the claim."
     },
     "tags": ["quantitative-evidence", "table", "support-claim"]
   },
@@ -180,11 +180,11 @@
       "\"Rosalind greeted the other performers with an easy smile, though beneath the folds of her dress her hands would not stop trembling.\""
     ],
     "answer": "D",
-    "explanation": "The portrayal has two parts: outward calm and hidden anxiety. Choice D shows both at once: an easy smile for others and trembling hands that no one can see.",
+    "explanation": "The author shows Rosalind in two layers: calm on the outside, anxious on the inside. The best quote shows both layers at once.\n\nChoice D does: she greets people \"with an easy smile\" (calm on the outside), while her hands \"would not stop trembling\" where nobody can see (anxiety on the inside).\n\nThe other quotes show one layer at most.",
     "rationales": {
-      "A": "This shows hard work and preparation, not a contrast between outward calm and inner anxiety.",
-      "B": "This shows anxiety, but Rosalind expresses it openly to her sister, so it isn't hidden behind a calm appearance.",
-      "C": "This shows only the calm appearance; nothing in the quotation reveals hidden anxiety."
+      "A": "Practicing hard shows dedication. It doesn't show a calm surface hiding nerves.",
+      "B": "This shows anxiety, but she tells her sister openly, so it isn't hidden behind a calm face.",
+      "C": "This shows only the calm surface. Nothing in it reveals the anxiety underneath."
     },
     "tags": ["textual-evidence", "literary-text"]
   }
