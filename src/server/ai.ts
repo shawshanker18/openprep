@@ -1,13 +1,16 @@
 // AI tutor rules (spec 04 §8): reveal rights, never during a test, shared cache for canned modes, daily cap.
 import "server-only";
 import { and, eq, gte, ne } from "drizzle-orm";
+import { anthropic } from "@ai-sdk/anthropic";
+import { google } from "@ai-sdk/google";
+import { createOpenAI, openai } from "@ai-sdk/openai";
 import { db } from "@/db";
 import { aiCache, aiMessages, attempts, questions, skillState, testItems, testModules, testSessions, type Question } from "@/db/schema";
 import { SKILL_BY_ID } from "@/content/taxonomy";
 import { masteryPct, status } from "@/engine/mastery";
 import { localDate } from "@/engine/plan";
 
-export const MODES = ["hint", "explain", "byhand", "fast", "desmos", "why_wrong", "chat"] as const;
+export const MODES = ["hint", "explain", "byhand", "fast", "desmos", "why_wrong", "vocab", "similar", "chat"] as const;
 export type Mode = (typeof MODES)[number];
 
 const MODE_RULE: Record<Mode, string> = {
@@ -17,8 +20,24 @@ const MODE_RULE: Record<Mode, string> = {
   fast: "fast: the quickest legitimate test-day method.",
   desmos: "desmos: exact things to type into the Desmos calculator and what to click.",
   why_wrong: "why_wrong: explain the specific mistake that leads to the student's choice, then the fix.",
+  vocab: "vocab: explain the key vocabulary or grammar rule this question tests (word in context, punctuation, agreement, transitions) in plain language, with 1-2 short original example sentences.",
+  similar: "similar: write ONE new original practice question testing the same skill at the same difficulty in the same SAT format (a short passage if Reading & Writing; 4 choices A-D, or a student-produced response if the original is one). Start with the heading \"**AI-generated practice (not scored)**\", then the question, then a line \"Answer: X\", then a short worked solution. Do not reuse the original's wording or numbers. Up to 300 words.",
   chat: "chat: answer the student's follow-up question.",
 };
+
+/** Provider-independent model from env (AI_PROVIDER / AI_MODEL); null when not configured. */
+export function getModel() {
+  const e = process.env, id = e.AI_MODEL;
+  switch (e.AI_PROVIDER || "anthropic") {
+    case "anthropic": return e.ANTHROPIC_API_KEY ? anthropic(id || "claude-haiku-4-5-20251001") : null;
+    case "openai": return e.OPENAI_API_KEY ? openai(id || "gpt-5-mini") : null;
+    case "google": return e.GOOGLE_GENERATIVE_AI_API_KEY ? google(id || "gemini-2.5-flash") : null;
+    case "openrouter": return e.OPENROUTER_API_KEY
+      ? createOpenAI({ baseURL: "https://openrouter.ai/api/v1", apiKey: e.OPENROUTER_API_KEY }).chat(id || "anthropic/claude-haiku-4.5") : null;
+    case "local": return e.AI_BASE_URL ? createOpenAI({ baseURL: e.AI_BASE_URL, apiKey: "local" }).chat(id || "llama3.2") : null;
+    default: return null;
+  }
+}
 
 /** Is any of this question's test sessions still running for this user? (No AI help during tests.) */
 async function inRunningTest(userId: string, questionId: string) {
@@ -78,12 +97,12 @@ Correct answer: ${answer}
 Official explanation: ${q.explanationMd}
 ${rationales ? `Why each wrong choice is wrong:\n${rationales}\n` : ""}${q.fastMethodMd ? `Fast method: ${q.fastMethodMd}\n` : ""}${q.desmos ? `Desmos steps: ${q.desmos.stepsMd} (expressions: ${q.desmos.expressions.join("; ")})\n` : ""}
 STUDENT CONTEXT:
-Skill: ${SKILL_BY_ID[q.skillId]?.name ?? q.skillId}. ${student}
+Skill: ${SKILL_BY_ID[q.skillId]?.name ?? q.skillId} (difficulty ${q.difficulty}). ${student}
 
 RULES:
 - Mode = ${mode}. ${MODE_RULE[mode]}
 - Match depth to mastery when known: below 45% define terms and go slower; above 70% be brief.
-- Use $...$ for all math. Keep answers under 180 words unless asked for more steps.
+- Use $...$ for all math. Keep answers under 180 words unless asked for more steps or the mode allows more.
 - Stay on this question, its skill, and SAT preparation. Politely decline anything else.
 - If the student claims the official answer is wrong, re-check carefully. If you still agree with the official answer, explain why.
   If you genuinely cannot reconcile it, say so and tell them to use the "Report question" button. Never invent a new official answer.

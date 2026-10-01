@@ -17,8 +17,10 @@ const USER = "00000000-0000-0000-0000-0000000000aa";
 const OTHER = "00000000-0000-0000-0000-0000000000bb";
 
 beforeAll(async () => {
-  const sql = fs.readFileSync(path.resolve(import.meta.dirname, "../../drizzle/0000_init.sql"), "utf8");
-  for (const stmt of sql.split("--> statement-breakpoint")) await pg.exec(stmt);
+  // Apply every migration in order (skip 0001: it needs Supabase's auth schema).
+  const dir = path.resolve(import.meta.dirname, "../../drizzle");
+  for (const file of fs.readdirSync(dir).filter((x) => x.endsWith(".sql") && !x.startsWith("0001")).sort())
+    for (const stmt of fs.readFileSync(path.join(dir, file), "utf8").split("--> statement-breakpoint")) await pg.exec(stmt);
   await db.insert(schema.profiles).values([{ id: USER }, { id: OTHER }]);
   await db.insert(schema.skillState).values(SKILLS.map((s) => ({ userId: USER, skillId: s.id })));
   // 12 questions per math skill × difficulty mix → plenty for two math modules. Correct answer is always "A".
@@ -125,4 +127,23 @@ it("full test on a thin bank: an empty routed R&W module is skipped and Math sti
 
 it("mini test for a skill with no questions fails cleanly", async () => {
   expect(await T.startTest(USER, { kind: "mini", skillId: "rw-ii-central" })).toMatchObject({ ok: false });
+});
+
+it("custom test honours sub-topics and difficulty, topping up from the skill when the tag pool is thin", async () => {
+  await db.insert(schema.questions).values(Array.from({ length: 2 }, (_, i) => ({
+    id: `m-geo-circles-tag-${i}`, skillId: "m-geo-circles", section: "math", domain: "m-geo", difficulty: 1, type: "mcq",
+    passageMd: null, stemMd: "s", choices: [], answer: { choice: "A" }, explanationMd: "e", choiceRationales: null,
+    fastMethodMd: null, desmos: null, tags: ["arc-length"], status: "active", version: 1,
+  })));
+  const r = await T.startTest(USER, { kind: "custom", skillIds: ["m-geo-circles"], count: 6, timed: false, tags: ["arc-length"], difficulty: 3 });
+  if (!r.ok) throw new Error(r.error);
+  const [m] = await modules(r.id);
+  const ids = (await items(m!.id)).map((i) => i.questionId);
+  expect(ids).toHaveLength(6);
+  expect(ids.filter((id) => id.startsWith("m-geo-circles-tag-"))).toHaveLength(2); // every tagged question, even off-difficulty
+  const rest = await db.select().from(schema.questions);
+  expect(rest.filter((x) => ids.includes(x.id) && !x.tags.length).every((x) => x.difficulty === 3)).toBe(true);
+  const [s] = await db.select().from(schema.testSessions).where(eq(schema.testSessions.id, r.id));
+  expect(s!.config).toMatchObject({ skillIds: ["m-geo-circles"], tags: ["arc-length"], difficulty: 3, timed: false });
+  await T.abandonTest(USER, r.id);
 });

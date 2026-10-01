@@ -113,7 +113,7 @@ export async function getDiagnostic(userId: string, sessionId: string) {
 }
 
 export async function answerDiagnostic(userId: string, input: {
-  sessionId: string; questionId: string; response: string | null; timeMs: number;
+  sessionId: string; questionId: string; response: string | null; timeMs: number; confidence?: 1 | 2 | 3 | null;
 }) {
   return db.transaction(async (tx) => {
     const now = new Date();
@@ -129,7 +129,7 @@ export async function answerDiagnostic(userId: string, input: {
     await tx.update(testItems).set({ response: input.response, timeMs: input.timeMs })
       .where(and(eq(testItems.moduleId, cur.moduleId), eq(testItems.position, cur.position)));
     await recordAttempt(tx, userId, cur.q, {
-      response: input.response, timeMs: input.timeMs, confidence: input.response === null ? 1 : null,
+      response: input.response, timeMs: input.timeMs, confidence: input.response === null ? 1 : (input.confidence ?? null),
       context: "diagnostic", sessionId: input.sessionId, now,
     });
     const next = await appendNext(tx, userId, input.sessionId);

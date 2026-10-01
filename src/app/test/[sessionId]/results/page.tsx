@@ -8,6 +8,8 @@ import { requireUser } from "@/server/auth";
 import { getSkillSummary, type SkillSummary } from "@/server/analytics";
 import { getTestResult } from "@/server/tests";
 import { TestResults } from "./test-results";
+import { skillsByPriority } from "@/server/plan";
+import { SKILL_BY_ID } from "@/content/taxonomy";
 
 const SELF = ["Don't know", "A little", "Know it", "Very confident"];
 
@@ -29,14 +31,17 @@ function SkillList({ title, skills }: { title: string; skills: SkillSummary[] })
 // Diagnostic → starting-profile view (spec 04 §2); every other kind → test results (spec 04 §5.3).
 export default async function ResultsPage({ params }: PageProps<"/test/[sessionId]/results">) {
   const { sessionId } = await params;
-  const { userId } = await requireUser();
+  const { userId, profile } = await requireUser();
   if (!/^[0-9a-f-]{36}$/i.test(sessionId)) notFound();
   const [s] = await db.select().from(testSessions).where(and(eq(testSessions.id, sessionId), eq(testSessions.userId, userId)));
   if (!s) notFound();
   if (s.status === "in_progress") redirect(`/test/${sessionId}`);
   if (s.kind !== "diagnostic") return <TestResults data={(await getTestResult(userId, sessionId))!} />;
 
-  const { skills, estimate } = await getSkillSummary(userId);
+  const [{ skills, estimate }, ranked] = await Promise.all([getSkillSummary(userId), skillsByPriority(userId, profile)]);
+  // Personalized starting curriculum (plan §24.6): biggest gains first; skip what's already strong.
+  const path = ranked.slice(0, 5).map((r) => skills.find((k) => k.id === r.skillId)!).filter(Boolean);
+  const skip = skills.filter((k) => k.status === "strong" || k.status === "mastered");
   const measured = skills.filter((k) => k.status !== "unknown").sort((a, b) => b.mastery - a.mastery);
   const strong = measured.filter((k) => k.status === "strong" || k.status === "mastered");
   const developing = measured.filter((k) => k.status === "developing");
@@ -73,6 +78,27 @@ export default async function ResultsPage({ params }: PageProps<"/test/[sessionI
           ))}
         </div>
       )}
+
+      <section className="flex flex-col gap-3 rounded-lg border p-4">
+        <h3 className="font-medium">Your starting path</h3>
+        <p className="text-sm text-muted-foreground">Ordered by how many points each skill can add toward your target. Your daily plan follows this order.</p>
+        <ol className="flex flex-col gap-2 text-sm">
+          {path.map((k, i) => (
+            <li key={k.id} className="flex flex-wrap items-center justify-between gap-2">
+              <span>{i + 1}. {k.name} <span className="text-muted-foreground">· {k.status === "unknown" ? "not measured" : `${k.mastery}%`}</span></span>
+              <span className="flex gap-3">
+                <Link className="underline" href={`/skills/${k.id}?tab=learn`}>Learn</Link>
+                <Link className="underline" href={`/practice?skill=${k.id}`}>Practise</Link>
+              </span>
+            </li>
+          ))}
+        </ol>
+        {skip.length > 0 && (
+          <p className="text-sm text-muted-foreground">
+            You can skip for now: {skip.map((k) => SKILL_BY_ID[k.id]?.name).join(", ")}.
+          </p>
+        )}
+      </section>
 
       {unmeasured.length > 0 && (
         <p className="text-sm text-muted-foreground">

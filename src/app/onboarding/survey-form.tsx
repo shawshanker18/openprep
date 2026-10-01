@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { TOPICS } from "@/content/taxonomy";
+import { SUBJECTS, TOPICS } from "@/content/taxonomy";
 import { submitSurvey } from "./actions";
 
 const field = "flex flex-col gap-1.5 text-sm";
@@ -26,6 +26,7 @@ export function SurveyForm() {
         grade: num("grade"),
         curriculum: f.get("curriculum") as "cbse",
         topicsStudied: f.getAll("topics") as string[],
+        subjects: f.getAll("subjects") as (typeof SUBJECTS)[number][],
         englishBackground: f.get("english") as "fluent",
         prior: tookSat ? { math: num("priorMath"), rw: num("priorRw"), takenOn: String(f.get("priorDate")) } : null,
         targetScore: target,
@@ -57,7 +58,14 @@ export function SurveyForm() {
       </div>
 
       <fieldset className="flex flex-col gap-2 text-sm">
-        <legend className="mb-2">Which of these have you studied in school?</legend>
+        <legend className="mb-2">Subjects you&apos;re studying now</legend>
+        <div className="flex flex-wrap gap-x-4 gap-y-2">
+          {SUBJECTS.map((s) => <label key={s} className="flex items-center gap-2"><input type="checkbox" name="subjects" value={s} /> {s}</label>)}
+        </div>
+      </fieldset>
+
+      <fieldset className="flex flex-col gap-2 text-sm">
+        <legend className="mb-2">Which math chapters have you already studied?</legend>
         <div className="grid gap-2 sm:grid-cols-2">
           {TOPICS.map((t) => (
             <label key={t.id} className="flex items-center gap-2">

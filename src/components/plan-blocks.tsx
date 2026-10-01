@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { SKILL_BY_ID } from "@/content/taxonomy";
 import type { PlanBlock } from "@/engine/plan";
 import { cn } from "@/lib/utils";
-import { setBlockDone } from "@/app/(app)/plan/actions";
+import { removePlanBlock, setBlockDone } from "@/app/(app)/plan/actions";
 
 function describe(b: PlanBlock, i: number): { label: string; href: string } {
   switch (b.kind) {
@@ -16,7 +16,7 @@ function describe(b: PlanBlock, i: number): { label: string; href: string } {
   }
 }
 
-export function PlanBlocks({ blocks }: { blocks: PlanBlock[] }) {
+export function PlanBlocks({ blocks, removable }: { blocks: PlanBlock[]; removable?: boolean }) {
   if (!blocks.length) return <p className="text-sm text-muted-foreground">Nothing planned today — try smart practice.</p>;
   return (
     <ol className="flex flex-col gap-2">
@@ -35,6 +35,11 @@ export function PlanBlocks({ blocks }: { blocks: PlanBlock[] }) {
               <span className="ml-2 text-muted-foreground tabular-nums">{b.minutes} min</span>
             </div>
             {!b.done && <Button size="sm" variant="outline" render={<Link href={href} />}>Start</Button>}
+            {removable && (
+              <form action={removePlanBlock.bind(null, i)}>
+                <Button size="sm" variant="ghost" type="submit" aria-label={`Remove "${label}"`}>Remove</Button>
+              </form>
+            )}
           </li>
         );
       })}

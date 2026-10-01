@@ -65,3 +65,22 @@ export const TOPICS: { id: string; label: string; skills: string[] }[] = [
   { id: "geometry",   label: "Geometry: area, volume, angles, circles", skills: ["m-geo-area", "m-geo-lines", "m-geo-circles"] },
   { id: "trig",       label: "Trigonometry", skills: ["m-geo-trig"] },
 ];
+
+// Onboarding "subjects currently studying" (context only).
+export const SUBJECTS = ["Mathematics", "English", "Physics", "Chemistry", "Biology", "Economics", "Computer Science", "History", "Other"] as const;
+
+/**
+ * Curriculum as prior knowledge (plan §11): topics a student on this board has *probably* met by this grade.
+ * ponytail: coarse heuristic; it only nudges the starting point (+0.1) — the diagnostic decides.
+ */
+const BOARD_BY_GRADE: Record<string, [number, string[]][]> = {
+  cbse:     [[9, ["linear", "geometry", "percent"]], [10, ["systems", "quadratics", "stats", "trig"]], [11, ["functions"]]],
+  icse:     [[9, ["linear", "geometry", "percent", "systems"]], [10, ["quadratics", "stats", "trig"]], [11, ["functions"]]],
+  ib:       [[9, ["linear", "percent", "geometry"]], [10, ["systems", "quadratics", "stats"]], [11, ["functions", "trig"]]],
+  gcse:     [[9, ["linear", "percent", "geometry"]], [10, ["systems", "quadratics", "stats", "trig"]], [12, ["functions"]]],
+  american: [[9, ["linear", "systems", "percent"]], [10, ["geometry", "quadratics", "stats"]], [11, ["functions", "trig"]]],
+};
+export function boardTopics(curriculum: string | null, grade: number | null): string[] {
+  if (!curriculum || !grade) return [];
+  return (BOARD_BY_GRADE[curriculum] ?? []).filter(([g]) => grade >= g).flatMap(([, t]) => t);
+}

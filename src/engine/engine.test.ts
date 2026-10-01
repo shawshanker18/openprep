@@ -81,6 +81,17 @@ describe("prior", () => {
   });
 });
 
+describe("board prior", () => {
+  it("board-implied is a smaller nudge than a ticked topic", () => {
+    const base = { selfRating: 1 as SelfRating, priorSectionScore: null };
+    const none = priorTheta({ ...base, topicStudied: false });
+    const board = priorTheta({ ...base, topicStudied: false, boardImplied: true });
+    const ticked = priorTheta({ ...base, topicStudied: true });
+    expect(none).toBeLessThan(board);
+    expect(board).toBeLessThan(ticked);
+  });
+});
+
 describe("grade", () => {
   it("grades MCQ by exact choice", () => {
     expect(grade({ answer: { choice: "B" } }, "B")).toBe(true);
@@ -209,6 +220,12 @@ describe("assemble", () => {
     const m = assembleModule(moduleBlueprint("rw", "base"), pool, new Set(), rngFrom(9));
     expect(m.every((q) => q.lastSeenAt === null)).toBe(true);
   });
+  it("a single-difficulty blueprint fills from that difficulty, then borrows the nearest", () => {
+    const pool = makePool("math", 2).filter((q) => q.skillId === "m-geo-circles"); // 2 per difficulty
+    const bp = { section: "math" as const, count: 4, timeLimitS: null, domainCounts: { "m-geo": 4 }, difficultyCounts: { 1: 0, 2: 0, 3: 1 } };
+    const m = assembleModule(bp, pool, new Set(), rngFrom(4));
+    expect(m.map((q) => q.difficulty).sort()).toEqual([2, 2, 3, 3]);
+  });
   it("largestRemainder sums exactly", () => {
     expect(largestRemainder(7, [8, 11, 8]).reduce((a, b) => a + b)).toBe(7);
     expect(largestRemainder(0, [1, 1, 1])).toEqual([0, 0, 0]);
@@ -289,5 +306,37 @@ describe("readyBy", () => {
     expect(readyBy({ estimate: 1400, target: 1400, minutesPerDay: 45, daysPerWeek: 5, now })!.weeks).toBe(2);
     expect(readyBy({ estimate: 1100, target: 1400, minutesPerDay: 45, daysPerWeek: 5, now })!.weeks).toBe(22);
     expect(readyBy({ estimate: 400, target: 1600, minutesPerDay: 15, daysPerWeek: 3, now })).toBeNull(); // > 2 years
+  });
+});
+
+describe("plan near the test date", () => {
+  const focus = (lessonDone: boolean, attemptsThisWeek = 0) => SKILLS.slice(0, 3).map((s) => ({
+    skillId: s.id, section: s.section, masteryPct: 30, lessonDone, attemptsThisWeek,
+  }));
+  const base = { dueReviews: 3, nextDesmosLesson: null, dayOfWeekIndex: 1 };
+  it("≤ 28 days: first practice block ≥ 15 min becomes a mini check-in; budget respected; deterministic", () => {
+    for (const minutes of [15, 30, 45, 60, 90, 120]) for (const daysToTest of [null, 40, 28, 7, 0]) {
+      const input = { ...base, minutes, focus: focus(true), daysToTest };
+      const p = buildDailyPlan(input);
+      expect(p.reduce((a, b) => a + b.minutes, 0)).toBeLessThanOrEqual(minutes + 5);
+      expect(buildDailyPlan(input)).toEqual(p);
+      const minis = p.filter((b) => b.kind === "mini");
+      const firstPractice = p.find((b) => b.kind === "practice" || b.kind === "mini");
+      if (daysToTest != null && daysToTest <= 28 && firstPractice && firstPractice.minutes >= 15) expect(firstPractice.kind).toBe("mini");
+      if (daysToTest == null || daysToTest > 28) expect(minis).toHaveLength(0);
+      expect(minis.length).toBeLessThanOrEqual(1);
+    }
+  });
+  it("≤ 7 days: no learn blocks, review kept", () => {
+    const far = buildDailyPlan({ ...base, minutes: 60, focus: focus(false), daysToTest: 30 });
+    expect(far.some((b) => b.kind === "learn")).toBe(true);
+    const near = buildDailyPlan({ ...base, minutes: 60, focus: focus(false), daysToTest: 5 });
+    expect(near.some((b) => b.kind === "learn")).toBe(false);
+    expect(near.some((b) => b.kind === "review")).toBe(true);
+    expect(near.some((b) => b.kind === "mini")).toBe(true);
+  });
+  it("a past test date is ignored", () => {
+    const input = { ...base, minutes: 60, focus: focus(false) };
+    expect(buildDailyPlan({ ...input, daysToTest: -3 })).toEqual(buildDailyPlan(input));
   });
 });

@@ -30,8 +30,10 @@ const review = async (questionId: string) =>
   (await db.select().from(schema.reviewItems).where(eq(schema.reviewItems.questionId, questionId)))[0];
 
 beforeAll(async () => {
-  const sql = fs.readFileSync(path.resolve(import.meta.dirname, "../../drizzle/0000_init.sql"), "utf8");
-  for (const stmt of sql.split("--> statement-breakpoint")) await pg.exec(stmt);
+  // Apply every migration in order (skip 0001: it needs Supabase's auth schema).
+  const dir = path.resolve(import.meta.dirname, "../../drizzle");
+  for (const file of fs.readdirSync(dir).filter((x) => x.endsWith(".sql") && !x.startsWith("0001")).sort())
+    for (const stmt of fs.readFileSync(path.join(dir, file), "utf8").split("--> statement-breakpoint")) await pg.exec(stmt);
   await db.insert(schema.profiles).values({ id: USER });
   await db.insert(schema.questions).values([Q1, Q2]);
   await db.insert(schema.skillState).values(
@@ -79,4 +81,16 @@ it("omitted test answers are wrong, typed as timing, and time is capped", async 
 it("refuses when onboarding never created skill rows", async () => {
   const other = { ...Q1, skillId: "m-alg-lin1", domain: "m-alg" };
   await expect(record(other, { response: "B", timeMs: 1, confidence: 3, context: "practice", now })).rejects.toThrow(/skill_state missing/);
+});
+
+it("guessed-right is queued for review in 3 days, and a guessed-right review stays at stage 0", async () => {
+  const Q3 = q("m-adv-nonlin-eq-0003", 2, "D");
+  await db.insert(schema.questions).values(Q3);
+  const r = await record(Q3, { response: "D", timeMs: 30_000, confidence: 1, context: "practice", now });
+  expect(r.correct).toBe(true);
+  expect(await review(Q3.id)).toMatchObject({ stage: 0, dueAt: new Date("2026-10-04T10:00:00Z") });
+  await record(Q3, { response: "D", timeMs: 30_000, confidence: 1, context: "review", now });
+  expect((await review(Q3.id))!.stage).toBe(0);
+  await record(Q3, { response: "D", timeMs: 30_000, confidence: 3, context: "review", now });
+  expect((await review(Q3.id))!.stage).toBe(1); // a sure answer walks the ladder as before
 });

@@ -5,7 +5,9 @@ import type { TestResult } from "@/engine/score";
 import { DiagnosticGate } from "@/components/diagnostic-gate";
 import { diagnosticPending, requireUser } from "@/server/auth";
 import { skillsWithQuestions } from "@/server/plan";
+import { tagsBySkill } from "@/server/practice";
 import { listTests } from "@/server/tests";
+import { SkillTagPicker } from "../practice/skill-tag-picker";
 import { abandon } from "@/app/test/[sessionId]/actions";
 import { startTestAction } from "./actions";
 
@@ -28,7 +30,7 @@ export default async function TestsPage({ searchParams }: PageProps<"/tests">) {
   const sp = await searchParams;
   const { userId, profile } = await requireUser();
   if (diagnosticPending(profile)) return <DiagnosticGate />;
-  const [history, available] = await Promise.all([listTests(userId), skillsWithQuestions()]);
+  const [history, available, tags] = await Promise.all([listTests(userId), skillsWithQuestions(), tagsBySkill()]);
   const open = history.filter((t) => t.status === "in_progress" && t.kind !== "diagnostic");
   const skills = SKILLS.filter((s) => available.has(s.id));
   const sectionPick = (
@@ -72,15 +74,16 @@ export default async function TestsPage({ searchParams }: PageProps<"/tests">) {
         </StartCard>
         <StartCard title="Custom test" time="You choose" fields={<>
           <input type="hidden" name="kind" value="custom" />
-          <fieldset className="flex max-h-32 flex-col gap-1 overflow-y-auto text-sm">
-            {skills.map((s) => <label key={s.id} className="flex gap-2"><input type="checkbox" name="skillIds" value={s.id} />{s.name}</label>)}
-          </fieldset>
-          <div className="flex items-center gap-3 text-sm">
+          <SkillTagPicker skills={skills} tagsBySkill={tags} name="skillIds" />
+          <div className="flex flex-wrap items-center gap-3 text-sm">
+            <select name="difficulty" className={control} defaultValue="mixed" aria-label="Difficulty">
+              <option value="mixed">Mixed</option><option value="1">Easy</option><option value="2">Medium</option><option value="3">Hard</option>
+            </select>
             <label className="flex items-center gap-2">Questions <input name="count" type="number" min={5} max={30} defaultValue={10} className={`${control} w-20`} /></label>
             <label className="flex items-center gap-2"><input type="checkbox" name="timed" defaultChecked /> Timed</label>
           </div>
         </>}>
-          Pick skills, length, and timing.
+          Pick skills, sub-topics, difficulty, length, and timing.
         </StartCard>
       </div>
 

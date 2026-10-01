@@ -8,10 +8,11 @@ const SELF_THETA = [-1.2, -0.4, 0.4, 0.9] as const; // don't know, a little, kno
 export function priorTheta(input: {
   selfRating: SelfRating | null;     // null (skipped) is treated as 1
   topicStudied: boolean;
+  boardImplied?: boolean;               // the student's board/grade usually covers it (smaller nudge)
   priorSectionScore: number | null;
 }): number {
   const self = SELF_THETA[input.selfRating ?? 1];
-  const bonus = input.topicStudied ? 0.2 : 0;
+  const bonus = input.topicStudied ? 0.2 : input.boardImplied ? 0.1 : 0;
   if (input.priorSectionScore == null) return clamp(0.6 * self + bonus, -2, 2);
   const fromScore = (input.priorSectionScore - 500) / SCORE_SLOPE;
   return clamp(0.5 * self + 0.5 * fromScore + bonus, -2, 2);

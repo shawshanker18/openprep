@@ -1,5 +1,5 @@
 // Test scoring, score estimates, superscore, test insights (spec 03 §8, §11).
-import { DOMAINS, SKILLS, skillWeight, type DomainId } from "@/content/taxonomy";
+import { DOMAINS, SKILLS, SKILL_BY_ID, skillWeight, type DomainId } from "@/content/taxonomy";
 import { MOCK_HALF_WIDTH, SCORE_SLOPE, TARGET_SECONDS, type Difficulty } from "./constants";
 import { clamp, sigma } from "./mastery";
 import { MISTAKE_LABEL, type MistakeType } from "./mistakes";
@@ -138,6 +138,12 @@ export function buildTestResult(
   for (const i of items) if (!i.correct && i.mistakeType) counts.set(i.mistakeType, (counts.get(i.mistakeType) ?? 0) + 1);
   const top = [...counts.entries()].sort((a, b) => b[1] - a[1])[0];
   if (top && top[1] >= 3) insights.push(`Most common mistake: ${MISTAKE_LABEL[top[0] as MistakeType] ?? top[0]}.`);
+  // Most-missed skill (plan §17 "Most common mistake: Evidence questions").
+  const missedBySkill = new Map<string, number>();
+  for (const i of items) if (!i.correct) missedBySkill.set(i.skillId, (missedBySkill.get(i.skillId) ?? 0) + 1);
+  const worstSkill = [...missedBySkill.entries()].sort((a, b) => b[1] - a[1])[0];
+  if (worstSkill && worstSkill[1] >= 3)
+    insights.push(`Most-missed skill: ${SKILL_BY_ID[worstSkill[0]]?.name ?? worstSkill[0]} (${worstSkill[1]} wrong) — practise it next.`);
   const easy = ofDiff(1);
   const easyMissed = easy.filter((i) => !i.correct).length;
   if (easy.length >= 3 && easyMissed / easy.length > 0.2)

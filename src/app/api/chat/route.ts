@@ -1,11 +1,10 @@
 // AI tutor endpoint (spec 04 §8.3). Plain-text streaming; the client reads it with fetch.
 import { after } from "next/server";
 import { streamText } from "ai";
-import { anthropic } from "@ai-sdk/anthropic";
 import { z } from "zod";
 import { AI_INPUT_MAX_CHARS } from "@/engine/constants";
 import { getUserId } from "@/server/auth";
-import { cacheKey, checkAccess, getCached, loadQuestion, logMessage, MODES, saveCache, systemPrompt, usedToday } from "@/server/ai";
+import { cacheKey, checkAccess, getCached, getModel, loadQuestion, logMessage, MODES, saveCache, systemPrompt, usedToday } from "@/server/ai";
 import { db } from "@/db";
 import { profiles } from "@/db/schema";
 import { eq } from "drizzle-orm";
@@ -32,16 +31,19 @@ export async function POST(req: Request) {
 
   const q = await loadQuestion(questionId);
   if (!q) return text("Question not found.", 404);
+  if (mode === "vocab" && q.section !== "rw") return text("Vocabulary help is for Reading & Writing questions.", 400);
   const denied = await checkAccess(userId, q, mode);
   if (denied) return text(denied, 403);
 
-  const key = mode === "chat" ? null : cacheKey(q, mode, choice);
+  // similar: fresh question every click — never cached, never stored as a real question.
+  const key = mode === "chat" || mode === "similar" ? null : cacheKey(q, mode, choice);
   if (key) {
     const hit = await getCached(key);
     if (hit) return text(hit);
   }
 
-  if (!process.env.ANTHROPIC_API_KEY) return text("The tutor isn't set up on this server yet. The written explanations are always available.", 503);
+  const model = getModel();
+  if (!model) return text("The tutor isn't set up on this server yet. The written explanations are always available.", 503);
   const [profile] = await db.select({ tz: profiles.timezone }).from(profiles).where(eq(profiles.id, userId));
   const limit = Number(process.env.AI_DAILY_LIMIT) || 30;
   if ((await usedToday(userId, profile?.tz ?? "UTC")) >= limit)
@@ -51,10 +53,10 @@ export async function POST(req: Request) {
   await logMessage(userId, q.id, "user", prompt);
 
   const result = streamText({
-    model: anthropic(process.env.AI_MODEL || "claude-haiku-4-5-20251001"),
+    model,
     instructions: await systemPrompt(userId, q, mode, choice),
     messages: mode === "chat" ? messages.slice(-8) : [{ role: "user", content: prompt }],
-    maxOutputTokens: 700,
+    maxOutputTokens: mode === "similar" ? 1000 : 700,
   });
   after(async () => {
     const out = await result.text;
