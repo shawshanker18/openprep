@@ -108,7 +108,7 @@ export default async function SkillPage({ params, searchParams }: PageProps<"/sk
           <dl className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             {[
               ["You said", s.selfRating != null ? SELF[s.selfRating] : "Not yet"],
-              ["Estimate certainty", measured ? `${certaintyPct(s.n)}% (${certaintyLabel(s.n)})` : "Not yet"],
+              ["How sure we are", measured ? `${certaintyPct(s.n)}% (${certaintyLabel(s.n)})` : "Not yet"],
               ["Your confidence", confTotal ? stats.confidence.toSorted((a, b) => a.confidence - b.confidence)
                 .map((r) => `${CONF[r.confidence]} ${Math.round((100 * r.n) / confTotal)}%`).join(" · ") : "Not yet"],
               ["Accuracy", s.accuracy != null ? `${s.accuracy}%` : "Not yet"],

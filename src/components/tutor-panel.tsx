@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -15,6 +15,10 @@ const LABEL: Record<Exclude<Mode, "chat">, string> = {
   vocab: "Explain the vocabulary/grammar", similar: "Give me a similar question",
 };
 
+// One check per page load: is a tutor model configured on this server?
+let enabledCheck: Promise<boolean> | null = null;
+const tutorEnabled = () => (enabledCheck ??= fetch("/api/chat").then((r) => r.json()).then((j: { enabled?: boolean }) => !!j.enabled).catch(() => false));
+
 /** Slide-over AI tutor for one question (spec 04 §8). `answered=false` → hint mode only. */
 export function TutorPanel({ questionId, answered, isMath, wrongChoice }: {
   questionId: string; answered: boolean; isMath: boolean; wrongChoice?: string | null;
@@ -23,6 +27,8 @@ export function TutorPanel({ questionId, answered, isMath, wrongChoice }: {
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const abort = useRef<AbortController | null>(null);
+  const [enabled, setEnabled] = useState(false);
+  useEffect(() => { void tutorEnabled().then(setEnabled); }, []);
 
   const ask = async (mode: Mode, text?: string) => {
     const userMsg: Msg = { role: "user", content: text ?? LABEL[mode as Exclude<Mode, "chat">] };
@@ -53,6 +59,7 @@ export function TutorPanel({ questionId, answered, isMath, wrongChoice }: {
     : ["explain", "byhand", "fast", ...(isMath ? ["desmos" as const] : []), ...(wrongChoice ? ["why_wrong" as const] : []),
       ...(isMath ? [] : ["vocab" as const]), "similar"];
 
+  if (!enabled) return null;
   return (
     <Sheet onOpenChange={(open) => { if (!open) abort.current?.abort(); }}>
       <SheetTrigger render={<Button variant="outline" size="sm" />}><Sparkles /> {answered ? "Ask tutor" : "Hint"}</SheetTrigger>

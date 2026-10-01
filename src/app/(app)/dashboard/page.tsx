@@ -69,7 +69,7 @@ export default async function DashboardPage() {
           {testDay && <SatCountdown testDate={profile.testDate!} timeZone={profile.timezone} />}
         </div>
         {tooSoon && <p className="text-sm">Book an SAT in <b>{month(ready!.date)}</b> or later, or add study time, to give yourself a realistic shot at {profile.targetScore}.</p>}
-        <p className="text-xs text-muted-foreground">Prediction = points still needed ÷ (your study hours per week × {POINTS_PER_STUDY_HOUR} points per hour), plus 2 weeks for a final mock. A planning estimate, not a promise.</p>
+        <p className="text-xs text-muted-foreground">How we guess this: we compare the points you still need with how much you study each week (students gain roughly {POINTS_PER_STUDY_HOUR} points per hour of focused practice), then add two weeks for a final practice test. It&apos;s a guide for planning, not a promise.</p>
       </Card>
     ),
     today: (

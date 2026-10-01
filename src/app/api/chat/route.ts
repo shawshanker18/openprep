@@ -18,6 +18,11 @@ const Body = z.object({
 
 const text = (body: string, status = 200) => new Response(body, { status, headers: { "content-type": "text/plain; charset=utf-8" } });
 
+/** Whether a tutor model is configured, so the UI can hide the tutor instead of showing a dead button. */
+export function GET() {
+  return Response.json({ enabled: !!getModel() }, { headers: { "cache-control": "public, max-age=300" } });
+}
+
 export async function POST(req: Request) {
   const userId = await getUserId();
   if (!userId) return text("Please sign in.", 401);
