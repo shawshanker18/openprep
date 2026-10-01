@@ -1,0 +1,24 @@
+import "server-only";
+import { cache } from "react";
+import { redirect } from "next/navigation";
+import { eq } from "drizzle-orm";
+import { createClient } from "@/lib/supabase/server";
+import { db } from "@/db";
+import { profiles } from "@/db/schema";
+
+/** Current user id from a verified JWT, or null. One auth round-trip per request. */
+export const getUserId = cache(async (): Promise<string | null> => {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser(); // getUser, NOT getSession: verifies the JWT
+  return user?.id ?? null;
+});
+
+export const requireUser = cache(async () => {
+  const userId = await getUserId();
+  if (!userId) redirect("/login");
+  await db.insert(profiles).values({ id: userId }).onConflictDoNothing();
+  const [profile] = await db.select().from(profiles).where(eq(profiles.id, userId));
+  return { userId, profile: profile! };
+});
+
+export type ActionResult<T = undefined> = { ok: true; data: T } | { ok: false; error: string };

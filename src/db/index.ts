@@ -1,0 +1,12 @@
+import "server-only";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
+import * as schema from "./schema";
+
+// Supabase transaction pooler does not support prepared statements → prepare: false.
+const g = globalThis as unknown as { pg?: ReturnType<typeof postgres> };
+const client = g.pg ?? postgres(process.env.DATABASE_URL!, { prepare: false, max: 5 });
+if (process.env.NODE_ENV !== "production") g.pg = client; // survive dev hot-reload
+
+export const db = drizzle(client, { schema });
+export type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
