@@ -6,11 +6,11 @@
     "stem": "A bag contains $5$ red marbles, $7$ blue marbles, and $8$ green marbles. If one marble is chosen at random, what is the probability that it is blue?",
     "choices": ["$\\frac{1}{3}$", "$\\frac{7}{20}$", "$\\frac{7}{13}$", "$\\frac{13}{20}$"],
     "answer": "B",
-    "explanation": "There are $5 + 7 + 8 = 20$ marbles, and $7$ are blue. The probability is $\\frac{7}{20}$.",
+    "explanation": "Probability is the number of outcomes you want over the number of possible outcomes, when every outcome is equally likely.\n\nEach marble is equally likely to be picked. There are $5 + 7 + 8 = 20$ marbles, and $7$ of them are blue.\n\nSo the probability is $\\frac{7}{20}$.",
     "rationales": {
-      "A": "This treats the three colors as equally likely, but the colors have different numbers of marbles.",
-      "C": "This divides by the number of marbles that are not blue ($13$) instead of the total ($20$).",
-      "D": "This is the probability that the marble is not blue."
+      "A": "There are three colors, but they aren't equally likely because each color has a different number of marbles. Count marbles, not colors.",
+      "C": "The bottom of the fraction should be all $20$ marbles, not just the $13$ that aren't blue.",
+      "D": "$\\frac{13}{20}$ is the chance of NOT getting blue. Blue is $\\frac{7}{20}$."
     },
     "tags": ["simple-probability"]
   },
@@ -21,11 +21,11 @@
     "stem": "The table summarizes whether students in two grades at a school play a sport.\n\n| | Plays a sport | Does not play a sport | Total |\n|---|---|---|---|\n| 9th grade | $42$ | $38$ | $80$ |\n| 10th grade | $54$ | $66$ | $120$ |\n| Total | $96$ | $104$ | $200$ |\n\nIf one of these $200$ students is selected at random, what is the probability that the student is in 10th grade and plays a sport?",
     "choices": ["$\\frac{27}{100}$", "$\\frac{9}{20}$", "$\\frac{12}{25}$", "$\\frac{9}{16}$"],
     "answer": "A",
-    "explanation": "$54$ students are both in 10th grade and play a sport, out of $200$ students total: $\\frac{54}{200} = \\frac{27}{100}$.",
+    "explanation": "The student is picked from all $200$ students, so $200$ goes on the bottom.\n\nThe student has to be in 10th grade AND play a sport. That is a single cell in the table: $54$ students.\n\nSo the probability is $\\frac{54}{200} = \\frac{27}{100}$.\n\nWith table questions, always ask first: who am I choosing from? That group's total goes on the bottom.",
     "rationales": {
-      "B": "This divides by the number of 10th graders ($\\frac{54}{120}$), which answers a different question: the probability a 10th grader plays a sport.",
-      "C": "This is the probability that a student plays a sport, $\\frac{96}{200}$, regardless of grade.",
-      "D": "This divides by the number of students who play a sport ($\\frac{54}{96}$) instead of all $200$ students."
+      "B": "This divides by the $120$ tenth graders, which answers \"if a 10th grader is picked, do they play?\" Here the pick is from all $200$ students.",
+      "C": "$\\frac{96}{200}$ counts every student who plays a sport, in either grade. You need only the 10th graders who play.",
+      "D": "This divides by the $96$ who play a sport. The student is picked from all $200$, so divide by $200$."
     },
     "tags": ["two-way-tables"]
   },
@@ -35,7 +35,7 @@
     "type": "spr",
     "stem": "A fair $8$-sided die has faces numbered $1$ through $8$. If the die is rolled once, what is the probability that the result is greater than $5$?",
     "answer": ["3/8"],
-    "explanation": "The results greater than $5$ are $6$, $7$, and $8$: $3$ outcomes out of $8$ equally likely outcomes. The probability is $\\frac{3}{8}$.",
+    "explanation": "List the outcomes that count. \"Greater than $5$\" means $6$, $7$, or $8$, which is $3$ outcomes. ($5$ itself isn't greater than $5$.)\n\nThe die has $8$ equally likely faces, so the probability is $\\frac{3}{8}$.",
     "tags": ["simple-probability"]
   },
   {
@@ -45,11 +45,11 @@
     "stem": "The table summarizes whether students in two grades at a school play a sport.\n\n| | Plays a sport | Does not play a sport | Total |\n|---|---|---|---|\n| 9th grade | $42$ | $38$ | $80$ |\n| 10th grade | $54$ | $66$ | $120$ |\n| Total | $96$ | $104$ | $200$ |\n\nIf a student who plays a sport is selected at random, what is the probability that the student is in 9th grade?",
     "choices": ["$\\frac{21}{100}$", "$\\frac{7}{16}$", "$\\frac{12}{25}$", "$\\frac{21}{40}$"],
     "answer": "B",
-    "explanation": "The selection is only from students who play a sport, so the denominator is $96$. Of those, $42$ are in 9th grade: $\\frac{42}{96} = \\frac{7}{16}$.",
+    "explanation": "Read the selection carefully: the student is picked from those who play a sport. That shrinks the group to the $96$ sport players, so $96$ goes on the bottom.\n\nOf those $96$, the 9th graders are $42$.\n\nSo the probability is $\\frac{42}{96} = \\frac{7}{16}$.\n\nThe words \"a student who plays a sport is selected\" are the clue that you're choosing only from that column.",
     "rationales": {
-      "A": "This divides by all $200$ students instead of only the $96$ who play a sport.",
-      "C": "This is the probability that a student plays a sport, $\\frac{96}{200}$.",
-      "D": "This conditions on the wrong group: $\\frac{42}{80}$ is the probability that a 9th grader plays a sport."
+      "A": "The student is picked only from the $96$ who play a sport, so divide by $96$, not $200$.",
+      "C": "$\\frac{96}{200}$ is the chance that a random student plays a sport. Here you already know they do.",
+      "D": "This divides by the $80$ ninth graders, which answers \"does a 9th grader play a sport?\" The question is the other way around."
     },
     "tags": ["two-way-tables", "conditional-probability"]
   },
@@ -60,11 +60,11 @@
     "stem": "A spinner is divided into $4$ equal sections numbered $1$, $2$, $3$, and $4$. The spinner is spun twice. What is the probability that at least one of the two spins lands on an even number?",
     "choices": ["$\\frac{1}{4}$", "$\\frac{1}{2}$", "$\\frac{3}{4}$", "$1$"],
     "answer": "C",
-    "explanation": "Use the complement. The probability that a spin is odd is $\\frac{1}{2}$, so the probability that both spins are odd is $\\frac{1}{2} \\cdot \\frac{1}{2} = \\frac{1}{4}$. The probability of at least one even spin is $1 - \\frac{1}{4} = \\frac{3}{4}$.",
+    "explanation": "\"At least one\" problems are easiest through the opposite. The only way to have no even spins is for both spins to be odd.\n\nEach spin is odd half the time, so both are odd with probability $\\frac{1}{2} \\times \\frac{1}{2} = \\frac{1}{4}$.\n\nEverything else has at least one even spin: $1 - \\frac{1}{4} = \\frac{3}{4}$.\n\nYou can also list the four equally likely patterns: odd odd, odd even, even odd, even even. Three of the four have an even spin.",
     "rationales": {
-      "A": "This is the probability that both spins are even (or both odd), not at least one even.",
-      "B": "This is the probability for a single spin and ignores the second spin.",
-      "D": "This adds $\\frac{1}{2} + \\frac{1}{2}$, counting the outcomes where both spins are even twice."
+      "A": "$\\frac{1}{4}$ is the chance that both spins are even (or both odd). \"At least one even\" also includes the mixed results.",
+      "B": "$\\frac{1}{2}$ is the chance for just one spin. Having two spins gives more chances to hit an even number.",
+      "D": "Adding $\\frac{1}{2} + \\frac{1}{2}$ double counts the case where both spins are even. It is possible for both to be odd, so the answer can't be $1$."
     },
     "tags": ["compound-events"]
   },
@@ -74,8 +74,8 @@
     "type": "spr",
     "stem": "In a survey of $250$ people, 40% said they prefer tea to coffee. Of the people who prefer tea, 30% said they add honey. If one of the $250$ people is selected at random, what is the probability that the person prefers tea and adds honey? (Express your answer as a decimal or fraction.)",
     "answer": ["0.12"],
-    "explanation": "People who prefer tea: $0.40 \\times 250 = 100$. Of those, $0.30 \\times 100 = 30$ add honey. The probability is $\\frac{30}{250} = 0.12$.",
-    "fastMethod": "Multiply the percents directly: $0.40 \\times 0.30 = 0.12$.",
+    "explanation": "Follow the people step by step.\n\nTea lovers: 40% of $250$ is $0.40 \\times 250 = 100$ people.\n\nOf those, 30% add honey: $0.30 \\times 100 = 30$ people.\n\nThe person is chosen from all $250$, so the probability is $\\frac{30}{250} = 0.12$.",
+    "fastMethod": "\"30% of 40%\" is just $0.30 \\times 0.40 = 0.12$. The total of $250$ cancels out.",
     "tags": ["compound-events"]
   },
   {
@@ -85,11 +85,11 @@
     "stem": "A committee has $6$ seniors and $4$ juniors. Two members are chosen at random, one after the other, without replacement. What is the probability that both members chosen are juniors?",
     "choices": ["$\\frac{2}{15}$", "$\\frac{4}{25}$", "$\\frac{8}{45}$", "$\\frac{2}{5}$"],
     "answer": "A",
-    "explanation": "The first pick is a junior with probability $\\frac{4}{10}$. After one junior is chosen, $3$ juniors remain among $9$ members, so the second pick is a junior with probability $\\frac{3}{9}$. Multiply: $\\frac{4}{10} \\cdot \\frac{3}{9} = \\frac{12}{90} = \\frac{2}{15}$.",
+    "explanation": "\"Without replacement\" means the first person picked is no longer available, so the numbers change for the second pick.\n\nFirst pick: $4$ juniors out of $10$ people, so $\\frac{4}{10}$.\n\nSecond pick: one junior is gone, so $3$ juniors remain out of $9$ people. That is $\\frac{3}{9}$.\n\nBoth must happen, so multiply: $\\frac{4}{10} \\times \\frac{3}{9} = \\frac{12}{90} = \\frac{2}{15}$.",
     "rationales": {
-      "B": "This treats the picks as with replacement: $\\frac{4}{10} \\cdot \\frac{4}{10}$.",
-      "C": "This reduces the total to $9$ for the second pick but forgets to reduce the number of juniors: $\\frac{4}{10} \\cdot \\frac{4}{9}$.",
-      "D": "This is the probability for only one pick, $\\frac{4}{10}$."
+      "B": "This keeps $\\frac{4}{10}$ for the second pick, as if the first person went back into the group. Without replacement, it becomes $\\frac{3}{9}$.",
+      "C": "You reduced the group to $9$ but kept $4$ juniors. One junior was already picked, so only $3$ remain.",
+      "D": "$\\frac{4}{10}$ is the chance for the first pick only. Both picks need to be juniors, so multiply by the second chance too."
     },
     "tags": ["compound-events"]
   },
@@ -99,7 +99,7 @@
     "type": "spr",
     "stem": "A factory made $2{,}000$ parts on two machines. Machine A made 60% of the parts, and Machine B made the rest. Of the parts made by Machine A, 5% are defective; of the parts made by Machine B, 2% are defective. If a defective part is selected at random, what is the probability that it was made by Machine A?",
     "answer": ["15/19"],
-    "explanation": "Machine A made $0.60 \\times 2{,}000 = 1{,}200$ parts, and $0.05 \\times 1{,}200 = 60$ are defective. Machine B made $800$ parts, and $0.02 \\times 800 = 16$ are defective. There are $60 + 16 = 76$ defective parts, so the probability is $\\frac{60}{76} = \\frac{15}{19}$.",
+    "explanation": "The part is picked from the defective ones only, so first count how many defective parts each machine made.\n\nMachine A made 60% of $2{,}000$, which is $1{,}200$ parts. 5% of those are defective: $60$ parts.\n\nMachine B made the other $800$. 2% of those are defective: $16$ parts.\n\nThere are $60 + 16 = 76$ defective parts, and $60$ came from Machine A. So the probability is $\\frac{60}{76} = \\frac{15}{19}$.",
     "tags": ["conditional-probability"]
   },
   {
@@ -109,11 +109,11 @@
     "stem": "In a group of $150$ people, $90$ have a library card. Of the people with a library card, 60% read e-books. Of the people without a library card, $20$ read e-books. If a person who reads e-books is selected at random from the group, what is the probability that the person has a library card?",
     "choices": ["$\\frac{9}{25}$", "$\\frac{37}{75}$", "$\\frac{3}{5}$", "$\\frac{27}{37}$"],
     "answer": "D",
-    "explanation": "Card holders who read e-books: $0.60 \\times 90 = 54$. Total e-book readers: $54 + 20 = 74$. Given that the person reads e-books, the probability of having a card is $\\frac{54}{74} = \\frac{27}{37}$.",
+    "explanation": "The person is chosen from the e-book readers, so that group's size goes on the bottom. Count the e-book readers first.\n\nWith a card: 60% of $90$ is $54$ people. Without a card: $20$ people. Total e-book readers: $54 + 20 = 74$.\n\nOf those $74$, the ones with a card are $54$. So the probability is $\\frac{54}{74} = \\frac{27}{37}$.",
     "rationales": {
-      "A": "This divides by the whole group of $150$ instead of only the $74$ e-book readers: $\\frac{54}{150}$.",
-      "B": "This is the probability that a person in the group reads e-books, $\\frac{74}{150}$.",
-      "C": "This is the probability that a card holder reads e-books, which reverses the condition."
+      "A": "This divides by all $150$ people. The person is picked from the $74$ e-book readers only.",
+      "B": "$\\frac{74}{150}$ is the chance that someone in the whole group reads e-books. You already know they do.",
+      "C": "$\\frac{3}{5}$ is the share of card holders who read e-books. The question asks the reverse: of the e-book readers, how many have cards."
     },
     "tags": ["conditional-probability"]
   }

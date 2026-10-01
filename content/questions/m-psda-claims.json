@@ -11,11 +11,11 @@
       "All residents of the city, including those who are not registered voters"
     ],
     "answer": "A",
-    "explanation": "Results from a random sample can be generalized to the population the sample was drawn from. The sample was drawn at random from all registered voters in the city.",
+    "explanation": "Results from a random sample apply to the group the sample was drawn from, and no further.\n\nThese $500$ voters were picked at random from the list of registered voters in this city. So the results can be extended to all registered voters in the city.\n\nAsk yourself two questions on these problems: who could have been picked, and were they picked at random?",
     "rationales": {
-      "B": "Voters outside the city had no chance of being selected, so the sample does not represent them.",
-      "C": "Because the sample was random, the results can be extended beyond the people surveyed to the population they were drawn from.",
-      "D": "Residents who are not registered voters were not part of the population sampled."
+      "B": "Voters outside the city had no chance to be picked, so the sample says nothing reliable about them.",
+      "C": "Because the sample was random, it represents more than just the $500$ people asked. It speaks for the whole list it was drawn from.",
+      "D": "Only registered voters could be picked. People who aren't registered weren't part of the group sampled."
     },
     "tags": ["generalization"]
   },
@@ -31,11 +31,11 @@
       "Skipping breakfast causes students to earn lower test scores."
     ],
     "answer": "B",
-    "explanation": "In an observational study, researchers do not assign the treatment, so other differences between the groups could explain the result. The study supports an association, not cause and effect.",
+    "explanation": "In an observational study, researchers just watch what people already do. They don't decide who eats breakfast.\n\nThat means the breakfast eaters might differ in other ways too, like sleep, routines, or support at home. Any of those could explain the higher scores.\n\nSo the study can show that breakfast and scores go together (an association), but not that breakfast causes the higher scores.\n\nTo show cause and effect, researchers need to randomly assign who gets the treatment.",
     "rationales": {
-      "A": "An observational study cannot show cause and effect; students who eat breakfast may differ in other ways.",
-      "C": "This claims a causal effect from an intervention that the study never tested.",
-      "D": "This is still a cause-and-effect claim, which an observational study cannot support."
+      "A": "Nobody was assigned to eat breakfast, so other differences between the groups could explain the scores. That rules out claiming a cause.",
+      "C": "This predicts what would happen if breakfast were required, but the study never tried that. It only observed students.",
+      "D": "This is still a cause and effect claim, just flipped around. An observational study can't support it."
     },
     "tags": ["causation"]
   },
@@ -45,7 +45,7 @@
     "type": "spr",
     "stem": "In an experiment, $60$ tomato plants were randomly assigned to receive a new fertilizer and $60$ were randomly assigned to receive no fertilizer. The mean growth was $14.8$ centimeters for the fertilizer group and $11.3$ centimeters for the other group. How many centimeters greater was the mean growth of the fertilizer group?",
     "answer": ["3.5"],
-    "explanation": "Subtract the means: $14.8 - 11.3 = 3.5$ centimeters.",
+    "explanation": "\"How much greater\" asks for a difference, so subtract the two means.\n\n$14.8 - 11.3 = 3.5$ centimeters.\n\nBecause the plants were randomly assigned, this difference can fairly be credited to the fertilizer.",
     "tags": ["experimental-design"]
   },
   {
@@ -60,11 +60,11 @@
       "Survey students who already use the app about whether their scores have improved."
     ],
     "answer": "C",
-    "explanation": "Random assignment makes the two groups similar in every way except app use, on average. A difference in their scores can then be attributed to the app.",
+    "explanation": "To show that the app causes better scores, the only real difference between the two groups should be the app.\n\nRandomly assigning students to use it or not does that. With a large group, random assignment spreads things like motivation and ability evenly across both groups. If the app group then scores higher, the app is the best explanation.\n\nThe other designs let some other difference sneak in.",
     "rationales": {
-      "A": "Students who choose the app may already be more motivated, so the groups differ in more than app use.",
-      "B": "This year's and last year's students may differ in many ways, such as ability or teaching, so the comparison is not controlled.",
-      "D": "Self-reported improvement from current users has no comparison group and may be biased."
+      "A": "Students who choose the app might already be more motivated, so the groups differ in more than just the app.",
+      "B": "This year's class and last year's class can differ in many ways, so you can't tell if the app made the difference.",
+      "D": "Asking current users how they feel has no comparison group, and people's opinions of their own progress can be biased."
     },
     "tags": ["experimental-design", "causation"]
   },
@@ -80,11 +80,11 @@
       "A high-protein diet likely causes greater muscle gain for members of the city's gyms."
     ],
     "answer": "D",
-    "explanation": "Random assignment to diets supports a cause-and-effect conclusion. Random selection from the city's gym members allows that conclusion to be generalized to that population, but not beyond it.",
+    "explanation": "Two separate questions decide what you can conclude.\n\nCan you claim cause and effect? Yes, because the diets were randomly assigned.\n\nWho does it apply to? Only the group the people were randomly selected from: members of this city's gyms.\n\nPut together: a high protein diet likely causes more muscle gain for members of the city's gyms.",
     "rationales": {
-      "A": "The sample came only from gym members, who may differ from adults in the city who do not use a gym.",
-      "B": "The sample came only from one city's gym members, so it does not represent the whole country.",
-      "C": "The diets were randomly assigned, and $200$ subjects is enough to draw a conclusion; random assignment is what allows a causal claim."
+      "A": "Everyone in the study came from gym members, who may differ from adults who don't go to a gym. The result can't stretch that far.",
+      "B": "The sample came from one city's gyms, so it can't speak for the whole country.",
+      "C": "Random assignment, not a huge sample, is what allows a cause and effect claim. $200$ people randomly assigned is enough."
     },
     "tags": ["generalization", "causation"]
   },
@@ -94,7 +94,7 @@
     "type": "spr",
     "stem": "A student council surveyed $80$ randomly selected students about a proposed later start time, and $32$ of them said they support it. A council member claims that most students support the proposal. What percent of the surveyed students supported the proposal?",
     "answer": ["40"],
-    "explanation": "$\\frac{32}{80} = 0.40$, so 40% of the sampled students supported the proposal. (This does not support the claim that most students, more than 50%, support it.)",
+    "explanation": "Percent of the sample that supports it: $\\frac{32}{80} = 0.40$, or 40%.\n\nNotice what this means for the council member's claim. \"Most\" means more than half, but only 40% of the sample said yes. The survey doesn't back up the claim.",
     "tags": ["sampling-bias", "generalization"]
   },
   {
@@ -109,11 +109,11 @@
       "If an adult in the region gets a dog, that adult will exercise more."
     ],
     "answer": "A",
-    "explanation": "Random selection lets the results be generalized to adults in the region. But dog ownership was not randomly assigned, so the survey shows only an association, not a cause.",
+    "explanation": "Again, two questions.\n\nWho does it apply to? The adults were randomly selected from the region, so the result applies to adults in the region.\n\nIs it cause and effect? No. Nobody was assigned a dog; people already owned one or didn't. People who love exercise might be more likely to get a dog in the first place.\n\nSo the best conclusion is an association among adults in the region.",
     "rationales": {
-      "B": "Dog ownership was observed, not assigned; people who already like exercise may be more likely to own dogs.",
-      "C": "Because the adults were selected at random from the region, the association can be generalized to the region's adults.",
-      "D": "This predicts a causal effect for an individual, which an observational survey cannot support."
+      "B": "Dog ownership wasn't assigned. Active people may simply be more likely to own dogs, so you can't say the dog causes the exercise.",
+      "C": "Because the adults were chosen at random from the region, the association can be extended to the region's adults.",
+      "D": "This predicts that getting a dog would change one person's habits. That is a cause and effect claim the survey can't support."
     },
     "tags": ["causation", "generalization"]
   },
@@ -129,11 +129,11 @@
       "A margin of error cannot be found for a percent."
     ],
     "answer": "C",
-    "explanation": "This is a voluntary-response sample: people decided for themselves whether to vote, and people with strong opinions are more likely to respond. Website visitors may also live outside the city. The sample is not random, so it may be biased.",
+    "explanation": "The problem is how the sample was chosen. Visitors decided for themselves whether to vote. People with strong feelings are much more likely to bother, and anyone online could vote, including people who don't live in the city.\n\nThat makes it a voluntary response sample, which may not match the city's residents, no matter how many people vote.\n\nA large sample can't fix a biased way of choosing it.",
     "rationales": {
-      "A": "The problem is how the sample was chosen, not its size; $5{,}000$ responses is a large sample.",
-      "B": "A high percent is not a sign of bias by itself.",
-      "D": "Margins of error are routinely reported for percents; the real issue is that the sample was not random."
+      "A": "$5{,}000$ is a large sample. The trouble is that it wasn't random, not that it's too small.",
+      "B": "A high percent isn't a sign of bias by itself. Sometimes most people really do agree.",
+      "D": "Margins of error are reported for percents all the time. The real issue is that the sample wasn't random."
     },
     "tags": ["sampling-bias"]
   },
@@ -143,7 +143,7 @@
     "type": "spr",
     "stem": "In a randomized experiment, $150$ participants were assigned to take a new sleep aid and $150$ were assigned to take a placebo. In the sleep-aid group, $96$ participants reported improved sleep; in the placebo group, $66$ did. By how many percentage points was the percent reporting improved sleep in the sleep-aid group greater than in the placebo group?",
     "answer": ["20"],
-    "explanation": "Sleep-aid group: $\\frac{96}{150} = 0.64$, or 64%. Placebo group: $\\frac{66}{150} = 0.44$, or 44%. The difference is $64 - 44 = 20$ percentage points.",
+    "explanation": "Turn each group's count into a percent so the groups can be compared fairly.\n\nSleep aid: $\\frac{96}{150} = 0.64$, which is 64%.\n\nPlacebo: $\\frac{66}{150} = 0.44$, which is 44%.\n\nThe difference is $64 - 44 = 20$ percentage points.",
     "tags": ["experimental-design"]
   }
 ]

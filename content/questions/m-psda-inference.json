@@ -6,11 +6,11 @@
     "stem": "In a random sample of $400$ residents of a town, 35% said they support building a new park. The town has $12{,}000$ residents. Based on the sample, which of the following is the best estimate of the number of residents who support building the park?",
     "choices": ["$140$", "$420$", "$4{,}200$", "$7{,}800$"],
     "answer": "C",
-    "explanation": "Apply the sample percent to the whole population: $0.35 \\times 12{,}000 = 4{,}200$.",
+    "explanation": "A good random sample is a small picture of the whole town. So assume the same share holds for everyone: 35% of the whole town supports the park.\n\n$0.35 \\times 12{,}000 = 4{,}200$ residents.\n\nThe $400$ only matters for how trustworthy the estimate is. The percent is what carries over.",
     "rationales": {
-      "A": "This is the number of supporters in the sample, $0.35 \\times 400$, not in the town.",
-      "B": "This uses 3.5% instead of 35%.",
-      "D": "This estimates the residents who do not support the park (65%)."
+      "A": "$140$ is how many people in the sample of $400$ said yes. The question asks about the whole town of $12{,}000$.",
+      "B": "35% is $0.35$, not $0.035$. Check the decimal: $0.35 \\times 12{,}000 = 4{,}200$.",
+      "D": "$7{,}800$ is the 65% who don't support the park. The question asks about supporters."
     },
     "tags": ["population-estimates"]
   },
@@ -21,11 +21,11 @@
     "stem": "A poll of randomly selected voters estimates that 58% of all voters favor a proposal, with a margin of error of $4$ percentage points. Which of the following is the most plausible range for the percent of all voters who favor the proposal?",
     "choices": ["54% to 62%", "56% to 60%", "58% to 62%", "50% to 66%"],
     "answer": "A",
-    "explanation": "The margin of error extends the same distance on both sides of the estimate: $58 - 4 = 54$ and $58 + 4 = 62$. So the plausible range is 54% to 62%.",
+    "explanation": "A margin of error says the true value is probably within that distance of the estimate, in either direction.\n\nGo $4$ points down and $4$ points up from 58%: $58 - 4 = 54$ and $58 + 4 = 62$.\n\nSo the plausible range is 54% to 62%.",
     "rationales": {
-      "B": "This uses half the margin of error on each side.",
-      "C": "This adds the margin of error but forgets to subtract it.",
-      "D": "This uses twice the margin of error on each side."
+      "B": "The margin of error is the full distance on each side, so go $4$ points each way, not $2$.",
+      "C": "The margin of error goes both ways. The true value could also be up to $4$ points below 58%.",
+      "D": "This goes $8$ points each way. The margin of error is $4$ points on each side."
     },
     "tags": ["margin-of-error"]
   },
@@ -35,7 +35,7 @@
     "type": "spr",
     "stem": "An inspector selects a random sample of $50$ boxes from a shipment of $3{,}000$ boxes and finds that $2$ of the sampled boxes are damaged. Based on the sample, how many boxes in the whole shipment are expected to be damaged?",
     "answer": ["120"],
-    "explanation": "The sample rate of damage is $\\frac{2}{50} = 0.04$. Apply it to the shipment: $0.04 \\times 3{,}000 = 120$ boxes.",
+    "explanation": "Find the damage rate in the sample, then apply it to the whole shipment.\n\nIn the sample, $2$ out of $50$ boxes are damaged. That's $\\frac{2}{50} = 0.04$, or 4%.\n\n4% of the $3{,}000$ boxes is $0.04 \\times 3{,}000 = 120$ boxes.\n\nAnother way to see it: $3{,}000$ is $60$ times $50$, so expect $60$ times as many damaged boxes: $2 \\times 60 = 120$.",
     "tags": ["population-estimates"]
   },
   {
@@ -50,11 +50,11 @@
       "Post an online survey and use the first $100$ responses."
     ],
     "answer": "C",
-    "explanation": "A random sample from the full list of students gives every student the same chance of being chosen, so the sample is likely to represent the whole school.",
+    "explanation": "An unbiased sample gives every student the same chance of being picked, so it looks like the school as a whole.\n\nChoosing $100$ students at random from a list of all students does exactly that.\n\nThe other methods each pick a particular kind of student, such as early arrivals, athletes, or students who choose to answer, and those groups may sleep differently from everyone else.",
     "rationales": {
-      "A": "Students who arrive earliest may have different sleep habits than other students, so this sample may be biased.",
-      "B": "Athletes are only one group of students and may sleep differently from the rest of the school.",
-      "D": "Students choose whether to respond, and those who respond quickly may differ from others; this is a voluntary sample."
+      "A": "Students who arrive first might be early risers with different sleep habits, so they may not represent the whole school.",
+      "B": "Athletes are only one group, and their sleep may differ from other students'. A fair sample needs everyone to have the same chance.",
+      "D": "People choose whether to answer, so the sample is made of volunteers. They may differ from students who don't respond."
     },
     "tags": ["sampling"]
   },
@@ -70,11 +70,11 @@
       "Poll B's margin of error is exactly one-fourth of Poll A's."
     ],
     "answer": "B",
-    "explanation": "With the same method, a larger random sample gives a more precise estimate, so its margin of error is smaller. Poll B's sample is four times as large, so Poll B has the smaller margin of error.",
+    "explanation": "Bigger random samples give more precise estimates, so their margins of error are smaller.\n\nPoll B asked $2{,}000$ people, four times as many as Poll A. So Poll B should have the smaller margin of error.\n\nOne detail worth knowing: the margin shrinks with the square root of the sample size. Four times the people roughly halves the margin; it doesn't cut it to a quarter.",
     "rationales": {
-      "A": "This reverses the relationship: larger samples have smaller margins of error.",
-      "C": "Sample size affects the margin of error, so the polls would not be expected to match.",
-      "D": "The margin of error shrinks with the square root of the sample size, so quadrupling the sample roughly halves it; it does not divide it by $4$."
+      "A": "This is backward. More people means a more precise estimate and a smaller margin of error.",
+      "C": "Sample size affects the margin of error, so the polls shouldn't match.",
+      "D": "The margin shrinks with the square root of the sample size. Four times the sample roughly halves it, not quarters it."
     },
     "tags": ["margin-of-error", "sampling"]
   },
@@ -84,7 +84,7 @@
     "type": "spr",
     "stem": "Based on a random sample, a researcher reports that the plausible values for the mean weight of apples in an orchard are from $12.6$ ounces to $15.4$ ounces. The interval was found as the sample mean plus or minus the margin of error. What is the margin of error, in ounces?",
     "answer": ["1.4"],
-    "explanation": "The interval is centered at the sample mean, so the margin of error is half the interval's width: $\\frac{15.4 - 12.6}{2} = \\frac{2.8}{2} = 1.4$ ounces.",
+    "explanation": "The interval is built as mean minus the margin up to mean plus the margin. So the margin of error is half the interval's width.\n\nThe width is $15.4 - 12.6 = 2.8$ ounces. Half of that is $1.4$ ounces.\n\nAs a bonus, the sample mean is the middle of the interval: $12.6 + 1.4 = 14$ ounces.",
     "tags": ["margin-of-error", "confidence-intervals"]
   },
   {
@@ -99,11 +99,11 @@
       "The mean daily commute time of all adults in the city is plausibly between $24.5$ and $29.5$ minutes."
     ],
     "answer": "D",
-    "explanation": "A confidence interval gives plausible values for a population parameter, here the mean commute of all adults in the city, which is the population the sample was drawn from.",
+    "explanation": "A confidence interval is about the population the sample came from, and about the population's mean, not individual people.\n\nThe sample was adults in this city, and the interval estimates their mean commute. So the right conclusion is that the city's mean commute is plausibly between $24.5$ and $29.5$ minutes.\n\nKeep two limits in mind: the conclusion can't stretch to people outside the sampled group, and it is about the average, not each person.",
     "rationales": {
-      "A": "The interval estimates the mean, not the commute times of individual adults; many individuals may commute much more or less.",
-      "B": "The sample was drawn only from the city, so the results cannot be extended to the whole country.",
-      "C": "$27$ is the center of the interval (the sample mean), but the true mean is only estimated, not known exactly."
+      "A": "The interval is about the average commute, not individual commutes. Plenty of people could commute far more or less than this range.",
+      "B": "The sample came only from this city, so you can't stretch the conclusion to the whole country.",
+      "C": "$27$ is the middle of the interval, but the true mean is only estimated. It could be anywhere in the range."
     },
     "tags": ["confidence-intervals"]
   },
@@ -119,11 +119,11 @@
       "Exactly 62% of households in Town X compost."
     ],
     "answer": "B",
-    "explanation": "Town X's plausible range is 59% to 65%. Town Y's is 50% to 60%. The ranges overlap from 59% to 60%, so the two towns could have the same true percent. The data do not show a definite difference.",
+    "explanation": "Turn each estimate into its plausible range, then compare the ranges.\n\nTown X: 62% give or take $3$, so 59% to 65%.\n\nTown Y: 55% give or take $5$, so 50% to 60%.\n\nThe ranges overlap between 59% and 60%. Both towns could have, say, 59.5% composting. So it's plausible they're the same, and you can't say for sure that X is higher.",
     "rationales": {
-      "A": "The plausible ranges overlap (59% to 60%), so a difference is not certain.",
-      "C": "Town Y's plausible range is 50% to 60%; nothing supports a value below 50%.",
-      "D": "62% is only the sample estimate; the true percent is plausibly anywhere from 59% to 65%."
+      "A": "The ranges overlap from 59% to 60%, so the towns could be equal. \"Definitely\" goes too far.",
+      "C": "Town Y's plausible range is 50% to 60%. Nothing in the data points below 50%.",
+      "D": "62% is only the sample's estimate. The true percent could be anywhere from 59% to 65%."
     },
     "tags": ["margin-of-error"]
   },
@@ -133,7 +133,7 @@
     "type": "spr",
     "stem": "A forester examines a random sample of $80$ of the $2{,}400$ trees in a forest and finds that $18$ of the sampled trees are infected with a fungus. Based on the sample, how many trees in the forest are estimated to be NOT infected?",
     "answer": ["1860"],
-    "explanation": "Sampled trees not infected: $80 - 18 = 62$. The sample proportion is $\\frac{62}{80} = 0.775$. Apply it to the forest: $0.775 \\times 2{,}400 = 1{,}860$ trees.",
+    "explanation": "The question asks about trees that are NOT infected, so count those in the sample first: $80 - 18 = 62$.\n\nThe share not infected is $\\frac{62}{80} = 0.775$.\n\nApply that share to the whole forest: $0.775 \\times 2{,}400 = 1{,}860$ trees.\n\nCheck: the infected estimate would be $\\frac{18}{80} \\times 2{,}400 = 540$, and $540 + 1{,}860 = 2{,}400$.",
     "tags": ["population-estimates"]
   }
 ]

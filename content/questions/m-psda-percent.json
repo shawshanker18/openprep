@@ -6,11 +6,11 @@
     "stem": "What is 35% of $240$?",
     "choices": ["$84$", "$156$", "$275$", "$840$"],
     "answer": "A",
-    "explanation": "Write 35% as the decimal $0.35$ and multiply: $0.35 \\times 240 = 84$.",
+    "explanation": "\"Percent\" means \"out of $100$,\" so 35% is $\\frac{35}{100} = 0.35$. \"Of\" means multiply.\n\n$0.35 \\times 240 = 84$.\n\nA mental math route: 10% of $240$ is $24$, so 30% is $72$ and 5% is $12$. Together that is $84$.",
     "rationales": {
-      "B": "This is 65% of $240$, the part that remains after taking away 35%.",
-      "C": "This adds $35$ to $240$ instead of taking a percent.",
-      "D": "This converts 35% to $3.5$ instead of $0.35$."
+      "B": "$156$ is what's left after taking 35% away, which is 65% of $240$. The question asks for the 35% itself.",
+      "C": "Adding $35$ treats the percent as a plain number. 35% of $240$ means $0.35 \\times 240$.",
+      "D": "35% is $0.35$, not $3.5$. Move the decimal two places to the left."
     },
     "tags": ["percent-of"]
   },
@@ -21,11 +21,11 @@
     "stem": "The price of a concert ticket rose from \\$60 to \\$75. By what percent did the price increase?",
     "choices": ["15%", "20%", "25%", "125%"],
     "answer": "C",
-    "explanation": "Percent change is the change divided by the original value: $\\frac{75 - 60}{60} = \\frac{15}{60} = 0.25$, which is a 25% increase.",
+    "explanation": "Percent change always compares the change to the starting value.\n\nThe change is $75 - 60 = 15$ dollars. The starting price was $60$. So the increase is $\\frac{15}{60} = 0.25$, which is 25%.\n\nSay it in words to keep it straight: \"the price went up by a quarter of what it used to be.\"",
     "rationales": {
-      "A": "This is the dollar amount of the increase, not the percent.",
-      "B": "This divides the change by the new price, $\\frac{15}{75}$, instead of the original price.",
-      "D": "This is the new price as a percent of the old price, not the percent increase."
+      "A": "\\$15 is how much the price went up in dollars. To turn it into a percent, divide by the original \\$60.",
+      "B": "This divides by the new price, \\$75. Percent change always divides by the original, \\$60.",
+      "D": "125% is the new price as a percent of the old one. The increase is the extra 25%."
     },
     "tags": ["percent-change"]
   },
@@ -35,7 +35,7 @@
     "type": "spr",
     "stem": "A jacket that regularly costs \\$120 is on sale for 30% off. What is the sale price of the jacket, in dollars?",
     "answer": ["84"],
-    "explanation": "A 30% discount leaves 70% of the price: $0.70 \\times 120 = 84$ dollars.",
+    "explanation": "If you take 30% off, you pay the other 70%. So the sale price is 70% of \\$120.\n\n$0.70 \\times 120 = 84$ dollars.\n\nThis is quicker than finding the discount and subtracting, and it avoids a step where mistakes creep in.",
     "tags": ["percent-change"]
   },
   {
@@ -45,11 +45,11 @@
     "stem": "After a 20% discount, a lamp costs \\$52. What was the price of the lamp before the discount?",
     "choices": ["\\$41.60", "\\$62.40", "\\$65.00", "\\$72.00"],
     "answer": "C",
-    "explanation": "After a 20% discount the sale price is 80% of the original: $0.8p = 52$. Divide: $p = \\frac{52}{0.8} = 65$.",
+    "explanation": "This runs a discount backward. The key is that the 20% was taken off the original price, which you don't know yet.\n\nAfter 20% off, you pay 80% of the original. So $0.8p = 52$, where $p$ is the original price.\n\nDivide: $p = 52 \\div 0.8 = 65$.\n\nCheck: 20% of \\$65 is \\$13, and $65 - 13 = 52$. It works.\n\nA tempting shortcut is to add 20% of \\$52 back on, but that uses the wrong starting amount.",
     "rationales": {
-      "A": "This takes another 20% off the sale price: $0.8 \\times 52$.",
-      "B": "This adds 20% of the sale price back on: $1.2 \\times 52$. The 20% was taken from the original price, not the sale price.",
-      "D": "This adds $20$ dollars instead of undoing a 20% decrease."
+      "A": "This takes another 20% off the sale price. You need to go back up to the original, so divide by $0.8$ instead.",
+      "B": "The 20% was taken from the original price, not from \\$52. Adding 20% of \\$52 back on doesn't undo it.",
+      "D": "A 20% discount isn't \\$20. Solve $0.8p = 52$ to find the original price."
     },
     "tags": ["reverse-percent"]
   },
@@ -60,11 +60,11 @@
     "stem": "A store raised the price of a \\$250 bike by 20%. Later, it discounted the new price by 25%. What was the final price of the bike?",
     "choices": ["\\$187.50", "\\$225.00", "\\$237.50", "\\$300.00"],
     "answer": "B",
-    "explanation": "After the increase: $250 \\times 1.20 = 300$. After the discount: $300 \\times 0.75 = 225$. The final price is \\$225.",
+    "explanation": "Apply the changes one at a time, each to the price at that moment.\n\nA 20% increase means multiply by $1.20$: $250 \\times 1.20 = 300$.\n\nA 25% discount means you pay 75%, so multiply by $0.75$: $300 \\times 0.75 = 225$.\n\nThe final price is \\$225. Notice it's below \\$250: the discount is taken from the bigger, raised price, so it wipes out more than the increase added.",
     "rationales": {
-      "A": "This applies only the 25% discount to the original \\$250 and ignores the increase.",
-      "C": "This combines the changes into a single 5% decrease, but the 25% is taken from a larger amount than the 20% was.",
-      "D": "This is the price after the increase only; the discount was never applied."
+      "A": "This skips the price increase. The 25% discount comes off the raised price of \\$300.",
+      "C": "You can't just combine $+20\\%$ and $-25\\%$ into $-5\\%$, because the two percents are taken from different amounts.",
+      "D": "\\$300 is the price after the increase. The 25% discount still needs to come off."
     },
     "tags": ["successive-percent"]
   },
@@ -74,7 +74,7 @@
     "type": "spr",
     "stem": "In a class of $40$ students, $15$ are in the school band. What percent of the students in the class are NOT in the band?",
     "answer": ["62.5"],
-    "explanation": "Students not in the band: $40 - 15 = 25$. As a percent of the class: $\\frac{25}{40} = 0.625$, which is 62.5%.",
+    "explanation": "The question asks about students NOT in the band, so find that group first: $40 - 15 = 25$ students.\n\nAs a percent of the class: $\\frac{25}{40} = 0.625$, which is 62.5%.\n\nWords like NOT and EXCEPT flip what you are counting, so circle them when you read.",
     "tags": ["percent-of"]
   },
   {
@@ -84,11 +84,11 @@
     "stem": "The number of members of a club increased by 25% from 2022 to 2023 and then decreased by 12% from 2023 to 2024. There were $220$ members in 2024. How many members were there in 2022?",
     "choices": ["$176$", "$200$", "$242$", "$250$"],
     "answer": "B",
-    "explanation": "Let $x$ be the 2022 membership. Then $x(1.25)(0.88) = 220$. Since $1.25 \\times 0.88 = 1.1$, this is $1.1x = 220$, so $x = 200$.",
+    "explanation": "Work forward with a variable, then solve. Let $x$ be the number of members in 2022.\n\nUp 25% means multiply by $1.25$. Down 12% means multiply by $0.88$. So $x \\times 1.25 \\times 0.88 = 220$.\n\nMultiply the two factors: $1.25 \\times 0.88 = 1.1$. So $1.1x = 220$ and $x = 200$.\n\nCheck forward: $200 \\to 250 \\to 220$. That matches.",
     "rationales": {
-      "A": "This undoes only the 25% increase ($\\frac{220}{1.25}$) and ignores the 12% decrease.",
-      "C": "This applies the combined change forward to the 2024 number, $220 \\times 1.1$, instead of working backward.",
-      "D": "This undoes only the 12% decrease ($\\frac{220}{0.88}$) and ignores the 25% increase."
+      "A": "This only undoes the 25% increase. The 12% decrease also has to be undone.",
+      "C": "This pushes the changes forward from 2024. You need to go backward, so divide by $1.1$ instead of multiplying.",
+      "D": "This only undoes the 12% decrease. The 25% increase also has to be undone."
     },
     "tags": ["reverse-percent", "successive-percent"]
   },
@@ -98,7 +98,7 @@
     "type": "spr",
     "stem": "A $400$-gram salt solution is 30% salt by mass. How many grams of pure water must be added so that the solution is 24% salt by mass?",
     "answer": ["100"],
-    "explanation": "The salt stays the same: $0.30 \\times 400 = 120$ grams. After adding $w$ grams of water, $\\frac{120}{400 + w} = 0.24$. So $400 + w = \\frac{120}{0.24} = 500$, and $w = 100$ grams.",
+    "explanation": "Adding water changes the total weight but not the amount of salt, so start by finding the salt.\n\nSalt: 30% of $400$ grams is $0.30 \\times 400 = 120$ grams.\n\nAfter adding $w$ grams of water, the total is $400 + w$ grams, and the salt should be 24% of that: $\\frac{120}{400 + w} = 0.24$.\n\nSo $400 + w = 120 \\div 0.24 = 500$, and $w = 100$ grams.\n\nCheck: $120$ out of $500$ is 24%.",
     "tags": ["percent-of"]
   },
   {
@@ -108,11 +108,11 @@
     "stem": "The number $a$ is 40% greater than $b$, and $b$ is 25% greater than $c$, where $c > 0$. The number $a$ is what percent of $c$?",
     "choices": ["125%", "140%", "165%", "175%"],
     "answer": "D",
-    "explanation": "Write each relationship as a multiplier: $a = 1.4b$ and $b = 1.25c$. Substitute: $a = 1.4(1.25c) = 1.75c$. So $a$ is 175% of $c$.",
+    "explanation": "Turn each percent sentence into a multiplier. \"40% greater than $b$\" means $a = 1.4b$. \"25% greater than $c$\" means $b = 1.25c$.\n\nNow substitute: $a = 1.4 \\times 1.25c = 1.75c$.\n\nSo $a$ is 175% of $c$.\n\nPercent increases stack by multiplying, not by adding. That is why the answer is not simply $100 + 40 + 25$.",
     "rationales": {
-      "A": "This uses only the relationship between $b$ and $c$.",
-      "B": "This uses only the relationship between $a$ and $b$.",
-      "C": "This adds the percents ($100 + 40 + 25$) instead of multiplying the factors."
+      "A": "125% is how $b$ compares to $c$. You still need to apply the 40% from $b$ to $a$.",
+      "B": "140% is how $a$ compares to $b$. You still need to bring in the 25% from $c$ to $b$.",
+      "C": "Adding $40$ and $25$ gives 165%, but percent increases stack by multiplying: $1.4 \\times 1.25 = 1.75$."
     },
     "tags": ["successive-percent"]
   }

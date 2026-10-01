@@ -6,11 +6,11 @@
     "stem": "What is the median of the data set $4, 7, 7, 9, 12, 15$?",
     "choices": ["$7$", "$8$", "$9$", "$11$"],
     "answer": "B",
-    "explanation": "The data are already in order and there are $6$ values, so the median is the mean of the $3$rd and $4$th values: $\\frac{7 + 9}{2} = 8$.",
+    "explanation": "The median is the middle value once the data are in order. These already are.\n\nThere are $6$ values, an even number, so there is no single middle value. Instead, take the two in the middle (the 3rd and 4th) and find their average: $\\frac{7 + 9}{2} = 8$.\n\nNotice the median doesn't have to be one of the numbers in the list.",
     "rationales": {
-      "A": "This is the mode (the value that appears most often), not the median.",
-      "C": "This is the mean: $\\frac{54}{6} = 9$.",
-      "D": "This is the range: $15 - 4 = 11$."
+      "A": "$7$ is the mode, the value that shows up most often. The median is the middle value.",
+      "C": "$9$ is the mean (the total, $54$, divided by $6$). The median is the middle of the ordered list.",
+      "D": "$11$ is the range, the largest minus the smallest. The median is the middle value."
     },
     "tags": ["mean-median"]
   },
@@ -21,11 +21,11 @@
     "stem": "The mean of five numbers is $16$. Four of the numbers are $12$, $20$, $15$, and $25$. What is the fifth number?",
     "choices": ["$8$", "$16$", "$18$", "$72$"],
     "answer": "A",
-    "explanation": "The five numbers sum to $5 \\times 16 = 80$. The four known numbers sum to $12 + 20 + 15 + 25 = 72$. The fifth number is $80 - 72 = 8$.",
+    "explanation": "Means are easiest to work with through totals. If five numbers have a mean of $16$, they add up to $5 \\times 16 = 80$.\n\nThe four you know add up to $12 + 20 + 15 + 25 = 72$.\n\nSo the fifth number must make up the difference: $80 - 72 = 8$.\n\nWhenever a mean question has a missing value, turn the mean into a total first.",
     "rationales": {
-      "B": "This is the mean itself; the fifth number need not equal the mean.",
-      "C": "This is the mean of the four known numbers, $\\frac{72}{4}$.",
-      "D": "This is the sum of the four known numbers."
+      "B": "The fifth number doesn't have to equal the mean. Work out the total the five must reach and see what's missing.",
+      "C": "$18$ is the mean of the four known numbers. You need the number that brings the total to $80$.",
+      "D": "$72$ is the total of the four known numbers. The fifth number is what's left to reach $80$."
     },
     "tags": ["mean-median"]
   },
@@ -35,7 +35,7 @@
     "type": "spr",
     "stem": "The table shows how many pets each of $20$ students has.\n\n| Number of pets | Number of students |\n|---|---|\n| $0$ | $5$ |\n| $1$ | $8$ |\n| $2$ | $4$ |\n| $3$ | $3$ |\n\nWhat is the mean number of pets per student?",
     "answer": ["1.25"],
-    "explanation": "Total pets: $0(5) + 1(8) + 2(4) + 3(3) = 0 + 8 + 8 + 9 = 25$. Divide by the $20$ students: $\\frac{25}{20} = 1.25$.",
+    "explanation": "The table groups students by how many pets they have. To find the mean, you need the total number of pets, then divide by the number of students.\n\nEach row contributes (pets) times (students): $0 \\cdot 5 = 0$, $1 \\cdot 8 = 8$, $2 \\cdot 4 = 8$, $3 \\cdot 3 = 9$. Total pets: $25$.\n\nThere are $20$ students, so the mean is $25 \\div 20 = 1.25$ pets per student.",
     "tags": ["frequency-tables", "mean-median"]
   },
   {
@@ -50,11 +50,11 @@
       "The mean stays the same and the median decreases."
     ],
     "answer": "C",
-    "explanation": "Removing the largest value lowers the mean (from $\\frac{258}{7} \\approx 36.9$ to $\\frac{163}{6} \\approx 27.2$). The original median is the $4$th value, $28$. With $6$ values left, the median is $\\frac{27 + 28}{2} = 27.5$, so it also decreases, though only slightly.",
+    "explanation": "Think about what each measure depends on.\n\nThe mean uses every value, so removing a huge value like $95$ pulls it down a lot. It drops from about $36.9$ to about $27.2$.\n\nThe median is just the middle. With $7$ values it was the 4th one, $28$. With $6$ values left, it is the average of the 3rd and 4th: $\\frac{27 + 28}{2} = 27.5$. So it drops too, just a little.\n\nBoth go down.",
     "rationales": {
-      "A": "With an even number of values left, the median becomes the average of $27$ and $28$, so it drops from $28$ to $27.5$.",
-      "B": "Removing the largest value cannot raise the mean or the median.",
-      "D": "Removing an outlier far above the rest changes the mean a lot."
+      "A": "The median does change slightly. With $6$ values left, it becomes the average of $27$ and $28$, which is $27.5$.",
+      "B": "Taking away the biggest value can't make the mean or median go up.",
+      "D": "$95$ is far above everything else, so removing it changes the mean a lot."
     },
     "tags": ["outliers", "mean-median"]
   },
@@ -70,11 +70,11 @@
       "The data sets have the same mean, and X has the greater standard deviation."
     ],
     "answer": "D",
-    "explanation": "Both data sets are symmetric around $30$, so both means are $30$. Standard deviation measures how spread out values are from the mean. X's values are $10$ to $20$ away from $30$, while Y's are at most $2$ away, so X has the greater standard deviation.",
+    "explanation": "Compare the centers first, then the spreads.\n\nBoth sets are balanced around $30$, with values the same distance above and below it. So both means are $30$.\n\nStandard deviation measures how far values typically sit from the mean. In X, values are as far as $20$ away from $30$. In Y, nothing is more than $2$ away. X is much more spread out, so X has the greater standard deviation.\n\nYou never need to calculate standard deviation on the SAT. Just compare how spread out the data look.",
     "rationales": {
-      "A": "This reverses the spread: Y's values are tightly clustered around $30$, so Y has the smaller standard deviation.",
-      "B": "Both means are $30$. Having larger values at the ends does not raise the mean when the data are symmetric about $30$.",
-      "C": "The means match, but X is far more spread out, so the standard deviations differ."
+      "A": "The spreads are reversed. Y's values all sit within $2$ of $30$, so Y has the smaller standard deviation.",
+      "B": "Both sets balance around $30$, so their means are equal.",
+      "C": "The means match, but X is far more spread out, so the standard deviations are different."
     },
     "tags": ["spread"]
   },
@@ -84,7 +84,7 @@
     "type": "spr",
     "stem": "The mean of a student's first $8$ test scores is $84$. After a ninth test, the mean of all $9$ scores is $85$. What was the student's score on the ninth test?",
     "answer": ["93"],
-    "explanation": "The first $8$ scores total $8 \\times 84 = 672$. All $9$ scores total $9 \\times 85 = 765$. The ninth score is $765 - 672 = 93$.",
+    "explanation": "Turn each mean into a total, then compare the totals.\n\nThe first $8$ scores add up to $8 \\times 84 = 672$. All $9$ scores add up to $9 \\times 85 = 765$.\n\nThe ninth test is the difference: $765 - 672 = 93$.\n\nIt makes sense: to pull the average up by a full point across $9$ tests, the new score had to be well above $85$.",
     "tags": ["mean-median"]
   },
   {
@@ -94,11 +94,11 @@
     "stem": "Class A has $20$ students with a mean test score of $78$. Class B has $30$ students with a mean test score of $88$. What is the mean test score of all $50$ students combined?",
     "choices": ["$82$", "$83$", "$84$", "$88$"],
     "answer": "C",
-    "explanation": "Find each class's total: $20 \\times 78 = 1{,}560$ and $30 \\times 88 = 2{,}640$. The combined total is $4{,}200$, and $\\frac{4{,}200}{50} = 84$.",
+    "explanation": "You can't just average $78$ and $88$, because Class B has more students and should count more.\n\nGo through totals instead. Class A's scores add up to $20 \\times 78 = 1{,}560$. Class B's add up to $30 \\times 88 = 2{,}640$.\n\nAll $50$ students together: $1{,}560 + 2{,}640 = 4{,}200$. The combined mean is $4{,}200 \\div 50 = 84$.\n\nSense check: the answer is closer to $88$ than to $78$, because the bigger class scored $88$.",
     "rationales": {
-      "A": "This swaps the class sizes, weighting $78$ by $30$ and $88$ by $20$.",
-      "B": "This averages the two means without weighting by class size; the larger class should count more.",
-      "D": "This uses only the larger class's mean."
+      "A": "The class sizes got swapped. Class B has $30$ students, so the $88$ should carry the bigger weight.",
+      "B": "Averaging $78$ and $88$ treats both classes as the same size. Class B has more students, so it pulls the mean toward $88$.",
+      "D": "$88$ is only Class B's mean. Class A's lower scores bring the combined mean down."
     },
     "tags": ["mean-median"]
   },
@@ -114,11 +114,11 @@
       "The median is $40$, and the range is the same as before."
     ],
     "answer": "A",
-    "explanation": "The median of $11$ values is the $6$th value in order. Raising the largest value and lowering the smallest keeps them at the ends, so the $6$th value is still $40$. The range is largest minus smallest: $(\\text{max} + 20) - (\\text{min} - 5) = (\\text{max} - \\text{min}) + 25$.",
+    "explanation": "With $11$ values in order, the median is the 6th one: five values below it and five above.\n\nRaising the biggest value keeps it the biggest. Lowering the smallest keeps it the smallest. The middle value doesn't move, so the median is still $40$.\n\nThe range is biggest minus smallest. The biggest went up by $20$ and the smallest went down by $5$, so the gap between them grew by $20 + 5 = 25$.",
     "rationales": {
-      "B": "Changing only the extreme values does not move the middle value, so the median is still $40$.",
-      "C": "This subtracts the $5$ instead of adding it; lowering the minimum makes the range larger.",
-      "D": "The range depends on the largest and smallest values, which both changed."
+      "B": "Only the two end values changed, so the middle value, the median, stays at $40$.",
+      "C": "Lowering the smallest value stretches the range further, so the $5$ adds to the $20$: $25$ in total.",
+      "D": "The range depends on the biggest and smallest values, and both of them changed."
     },
     "tags": ["spread", "mean-median"]
   },
@@ -128,7 +128,7 @@
     "type": "spr",
     "stem": "The table shows the number of hours that students in a group spent volunteering last week.\n\n| Hours | Number of students |\n|---|---|\n| $1$ | $3$ |\n| $2$ | $6$ |\n| $3$ | $6$ |\n| $4$ | $k$ |\n\nThe mean number of hours for the group is $2.65$. What is the value of $k$?",
     "answer": ["5"],
-    "explanation": "Total hours: $1(3) + 2(6) + 3(6) + 4k = 33 + 4k$. Number of students: $15 + k$. Set the mean equal to $2.65$: $33 + 4k = 2.65(15 + k) = 39.75 + 2.65k$. So $1.35k = 6.75$ and $k = 5$.",
+    "explanation": "Set up the mean as total hours divided by number of students, with $k$ in both.\n\nTotal hours: $1(3) + 2(6) + 3(6) + 4k = 3 + 12 + 18 + 4k = 33 + 4k$.\n\nNumber of students: $3 + 6 + 6 + k = 15 + k$.\n\nThe mean is $2.65$, so $\\frac{33 + 4k}{15 + k} = 2.65$. Multiply both sides by $15 + k$: $33 + 4k = 39.75 + 2.65k$. Then $1.35k = 6.75$, so $k = 5$.\n\nCheck: $53$ hours over $20$ students is $2.65$.",
     "tags": ["frequency-tables", "mean-median"]
   }
 ]
