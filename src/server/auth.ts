@@ -24,8 +24,12 @@ export const getUserId = cache(async (): Promise<string | null> => (await getAut
 export const requireUser = cache(async () => {
   const userId = await getUserId();
   if (!userId) redirect("/login");
-  await db.insert(profiles).values({ id: userId }).onConflictDoNothing();
-  const [profile] = await db.select().from(profiles).where(eq(profiles.id, userId));
+  // One round trip for returning users; the insert only runs on a first visit.
+  let [profile] = await db.select().from(profiles).where(eq(profiles.id, userId));
+  if (!profile) {
+    await db.insert(profiles).values({ id: userId }).onConflictDoNothing();
+    [profile] = await db.select().from(profiles).where(eq(profiles.id, userId));
+  }
   return { userId, profile: profile! };
 });
 

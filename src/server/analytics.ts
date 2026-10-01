@@ -1,5 +1,6 @@
 // Read-side numbers for the student model (spec 03 §11–12). Plain SQL over indexed columns.
 import "server-only";
+import { skillStatesOf } from "./daily";
 import { and, desc, eq, gte, isNotNull, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { attempts, lessonProgress, questions, reviewItems, satAttempts, scoreSnapshots, skillState } from "@/db/schema";
@@ -10,7 +11,7 @@ import { sectionEstimate, superscore, totalEstimate } from "@/engine/score";
 
 export async function getSkillSummary(userId: string) {
   const [states, byDomain] = await Promise.all([
-    db.select().from(skillState).where(eq(skillState.userId, userId)),
+    skillStatesOf(userId),
     db.select({ skillId: attempts.skillId, n: sql<number>`count(*)::int` }).from(attempts)
       .where(eq(attempts.userId, userId)).groupBy(attempts.skillId),
   ]);
