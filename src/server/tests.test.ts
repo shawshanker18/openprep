@@ -156,6 +156,11 @@ it("a question in a live test can't be answered (and revealed) through practice"
   const [first] = await items(m!.id);
   expect(await T.inRunningTest(USER, first!.questionId)).toBe(true);
   expect(await P.submitAnswer(USER, { questionId: first!.questionId, response: "A", timeMs: 5000, confidence: 3 })).toBeNull();
+  await T.recordFocusLoss(USER, r.id);
+  await T.recordFocusLoss(USER, r.id);
+  await T.recordFocusLoss(OTHER, r.id); // not theirs: ignored
+  const [live] = await db.select().from(schema.testSessions).where(eq(schema.testSessions.id, r.id));
+  expect((live!.config as { focusLost?: number }).focusLost).toBe(2);
   await T.abandonTest(USER, r.id);
   expect(await P.submitAnswer(USER, { questionId: first!.questionId, response: "A", timeMs: 5000, confidence: 3 })).not.toBeNull();
 });

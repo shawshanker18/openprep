@@ -295,3 +295,9 @@ export async function inRunningTest(userId: string, questionId: string) {
     .where(and(eq(testItems.questionId, questionId), eq(testSessions.userId, userId), eq(testSessions.status, "in_progress"))).limit(1);
   return !!r;
 }
+
+export async function recordFocusLoss(userId: string, sessionId: string) {
+  await db.update(testSessions)
+    .set({ config: sql`jsonb_set(${testSessions.config}, '{focusLost}', to_jsonb(coalesce((${testSessions.config}->>'focusLost')::int, 0) + 1))` })
+    .where(and(eq(testSessions.id, sessionId), eq(testSessions.userId, userId), eq(testSessions.status, "in_progress")));
+}

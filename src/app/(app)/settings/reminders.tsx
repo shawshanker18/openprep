@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { inNativeApp, setNativeReminder } from "@/lib/native";
 import { setReminderHour, subscribePush, testPush, unsubscribePush } from "./actions";
 
 const KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
@@ -14,7 +15,7 @@ function keyBytes(base64: string) {
   return Uint8Array.from(b, (c) => c.charCodeAt(0));
 }
 
-type State = "loading" | "unsupported" | "ios-install" | "denied" | "off" | "on";
+type State = "loading" | "native" | "unsupported" | "ios-install" | "denied" | "off" | "on";
 
 export function Reminders({ hour }: { hour: number | null }) {
   const [state, setState] = useState<State>("loading");
@@ -23,6 +24,7 @@ export function Reminders({ hour }: { hour: number | null }) {
 
   useEffect(() => {
     (async () => {
+      if (inNativeApp()) return setState("native"); // the app schedules its own daily notification
       const ios = /iPad|iPhone|iPod/.test(navigator.userAgent);
       const standalone = window.matchMedia("(display-mode: standalone)").matches;
       if (!KEY || !("serviceWorker" in navigator) || !("PushManager" in window)) return setState(ios && !standalone ? "ios-install" : "unsupported");
@@ -69,11 +71,16 @@ export function Reminders({ hour }: { hour: number | null }) {
       <h2 className="font-medium">Study reminders</h2>
       <p className="text-sm text-muted-foreground">A notification at your study time on days you haven&apos;t practised yet. Turn it on for each device you use.</p>
       <label className="flex flex-col gap-1 text-sm sm:w-60">Remind me at
-        <select className={control} value={hour ?? ""} onChange={(e) => setReminderHour(e.target.value === "" ? null : Number(e.target.value))}>
+        <select className={control} value={hour ?? ""} onChange={(e) => {
+          const h = e.target.value === "" ? null : Number(e.target.value);
+          void setReminderHour(h);
+          if (state === "native") void setNativeReminder(h);
+        }}>
           <option value="">Off</option>
           {Array.from({ length: 24 }, (_, h) => <option key={h} value={h}>{hourLabel(h)}</option>)}
         </select>
       </label>
+      {state === "native" && <p className="text-sm text-muted-foreground">This app reminds you on this device at the time above.</p>}
       {state === "loading" && <p className="text-sm text-muted-foreground">Checking this browser…</p>}
       {state === "unsupported" && <p className="text-sm text-muted-foreground">This browser can&apos;t receive notifications.</p>}
       {state === "ios-install" && <p className="text-sm">On iPhone and iPad: tap Share → <b>Add to Home Screen</b>, open OpenPrep from your home screen, then come back here.</p>}

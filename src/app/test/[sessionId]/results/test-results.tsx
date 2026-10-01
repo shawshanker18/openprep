@@ -76,6 +76,10 @@ export function TestResults({ data }: { data: Data }) {
         {scored && <p className="text-xs text-muted-foreground">Estimated score — real SAT scoring differs. See <Link className="underline" href="/about">how estimates work</Link>.</p>}
       </div>
 
+      {(() => {
+        const lost = (s.config as { focusLost?: number }).focusLost ?? 0;
+        return lost > 0 && <p className="rounded-lg border p-4 text-sm">You left the test window {lost} time{lost === 1 ? "" : "s"}. On test day, stay in the test the whole time.</p>;
+      })()}
       {r.insights.length > 0 && (
         <ul className="flex flex-col gap-1 rounded-lg border p-4 text-sm">{r.insights.map((t) => <li key={t}>• {t}</li>)}</ul>
       )}
