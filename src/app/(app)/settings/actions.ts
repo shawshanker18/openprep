@@ -8,7 +8,8 @@ import { db } from "@/db";
 import { profiles, satAttempts, testSessions } from "@/db/schema";
 import { createClient } from "@/lib/supabase/server";
 import { SUBJECTS, TOPICS } from "@/content/taxonomy";
-import { requireUser } from "@/server/auth";
+import { requireUser, type ActionResult } from "@/server/auth";
+import { PushSubscriptionInput, removeSubscription, saveSubscription, sendTest } from "@/server/push";
 import { DASHBOARD_CARDS } from "@/server/daily";
 import { startDiagnostic } from "@/server/diagnostic";
 
@@ -111,4 +112,34 @@ export async function deleteAccount(form: FormData) {
   });
   await (await createClient()).auth.signOut();
   redirect("/?deleted=1");
+}
+
+export async function setReminderHour(hour: number | null) {
+  const { userId } = await requireUser();
+  const p = z.number().int().min(0).max(23).nullable().safeParse(hour);
+  if (!p.success) return;
+  await db.update(profiles).set({ reminderHour: p.data }).where(eq(profiles.id, userId));
+  revalidatePath("/settings");
+}
+
+/** Registers this device for reminders; turns reminders on at 6 pm if no hour is set yet. */
+export async function subscribePush(sub: unknown): Promise<ActionResult> {
+  const { userId, profile } = await requireUser();
+  const p = PushSubscriptionInput.safeParse(sub);
+  if (!p.success) return { ok: false, error: "This browser's push service isn't supported." };
+  await saveSubscription(userId, p.data);
+  if (profile.reminderHour == null) await db.update(profiles).set({ reminderHour: 18 }).where(eq(profiles.id, userId));
+  revalidatePath("/", "layout");
+  return { ok: true, data: undefined };
+}
+
+export async function unsubscribePush(endpoint: unknown) {
+  const { userId } = await requireUser();
+  if (typeof endpoint === "string" && endpoint.length <= 1000) await removeSubscription(userId, endpoint);
+  revalidatePath("/", "layout");
+}
+
+export async function testPush(): Promise<ActionResult<{ devices: number; delivered: number }>> {
+  const { userId } = await requireUser();
+  return { ok: true, data: await sendTest(userId) };
 }

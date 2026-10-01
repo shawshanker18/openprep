@@ -7,6 +7,7 @@ import { requireUser } from "@/server/auth";
 import { DASHBOARD_CARDS, dashboardLayout } from "@/server/daily";
 import { signOut } from "@/app/auth/actions";
 import { ThemeSelect } from "@/components/theme";
+import { Reminders } from "./reminders";
 import {
   addOfficialScore, deleteAccount, removeOfficialScore, resetDashboard, retakeDiagnostic, saveDashboard, updateProfile, updateSettings,
 } from "./actions";
@@ -60,6 +61,8 @@ export default async function SettingsPage({ searchParams }: PageProps<"/setting
         <p className="text-xs text-muted-foreground">Changes apply from tomorrow&apos;s plan — today&apos;s stays as it is.</p>
         <Button type="submit" className="self-start">Save</Button>
       </form>
+
+      <Reminders hour={profile.reminderHour} />
 
       <form action={updateProfile} className="flex flex-col gap-4">
         <h2 className="font-medium">Profile</h2>
