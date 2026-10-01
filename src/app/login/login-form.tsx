@@ -10,7 +10,7 @@ export function LoginForm({ google: showGoogle, inApp = false }: { google: boole
   const [email, setEmail] = useState("");
   const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
   // In the apps the email link opens in a browser, which hands the code back to the app (see /auth/callback).
-  const redirectTo = () => `${window.location.origin}/auth/callback${inApp ? "?app=1" : ""}`;
+  const redirectTo = () => `${window.location.origin}/auth/callback`;
 
   const magic = async (e: React.FormEvent) => {
     e.preventDefault();
