@@ -53,7 +53,7 @@ export default async function SkillsPage({ searchParams }: PageProps<"/skills">)
             );
           })}
         </ol>
-          <p className="text-xs text-muted-foreground">Ranked by points still available toward your target, weighted by how often each skill is tested. Skills you&apos;ve already reached are at the bottom.</p>
+          <p className="text-xs text-muted-foreground">Skills at the top can add the most points toward your target, because they are tested often and you have room to grow. Skills you&apos;ve already mastered sit at the bottom.</p>
       </div>) : (
       <div className="grid gap-8 lg:grid-cols-2">
         {(["rw", "math"] as const).map((section) => (

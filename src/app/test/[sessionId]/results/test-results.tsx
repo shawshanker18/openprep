@@ -98,7 +98,7 @@ export function TestResults({ data }: { data: Data }) {
       <section className="flex flex-col gap-2">
         <h2 className="font-medium">Time per question</h2>
         <TimingChart items={data.items} />
-        <p className="text-xs text-muted-foreground">Blue: correct · red: incorrect · grey: not answered. Hover a bar for details.</p>
+        <p className="text-xs text-muted-foreground">Taller bars took longer. Blue means correct, red means incorrect, and grey means not answered. Hover over a bar for details.</p>
       </section>
 
       <section className="flex flex-col gap-2">

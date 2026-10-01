@@ -64,7 +64,7 @@ export default async function ProgressPage() {
       <section className="flex flex-col gap-3">
         <h2 className="font-medium">Estimated score</h2>
         <ScoreChart points={points} target={profile.targetScore} />
-        <p className="text-xs text-muted-foreground">Line and shaded band: model estimate and its range · circles: estimates · diamonds: mocks (blue) and official scores (black).</p>
+        <p className="text-xs text-muted-foreground">The line is your estimated score and the shaded band is how sure we are. Circles are past estimates, blue diamonds are practice tests, and black diamonds are official SAT scores.</p>
       </section>
 
       {p.official.length > 0 && (
