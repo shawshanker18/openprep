@@ -1,0 +1,1 @@
+CREATE INDEX "ti_question" ON "test_items" USING btree ("question_id");
