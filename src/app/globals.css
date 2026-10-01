@@ -135,7 +135,8 @@
 .prose-op h3 { font-weight: 600; margin-top: 1em; }
 .prose-op ul { list-style: disc; padding-left: 1.25rem; }
 .prose-op ol { list-style: decimal; padding-left: 1.25rem; }
-.prose-op table { border-collapse: collapse; }
+.prose-op table { border-collapse: collapse; display: block; max-width: 100%; overflow-x: auto; }
+.prose-op .katex-display { max-width: 100%; overflow-x: auto; overflow-y: hidden; }
 .prose-op th, .prose-op td { border: 1px solid var(--border); padding: 0.25rem 0.5rem; }
 .prose-op code { font-family: var(--font-mono); font-size: 0.9em; }
 .prose-op img { max-width: 100%; }
