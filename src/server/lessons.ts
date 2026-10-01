@@ -17,3 +17,8 @@ export async function getLesson(skillId: string) {
   });
   return { minutes: Number(data.minutes) || null, sections };
 }
+
+export async function lessonExists(skillId: string) {
+  if (!SKILL_BY_ID[skillId]) return false;
+  return fs.access(path.join(process.cwd(), "content", "lessons", `${skillId}.md`)).then(() => true, () => false);
+}
