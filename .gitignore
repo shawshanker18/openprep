@@ -43,3 +43,6 @@ next-env.d.ts
 
 # copied from content/figures by content:seed
 /public/figures/
+
+.vercel
+.env*
