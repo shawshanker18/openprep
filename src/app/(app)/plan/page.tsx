@@ -45,8 +45,8 @@ export default async function PlanPage({ searchParams }: PageProps<"/plan">) {
               <option value="practice">Practice</option><option value="learn">Learn</option><option value="review">Review mistakes</option>
               <option value="mini">Check-in</option><option value="desmos">Desmos</option>
             </select></label>
-          <label className="flex flex-col gap-1 text-sm">Skill (practice, learn, check-in)
-            <select name="skillId" defaultValue={d.focus[0]} className={control}>
+          <label className="flex max-w-full flex-col gap-1 text-sm">Skill (practice, learn, check-in)
+            <select name="skillId" defaultValue={d.focus[0]} className={`${control} max-w-full`}>
               {SKILLS.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select></label>
           <label className="flex flex-col gap-1 text-sm">Minutes

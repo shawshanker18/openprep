@@ -17,7 +17,7 @@ const control = "h-9 rounded-md border bg-background px-2 text-sm";
 
 function StartCard({ title, time, children, fields }: { title: string; time: string; children: React.ReactNode; fields: React.ReactNode }) {
   return (
-    <form action={startTestAction} className="flex flex-col gap-3 rounded-xl border p-5">
+    <form action={startTestAction} className="flex min-w-0 flex-col gap-3 rounded-xl border p-5">
       <div><h2 className="font-medium">{title}</h2><p className="text-sm text-muted-foreground">{time}</p></div>
       <p className="text-sm">{children}</p>
       {fields}
@@ -65,7 +65,7 @@ export default async function TestsPage({ searchParams }: PageProps<"/tests">) {
         </StartCard>
         <StartCard title="Mini test" time="12–15 min · 10 questions" fields={<>
           <input type="hidden" name="kind" value="mini" />
-          <select name="skillId" className={control} required>{skills.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}</select>
+          <select name="skillId" className={`${control} max-w-full`} required>{skills.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}</select>
         </>}>
           A quick check on one skill.
         </StartCard>
