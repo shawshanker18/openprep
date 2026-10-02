@@ -164,3 +164,28 @@ it("a question in a live test can't be answered (and revealed) through practice"
   await T.abandonTest(USER, r.id);
   expect(await P.submitAnswer(USER, { questionId: first!.questionId, response: "A", timeMs: 5000, confidence: 3 })).not.toBeNull();
 });
+
+it("server clock: reported time is capped by real elapsed time, and the sweep closes expired modules", async () => {
+  const now = new Date("2026-10-02T10:00:00Z");
+  expect(T.serverCappedTime(30_000, new Date(now.getTime() - 60_000), now)).toBe(30_000); // honest client
+  expect(T.serverCappedTime(3_600_000, new Date(now.getTime() - 45_000), now)).toBe(45_000); // inflated claim
+  expect(T.serverCappedTime(500_000_000, null, now)).toBe(600_000); // no server timestamp: 10 min cap
+
+  const r = await T.startTest(USER, { kind: "module", section: "math" });
+  if (!r.ok) throw new Error(r.error);
+  const [m] = await modules(r.id);
+  await T.startModule(USER, m!.id);
+  // Claiming an hour right after the module started records only the real few seconds.
+  await T.saveResponse(USER, { moduleId: m!.id, position: 0, response: "A", flagged: false, timeMsDelta: 3_600_000 });
+  const [first] = await items(m!.id);
+  expect(first!.timeMs).toBeLessThan(10_000);
+
+  // Time runs out while the tab is closed: the sweep submits the module and finishes the test.
+  await db.update(schema.testModules).set({ deadlineAt: new Date(Date.now() - 60_000) }).where(eq(schema.testModules.id, m!.id));
+  const swept = await T.sweepTests();
+  expect(swept.submitted).toBe(1);
+  const [after] = await modules(r.id);
+  expect(after!.submittedAt).not.toBeNull();
+  const [s] = await db.select().from(schema.testSessions).where(eq(schema.testSessions.id, r.id));
+  expect(s!.status).toBe("completed");
+});

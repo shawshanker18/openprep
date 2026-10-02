@@ -134,7 +134,15 @@ export const testItems = pgTable("test_items", {
   response: text("response"),
   flagged: boolean("flagged").notNull().default(false),
   timeMs: integer("time_ms").notNull().default(0),
+  servedAt: ts("served_at").defaultNow(), // when the server handed this item out (diagnostic timing)
 }, (t) => [primaryKey({ columns: [t.moduleId, t.position] }), index("ti_question").on(t.questionId)]);
+
+/** Server-side clock for practice: when each question was last served to each student. */
+export const questionServes = pgTable("question_serves", {
+  userId: userRef(),
+  questionId: text("question_id").notNull(),
+  servedAt: ts("served_at").notNull().defaultNow(),
+}, (t) => [primaryKey({ columns: [t.userId, t.questionId] })]);
 
 /* ───────── progress, plan, misc ───────── */
 export const scoreSnapshots = pgTable("score_snapshots", {

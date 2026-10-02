@@ -1,4 +1,4 @@
-// Web push reminders: device subscriptions + the hourly sender called by /api/cron/reminders.
+// Web push reminders: device subscriptions + the sender called by the /api/cron/tick job.
 import "server-only";
 import webpush from "web-push";
 import { and, eq, inArray, sql } from "drizzle-orm";
