@@ -4,6 +4,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.webkit.WebView;
+import androidx.core.splashscreen.SplashScreen;
+import com.getcapacitor.WebViewListener;
 import android.view.WindowManager;
 import android.util.Base64;
 import android.webkit.CookieManager;
@@ -13,12 +18,20 @@ import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
     private static final String SITE = "https://openprep-opal.vercel.app";
+    private volatile boolean pageReady = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        // Keep the launch screen up until the first page has loaded (no blank white screen), 10 seconds at most.
+        SplashScreen.installSplashScreen(this).setKeepOnScreenCondition(() -> !pageReady);
+        new Handler(Looper.getMainLooper()).postDelayed(() -> pageReady = true, 10_000);
         registerPlugin(LockdownPlugin.class);
         ensureInstallCookie();
         super.onCreate(savedInstanceState);
+        getBridge().addWebViewListener(new WebViewListener() {
+            @Override
+            public void onPageLoaded(WebView webView) { pageReady = true; } // the offline page counts too
+        });
         // Questions can't be screenshotted or screen recorded, and the app is blank in the recent apps view.
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
         // The site needs no files, content providers or location: switch them off in the WebView.
