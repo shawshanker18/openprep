@@ -7,8 +7,8 @@ import { db } from "@/db";
 import { attempts, bookmarks, questionReports, questions } from "@/db/schema";
 import { MISTAKE_TYPES } from "@/engine/mistakes";
 import { diagnosticPending, requireUser } from "@/server/auth";
-import { nextQuestion as next, overServeLimit, submitAnswer as submit, wasGiven } from "@/server/practice";
-import { HOUR_CAP, limitPractice } from "@/server/ratelimit";
+import { nextQuestion as next, submitAnswer as submit, tooFast, wasGiven } from "@/server/practice";
+import { limitPractice, SLOW_DOWN } from "@/server/ratelimit";
 import { internalId, internalIds } from "@/server/questions";
 
 const id = text().min(1).max(64);
@@ -28,9 +28,9 @@ export async function nextQuestion(input: z.input<typeof Next>) {
   if (diagnosticPending(profile)) return { ok: false as const, error: "Take the diagnostic first." };
   const p = Next.safeParse(input);
   if (!p.success) return { ok: false as const, error: "Invalid request." };
-  const limited = await limitPractice(userId, "question");
+  const limited = await limitPractice(userId, "request");
   if (limited) return { ok: false as const, error: limited };
-  if (await overServeLimit(userId)) return { ok: false as const, error: HOUR_CAP };
+  if (await tooFast(userId)) return { ok: false as const, error: SLOW_DOWN };
   const [exclude, ids] = await Promise.all([internalIds(p.data.exclude), p.data.ids ? internalIds(p.data.ids) : undefined]);
   const r = await next(userId, profile, { ...p.data, exclude, ids });
   return { ok: true as const, data: r ?? { done: true as const } };

@@ -47,17 +47,17 @@ it("list mode walks the given ids in order, and the bank shows last result and s
 it("stops handing out questions once an account pulls too many too fast", async () => {
   const U2 = "00000000-0000-0000-0000-0000000000dd";
   await db.insert(schema.profiles).values({ id: U2 });
-  const many = Array.from({ length: P.SERVE_LIMITS.hour.max }, (_, i) => `${skill.id}-bulk${i}`);
+  const many = Array.from({ length: P.SPEED_LIMIT.max }, (_, i) => `${skill.id}-bulk${i}`);
   await db.insert(schema.questions).values(many.map((id) => ({ id, skillId: skill.id, section: "math" as const, domain: skill.domain, difficulty: 2,
     type: "mcq" as const, passageMd: null, stemMd: "s", choices: [], answer: { choice: "A" }, explanationMd: "e", choiceRationales: null,
     fastMethodMd: null, desmos: null, tags: [], status: "active" as const, version: 1 })));
   const now = new Date();
   await db.insert(schema.questionServes).values(many.slice(0, -1).map((questionId) => ({ userId: U2, questionId, servedAt: now })));
-  expect(await P.overServeLimit(U2, now)).toBe(false);
+  expect(await P.tooFast(U2, now)).toBe(false);
   await db.insert(schema.questionServes).values({ userId: U2, questionId: many.at(-1)!, servedAt: now });
-  expect(await P.overServeLimit(U2, now)).toBe(true);
-  // Just over an hour later the hourly window has passed (the daily cap is far away).
-  expect(await P.overServeLimit(U2, new Date(now.getTime() + 3_600_001))).toBe(false);
+  expect(await P.tooFast(U2, now)).toBe(true);
+  // A minute later they can carry on: it's a speed limit, not a quota.
+  expect(await P.tooFast(U2, new Date(now.getTime() + 60_001))).toBe(false);
 });
 
 it("plan blocks are done only from real work today (a click can't tick them)", async () => {
