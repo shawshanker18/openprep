@@ -9,7 +9,8 @@ import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 
 /**
- * Test lockdown on Android: pins the screen (Android's screen pinning), swallows the back button, and pins again if
+ * Back button and test lockdown on Android. Normally Back goes to the previous page (and closes the app from the
+ * first one). During a test it does nothing, the screen is pinned (Android's screen pinning), and it pins again if
  * the student unpins while the test is still running. The page calls start() when a test begins and stop() when it
  * is finished or ended. The test's address is kept so the app reopens straight into it if it was closed.
  */
@@ -23,9 +24,16 @@ public class LockdownPlugin extends Plugin {
 
     @Override
     public void load() {
-        back = new OnBackPressedCallback(false) {
+        back = new OnBackPressedCallback(true) {
             @Override
-            public void handleOnBackPressed() { /* no going back out of a test */ }
+            public void handleOnBackPressed() {
+                if (on) return; // no going back out of a test
+                if (getBridge().getWebView().canGoBack()) { getBridge().getWebView().goBack(); return; }
+                // First page: let Android close the app as usual.
+                setEnabled(false);
+                getActivity().getOnBackPressedDispatcher().onBackPressed();
+                setEnabled(true);
+            }
         };
         getActivity().getOnBackPressedDispatcher().addCallback(getActivity(), back);
     }
@@ -34,7 +42,6 @@ public class LockdownPlugin extends Plugin {
     public void start(PluginCall call) {
         getActivity().runOnUiThread(() -> {
             on = true;
-            back.setEnabled(true);
             prefs().edit().putString(LOCKED_URL, getBridge().getWebView().getUrl()).apply();
             pin();
             call.resolve();
@@ -45,7 +52,6 @@ public class LockdownPlugin extends Plugin {
     public void stop(PluginCall call) {
         getActivity().runOnUiThread(() -> {
             on = false;
-            back.setEnabled(false);
             prefs().edit().remove(LOCKED_URL).apply();
             try { getActivity().stopLockTask(); } catch (Exception ignored) { /* wasn't pinned */ }
             call.resolve();
