@@ -73,7 +73,8 @@ function applyLockdown(kind) {
   win.setAlwaysOnTop(on, "screen-saver");
   win.setMinimizable(!on);
   // If the app is killed mid-test, it reopens straight into the test, locked again.
-  writeState({ ...readState(), lockedUrl: kind === "test" ? win.webContents.getURL() : null });
+  const here = (() => { try { const u = new URL(win.webContents.getURL()); return u.origin + u.pathname; } catch { return null; } })();
+  writeState({ ...readState(), lockedUrl: kind === "test" ? here : null });
   if (on) {
     win.webContents.navigationHistory.clear(); // nothing to go "back" to
     win.show(); win.focus();
@@ -131,10 +132,12 @@ function showWindow() {
   win.focus();
 }
 
-// "Try again" goes back to where the student was (a locked test, if one was running).
-const OFFLINE = (back) => `data:text/html;charset=utf-8,${encodeURIComponent(`<!doctype html><meta charset="utf-8"><title>OpenPrep</title>
+// "Try again" goes back to where the student was (a locked test, if one was running). During a locked test it also
+// retries by itself every few seconds, and the lock stays on (switching Wi-Fi off is not a way out of a test).
+const OFFLINE = (back, inTest) => `data:text/html;charset=utf-8,${encodeURIComponent(`<!doctype html><meta charset="utf-8"><title>OpenPrep</title>
+${inTest ? `<script>setTimeout(() => { location.href = ${JSON.stringify(back)}; }, 5000)</script>` : ""}
 <body style="font-family:system-ui;background:#fff;color:#0a0a0a;display:grid;place-items:center;height:100vh;margin:0">
-<div style="text-align:center"><h1 style="font-weight:600">You're offline</h1><p style="color:#737373">OpenPrep needs the internet to load your practice.</p>
+<div style="text-align:center"><h1 style="font-weight:600">You're offline</h1><p style="color:#737373">${inTest ? "Your test is still running and stays locked. Reconnecting…" : "OpenPrep needs the internet to load your practice."}</p>
 <button onclick="location.href='${back}'" style="height:44px;padding:0 20px;border-radius:12px;border:0;background:#0a0a0a;color:#fff;font-weight:600;cursor:pointer">Try again</button></div>`)}`;
 
 function createWindow() {
@@ -174,15 +177,13 @@ function createWindow() {
   win.webContents.on("did-fail-load", (_e, code, _desc, url, isMainFrame) => {
     if (!isMainFrame || code === -3 || !isAppUrl(url, SITE)) return; // -3 = aborted (normal on redirects)
     const back = readState().lockedUrl;
-    void win.loadURL(OFFLINE(back && isAppUrl(back, SITE) ? back : `${SITE}/dashboard`));
+    void win.loadURL(OFFLINE(back && isAppUrl(back, SITE) ? back : `${SITE}/dashboard`, locked === "test"));
   });
-  // A full page load away from a running test (offline page, a crash, a sign out) releases the lock, so nobody is ever
-  // trapped in kiosk mode; the test page locks again when it loads. Offline keeps the way back to the test.
+  // A full page load away from a running test (a crash, a sign out) releases the lock; the test page locks again when
+  // it loads. The offline page keeps it: it retries the test by itself, and Ctrl+Alt+Del or shutting down still work.
   win.webContents.on("did-navigate", (_e, url) => {
-    if (locked !== "test" || isTestPage(url, SITE)) return;
-    const back = readState().lockedUrl;
+    if (locked !== "test" || isTestPage(url, SITE) || url.startsWith("data:")) return;
     applyLockdown(null);
-    if (url.startsWith("data:")) writeState({ ...readState(), lockedUrl: back });
   });
 
   // Never: view source, save page, print. During lockdown also: reload, back/forward, zoom tricks, closing by shortcut.
@@ -258,7 +259,8 @@ function createWindow() {
   });
   // Back into a locked test if the app was killed during one (the page re-locks, or moves on if it already ended).
   const resume = readState().lockedUrl;
-  void win.loadURL(resume && isAppUrl(resume, SITE) ? resume : `${SITE}/dashboard`);
+  // "?resumed=1": the test page counts the app having been closed mid-test as leaving the test window.
+  void win.loadURL(resume && isAppUrl(resume, SITE) ? `${resume}?resumed=1` : `${SITE}/dashboard`);
 }
 
 function createTray() {
@@ -285,10 +287,13 @@ ipcMain.on("reminder", (e, hour) => { if (fromSite(e)) setReminder(Number.isInte
  */
 async function ensureInstallCookie() {
   const ses = session.defaultSession;
-  if ((await ses.cookies.get({ url: SITE, name: "openprep_app" })).length) return;
+  const [have] = await ses.cookies.get({ url: SITE, name: "openprep_app" });
+  if (have?.httpOnly && have.sameSite === "lax") return;
+  // Lax, not strict: the offline page's "reconnect" counts as coming from another site, and strict cookies aren't
+  // sent then (the app would look like a browser). Re-set an existing one so older installs get fixed too.
   await ses.cookies.set({
-    url: SITE, name: "openprep_app", value: crypto.randomBytes(24).toString("base64url"), path: "/",
-    httpOnly: true, secure: SITE.startsWith("https:"), sameSite: "strict", expirationDate: Math.floor(Date.now() / 1000) + 10 * 365 * 86400,
+    url: SITE, name: "openprep_app", value: have?.value || crypto.randomBytes(24).toString("base64url"), path: "/",
+    httpOnly: true, secure: SITE.startsWith("https:"), sameSite: "lax", expirationDate: Math.floor(Date.now() / 1000) + 10 * 365 * 86400,
   });
   await ses.cookies.flushStore();
 }
