@@ -72,18 +72,17 @@ async function skillSetModule(tx: Tx, userId: string, sessionId: string, idx: nu
   return insertModule(tx, sessionId, idx, sections.size === 1 ? [...sections][0]! : "mixed", "base", timeLimitS, picked);
 }
 
-// Every new test hands out a module of questions, so starts are capped (anti-scraping; real students stay far below).
-const MAX_STARTS_PER_HOUR = 10;
-const MAX_STARTS_PER_DAY = 25;
+// Every new test hands out questions, so starting them has a speed limit (anti-scraping). It's not a quota: no one
+// starts tests this fast by hand, even ending each one straight away.
+const START_LIMIT = { ms: 5 * 60_000, max: 4 };
 
 export async function startTest(userId: string, input: {
   kind: TestKind; section?: Section; skillId?: string; skillIds?: string[]; count?: number; timed?: boolean; focus?: string[];
   tags?: string[]; difficulty?: Difficulty | "mixed"; title?: string;
 }): Promise<{ ok: true; id: string } | { ok: false; error: string; resumeId?: string }> {
-  const started = (ms: number) => db.select({ n: count() }).from(testSessions)
-    .where(and(eq(testSessions.userId, userId), gte(testSessions.startedAt, new Date(Date.now() - ms)))).then((r) => r[0]!.n);
-  const [hour, day] = await Promise.all([started(3_600_000), started(86_400_000)]);
-  if (hour >= MAX_STARTS_PER_HOUR || day >= MAX_STARTS_PER_DAY) return { ok: false, error: "rate" };
+  const [{ n }] = (await db.select({ n: count() }).from(testSessions)
+    .where(and(eq(testSessions.userId, userId), gte(testSessions.startedAt, new Date(Date.now() - START_LIMIT.ms))))) as [{ n: number }];
+  if (n >= START_LIMIT.max) return { ok: false, error: "rate" };
   if (input.kind === "full" || input.kind === "section") {
     const [open] = await db.select({ id: testSessions.id }).from(testSessions)
       .where(and(eq(testSessions.userId, userId), eq(testSessions.status, "in_progress"), inArray(testSessions.kind, ["full", "section"]))).limit(1);

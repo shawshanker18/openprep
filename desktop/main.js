@@ -78,7 +78,32 @@ function applyLockdown(kind) {
     win.webContents.navigationHistory.clear(); // nothing to go "back" to
     win.show(); win.focus();
   }
+  coverOtherScreens(kind === "test");
 }
+
+/* During a locked test every other monitor is blacked out, so nothing can be read off a second screen. */
+let covers = [];
+function coverOtherScreens(on) {
+  covers.forEach((c) => { if (!c.isDestroyed()) c.destroy(); });
+  covers = [];
+  if (!on || !win) return;
+  const testScreen = screen.getDisplayMatching(win.getBounds()).id;
+  for (const d of screen.getAllDisplays()) {
+    if (d.id === testScreen) continue;
+    const cover = new BrowserWindow({
+      ...d.bounds, frame: false, show: false, focusable: false, skipTaskbar: true, resizable: false, movable: false,
+      backgroundColor: "#000000", webPreferences: { sandbox: true, contextIsolation: true, devTools: false },
+    });
+    cover.setAlwaysOnTop(true, "screen-saver");
+    cover.setContentProtection(true);
+    cover.setBounds(d.bounds);
+    // Safety: a cover must never land on the test's own screen (it would black out the test).
+    if (screen.getDisplayMatching(cover.getBounds()).id === testScreen) { cover.destroy(); continue; }
+    cover.showInactive(); // never takes focus from the test
+    covers.push(cover);
+  }
+}
+const recover = () => { if (locked === "test") coverOtherScreens(true); }; // a monitor plugged in or changed mid-test
 
 /* ───────── reminders: checked every minute while the app (or its tray icon) is running ───────── */
 function checkReminder() {
@@ -269,6 +294,7 @@ async function ensureInstallCookie() {
 }
 
 app.whenReady().then(async () => {
+  ["display-added", "display-removed", "display-metrics-changed"].forEach((ev) => screen.on(ev, recover));
   Menu.setApplicationMenu(null);
   app.setAppUserModelId("com.openprep.desktop"); // Windows notifications need it
   // The site needs no camera, mic, location, etc.

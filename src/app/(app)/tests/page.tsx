@@ -15,7 +15,7 @@ import { Choice } from "@/components/ui/choice";
 export const metadata = { title: "Practice tests" };
 
 const KIND = { full: "Full practice test", section: "Section test", module: "Single module", mini: "Mini test", weakness: "Weakness test", custom: "Custom test", diagnostic: "Diagnostic" } as Record<string, string>;
-const ERR: Record<string, string> = { empty: "There aren't enough questions for that test yet.", invalid: "Please check the test options.", rate: "You've started a lot of tests recently. Finish one, or try again later." };
+const ERR: Record<string, string> = { empty: "There aren't enough questions for that test yet.", invalid: "Please check the test options.", rate: "Too many tests started in a few minutes. Please wait a moment and try again." };
 const control = "h-9 rounded-md border bg-background px-2 text-sm";
 
 function StartCard({ title, time, children, fields }: { title: string; time: string; children: React.ReactNode; fields: React.ReactNode }) {
