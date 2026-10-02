@@ -1,7 +1,7 @@
 // OpenPrep desktop: the live website in a locked-down window, plus test lockdown (kiosk) and local daily reminders.
 const path = require("node:path");
 const fs = require("node:fs");
-const { app, BrowserWindow, Menu, Notification, Tray, dialog, ipcMain, nativeImage, session, shell } = require("electron");
+const { app, BrowserWindow, Menu, Notification, Tray, dialog, ipcMain, nativeImage, screen, session, shell } = require("electron");
 const { parseAuthLink, isAppUrl, isTestPage, isExternalWebUrl, localDay, reminderDue } = require("./lib");
 
 // The installed app always loads the real site; OPENPREP_URL only works when running from source (development).
@@ -112,6 +112,10 @@ const OFFLINE = (back) => `data:text/html;charset=utf-8,${encodeURIComponent(`<!
 <button onclick="location.href='${back}'" style="height:44px;padding:0 20px;border-radius:12px;border:0;background:#0a0a0a;color:#fff;font-weight:600;cursor:pointer">Try again</button></div>`)}`;
 
 function createWindow() {
+  // Reopen where the student left it: same size and place (if that spot is still on a screen), maximized if it was.
+  const saved = readState().bounds;
+  const onScreen = saved && screen.getAllDisplays().some(({ workArea: a }) =>
+    saved.x >= a.x - 50 && saved.y >= a.y - 50 && saved.x + 200 <= a.x + a.width && saved.y + 100 <= a.y + a.height);
   win = new BrowserWindow({
     // Shown once the first page has painted (no blank flash); white to match the site's default light theme.
     width: 1280, height: 860, minWidth: 360, minHeight: 600, show: false,
@@ -190,6 +194,21 @@ function createWindow() {
     // Keep running in the tray while reminders are on, so they can fire.
     if (readState().hour != null) { e.preventDefault(); win.hide(); }
   });
+  // Restored with the same measure it was saved in (constructor sizes drift a few pixels per launch on Windows).
+  if (onScreen) win.setBounds({ x: saved.x, y: saved.y, width: saved.width, height: saved.height });
+  if (saved?.maximized) win.maximize();
+  // Remember size and place (never while locked: kiosk mode is full screen on purpose).
+  let saveTimer = null;
+  const restoredAt = Date.now(); // our own restore fires resize/move: don't save those (rounding would creep)
+  const remember = () => {
+    if (Date.now() - restoredAt < 2000) return;
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => {
+      if (!win || win.isDestroyed() || locked || win.isMinimized()) return;
+      writeState({ ...readState(), bounds: { ...win.getNormalBounds(), maximized: win.isMaximized() } });
+    }, 500);
+  };
+  ["resize", "move", "maximize", "unmaximize"].forEach((ev) => win.on(ev, remember));
   win.on("closed", () => { win = null; });
 
   // `OPENPREP_SMOKE=1 npm start`: print what loaded, then exit (CI / quick check).
