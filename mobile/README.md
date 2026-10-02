@@ -14,6 +14,12 @@ npx cap sync android
 cd android && gradlew.bat assembleDebug    # app/build/outputs/apk/debug/app-debug.apk
 ```
 
-For Google Play: create an upload keystore in Android Studio (Build, Generate Signed Bundle), then build `bundleRelease`. iOS needs a Mac (`npx cap add ios`); until then iPhone students can install the website from Safari (Share, Add to Home Screen) and get web push reminders.
+Release builds are signed with the upload key named in `android/keystore.properties` (never committed; the key and its password live in `C:/Users/<you>/OpenPrep-signing/`). Back that folder up somewhere safe: Google Play needs the same key for every update.
+
+```bash
+cd android && gradlew.bat assembleRelease bundleRelease   # signed .apk (sideload) and .aab (Google Play)
+```
+
+Without `keystore.properties` the release build is simply unsigned. iOS needs a Mac (`npx cap add ios`); until then iPhone students can install the website from Safari (Share, Add to Home Screen) and get web push reminders.
 
 `node make-icons.cjs` (from the repo root's dependencies) regenerates icons and splash images.
