@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { formatDate } from "@/lib/dates";
 import { revalidatePath } from "next/cache";
 import { and, desc, eq, sql } from "drizzle-orm";
 import { Button } from "@/components/ui/button";
@@ -20,7 +21,7 @@ async function removeBookmark(pub: string) {
 }
 
 export default async function BookmarksPage() {
-  const { userId } = await requireUser();
+  const { userId, profile } = await requireUser();
   const rows = await db.select({
     id: questions.id, skillId: questions.skillId, stem: questions.stemMd, passage: questions.passageMd,
     explanation: questions.explanationMd, answer: questions.answer, at: bookmarks.createdAt,
@@ -50,7 +51,7 @@ export default async function BookmarksPage() {
               )}
               <div className="flex flex-wrap items-center gap-2">
                 <Link className="text-xs underline" href={`/skills/${r.skillId}`}>{SKILL_BY_ID[r.skillId]?.name}</Link>
-                <span className="text-xs text-muted-foreground">saved {r.at.toLocaleDateString()}</span>
+                <span className="text-xs text-muted-foreground">saved {formatDate(r.at, profile.timezone)}</span>
                 <span className="flex-1" />
                 <Button size="sm" variant="outline" render={<Link href={`/practice?skill=${r.skillId}`} />}>Practise this skill</Button>
                 <form action={removeBookmark.bind(null, publicId(r.id))}><Button size="sm" variant="ghost" type="submit">Remove</Button></form>

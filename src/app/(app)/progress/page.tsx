@@ -1,4 +1,5 @@
 import { DOMAINS, type DomainId } from "@/content/taxonomy";
+import { formatDate } from "@/lib/dates";
 import { MasteryBar } from "@/components/mastery-bar";
 import { MISTAKE_LABEL, type MistakeType } from "@/engine/mistakes";
 import { requireUser } from "@/server/auth";
@@ -9,7 +10,7 @@ export const metadata = { title: "Progress" };
 type Point = { t: number; total: number; half: number; source: string };
 
 /** Estimate over time: model line with ±range band, other sources as markers, target as a dashed line. */
-function ScoreChart({ points, target }: { points: Point[]; target: number | null }) {
+function ScoreChart({ points, target, timeZone }: { points: Point[]; target: number | null; timeZone: string }) {
   if (points.length < 2) return <p className="text-sm text-muted-foreground">Your score history appears here after a couple of days of practice.</p>;
   const W = 640, H = 200, P = 28;
   const t0 = points[0]!.t, t1 = points.at(-1)!.t || t0 + 1;
@@ -28,8 +29,8 @@ function ScoreChart({ points, target }: { points: Point[]; target: number | null
       {points.map((p, i) => p.source === "mock" || p.source === "official"
         ? <rect key={i} x={x(p.t) - 4} y={y(p.total) - 4} width="8" height="8" transform={`rotate(45 ${x(p.t)} ${y(p.total)})`} className={p.source === "official" ? "fill-foreground" : "fill-primary"} />
         : <circle key={i} cx={x(p.t)} cy={y(p.total)} r="3" className="fill-primary" />)}
-      <text x={P} y={H - 8} className="fill-muted-foreground text-[10px]">{new Date(t0).toLocaleDateString()}</text>
-      <text x={W - P} y={H - 8} textAnchor="end" className="fill-muted-foreground text-[10px]">{new Date(t1).toLocaleDateString()}</text>
+      <text x={P} y={H - 8} className="fill-muted-foreground text-[10px]">{formatDate(t0, timeZone)}</text>
+      <text x={W - P} y={H - 8} textAnchor="end" className="fill-muted-foreground text-[10px]">{formatDate(t1, timeZone)}</text>
     </svg>
   );
 }
@@ -65,7 +66,7 @@ export default async function ProgressPage() {
 
       <section className="flex flex-col gap-3">
         <h2 className="font-medium">Estimated score</h2>
-        <ScoreChart points={points} target={profile.targetScore} />
+        <ScoreChart points={points} target={profile.targetScore} timeZone={profile.timezone} />
         <p className="text-xs text-muted-foreground">The line is your estimated score and the shaded band is how sure we are. Circles are past estimates, blue diamonds are practice tests, and black diamonds are official SAT scores.</p>
       </section>
 

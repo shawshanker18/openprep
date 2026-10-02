@@ -38,7 +38,7 @@ export default async function ResultsPage({ params }: PageProps<"/test/[sessionI
   const [s] = await db.select().from(testSessions).where(and(eq(testSessions.id, sessionId), eq(testSessions.userId, userId)));
   if (!s) notFound();
   if (s.status === "in_progress") redirect(`/test/${sessionId}`);
-  if (s.kind !== "diagnostic") return <TestResults data={(await getTestResult(userId, sessionId))!} />;
+  if (s.kind !== "diagnostic") return <TestResults data={(await getTestResult(userId, sessionId))!} timeZone={profile.timezone} />;
 
   const [{ skills, estimate }, ranked] = await Promise.all([getSkillSummary(userId), skillsByPriority(userId, profile)]);
   // Personalized starting curriculum (plan §24.6): biggest gains first; skip what's already strong.

@@ -5,7 +5,7 @@ import { testSessions } from "@/db/schema";
 import { requireUser } from "@/server/auth";
 import { getDiagnostic } from "@/server/diagnostic";
 import { getTestState } from "@/server/tests";
-import { mayContinue } from "@/server/lockdown";
+import { appKeyHash, mayContinue } from "@/server/lockdown";
 import { DiagnosticRunner } from "./diagnostic-runner";
 import { TestRunner } from "./test-runner";
 import { Button } from "@/components/ui/button";
@@ -26,7 +26,11 @@ export default async function TestPage({ params }: PageProps<"/test/[sessionId]"
     return (
       <main className="mx-auto flex max-w-lg flex-col gap-4 px-4 py-16 text-center">
         <h1 className="text-2xl font-semibold">This test is in lockdown mode</h1>
-        <p className="text-muted-foreground">You started it in the OpenPrep app, so it can only be continued there. Open the app to carry on, or end the test here.</p>
+        <p className="text-muted-foreground">
+          {(await appKeyHash())
+            ? "You started it in the OpenPrep app on another device, so it can only be continued there. Carry on on that device, or end the test here."
+            : "You started it in the OpenPrep app, so it can only be continued there. Open the app to carry on, or end the test here."}
+        </p>
         <form action={(s.kind === "diagnostic" ? endDiagnostic : abandon).bind(null, sessionId)}><Button type="submit" variant="outline">End test</Button></form>
       </main>
     );
