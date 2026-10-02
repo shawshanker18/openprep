@@ -31,11 +31,18 @@ function writeState(s) {
   try { fs.writeFileSync(STATE_FILE(), JSON.stringify(s)); } catch { /* non-fatal */ }
 }
 
+/** Switch page from outside the page (deep link, tray, notification). Never during a locked test: leaving the test
+ * page would release the lock, so these would be ways out of it. */
+function openPage(url) {
+  if (!win || locked === "test") return;
+  void win.loadURL(url);
+}
+
 /* ───────── deep links: openprep://auth?code=… finishes an email sign-in started in this app ───────── */
 function handleDeepLink(url) {
   const code = parseAuthLink(url);
   if (!code || !win) return;
-  win.loadURL(`${SITE}/auth/callback?code=${encodeURIComponent(code)}`);
+  openPage(`${SITE}/auth/callback?code=${encodeURIComponent(code)}`);
   showWindow();
 }
 
@@ -80,7 +87,7 @@ function checkReminder() {
   writeState({ ...s, lastFired: localDay(now) });
   if (!Notification.isSupported()) return;
   const n = new Notification({ title: "Time for SAT practice", body: "Your plan for today is ready. Keep your streak going!", icon: ICON });
-  n.on("click", () => { showWindow(); win?.loadURL(`${SITE}/plan`); });
+  n.on("click", () => { showWindow(); openPage(`${SITE}/plan`); });
   n.show();
 }
 
@@ -214,7 +221,7 @@ function createTray() {
   tray.setToolTip("OpenPrep");
   tray.setContextMenu(Menu.buildFromTemplate([
     { label: "Open OpenPrep", click: () => showWindow() },
-    { label: "Today's plan", click: () => { showWindow(); win?.loadURL(`${SITE}/plan`); } },
+    { label: "Today's plan", click: () => { showWindow(); openPage(`${SITE}/plan`); } },
     { type: "separator" },
     { label: "Quit", click: () => { if (locked !== "test") { quitting = true; app.quit(); } } },
   ]));
