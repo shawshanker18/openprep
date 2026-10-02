@@ -2,6 +2,7 @@
 //   OPENPREP_URL=http://localhost:3000 npx electron e2e.js     (the app's window must already be signed in)
 // Starts a real course quiz, then checks: locked for the whole test, can't close/quit, focus is taken back,
 // the test can't be continued in a plain browser, the resume address is saved, and "End test" unlocks.
+// STAGE=escape also checks outside page switches are ignored while locked.
 // STAGE=kill stops right after the test locks (like killing the app); STAGE=resume then checks the app reopens into it.
 const STAGE = process.env.STAGE;
 process.env.OPENPREP_URL ||= "http://localhost:3000";
@@ -67,6 +68,12 @@ app.whenReady().then(async () => {
     r.lockedOnIntro = win.isKiosk() && win.isAlwaysOnTop();
     r.resumeSaved = state().lockedUrl === testUrl;
     if (STAGE === "kill") { console.log("E2E", JSON.stringify(r)); app.exit(0); return; }
+    if (STAGE === "escape") {
+      // A sign-in link opened from outside (Win+R, another app) must not pull the window off the test.
+      app.emit("second-instance", {}, [process.execPath, "openprep://auth?code=abcdefgh12345"]);
+      await wait(3000);
+      r.deepLinkIgnored = win.webContents.getURL() === testUrl && win.isKiosk();
+    }
     if (STAGE === "resume") r.reopenedIntoTest = true;
 
     win.close(); app.quit();
