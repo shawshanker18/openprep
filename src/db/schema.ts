@@ -144,6 +144,19 @@ export const questionServes = pgTable("question_serves", {
   servedAt: ts("served_at").notNull().defaultNow(),
 }, (t) => [primaryKey({ columns: [t.userId, t.questionId] })]);
 
+/**
+ * Sign-up cap: our server issues a short-lived ticket (email + the requester's real IP) before every sign-in
+ * attempt. Supabase's before-user-created hook (drizzle/0008) only creates an account that has a fresh ticket, and
+ * at most 3 per IP per day. Not tied to profiles: the account doesn't exist yet.
+ */
+export const signupTickets = pgTable("signup_tickets", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  email: text("email").notNull(),
+  ip: text("ip").notNull(),
+  createdAt: ts("created_at").notNull().defaultNow(),
+  usedAt: ts("used_at"),
+}, (t) => [index("signup_tickets_email_idx").on(t.email, t.createdAt), index("signup_tickets_ip_idx").on(t.ip, t.usedAt)]);
+
 /* ───────── progress, plan, misc ───────── */
 export const scoreSnapshots = pgTable("score_snapshots", {
   id: uuid("id").primaryKey().defaultRandom(),

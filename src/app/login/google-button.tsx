@@ -39,8 +39,8 @@ export function GoogleButton({ enabled }: { enabled: boolean }) {
         use_fedcm_for_prompt: true,
         callback: async ({ credential }: { credential: string }) => {
           setError(null);
-          const { ok } = await signInWithGoogle({ credential, nonce: raw }).catch(() => ({ ok: false }));
-          if (!ok) { setError("Google sign-in didn't work. Please try again or use the email link."); return; }
+          const r = await signInWithGoogle({ credential, nonce: raw }).catch(() => ({ ok: false, error: undefined }));
+          if (!r.ok) { setError(("error" in r && r.error) || "Google sign-in didn't work. Please try again or use the email link."); return; }
           router.replace("/dashboard");
           router.refresh();
         },

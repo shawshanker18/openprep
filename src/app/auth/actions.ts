@@ -3,11 +3,21 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { clientIp, issueSignupTicket, SIGNUP_REFUSALS } from "@/server/signup";
 
 export async function signOut() {
   await (await createClient()).auth.signOut();
   redirect("/");
 }
+
+/** Before an email link is requested: lets a new account be created for this email (3 per IP per day). */
+export async function prepareEmailSignIn(email: string) {
+  const p = z.email().max(254).safeParse(email);
+  if (p.success) await issueSignupTicket(p.data, await clientIp());
+}
+
+/** The sign-up cap's own message when that's why sign-in failed, so the student knows what happened. */
+const refusal = (message?: string) => SIGNUP_REFUSALS.find((r) => message?.includes(r)) ? message : undefined;
 
 const Google = z.object({ credential: z.string().regex(/^[\w-]+\.[\w-]+\.[\w-]+$/).max(8192), nonce: z.uuid() });
 
@@ -18,6 +28,11 @@ const Google = z.object({ credential: z.string().regex(/^[\w-]+\.[\w-]+\.[\w-]+$
 export async function signInWithGoogle(input: z.input<typeof Google>) {
   const p = Google.safeParse(input);
   if (!p.success) return { ok: false as const };
+  // The email is read (not trusted) only to key the sign-up ticket; Supabase verifies the token itself next.
+  try {
+    const email = (JSON.parse(Buffer.from(p.data.credential.split(".")[1]!, "base64url").toString()) as { email?: unknown }).email;
+    if (typeof email === "string") await issueSignupTicket(email, await clientIp());
+  } catch { /* not a readable token: Supabase will reject it */ }
   const { error } = await (await createClient()).auth.signInWithIdToken({ provider: "google", token: p.data.credential, nonce: p.data.nonce });
-  return { ok: !error };
+  return { ok: !error, error: refusal(error?.message) };
 }

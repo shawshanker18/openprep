@@ -4,18 +4,24 @@ import Link from "next/link";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { GoogleButton } from "./google-button";
+import { prepareEmailSignIn } from "@/app/auth/actions";
 
 export function LoginForm({ google: showGoogle, inApp = false }: { google: boolean; inApp?: boolean }) {
   const [age, setAge] = useState(false);
   const [email, setEmail] = useState("");
   const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [refused, setRefused] = useState<string | null>(null);
   // In the apps the email link opens in a browser, which hands the code back to the app (see /auth/callback).
   const redirectTo = () => `${window.location.origin}/auth/callback`;
 
   const magic = async (e: React.FormEvent) => {
     e.preventDefault();
     setState("sending");
+    setRefused(null);
+    await prepareEmailSignIn(email).catch(() => {}); // sign-up ticket (only used if this is a new account)
     const { error } = await createClient().auth.signInWithOtp({ email, options: { emailRedirectTo: redirectTo() } });
+    // The sign-up cap explains itself; anything else gets the general message.
+    if (error && /Too many new accounts|create your account on the OpenPrep/.test(error.message)) setRefused(error.message);
     setState(error ? "error" : "sent");
   };
 
@@ -58,7 +64,7 @@ export function LoginForm({ google: showGoogle, inApp = false }: { google: boole
           className="h-14 rounded-2xl bg-foreground text-base font-medium text-background transition-opacity disabled:opacity-40">
           {state === "sending" ? "Sending…" : "Continue with email"}
         </button>
-        {state === "error" && <p role="alert" className="text-sm text-destructive">Couldn&apos;t send the link. Try again in a minute.</p>}
+        {state === "error" && <p role="alert" className="text-sm text-destructive">{refused ?? "Couldn\u2019t send the link. Try again in a minute."}</p>}
       </form>
 
       <p className="text-center text-sm text-muted-foreground">
