@@ -11,7 +11,7 @@ import { pickQuestion, targetDifficulty } from "@/engine/select";
 import { recordAttempt } from "./attempts";
 import { ensureWeeklyFocus, skillsByPriority } from "./plan";
 import { toPublic, toRevealed } from "./questions";
-import { inRunningTest, serverCappedTime } from "./tests";
+import { inRunningTest, runningTestQuestionIds, serverCappedTime } from "./tests";
 
 export type PracticeMode = "skill" | "smart" | "review" | "set" | "list";
 export type SetDifficulty = Difficulty | "mixed"; // undefined = auto (targetDifficulty from theta)
@@ -91,15 +91,18 @@ export async function nextQuestion(userId: string, profile: Profile, input: {
   skillIds?: string[]; tags?: string[]; timing?: Timing;
 }) {
   const now = new Date();
+  // Never serve a question from one of the student's unfinished tests: it couldn't be answered here (that would
+  // reveal a live test question's answer), so practice would be stuck on it.
+  const exclude = [...input.exclude, ...(await runningTestQuestionIds(userId))];
   let q: Question | null = null;
   const forced = input.difficulty === "mixed" ? undefined : input.difficulty;
 
   if (input.mode === "list") {
     // A hand-picked list (question bank): the first one not answered yet in this session, in the given order.
-    const nextId = (input.ids ?? []).find((id) => !input.exclude.includes(id));
+    const nextId = (input.ids ?? []).find((id) => !exclude.includes(id));
     if (nextId) q = (await db.select().from(questions).where(and(eq(questions.id, nextId), eq(questions.status, "active"))))[0] ?? null;
   } else if (input.mode === "review") {
-    q = await dueReview(userId, now, input.exclude, input.skillId);
+    q = await dueReview(userId, now, exclude, input.skillId);
   } else if (input.mode === "set") {
     // Rotate through the chosen skills (Auto = this week's focus, then priority order as a fallback).
     let skills = (input.skillIds ?? []).filter((s) => SKILL_BY_ID[s]);
@@ -112,25 +115,25 @@ export async function nextQuestion(userId: string, profile: Profile, input: {
     const start = rotateOver ? input.exclude.length % rotateOver : 0;
     for (const skillId of [...skills.slice(start, rotateOver), ...skills.slice(0, start), ...skills.slice(rotateOver)]) {
       const want = input.difficulty === "mixed" ? ((1 + Math.floor(Math.random() * 3)) as Difficulty) : forced;
-      q = await pickInSkill(userId, skillId, input.exclude, now, want, input.tags);
+      q = await pickInSkill(userId, skillId, exclude, now, want, input.tags);
       if (q) break;
     }
   } else if (input.mode === "skill") {
     if (!input.skillId || !SKILL_BY_ID[input.skillId]) return null;
-    q = await pickInSkill(userId, input.skillId, input.exclude, now, forced);
+    q = await pickInSkill(userId, input.skillId, exclude, now, forced);
   } else {
     // Smart: weekly focus, switching skill every 5 answers today; every 6th question is a due review.
     // ponytail: "today" = last 24h, not the local calendar day; switch to localDate() if rotation feels off.
     const startOfDay = new Date(now.getTime() - 24 * 3_600_000);
     const [{ c: today }] = (await db.select({ c: count() }).from(attempts)
       .where(and(eq(attempts.userId, userId), gte(attempts.createdAt, startOfDay), inArray(attempts.context, ["practice", "review"])))) as [{ c: number }];
-    if (today > 0 && today % 6 === 5) q = await dueReview(userId, now, input.exclude);
+    if (today > 0 && today % 6 === 5) q = await dueReview(userId, now, exclude);
     if (!q) {
       const focus = await ensureWeeklyFocus(userId, profile, now);
       const rotated = focus.length ? [...focus.slice(Math.floor(today / 5) % focus.length), ...focus] : [];
       const fallback = (await skillsByPriority(userId, profile)).map((s) => s.skillId);
       for (const skillId of [...new Set([...rotated, ...fallback])]) {
-        q = await pickInSkill(userId, skillId, input.exclude, now);
+        q = await pickInSkill(userId, skillId, exclude, now);
         if (q) break;
       }
     }

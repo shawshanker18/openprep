@@ -161,6 +161,8 @@ it("a question in a live test can't be answered (and revealed) through practice"
   const [first] = await items(m!.id);
   expect(await T.inRunningTest(USER, first!.questionId)).toBe(true);
   expect(await P.submitAnswer(USER, { questionId: first!.questionId, response: "A", timeMs: 5000, confidence: 3 })).toBeNull();
+  // ...and practice doesn't serve it at all (it would be stuck on a question it can't grade).
+  expect(await P.nextQuestion(USER, {} as schema.Profile, { mode: "list", ids: [first!.questionId], exclude: [] })).toBeNull();
   await T.recordFocusLoss(USER, r.id);
   await T.recordFocusLoss(USER, r.id);
   await T.recordFocusLoss(OTHER, r.id); // not theirs: ignored
