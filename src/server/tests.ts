@@ -18,6 +18,16 @@ type Section = "rw" | "math";
 type Config = { sections: Section[]; adaptive: boolean; timed: boolean; skillIds?: string[]; count?: number; tags?: string[]; difficulty?: Difficulty | "mixed" };
 const GRACE_MS = 10_000;
 
+/**
+ * Time to record for one answer. The browser's number pauses while the tab is hidden, so it is usually right, but
+ * the server's own clock (time since the question was served) is the ceiling: a student can't claim more time than
+ * really passed. Without a server timestamp, fall back to a 10 minute cap.
+ */
+export function serverCappedTime(clientMs: number, servedAt: Date | null, now: Date) {
+  const serverMs = servedAt ? now.getTime() - servedAt.getTime() : 600_000;
+  return Math.max(1000, Math.min(clientMs, Math.max(1000, serverMs)));
+}
+
 /** Active questions matching a filter, with when this user last saw each. */
 async function pool(tx: Tx, userId: string, where: ReturnType<typeof and>) {
   const rows = await tx.select({ q: questions, seen: sql<Date | null>`max(${attempts.createdAt})` }).from(questions)
@@ -242,9 +252,14 @@ export async function saveResponse(userId: string, input: {
     const r = await ownedModule(tx, userId, input.moduleId);
     if (!r || r.s.status !== "in_progress" || r.m.submittedAt || !r.m.startedAt) return { ok: false as const, error: "This module is closed." };
     if (r.m.deadlineAt && Date.now() > r.m.deadlineAt.getTime() + GRACE_MS) return { ok: false as const, error: "Time is up for this module." };
+    // Server clock: across the module, recorded time can't exceed the real time since the module started.
+    const [{ used }] = (await tx.select({ used: sql<number>`coalesce(sum(${testItems.timeMs}), 0)::int` }).from(testItems)
+      .where(eq(testItems.moduleId, input.moduleId))) as [{ used: number }];
+    const room = Math.max(0, Date.now() - r.m.startedAt.getTime() + 2000 - used);
+    const delta = Math.max(0, Math.min(input.timeMsDelta, 3_600_000, room));
     const [u] = await tx.update(testItems).set({
       response: input.response, flagged: input.flagged,
-      timeMs: sql`least(${testItems.timeMs} + ${Math.max(0, Math.min(input.timeMsDelta, 3_600_000))}, 3600000)`,
+      timeMs: sql`least(${testItems.timeMs} + ${delta}, 3600000)`,
     }).where(and(eq(testItems.moduleId, input.moduleId), eq(testItems.position, input.position))).returning();
     return u ? { ok: true as const, data: undefined } : { ok: false as const, error: "Unknown question." };
   });
@@ -300,4 +315,22 @@ export async function recordFocusLoss(userId: string, sessionId: string) {
   await db.update(testSessions)
     .set({ config: sql`jsonb_set(${testSessions.config}, '{focusLost}', to_jsonb(coalesce((${testSessions.config}->>'focusLost')::int, 0) + 1))` })
     .where(and(eq(testSessions.id, sessionId), eq(testSessions.userId, userId), eq(testSessions.status, "in_progress")));
+}
+
+/**
+ * Server-side test timer, run every few minutes by the cron tick: submits modules whose time ran out (the student
+ * closed the tab or lost connection) and abandons non-diagnostic tests nobody has touched for 3 days.
+ */
+export async function sweepTests(now = new Date()) {
+  const expired = await db.select({ moduleId: testModules.id, sessionId: testSessions.id, userId: testSessions.userId })
+    .from(testModules).innerJoin(testSessions, eq(testSessions.id, testModules.sessionId))
+    .where(and(eq(testSessions.status, "in_progress"), isNull(testModules.submittedAt),
+      sql`${testModules.deadlineAt} < ${new Date(now.getTime() - GRACE_MS)}`))
+    .limit(200);
+  for (const e of expired) await db.transaction((tx) => submitModuleTx(tx, e.userId, e.sessionId, e.moduleId, now));
+  const stale = await db.update(testSessions).set({ status: "abandoned", completedAt: now })
+    .where(and(eq(testSessions.status, "in_progress"), sql`${testSessions.kind} <> 'diagnostic'`,
+      sql`${testSessions.startedAt} < ${new Date(now.getTime() - 3 * 86_400_000)}`))
+    .returning({ id: testSessions.id });
+  return { submitted: expired.length, abandoned: stale.length };
 }

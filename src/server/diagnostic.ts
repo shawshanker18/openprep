@@ -1,6 +1,7 @@
 // Adaptive diagnostic on top of the test-session tables (spec 03 §4, 04 §5.2 item 5).
 // Items are appended one at a time; every answer goes through recordAttempt immediately.
 import "server-only";
+import { serverCappedTime } from "./tests";
 import { and, asc, count, eq } from "drizzle-orm";
 import { db, type Tx } from "@/db";
 import { attempts, profiles, questions, scoreSnapshots, skillState, testItems, testModules, testSessions, type Question } from "@/db/schema";
@@ -14,7 +15,7 @@ import { toPublic } from "./questions";
 const SKILLS_BY_DOMAIN = Object.fromEntries(Object.keys(DOMAINS).map((d) => [d, skillsIn(d).map((s) => s.id)]));
 
 async function sessionItems(tx: Tx, sessionId: string) {
-  return tx.select({ moduleId: testItems.moduleId, position: testItems.position, q: questions })
+  return tx.select({ moduleId: testItems.moduleId, position: testItems.position, servedAt: testItems.servedAt, q: questions })
     .from(testItems)
     .innerJoin(testModules, eq(testItems.moduleId, testModules.id))
     .innerJoin(questions, eq(questions.id, testItems.questionId))
@@ -67,7 +68,7 @@ async function appendNext(tx: Tx, userId: string, sessionId: string): Promise<Qu
     const [mod] = await tx.select().from(testModules)
       .where(and(eq(testModules.sessionId, sessionId), eq(testModules.section, q.section)));
     const position = items.filter((i) => i.moduleId === mod!.id).length;
-    await tx.insert(testItems).values({ moduleId: mod!.id, position, questionId: q.id });
+    await tx.insert(testItems).values({ moduleId: mod!.id, position, questionId: q.id, servedAt: new Date() });
     return q;
   }
 }
@@ -125,11 +126,12 @@ export async function answerDiagnostic(userId: string, input: {
     const index = await answeredCount(tx, userId, input.sessionId);
     const cur = items[index];
     if (!cur || cur.q.id !== input.questionId) return { ok: false as const, error: "That question was already answered. Reload to continue." };
+    const timeMs = serverCappedTime(input.timeMs, cur.servedAt, now);
 
-    await tx.update(testItems).set({ response: input.response, timeMs: input.timeMs })
+    await tx.update(testItems).set({ response: input.response, timeMs })
       .where(and(eq(testItems.moduleId, cur.moduleId), eq(testItems.position, cur.position)));
     await recordAttempt(tx, userId, cur.q, {
-      response: input.response, timeMs: input.timeMs, confidence: input.response === null ? 1 : (input.confidence ?? null),
+      response: input.response, timeMs, confidence: input.response === null ? 1 : (input.confidence ?? null),
       context: "diagnostic", sessionId: input.sessionId, now,
     });
     const next = await appendNext(tx, userId, input.sessionId);

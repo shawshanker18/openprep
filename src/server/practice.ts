@@ -3,7 +3,7 @@ import "server-only";
 import { memo } from "@/lib/memo";
 import { and, asc, count, desc, eq, gte, inArray, isNotNull, lte, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { attempts, questions, reviewItems, skillState, type Profile, type Question } from "@/db/schema";
+import { attempts, questionServes, questions, reviewItems, skillState, type Profile, type Question } from "@/db/schema";
 import { SKILL_BY_ID } from "@/content/taxonomy";
 import { TARGET_SECONDS, type Difficulty } from "@/engine/constants";
 import { masteryPct, pace, status } from "@/engine/mastery";
@@ -11,7 +11,7 @@ import { pickQuestion, targetDifficulty } from "@/engine/select";
 import { recordAttempt } from "./attempts";
 import { ensureWeeklyFocus, skillsByPriority } from "./plan";
 import { toPublic, toRevealed } from "./questions";
-import { inRunningTest } from "./tests";
+import { inRunningTest, serverCappedTime } from "./tests";
 
 export type PracticeMode = "skill" | "smart" | "review" | "set";
 export type SetDifficulty = Difficulty | "mixed"; // undefined = auto (targetDifficulty from theta)
@@ -120,6 +120,9 @@ export async function nextQuestion(userId: string, profile: Profile, input: {
     }
   }
   if (!q) return null;
+  // Server-side clock: remember when this question was handed out (submitAnswer caps the reported time by it).
+  await db.insert(questionServes).values({ userId, questionId: q.id, servedAt: now })
+    .onConflictDoUpdate({ target: [questionServes.userId, questionServes.questionId], set: { servedAt: now } });
   const timeLimitS = input.mode === "set" ? await timeLimitFor(userId, q, input.timing) : null;
   return { question: toPublic(q), reviewsDue: await countDueReviews(userId, now), timeLimitS };
 }
@@ -127,17 +130,20 @@ export async function nextQuestion(userId: string, profile: Profile, input: {
 export async function submitAnswer(userId: string, input: {
   questionId: string; response: string | null; timeMs: number; confidence: 1 | 2 | 3;
 }) {
-  const [[q], live] = await Promise.all([
+  const [[q], live, [served]] = await Promise.all([
     db.select().from(questions).where(eq(questions.id, input.questionId)),
     inRunningTest(userId, input.questionId), // practice would reveal the answer to a question in a live test
+    db.select({ at: questionServes.servedAt }).from(questionServes)
+      .where(and(eq(questionServes.userId, userId), eq(questionServes.questionId, input.questionId))),
   ]);
   if (!q || live) return null;
+  const timeMs = serverCappedTime(input.timeMs, served?.at ?? null, new Date());
   return db.transaction(async (tx) => {
     // A question in the user's review queue is always recorded as a review, whatever the client says.
     const [queued] = await tx.select().from(reviewItems)
       .where(and(eq(reviewItems.userId, userId), eq(reviewItems.questionId, q.id)));
     const r = await recordAttempt(tx, userId, q, {
-      response: input.response, timeMs: input.timeMs, confidence: input.confidence,
+      response: input.response, timeMs, confidence: input.confidence,
       context: queued ? "review" : "practice", now: new Date(),
     });
     return {
