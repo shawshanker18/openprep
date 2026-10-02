@@ -143,3 +143,8 @@
 .prose-op code { font-family: var(--font-mono); font-size: 0.9em; }
 .prose-op img { max-width: 100%; }
 .prose-op .katex-display { overflow-x: auto; overflow-y: hidden; }
+
+/* Pages are not printable (no saving questions to PDF). */
+@media print {
+  body { display: none; }
+}

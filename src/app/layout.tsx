@@ -5,6 +5,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme";
+import { NoInspect } from "@/components/no-inspect";
 
 const geistSans = Geist({ variable: "--font-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <ThemeProvider>
         <TooltipProvider>{children}</TooltipProvider>
         <Toaster />
+        <NoInspect />
         <footer className="mt-auto border-t px-4 py-3 text-center text-xs text-muted-foreground">
           SAT® is a trademark registered by the College Board, which is not affiliated with, and does not endorse, OpenPrep.
         </footer>

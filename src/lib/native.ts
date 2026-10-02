@@ -6,15 +6,30 @@ type LocalNotifications = {
 };
 declare global {
   interface Window {
-    openprepDesktop?: { setLockdown(on: boolean): void; setReminder(hour: number | null): void };
-    Capacitor?: { isNativePlatform?(): boolean; Plugins?: { LocalNotifications?: LocalNotifications } };
+    openprepDesktop?: { setLockdown(on: boolean, kind?: "test" | "focus"): void; setReminder(hour: number | null): void };
+    Capacitor?: { isNativePlatform?(): boolean; Plugins?: { LocalNotifications?: LocalNotifications; Lockdown?: { start(): Promise<void>; stop(): Promise<void> } } };
   }
 }
 
 export const inNativeApp = () => typeof window !== "undefined" && (!!window.openprepDesktop || !!window.Capacitor?.isNativePlatform?.());
 
-/** Kiosk lockdown in the desktop app; no-op elsewhere. */
-export const setLockdown = (on: boolean) => window.openprepDesktop?.setLockdown(on);
+/**
+ * Lockdown in the apps; no-op on the website. "test" is strict (the app can't be left until the test ends);
+ * "focus" is a study session the student can end at any time. Android pins the screen for both.
+ */
+export function setLockdown(on: boolean, kind: "test" | "focus" = "test") {
+  window.openprepDesktop?.setLockdown(on, kind); // the desktop app debounces releases itself
+  const android = window.Capacitor?.Plugins?.Lockdown;
+  if (!android) return;
+  // Between test modules the page remounts (unlock, then lock): a late release keeps Android from asking to pin again.
+  clearTimeout(androidRelease);
+  if (!on) { androidRelease = setTimeout(() => { androidPinned = false; void android.stop().catch(() => {}); }, 1500); return; }
+  if (androidPinned) return;
+  androidPinned = true;
+  void android.start().catch(() => { androidPinned = false; });
+}
+let androidRelease: ReturnType<typeof setTimeout> | undefined;
+let androidPinned = false;
 
 const REMINDER_ID = 1;
 // Updates run one at a time (overlapping cancel/schedule pairs would cancel each other) and repeats are skipped.

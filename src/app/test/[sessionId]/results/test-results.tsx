@@ -1,13 +1,42 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { DOMAINS, SKILL_BY_ID, type DomainId } from "@/content/taxonomy";
-import type { TestResult } from "@/engine/score";
+import { timingStats, type TestResult } from "@/engine/score";
 import type { getTestResult } from "@/server/tests";
 import { ReviewItem } from "./review-item";
 
 type Data = NonNullable<Awaited<ReturnType<typeof getTestResult>>>;
 const KIND = { full: "Full practice test", section: "Section test", module: "Single module", mini: "Mini test", weakness: "Weakness test", custom: "Custom test" } as Record<string, string>;
 const ROUTE = { hard: "You reached the harder second module.", easy: "You were routed to the easier second module." } as Record<string, string>;
+
+/** 75000 → "1:15" */
+const mmss = (ms: number) => { const s = Math.round(ms / 1000); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
+
+function TimingStats({ items }: { items: Data["items"] }) {
+  const t = timingStats(items.map((i) => ({ section: i.question.section as "rw" | "math", timeMs: i.timeMs, correct: i.correct, answered: i.response != null })));
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="grid gap-3 sm:grid-cols-2">
+        {t.sections.map((s) => (
+          <div key={s.section} className="flex flex-col gap-1 rounded-lg border p-4 text-sm">
+            <p className="font-medium">{s.section === "rw" ? "Reading and Writing" : "Math"}</p>
+            <p><span className="text-2xl font-semibold tabular-nums">{mmss(s.avgMs)}</span> <span className="text-muted-foreground">per question on average (SAT pace is about {mmss(s.paceMs)})</span></p>
+            <p className="text-muted-foreground">{s.questions} questions in {mmss(s.totalMs)}</p>
+            {s.avgCorrectMs != null && <p>Right answers took {mmss(s.avgCorrectMs)} on average{s.avgWrongMs != null ? `, wrong ones ${mmss(s.avgWrongMs)}` : ""}.</p>}
+            {s.slow > 0 && <p>{s.slow} question{s.slow === 1 ? "" : "s"} took more than one and a half times the SAT pace.</p>}
+            {s.rushed > 0 && <p>{s.rushed} wrong answer{s.rushed === 1 ? " was" : "s were"} given in under {mmss(s.paceMs / 3)}. Slowing down there is free points.</p>}
+          </div>
+        ))}
+      </div>
+      {t.slowest.length > 0 && (
+        <p className="text-sm">
+          Longest: {t.slowest.map((x, k) => <span key={x.n}>{k > 0 && ", "}<a className="underline" href={`#q-${x.n}`}>question {x.n}</a> ({mmss(x.timeMs)})</span>)}.
+          Total time {mmss(t.totalMs)}.
+        </p>
+      )}
+    </div>
+  );
+}
 
 function TimingChart({ items }: { items: Data["items"] }) {
   const W = 640, H = 120, max = Math.max(1, ...items.map((i) => i.timeMs));
@@ -97,6 +126,7 @@ export function TestResults({ data }: { data: Data }) {
 
       <section className="flex flex-col gap-2">
         <h2 className="font-medium">Time per question</h2>
+        <TimingStats items={data.items} />
         <TimingChart items={data.items} />
         <p className="text-xs text-muted-foreground">Taller bars took longer. Blue means correct, red means incorrect, and grey means not answered. Hover over a bar for details.</p>
       </section>
@@ -104,7 +134,7 @@ export function TestResults({ data }: { data: Data }) {
       <section className="flex flex-col gap-2">
         <h2 className="font-medium">Review every question</h2>
         {data.items.map((it, i) => (
-          <ReviewItem key={`${it.moduleIdx}-${it.position}`} n={i + 1} q={it.question} response={it.response} correct={it.correct}
+          <ReviewItem key={`${it.moduleIdx}-${it.position}`} n={i + 1} q={it.question} response={it.response} correct={it.correct} timeMs={it.timeMs}
             attemptId={it.attemptId} mistakeType={it.mistakeType} />
         ))}
       </section>

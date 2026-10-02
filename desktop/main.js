@@ -2,7 +2,7 @@
 const path = require("node:path");
 const fs = require("node:fs");
 const { app, BrowserWindow, Menu, Notification, Tray, dialog, ipcMain, nativeImage, session, shell } = require("electron");
-const { parseAuthLink, isAppUrl, isExternalWebUrl, localDay, reminderDue } = require("./lib");
+const { parseAuthLink, isAppUrl, isTestPage, isExternalWebUrl, localDay, reminderDue } = require("./lib");
 
 const SITE = process.env.OPENPREP_URL || "https://openprep-opal.vercel.app";
 const ICON = path.join(__dirname, "icon.png");
@@ -10,7 +10,9 @@ const STATE_FILE = () => path.join(app.getPath("userData"), "state.json");
 
 let win = null;
 let tray = null;
-let locked = false;
+let locked = null; // null | "test" (strict: only finishing or ending the test unlocks) | "focus" (student can leave)
+let releaseTimer = null;
+let shuttingDown = false;
 let quitting = false;
 
 /* ───────── small persisted state (reminder hour, last reminder day) ───────── */
@@ -40,13 +42,26 @@ if (process.defaultApp) app.setAsDefaultProtocolClient("openprep", process.execP
 else app.setAsDefaultProtocolClient("openprep");
 
 /* ───────── lockdown (tests and focus sessions) ───────── */
-function setLockdown(on) {
-  if (!win || locked === on) return;
-  locked = on;
+// Releases are delayed a moment: between test modules the page remounts (unlock then lock), which must not flicker out.
+function setLockdown(kind) {
+  if (!win) return;
+  clearTimeout(releaseTimer);
+  if (kind) applyLockdown(kind);
+  else releaseTimer = setTimeout(() => applyLockdown(null), 1500);
+}
+function applyLockdown(kind) {
+  if (!win || locked === kind) return;
+  const on = !!kind;
+  locked = kind;
   win.setKiosk(on);
   win.setAlwaysOnTop(on, "screen-saver");
   win.setMinimizable(!on);
-  if (on) win.focus();
+  // If the app is killed mid-test, it reopens straight into the test, locked again.
+  writeState({ ...readState(), lockedUrl: kind === "test" ? win.webContents.getURL() : null });
+  if (on) {
+    win.webContents.navigationHistory.clear(); // nothing to go "back" to
+    win.show(); win.focus();
+  }
 }
 
 /* ───────── reminders: checked every minute while the app (or its tray icon) is running ───────── */
@@ -75,50 +90,76 @@ function showWindow() {
   win.focus();
 }
 
-const OFFLINE = `data:text/html;charset=utf-8,${encodeURIComponent(`<!doctype html><meta charset="utf-8"><title>OpenPrep</title>
+// "Try again" goes back to where the student was (a locked test, if one was running).
+const OFFLINE = (back) => `data:text/html;charset=utf-8,${encodeURIComponent(`<!doctype html><meta charset="utf-8"><title>OpenPrep</title>
 <body style="font-family:system-ui;background:#0a0a0a;color:#fafafa;display:grid;place-items:center;height:100vh;margin:0">
 <div style="text-align:center"><h1 style="font-weight:600">You're offline</h1><p style="color:#a3a3a3">OpenPrep needs the internet to load your practice.</p>
-<button onclick="location.href='${SITE}/dashboard'" style="height:44px;padding:0 20px;border-radius:12px;border:0;background:#fafafa;color:#0a0a0a;font-weight:600;cursor:pointer">Try again</button></div>`)}`;
+<button onclick="location.href='${back}'" style="height:44px;padding:0 20px;border-radius:12px;border:0;background:#fafafa;color:#0a0a0a;font-weight:600;cursor:pointer">Try again</button></div>`)}`;
 
 function createWindow() {
   win = new BrowserWindow({
     width: 1280, height: 860, minWidth: 360, minHeight: 600, show: !process.argv.includes("--hidden"),
     title: "OpenPrep", icon: ICON, backgroundColor: "#0a0a0a", autoHideMenuBar: true,
-    webPreferences: { preload: path.join(__dirname, "preload.js"), contextIsolation: true, sandbox: true, nodeIntegration: false, spellcheck: false },
+    webPreferences: { preload: path.join(__dirname, "preload.js"), contextIsolation: true, sandbox: true, nodeIntegration: false, spellcheck: false, devTools: false },
   });
+  // Questions can't be screenshotted or screen recorded from the app (the window shows up black in captures).
+  win.setContentProtection(true);
   win.webContents.setUserAgent(`${win.webContents.getUserAgent()} OpenPrepApp/desktop`);
 
   // Our site stays in the app; any other web link opens in the normal browser; nothing else is allowed.
   win.webContents.setWindowOpenHandler(({ url }) => {
-    if (isExternalWebUrl(url)) void shell.openExternal(url);
+    if (isExternalWebUrl(url) && !locked) void shell.openExternal(url);
     return { action: "deny" };
   });
   win.webContents.on("will-navigate", (e, url) => {
     if (isAppUrl(url, SITE) || url.startsWith("data:text/html")) return;
     e.preventDefault();
-    if (isExternalWebUrl(url)) void shell.openExternal(url);
+    if (isExternalWebUrl(url) && !locked) void shell.openExternal(url);
   });
   win.webContents.on("did-fail-load", (_e, code, _desc, url, isMainFrame) => {
-    if (isMainFrame && code !== -3 && isAppUrl(url, SITE)) void win.loadURL(OFFLINE); // -3 = aborted (normal on redirects)
+    if (!isMainFrame || code === -3 || !isAppUrl(url, SITE)) return; // -3 = aborted (normal on redirects)
+    const back = readState().lockedUrl;
+    void win.loadURL(OFFLINE(back && isAppUrl(back, SITE) ? back : `${SITE}/dashboard`));
+  });
+  // A full page load away from a running test (offline page, a crash, a sign out) releases the lock, so nobody is ever
+  // trapped in kiosk mode; the test page locks again when it loads. Offline keeps the way back to the test.
+  win.webContents.on("did-navigate", (_e, url) => {
+    if (locked !== "test" || isTestPage(url, SITE)) return;
+    const back = readState().lockedUrl;
+    applyLockdown(null);
+    if (url.startsWith("data:")) writeState({ ...readState(), lockedUrl: back });
   });
 
-  // During lockdown: no reload, devtools, zoom-out tricks, or closing the window by shortcut.
+  // Never: view source, save page, print. During lockdown also: reload, back/forward, zoom tricks, closing by shortcut.
   win.webContents.on("before-input-event", (e, input) => {
-    if (!locked || input.type !== "keyDown") return;
+    if (input.type !== "keyDown") return;
     const k = input.key.toLowerCase();
-    const combo = (input.control || input.meta) && ["r", "w", "q", "n", "t", "p", "-", "0"].includes(k);
-    if (combo || k === "f5" || k === "f11" || k === "f12" || (input.alt && k === "f4") || (input.control && input.shift && k === "i")) e.preventDefault();
+    const mod = input.control || input.meta;
+    if (mod && ["u", "s", "p"].includes(k)) return e.preventDefault();
+    if (!locked) return;
+    const combo = mod && ["r", "w", "q", "n", "t", "-", "0", "[", "]"].includes(k);
+    const nav = input.alt && ["arrowleft", "arrowright", "home", "f4"].includes(k);
+    if (combo || nav || ["f5", "f11", "browserback", "browserforward", "browserhome"].includes(k)) e.preventDefault();
+  });
+  // Mouse back/forward buttons (Windows app commands).
+  win.on("app-command", (e) => { if (locked) e.preventDefault(); });
+  // Test lockdown: anything that takes focus away (Alt+Tab, the Start menu, a notification) is pushed straight back.
+  // The page also counts each time it happens, on the results.
+  win.on("blur", () => {
+    if (locked !== "test") return;
+    setTimeout(() => { if (win && locked === "test") { win.show(); win.moveTop(); win.focus(); } }, 50);
   });
 
   win.on("close", (e) => {
     if (quitting) return;
+    if (locked === "test") return e.preventDefault(); // only finishing or ending the test unlocks
     if (locked) {
       e.preventDefault();
       const r = dialog.showMessageBoxSync(win, {
         type: "warning", buttons: ["Stay in the test", "Leave anyway"], defaultId: 0, cancelId: 0,
         message: "You're in a locked test or focus session.", detail: "Leaving now counts as leaving the test window.",
       });
-      if (r === 1) { setLockdown(false); win.close(); }
+      if (r === 1) { applyLockdown(null); win.close(); }
       return;
     }
     // Keep running in the tray while reminders are on, so they can fire.
@@ -132,12 +173,22 @@ function createWindow() {
     await win.webContents.executeJavaScript("window.openprepDesktop.setLockdown(true)");
     await new Promise((r) => setTimeout(r, 1500));
     const lockedDown = win.isKiosk() && win.isAlwaysOnTop();
+    // Strict lock: closing and quitting are both refused.
+    win.close(); app.quit();
+    await new Promise((r) => setTimeout(r, 500));
+    const survivedClose = !!win && !win.isDestroyed() && win.isVisible();
+    const resumeSaved = readState().lockedUrl === win.webContents.getURL();
+    win.webContents.openDevTools();
+    const devtoolsBlocked = !win.webContents.isDevToolsOpened();
     await win.webContents.executeJavaScript("window.openprepDesktop.setLockdown(false)");
-    await new Promise((r) => setTimeout(r, 1000));
-    console.log("SMOKE", JSON.stringify({ ...info, ua: win.webContents.getUserAgent().includes("OpenPrepApp"), lockedDown, released: !win.isKiosk() }));
+    await new Promise((r) => setTimeout(r, 2000)); // release is delayed 1.5s
+    console.log("SMOKE", JSON.stringify({ ...info, ua: win.webContents.getUserAgent().includes("OpenPrepApp"), lockedDown, survivedClose,
+      resumeSaved, devtoolsBlocked, released: !win.isKiosk() && readState().lockedUrl == null }));
     quitting = true; app.quit();
   });
-  void win.loadURL(`${SITE}/dashboard`);
+  // Back into a locked test if the app was killed during one (the page re-locks, or moves on if it already ended).
+  const resume = readState().lockedUrl;
+  void win.loadURL(resume && isAppUrl(resume, SITE) ? resume : `${SITE}/dashboard`);
 }
 
 function createTray() {
@@ -147,14 +198,14 @@ function createTray() {
     { label: "Open OpenPrep", click: () => showWindow() },
     { label: "Today's plan", click: () => { showWindow(); win?.loadURL(`${SITE}/plan`); } },
     { type: "separator" },
-    { label: "Quit", click: () => { quitting = true; app.quit(); } },
+    { label: "Quit", click: () => { if (locked !== "test") { quitting = true; app.quit(); } } },
   ]));
   tray.on("click", () => showWindow());
 }
 
 /* ───────── IPC: only from our own site's top frame ───────── */
 const fromSite = (e) => !!e.senderFrame && e.senderFrame === e.sender.mainFrame && isAppUrl(e.senderFrame.url, SITE);
-ipcMain.on("lockdown", (e, on) => { if (fromSite(e)) setLockdown(on === true); });
+ipcMain.on("lockdown", (e, on, kind) => { if (fromSite(e)) setLockdown(on === true ? (kind === "focus" ? "focus" : "test") : null); });
 ipcMain.on("reminder", (e, hour) => { if (fromSite(e)) setReminder(Number.isInteger(hour) && hour >= 0 && hour <= 23 ? hour : null); });
 
 app.whenReady().then(() => {
@@ -170,5 +221,10 @@ app.whenReady().then(() => {
   if (link) handleDeepLink(link);
 });
 
-app.on("before-quit", () => { quitting = true; });
+app.on("before-quit", (e) => {
+  if (locked === "test" && !shuttingDown) return e.preventDefault(); // no quitting out of a test
+  quitting = true;
+});
+// Windows is shutting down or signing out: never block that (the test resumes, locked, next time).
+app.on("session-end", () => { shuttingDown = true; quitting = true; });
 app.on("window-all-closed", () => { if (readState().hour == null) app.quit(); });

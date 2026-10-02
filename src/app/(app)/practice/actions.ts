@@ -6,7 +6,7 @@ import { db } from "@/db";
 import { attempts, bookmarks, questionReports, questions } from "@/db/schema";
 import { MISTAKE_TYPES } from "@/engine/mistakes";
 import { diagnosticPending, requireUser } from "@/server/auth";
-import { nextQuestion as next, submitAnswer as submit } from "@/server/practice";
+import { nextQuestion as next, overServeLimit, submitAnswer as submit } from "@/server/practice";
 
 const id = z.string().min(1).max(64);
 
@@ -25,6 +25,7 @@ export async function nextQuestion(input: z.input<typeof Next>) {
   if (diagnosticPending(profile)) return { ok: false as const, error: "Take the diagnostic first." };
   const p = Next.safeParse(input);
   if (!p.success) return { ok: false as const, error: "Invalid request." };
+  if (await overServeLimit(userId)) return { ok: false as const, error: "You've gone through a lot of questions very quickly. Take a short break and come back." };
   const r = await next(userId, profile, p.data);
   return { ok: true as const, data: r ?? { done: true as const } };
 }
