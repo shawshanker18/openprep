@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useReducer, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { Bookmark, Flag } from "lucide-react";
+import { Bookmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Markdown } from "@/components/markdown";
 import { QuestionView } from "@/components/question-view";
@@ -13,7 +13,8 @@ import { FocusToggle } from "@/components/focus-toggle";
 import { MISTAKE_LABEL, MISTAKE_TYPES, type MistakeType } from "@/engine/mistakes";
 import { cn } from "@/lib/utils";
 import type { PublicQuestion, RevealedQuestion } from "@/server/questions";
-import { nextQuestion, reportQuestion, setMistakeType, submitAnswer, toggleBookmark } from "./actions";
+import { nextQuestion, setMistakeType, submitAnswer, toggleBookmark } from "./actions";
+import { ReportQuestion } from "./report-question";
 
 type Mode = "skill" | "smart" | "review" | "set" | "list";
 type SetConfig = { skillIds: string[]; tags: string[]; count: number; timing: "auto" | "off" | "on" };
@@ -81,6 +82,7 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block, set, b
   const hiddenMs = useRef(0);
   const hiddenSince = useRef<number | null>(null);
   const similarTo = useRef<string | null>(null); // skill of a just-missed question → next pick is a similar one
+  const [bookmarked, setBookmarked] = useState(false); // the current question's, from the server
 
   const load = useCallback((exclude: string[]) => start(async () => {
     const sim = similarTo.current;
@@ -92,7 +94,11 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block, set, b
       .catch(() => ({ ok: false as const, error: "Couldn't load the next question. Check your connection and try again." }));
     if (!res.ok) { dispatch({ type: "failed", error: res.error }); return; }
     if ("done" in res.data) dispatch({ type: "done" });
-    else { dispatch({ type: "loaded", q: res.data.question, limitS: res.data.timeLimitS }); shownAt.current = performance.now(); hiddenMs.current = 0; }
+    else {
+      dispatch({ type: "loaded", q: res.data.question, limitS: res.data.timeLimitS });
+      setBookmarked(res.data.bookmarked);
+      shownAt.current = performance.now(); hiddenMs.current = 0;
+    }
   }), [mode, skillId, difficulty, set, ids]);
   // A set stops after `count` answers.
   const next = useCallback(() => dispatch({ type: set && s.answered >= set.count ? "done" : "next" }), [set, s.answered]);
@@ -191,15 +197,14 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block, set, b
         <div className="flex items-center gap-1">
           <FocusToggle />
           {s.phase === "answering" && s.limitS && <Countdown key={s.q.id} limitS={s.limitS} />}
-          <Button variant="ghost" size="sm" aria-label="Bookmark" onClick={async () => {
-            const res = await toggleBookmark({ questionId: s.q.id });
-            if (res.ok) toast(res.data.bookmarked ? "Bookmarked" : "Bookmark removed");
-          }}><Bookmark /></Button>
-          <Button variant="ghost" size="sm" aria-label="Report question" onClick={async () => {
-            const note = window.prompt("What's wrong with this question? (optional)") ?? undefined;
-            const res = await reportQuestion({ questionId: s.q.id, reason: "other", note });
-            toast[res.ok ? "success" : "error"](res.ok ? "Thanks, we'll take a look." : res.error);
-          }}><Flag /></Button>
+          <Button variant="ghost" size="sm" aria-label="Bookmark" aria-pressed={bookmarked} onClick={async () => {
+            const res = await toggleBookmark({ questionId: s.q.id })
+              .catch(() => ({ ok: false as const, error: "Couldn't save the bookmark. Check your connection and try again." }));
+            if (!res.ok) { toast.error(res.error); return; }
+            setBookmarked(res.data.bookmarked);
+            toast(res.data.bookmarked ? "Bookmarked" : "Bookmark removed");
+          }}><Bookmark className={bookmarked ? "fill-current" : undefined} /></Button>
+          <ReportQuestion questionId={s.q.id} />
         </div>
       </div>
 

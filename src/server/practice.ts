@@ -3,7 +3,7 @@ import "server-only";
 import { memo } from "@/lib/memo";
 import { and, asc, count, desc, eq, gte, inArray, isNotNull, lte, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { attempts, questionServes, questions, reviewItems, skillState, type Profile, type Question } from "@/db/schema";
+import { attempts, bookmarks, questionServes, questions, reviewItems, skillState, type Profile, type Question } from "@/db/schema";
 import { SKILL_BY_ID } from "@/content/taxonomy";
 import { TARGET_SECONDS, type Difficulty } from "@/engine/constants";
 import { masteryPct, pace, status } from "@/engine/mastery";
@@ -143,7 +143,11 @@ export async function nextQuestion(userId: string, profile: Profile, input: {
   await db.insert(questionServes).values({ userId, questionId: q.id, servedAt: now })
     .onConflictDoUpdate({ target: [questionServes.userId, questionServes.questionId], set: { servedAt: now } });
   const timeLimitS = input.mode === "set" ? await timeLimitFor(userId, q, input.timing) : null;
-  return { question: toPublic(q), reviewsDue: await countDueReviews(userId, now), timeLimitS };
+  const [reviewsDue, [saved]] = await Promise.all([
+    countDueReviews(userId, now),
+    db.select({ id: bookmarks.questionId }).from(bookmarks).where(and(eq(bookmarks.userId, userId), eq(bookmarks.questionId, q.id))),
+  ]);
+  return { question: toPublic(q), reviewsDue, timeLimitS, bookmarked: !!saved };
 }
 
 /**
