@@ -4,7 +4,15 @@ const fs = require("node:fs");
 const { app, BrowserWindow, Menu, Notification, Tray, dialog, ipcMain, nativeImage, session, shell } = require("electron");
 const { parseAuthLink, isAppUrl, isTestPage, isExternalWebUrl, localDay, reminderDue } = require("./lib");
 
-const SITE = process.env.OPENPREP_URL || "https://openprep-opal.vercel.app";
+// The installed app always loads the real site; OPENPREP_URL only works when running from source (development).
+const SITE = (!app.isPackaged && process.env.OPENPREP_URL) || "https://openprep-opal.vercel.app";
+
+// Refuse debugging switches in the installed app: they would attach DevTools (and walk around test lockdown) even
+// though DevTools are off. Node mode and NODE_OPTIONS are switched off in the binary itself (fuses in package.json).
+const DEBUG_SWITCHES = ["remote-debugging-port", "remote-debugging-pipe", "remote-debugging-address", "remote-allow-origins", "inspect", "inspect-brk", "inspect-port", "js-flags"];
+if (app.isPackaged && (DEBUG_SWITCHES.some((s) => app.commandLine.hasSwitch(s)) || process.argv.some((a) => /^--(inspect|remote-debugging|js-flags)/.test(a)))) {
+  app.exit(1);
+}
 const ICON = path.join(__dirname, "icon.png");
 const STATE_FILE = () => path.join(app.getPath("userData"), "state.json");
 
@@ -92,16 +100,18 @@ function showWindow() {
 
 // "Try again" goes back to where the student was (a locked test, if one was running).
 const OFFLINE = (back) => `data:text/html;charset=utf-8,${encodeURIComponent(`<!doctype html><meta charset="utf-8"><title>OpenPrep</title>
-<body style="font-family:system-ui;background:#0a0a0a;color:#fafafa;display:grid;place-items:center;height:100vh;margin:0">
-<div style="text-align:center"><h1 style="font-weight:600">You're offline</h1><p style="color:#a3a3a3">OpenPrep needs the internet to load your practice.</p>
-<button onclick="location.href='${back}'" style="height:44px;padding:0 20px;border-radius:12px;border:0;background:#fafafa;color:#0a0a0a;font-weight:600;cursor:pointer">Try again</button></div>`)}`;
+<body style="font-family:system-ui;background:#fff;color:#0a0a0a;display:grid;place-items:center;height:100vh;margin:0">
+<div style="text-align:center"><h1 style="font-weight:600">You're offline</h1><p style="color:#737373">OpenPrep needs the internet to load your practice.</p>
+<button onclick="location.href='${back}'" style="height:44px;padding:0 20px;border-radius:12px;border:0;background:#0a0a0a;color:#fff;font-weight:600;cursor:pointer">Try again</button></div>`)}`;
 
 function createWindow() {
   win = new BrowserWindow({
-    width: 1280, height: 860, minWidth: 360, minHeight: 600, show: !process.argv.includes("--hidden"),
-    title: "OpenPrep", icon: ICON, backgroundColor: "#0a0a0a", autoHideMenuBar: true,
+    // Shown once the first page has painted (no blank flash); white to match the site's default light theme.
+    width: 1280, height: 860, minWidth: 360, minHeight: 600, show: false,
+    title: "OpenPrep", icon: ICON, backgroundColor: "#ffffff", autoHideMenuBar: true,
     webPreferences: { preload: path.join(__dirname, "preload.js"), contextIsolation: true, sandbox: true, nodeIntegration: false, spellcheck: false, devTools: false },
   });
+  if (!process.argv.includes("--hidden")) win.once("ready-to-show", () => win?.show());
   // Questions can't be screenshotted or screen recorded from the app (the window shows up black in captures).
   win.setContentProtection(true);
   win.webContents.setUserAgent(`${win.webContents.getUserAgent()} OpenPrepApp/desktop`);
@@ -111,8 +121,16 @@ function createWindow() {
     if (isExternalWebUrl(url) && !locked) void shell.openExternal(url);
     return { action: "deny" };
   });
+  // Server-side redirects get the same check as links: other sites open in the normal browser, never in this window.
+  win.webContents.on("will-redirect", (e, url) => {
+    if (isAppUrl(url, SITE)) return;
+    e.preventDefault();
+    if (isExternalWebUrl(url) && !locked) void shell.openExternal(url);
+  });
+  // No embedded <webview>s, ever (they could load anything with their own settings).
+  win.webContents.on("will-attach-webview", (e) => e.preventDefault());
   win.webContents.on("will-navigate", (e, url) => {
-    if (isAppUrl(url, SITE) || url.startsWith("data:text/html")) return;
+    if (isAppUrl(url, SITE)) return; // the offline page is loaded by the app itself, not navigated to by the page
     e.preventDefault();
     if (isExternalWebUrl(url) && !locked) void shell.openExternal(url);
   });
@@ -212,7 +230,14 @@ app.whenReady().then(() => {
   Menu.setApplicationMenu(null);
   app.setAppUserModelId("com.openprep.desktop"); // Windows notifications need it
   // The site needs no camera, mic, location, etc.
-  session.defaultSession.setPermissionRequestHandler((_wc, permission, cb) => cb(permission === "fullscreen" || permission === "clipboard-sanitized-write"));
+  const allowed = (permission) => permission === "fullscreen" || permission === "clipboard-sanitized-write";
+  session.defaultSession.setPermissionRequestHandler((_wc, permission, cb) => cb(allowed(permission)));
+  session.defaultSession.setPermissionCheckHandler((_wc, permission) => allowed(permission));
+  // No USB, serial or HID devices.
+  session.defaultSession.setDevicePermissionHandler(() => false);
+  session.defaultSession.on("select-hid-device", (e, _d, cb) => { e.preventDefault(); cb(""); });
+  session.defaultSession.on("select-serial-port", (e, _p, _wc, cb) => { e.preventDefault(); cb(""); });
+  session.defaultSession.on("select-usb-device", (e, _d, cb) => { e.preventDefault(); cb(""); });
   createWindow();
   createTray();
   setInterval(checkReminder, 60_000);

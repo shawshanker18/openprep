@@ -2,7 +2,7 @@
   "name": "openprep-desktop",
   "productName": "OpenPrep",
   "version": "0.1.0",
-  "description": "OpenPrep desktop app — adaptive SAT prep with lockdown mode for tests and focus sessions.",
+  "description": "OpenPrep desktop app \u2014 adaptive SAT prep with lockdown mode for tests and focus sessions.",
   "main": "main.js",
   "private": true,
   "license": "MIT",
@@ -42,6 +42,15 @@
     },
     "directories": {
       "output": "dist"
+    },
+    "electronFuses": {
+      "runAsNode": false,
+      "enableNodeOptionsEnvironmentVariable": false,
+      "enableNodeCliInspectArguments": false,
+      "enableCookieEncryption": true,
+      "enableEmbeddedAsarIntegrityValidation": true,
+      "onlyLoadAppFromAsar": true,
+      "grantFileProtocolExtraPrivileges": false
     }
   },
   "devDependencies": {
