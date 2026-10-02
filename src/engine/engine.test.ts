@@ -8,7 +8,7 @@ import { DIAGNOSTIC_LENGTH, DOMAIN_ORDER, nextDiagnosticSpec, type DiagAnswered 
 import { pickQuestion, skillPriority, weeklyFocus, type Candidate } from "./select";
 import { afterReview } from "./review";
 import { assembleModule, largestRemainder, moduleBlueprint, RW_DOMAIN_ORDER, type PoolQ } from "./assemble";
-import { buildTestResult, mockSectionScore, sectionEstimate } from "./score";
+import { buildTestResult, mockSectionScore, sectionEstimate, timingStats } from "./score";
 import { buildDailyPlan, streak, weekOf } from "./plan";
 
 // Deterministic RNG for tests (mulberry32).
@@ -381,5 +381,21 @@ describe("course", async () => {
     expect(checkCount("quiz", 3)).toBe(6);
     expect(checkCount("unit-test", 5)).toBe(15);
     expect(checkCount("challenge", 29)).toBe(30);
+  });
+});
+
+describe("timing stats", () => {
+  it("compares each section with the SAT pace and finds slow, rushed and slowest questions", () => {
+    const t = timingStats([
+      { section: "math", timeMs: 200_000, correct: true, answered: true },  // slow (over 1.5 × 95s)
+      { section: "math", timeMs: 20_000, correct: false, answered: true },  // rushed (under 95s / 3)
+      { section: "math", timeMs: 90_000, correct: true, answered: true },
+      { section: "rw", timeMs: 60_000, correct: false, answered: false },   // blank: neither wrong nor rushed
+    ]);
+    expect(t.totalMs).toBe(370_000);
+    const math = t.sections.find((s) => s.section === "math")!;
+    expect(math).toMatchObject({ questions: 3, avgMs: 103_333, paceMs: 95_000, avgCorrectMs: 145_000, avgWrongMs: 20_000, slow: 1, rushed: 1 });
+    expect(t.sections.find((s) => s.section === "rw")).toMatchObject({ questions: 1, avgWrongMs: null, rushed: 0 });
+    expect(t.slowest.map((x) => x.n)).toEqual([1, 3, 4]);
   });
 });

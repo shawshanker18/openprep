@@ -189,3 +189,8 @@ it("server clock: reported time is capped by real elapsed time, and the sweep cl
   const [s] = await db.select().from(schema.testSessions).where(eq(schema.testSessions.id, r.id));
   expect(s!.status).toBe("completed");
 });
+
+it("full mock freshness: false when a section doesn't have enough unseen questions", async () => {
+  // The test bank has plenty of math but no Reading and Writing questions at all.
+  expect(await T.freshFullMock(OTHER)).toBe(false);
+});

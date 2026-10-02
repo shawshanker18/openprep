@@ -2,6 +2,6 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("openprepDesktop", {
-  setLockdown: (on) => ipcRenderer.send("lockdown", on === true),
+  setLockdown: (on, kind) => ipcRenderer.send("lockdown", on === true, kind === "focus" ? "focus" : "test"),
   setReminder: (hour) => ipcRenderer.send("reminder", Number.isInteger(hour) && hour >= 0 && hour <= 23 ? hour : null),
 });

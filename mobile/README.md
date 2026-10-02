@@ -5,6 +5,8 @@ A Capacitor shell around the live site, so the app always matches the website an
 - **Reminders:** a local daily notification at the time chosen in Settings (inexact by design, so no "exact alarm" permission).
 - **Sign in:** email link; the browser hands the one time code back through `openprep://auth?code=…` (see `MainActivity.java`). Google sign in is hidden in the app because Google blocks it inside embedded browsers.
 - **Offline:** `www/offline.html` is shown when the site can't load.
+- **Test lockdown:** `LockdownPlugin.java` pins the screen (Android screen pinning) for the whole test, swallows Back, pins again if the student unpins, and reopens the test if the app was closed. Android asks the student to confirm pinning the first time (only a device managed by a school can skip that). A locked test can't be continued in a normal browser.
+- **Always:** `FLAG_SECURE` blocks screenshots and screen recording, and WebView debugging is off in release builds.
 
 Build (needs the Android SDK and JDK 21):
 

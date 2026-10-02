@@ -74,6 +74,19 @@ async function timeLimitFor(userId: string, q: Question, timing: Timing | undefi
   return strong && pace(st.totalTimeMs / st.n, sec) === "slow" ? TARGET_SECONDS[sec] : null;
 }
 
+/**
+ * Anti-scraping: how many different questions one account may be handed. A student answering as fast as possible
+ * stays under these; a script pulling the whole bank does not. (questionServes keeps one row per question, so this
+ * counts distinct questions.)
+ */
+export const SERVE_LIMITS = { burst: { ms: 10 * 60_000, max: 60 }, day: { ms: 86_400_000, max: 250 } };
+export async function overServeLimit(userId: string, now = new Date()) {
+  const served = (ms: number) => db.select({ n: count() }).from(questionServes)
+    .where(and(eq(questionServes.userId, userId), gte(questionServes.servedAt, new Date(now.getTime() - ms)))).then((r) => r[0]!.n);
+  const [burst, day] = await Promise.all([served(SERVE_LIMITS.burst.ms), served(SERVE_LIMITS.day.ms)]);
+  return burst >= SERVE_LIMITS.burst.max || day >= SERVE_LIMITS.day.max;
+}
+
 export async function nextQuestion(userId: string, profile: Profile, input: {
   mode: PracticeMode; skillId?: string; exclude: string[]; difficulty?: SetDifficulty; ids?: string[];
   skillIds?: string[]; tags?: string[]; timing?: Timing;

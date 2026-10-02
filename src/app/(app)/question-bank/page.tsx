@@ -85,7 +85,8 @@ export default async function QuestionBankPage({ searchParams }: PageProps<"/que
                     {q.status === "correct" ? <Check className="size-4" /> : q.status === "incorrect" ? <X className="size-4 text-destructive" /> : <Circle className="size-4 text-muted-foreground" />}
                   </span>
                   <span className="flex min-w-0 flex-1 flex-col gap-1">
-                    <span className="line-clamp-2 text-sm">{preview(q.section === "rw" && q.passage ? q.passage : q.stem)}</span>
+                    {/* Only questions this student has already seen show their text, so the bank can't be read page by page. */}
+                    <span className="line-clamp-2 text-sm">{q.status === "new" && !q.saved ? `Question ${at + 1}` : preview(q.section === "rw" && q.passage ? q.passage : q.stem)}</span>
                     <span className="text-xs text-muted-foreground">
                       {DOMAINS[skillInfo.domain as DomainId].name} · {skillInfo.name} · {DIFF[q.difficulty]}{q.type === "spr" ? " · type your answer" : ""}
                     </span>

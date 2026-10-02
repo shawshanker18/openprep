@@ -6,7 +6,7 @@ import { DiagnosticGate } from "@/components/diagnostic-gate";
 import { diagnosticPending, requireUser } from "@/server/auth";
 import { skillsWithQuestions } from "@/server/plan";
 import { tagsBySkill } from "@/server/practice";
-import { listTests } from "@/server/tests";
+import { freshFullMock, listTests } from "@/server/tests";
 import { SkillTagPicker } from "../practice/skill-tag-picker";
 import { abandon } from "@/app/test/[sessionId]/actions";
 import { startTestAction } from "./actions";
@@ -15,7 +15,7 @@ import { Choice } from "@/components/ui/choice";
 export const metadata = { title: "Practice tests" };
 
 const KIND = { full: "Full practice test", section: "Section test", module: "Single module", mini: "Mini test", weakness: "Weakness test", custom: "Custom test", diagnostic: "Diagnostic" } as Record<string, string>;
-const ERR: Record<string, string> = { empty: "There aren't enough questions for that test yet.", invalid: "Please check the test options.", rate: "You've started a lot of tests in the last hour. Finish one, or try again a bit later." };
+const ERR: Record<string, string> = { empty: "There aren't enough questions for that test yet.", invalid: "Please check the test options.", rate: "You've started a lot of tests recently. Finish one, or try again later." };
 const control = "h-9 rounded-md border bg-background px-2 text-sm";
 
 function StartCard({ title, time, children, fields }: { title: string; time: string; children: React.ReactNode; fields: React.ReactNode }) {
@@ -33,7 +33,7 @@ export default async function TestsPage({ searchParams }: PageProps<"/tests">) {
   const sp = await searchParams;
   const { userId, profile } = await requireUser();
   if (diagnosticPending(profile)) return <DiagnosticGate />;
-  const [history, available, tags] = await Promise.all([listTests(userId), skillsWithQuestions(), tagsBySkill()]);
+  const [history, available, tags, fresh] = await Promise.all([listTests(userId), skillsWithQuestions(), tagsBySkill(), freshFullMock(userId)]);
   const open = history.filter((t) => t.status === "in_progress" && t.kind !== "diagnostic");
   const skills = SKILLS.filter((s) => available.has(s.id));
   const sectionPick = (
@@ -55,6 +55,8 @@ export default async function TestsPage({ searchParams }: PageProps<"/tests">) {
           </div>
         </div>
       ))}
+
+      {!fresh && <p className="rounded-md border p-3 text-sm">You&apos;ve seen most of our questions for a full practice test. More are being added; you can still take one, but some questions will repeat.</p>}
 
       <div className="grid gap-4 lg:grid-cols-2">
         <StartCard title="Full practice test" time="2 h 14 min · 98 questions + 10-min break" fields={<input type="hidden" name="kind" value="full" />}>

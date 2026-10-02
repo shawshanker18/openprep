@@ -152,3 +152,33 @@ export function buildTestResult(
   const halfWidth = total != null ? round10(Math.SQRT2 * MOCK_HALF_WIDTH) : MOCK_HALF_WIDTH;
   return { sections, total, halfWidth, byDomain, bySkill, timing, insights: insights.slice(0, 4) };
 }
+
+/* ───────── time per question (results page) ───────── */
+
+export type TimedItem = { section: "rw" | "math"; timeMs: number; correct: boolean; answered: boolean };
+export type SectionTiming = {
+  section: "rw" | "math"; questions: number; totalMs: number; avgMs: number; paceMs: number;
+  avgCorrectMs: number | null; avgWrongMs: number | null;
+  slow: number;   // took more than 1.5 times the SAT pace
+  rushed: number; // answered wrong in under a third of the pace
+};
+
+/** Time stats per section against the real SAT pace, plus the slowest questions (1-based numbers in test order). */
+export function timingStats(items: TimedItem[]) {
+  const mean = (xs: number[]) => (xs.length ? Math.round(avg(xs)) : null);
+  const sections: SectionTiming[] = (["rw", "math"] as const).flatMap((section) => {
+    const its = items.filter((i) => i.section === section);
+    if (!its.length) return [];
+    const paceMs = TARGET_SECONDS[section] * 1000;
+    const totalMs = its.reduce((a, i) => a + i.timeMs, 0);
+    return [{
+      section, questions: its.length, totalMs, avgMs: Math.round(totalMs / its.length), paceMs,
+      avgCorrectMs: mean(its.filter((i) => i.correct).map((i) => i.timeMs)),
+      avgWrongMs: mean(its.filter((i) => i.answered && !i.correct).map((i) => i.timeMs)),
+      slow: its.filter((i) => i.timeMs > 1.5 * paceMs).length,
+      rushed: its.filter((i) => i.answered && !i.correct && i.timeMs < paceMs / 3).length,
+    }];
+  });
+  const slowest = items.map((i, k) => ({ n: k + 1, timeMs: i.timeMs })).sort((a, b) => b.timeMs - a.timeMs).slice(0, 3).filter((x) => x.timeMs > 0);
+  return { totalMs: items.reduce((a, i) => a + i.timeMs, 0), sections, slowest };
+}

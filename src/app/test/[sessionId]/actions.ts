@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireUser } from "@/server/auth";
 import { answerDiagnostic as answer } from "@/server/diagnostic";
-import { abandonTest, recordFocusLoss, saveResponse as save, startModule as start, submitModule as submit } from "@/server/tests";
+import { abandonTest, markLocked, recordFocusLoss, saveResponse as save, startModule as start, submitModule as submit } from "@/server/tests";
 
 const Answer = z.object({
   sessionId: z.uuid(),
@@ -48,6 +48,12 @@ export async function abandon(sessionId: string) {
   const { userId } = await requireUser();
   if (z.uuid().safeParse(sessionId).success) await abandonTest(userId, sessionId);
   redirect("/tests");
+}
+
+/** The test is running in an app's lockdown mode: from now on it can only be continued in an app. */
+export async function markLockdown(sessionId: string) {
+  const { userId } = await requireUser();
+  if (z.uuid().safeParse(sessionId).success) await markLocked(userId, sessionId);
 }
 
 /** The student left the test window (tab switch, app switch, or lost focus). Counted on the results page. */

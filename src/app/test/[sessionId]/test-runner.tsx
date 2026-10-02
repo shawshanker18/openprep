@@ -5,13 +5,14 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Flag } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { QuestionView } from "@/components/question-view";
 import { ReferenceSheet } from "@/components/reference-sheet";
 import { DesmosToggle } from "@/components/desmos-panel";
 import { cn } from "@/lib/utils";
 import type { PublicQuestion } from "@/server/questions";
-import { setLockdown } from "@/lib/native";
-import { abandon, reportFocusLoss, saveResponse, startModule, submitModule } from "./actions";
+import { inNativeApp, setLockdown } from "@/lib/native";
+import { abandon, markLockdown, reportFocusLoss, saveResponse, startModule, submitModule } from "./actions";
 
 type Item = { position: number; question: PublicQuestion; response: string | null; flagged: boolean };
 type Mod = { id: string; idx: number; section: string; route: string; timeLimitS: number | null; startedAt: string | null; deadlineAt: string | null; adaptive: boolean };
@@ -50,11 +51,18 @@ export function TestRunner({ sessionId, module: m, items: initial, serverNow, br
   }, [pos]);
   useEffect(() => { enteredAt.current = screen === "question" ? now() : 0; }, [screen, pos]);
 
-  // While a module runs: desktop app locks down (kiosk); everywhere, leaving the window is counted on the results.
+  // In the apps the whole test is locked (every module, the break, the intro): the only way out is to finish or end it.
+  // The session is marked so it can't be carried on, unlocked, in a browser.
+  useEffect(() => {
+    setLockdown(true);
+    if (inNativeApp()) void markLockdown(sessionId);
+    return () => setLockdown(false);
+  }, [sessionId]);
+
+  // While a module runs, leaving the window is counted on the results (everywhere, apps included).
   const running = screen === "question" || screen === "review";
   useEffect(() => {
     if (!running) return;
-    setLockdown(true);
     let last = 0;
     const lost = () => {
       if (Date.now() - last < 3000) return; // blur + visibilitychange fire together
@@ -65,7 +73,7 @@ export function TestRunner({ sessionId, module: m, items: initial, serverNow, br
     const onVis = () => { if (document.hidden) lost(); };
     window.addEventListener("blur", lost);
     document.addEventListener("visibilitychange", onVis);
-    return () => { window.removeEventListener("blur", lost); document.removeEventListener("visibilitychange", onVis); setLockdown(false); };
+    return () => { window.removeEventListener("blur", lost); document.removeEventListener("visibilitychange", onVis); };
   }, [running, sessionId]);
 
   const save = useCallback(async (position: number, it: Item) => {
@@ -149,7 +157,7 @@ export function TestRunner({ sessionId, module: m, items: initial, serverNow, br
           setStarting(true);
           if (await startModule(m.id)) { setScreen("question"); router.refresh(); } else { toast.error("Couldn't start this module."); setStarting(false); }
         }}>Start</Button>
-        <form action={abandon.bind(null, sessionId)}><Button variant="ghost" size="sm" type="submit">Abandon test</Button></form>
+        <EndTest sessionId={sessionId} />
       </div>
     );
   }
@@ -168,6 +176,7 @@ export function TestRunner({ sessionId, module: m, items: initial, serverNow, br
         <div className="flex items-center gap-2">
           {(m.section === "math" || m.section === "mixed") && <ReferenceSheet />}
           <span className="text-xs text-muted-foreground">{saving === "saving" ? "Saving…" : saving === "error" ? "Not saved" : "Saved"}</span>
+          <EndTest sessionId={sessionId} />
         </div>
       </header>
 
@@ -211,6 +220,25 @@ export function TestRunner({ sessionId, module: m, items: initial, serverNow, br
         </footer>
       )}
     </div>
+  );
+}
+
+/** The way out of a locked test: ends it without a score (asks first). */
+function EndTest({ sessionId }: { sessionId: string }) {
+  return (
+    <Dialog>
+      <DialogTrigger render={<Button variant="ghost" size="sm" />}>End test</DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>End this test?</DialogTitle>
+          <DialogDescription>It won&apos;t be scored and your answers so far won&apos;t count. Lockdown ends with it.</DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <DialogClose render={<Button variant="outline" />}>Keep going</DialogClose>
+          <form action={abandon.bind(null, sessionId)}><Button type="submit" variant="destructive">End test</Button></form>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 

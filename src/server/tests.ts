@@ -1,7 +1,7 @@
 // Tests: assembly, module lifecycle, server-authoritative timing, scoring at completion (spec 03 §7–8, 04 §5).
 // Mastery is only updated when the whole session completes; abandoned sessions change nothing.
 import "server-only";
-import { and, asc, desc, eq, gte, inArray, isNull, lt, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, gte, inArray, isNull, lt, sql } from "drizzle-orm";
 import { db, type Tx } from "@/db";
 import { attempts, questions, scoreSnapshots, skillState, testItems, testModules, testSessions } from "@/db/schema";
 import { SKILL_BY_ID } from "@/content/taxonomy";
@@ -72,15 +72,18 @@ async function skillSetModule(tx: Tx, userId: string, sessionId: string, idx: nu
   return insertModule(tx, sessionId, idx, sections.size === 1 ? [...sections][0]! : "mixed", "base", timeLimitS, picked);
 }
 
-const MAX_STARTS_PER_HOUR = 30;
+// Every new test hands out a module of questions, so starts are capped (anti-scraping; real students stay far below).
+const MAX_STARTS_PER_HOUR = 10;
+const MAX_STARTS_PER_DAY = 25;
 
 export async function startTest(userId: string, input: {
   kind: TestKind; section?: Section; skillId?: string; skillIds?: string[]; count?: number; timed?: boolean; focus?: string[];
   tags?: string[]; difficulty?: Difficulty | "mixed"; title?: string;
 }): Promise<{ ok: true; id: string } | { ok: false; error: string; resumeId?: string }> {
-  const [{ n }] = (await db.select({ n: sql<number>`count(*)::int` }).from(testSessions)
-    .where(and(eq(testSessions.userId, userId), gte(testSessions.startedAt, new Date(Date.now() - 3_600_000))))) as [{ n: number }];
-  if (n >= MAX_STARTS_PER_HOUR) return { ok: false, error: "rate" };
+  const started = (ms: number) => db.select({ n: count() }).from(testSessions)
+    .where(and(eq(testSessions.userId, userId), gte(testSessions.startedAt, new Date(Date.now() - ms)))).then((r) => r[0]!.n);
+  const [hour, day] = await Promise.all([started(3_600_000), started(86_400_000)]);
+  if (hour >= MAX_STARTS_PER_HOUR || day >= MAX_STARTS_PER_DAY) return { ok: false, error: "rate" };
   if (input.kind === "full" || input.kind === "section") {
     const [open] = await db.select({ id: testSessions.id }).from(testSessions)
       .where(and(eq(testSessions.userId, userId), eq(testSessions.status, "in_progress"), inArray(testSessions.kind, ["full", "section"]))).limit(1);
@@ -312,6 +315,11 @@ export async function inRunningTest(userId: string, questionId: string) {
   return !!r;
 }
 
+export async function markLocked(userId: string, sessionId: string) {
+  await db.update(testSessions).set({ config: sql`jsonb_set(${testSessions.config}, '{lockdown}', 'true')` })
+    .where(and(eq(testSessions.id, sessionId), eq(testSessions.userId, userId), eq(testSessions.status, "in_progress")));
+}
+
 export async function recordFocusLoss(userId: string, sessionId: string) {
   await db.update(testSessions)
     .set({ config: sql`jsonb_set(${testSessions.config}, '{focusLost}', to_jsonb(coalesce((${testSessions.config}->>'focusLost')::int, 0) + 1))` })
@@ -334,4 +342,16 @@ export async function sweepTests(now = new Date()) {
       lt(testSessions.startedAt, new Date(now.getTime() - 3 * 86_400_000))))
     .returning({ id: testSessions.id });
   return { submitted: expired.length, abandoned: stale.length };
+}
+
+/**
+ * Plan 02 §7: a full mock should be at least 80% questions this student hasn't answered yet. False when the bank
+ * is too thin for that (the Tests page then says so, but still lets them start).
+ */
+export async function freshFullMock(userId: string) {
+  const rows = await db.select({
+    section: questions.section,
+    unseen: sql<number>`count(*) filter (where not exists (select 1 from attempts a where a.user_id = ${userId} and a.question_id = "questions"."id"))::int`,
+  }).from(questions).where(eq(questions.status, "active")).groupBy(questions.section);
+  return (["rw", "math"] as const).every((s) => (rows.find((r) => r.section === s)?.unseen ?? 0) >= 0.8 * 2 * moduleBlueprint(s, "base").count);
 }
