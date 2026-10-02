@@ -16,10 +16,18 @@ export async function proxy(request: NextRequest) {
       },
     },
   });
-  await supabase.auth.getUser(); // triggers refresh if needed
+  const { data: { user } } = await supabase.auth.getUser(); // verifies the session and refreshes it if needed
+  // The landing page is static; signed-in visitors go straight to the app from here instead.
+  const devUser = process.env.NODE_ENV === "development" && !!process.env.DEV_USER_ID;
+  if (request.nextUrl.pathname === "/" && (user || devUser)) {
+    const to = NextResponse.redirect(new URL("/dashboard", request.url));
+    response.cookies.getAll().forEach((c) => to.cookies.set(c)); // keep any refreshed session cookies
+    return to;
+  }
   return response;
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|sw.js|manifest.webmanifest|robots.txt|sitemap.xml|api/cron/|figures/|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
+  // Public pages with no account data (about, privacy, terms, security, .well-known) skip the session check.
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|sw.js|manifest.webmanifest|robots.txt|sitemap.xml|api/cron/|figures/|\\.well-known/|about$|privacy$|terms$|security$|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
 };
