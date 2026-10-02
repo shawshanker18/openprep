@@ -27,10 +27,36 @@ async function until(what, fn, ms = 45_000) {
 const state = () => JSON.parse(fs.readFileSync(path.join(app.getPath("userData"), "state.json"), "utf8"));
 const click = (text) => js(`(() => { const b = [...document.querySelectorAll("button")].filter((x) => x.textContent.trim() === ${JSON.stringify(text)}).pop(); if (!b) return false; b.click(); return true; })()`);
 
+// STAGE=diag: the diagnostic is locked the same way, and "End test" is its only way out.
+async function diagnostic(r) {
+  await win.loadURL(`${SITE}/onboarding`);
+  await until("Start the diagnostic", () => click("Start the diagnostic"));
+  const url = await until("diagnostic page", () => /\/test\/[0-9a-f-]{36}$/.test(win.webContents.getURL()) && win.webContents.getURL());
+  await until("first question", () => js(`document.body.innerText.includes("How sure are you?")`));
+  await wait(1000);
+  r.diagLocked = win.isKiosk() && win.isAlwaysOnTop() && state().lockedUrl === url;
+  win.close(); app.quit();
+  await wait(500);
+  r.diagCloseRefused = !win.isDestroyed() && win.isVisible();
+  const cookies = (await win.webContents.session.cookies.get({ url: SITE })).map((c) => `${c.name}=${c.value}`).join("; ");
+  r.diagBrowserBlocked = (await fetch(url, { headers: { cookie: cookies, "user-agent": "Mozilla/5.0 Chrome/140" } }).then((x) => x.text())).includes("This test is in lockdown mode");
+  await click("I don't know"); // one answer, kept after ending
+  await wait(2000);
+  await click("End test");
+  await until("confirm dialog", () => js(`document.body.innerText.includes("End this test?")`));
+  await click("End test");
+  await until("dashboard", () => /\/dashboard$/.test(win.webContents.getURL()));
+  await wait(2500);
+  r.diagUnlockedAfterEnd = !win.isKiosk() && state().lockedUrl == null;
+  console.log("E2E", JSON.stringify(r));
+  app.exit(0);
+}
+
 app.whenReady().then(async () => {
   const r = {};
   try {
     await until("window", () => win);
+    if (STAGE === "diag") return await diagnostic(r);
     if (STAGE !== "resume") {
       await win.loadURL(`${SITE}/course/m-alg`);
       await until("Start quiz button", () => click("Start quiz"));
