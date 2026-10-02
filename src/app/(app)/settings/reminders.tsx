@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Choice } from "@/components/ui/choice";
 import { inNativeApp, setNativeReminder } from "@/lib/native";
 import { setReminderHour, subscribePush, testPush, unsubscribePush } from "./actions";
 
 const KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
-const control = "h-9 rounded-md border bg-background px-2 text-sm";
 const hourLabel = (h: number) => new Date(2000, 0, 1, h).toLocaleTimeString("en-US", { hour: "numeric" });
 
 function keyBytes(base64: string) {
@@ -71,14 +71,13 @@ export function Reminders({ hour }: { hour: number | null }) {
       <h2 className="font-medium">Study reminders</h2>
       <p className="text-sm text-muted-foreground">A notification at your study time on days you haven&apos;t practised yet. Turn it on for each device you use.</p>
       <label className="flex flex-col gap-1 text-sm sm:w-60">Remind me at
-        <select className={control} value={hour ?? ""} onChange={(e) => {
-          const h = e.target.value === "" ? null : Number(e.target.value);
-          void setReminderHour(h);
-          if (state === "native") void setNativeReminder(h);
-        }}>
-          <option value="">Off</option>
-          {Array.from({ length: 24 }, (_, h) => <option key={h} value={h}>{hourLabel(h)}</option>)}
-        </select>
+        <Choice className="sm:w-60" value={hour == null ? "off" : String(hour)}
+          options={[{ value: "off", label: "Off" }, ...Array.from({ length: 24 }, (_, h) => ({ value: String(h), label: hourLabel(h) }))]}
+          onValueChange={(v) => {
+            const h = v === "off" ? null : Number(v);
+            void setReminderHour(h);
+            if (state === "native") void setNativeReminder(h);
+          }} />
       </label>
       {state === "native" && <p className="text-sm text-muted-foreground">This app reminds you on this device at the time above.</p>}
       {state === "loading" && <p className="text-sm text-muted-foreground">Checking this browser…</p>}

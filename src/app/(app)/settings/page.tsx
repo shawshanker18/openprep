@@ -11,6 +11,7 @@ import { Reminders } from "./reminders";
 import {
   addOfficialScore, deleteAccount, removeOfficialScore, resetDashboard, retakeDiagnostic, saveDashboard, updateProfile, updateSettings,
 } from "./actions";
+import { Choice } from "@/components/ui/choice";
 
 export const metadata = { title: "Settings" };
 
@@ -53,13 +54,9 @@ export default async function SettingsPage({ searchParams }: PageProps<"/setting
           <label className="flex flex-col gap-1 text-sm">Test date
             <input name="testDate" type="date" defaultValue={profile.testDate ?? ""} className={control} /></label>
           <label className="flex flex-col gap-1 text-sm">Minutes per day
-            <select name="minutesPerDay" defaultValue={profile.minutesPerDay} className={control}>
-              {[15, 30, 45, 60, 90, 120].map((m) => <option key={m} value={m}>{m} minutes</option>)}
-            </select></label>
+            <Choice name="minutesPerDay" defaultValue={String(profile.minutesPerDay)} options={[15, 30, 45, 60, 90, 120].map((m) => ({ value: String(m), label: `${m} minutes` }))} /></label>
           <label className="flex flex-col gap-1 text-sm">Days per week
-            <select name="daysPerWeek" defaultValue={profile.daysPerWeek} className={control}>
-              {[3, 4, 5, 6, 7].map((d) => <option key={d} value={d}>{d} days</option>)}
-            </select></label>
+            <Choice name="daysPerWeek" defaultValue={String(profile.daysPerWeek)} options={[3, 4, 5, 6, 7].map((d) => ({ value: String(d), label: `${d} days` }))} /></label>
         </div>
         <p className="text-xs text-muted-foreground">Changes apply from tomorrow&apos;s plan. Today&apos;s plan stays as it is.</p>
         <Button type="submit" className="self-start">Save</Button>
@@ -71,21 +68,11 @@ export default async function SettingsPage({ searchParams }: PageProps<"/setting
         <h2 className="font-medium">Profile</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="flex flex-col gap-1 text-sm">Grade
-            <select name="grade" defaultValue={profile.grade ?? 11} className={control}>
-              {[8, 9, 10, 11, 12].map((g) => <option key={g} value={g}>Grade {g}</option>)}
-              <option value="13">Other / gap year</option>
-            </select></label>
+            <Choice name="grade" defaultValue={String(profile.grade ?? 11)} options={[...[8, 9, 10, 11, 12].map((g) => ({ value: String(g), label: `Grade ${g}` })), { value: "13", label: "Other / gap year" }]} /></label>
           <label className="flex flex-col gap-1 text-sm">School curriculum
-            <select name="curriculum" defaultValue={profile.curriculum ?? "cbse"} className={control}>
-              <option value="cbse">CBSE</option><option value="icse">ICSE</option><option value="ib">IB</option>
-              <option value="gcse">GCSE / A-Levels</option><option value="american">American</option><option value="other">Other</option>
-            </select></label>
+            <Choice name="curriculum" defaultValue={profile.curriculum ?? "cbse"} options={[{ value: "cbse", label: "CBSE" }, { value: "icse", label: "ICSE" }, { value: "ib", label: "IB" }, { value: "gcse", label: "GCSE / A-Levels" }, { value: "american", label: "American" }, { value: "other", label: "Other" }]} /></label>
           <label className="flex flex-col gap-1 text-sm">English is my…
-            <select name="englishBackground" defaultValue={profile.englishBackground ?? "fluent"} className={control}>
-              <option value="first_language">First language</option>
-              <option value="fluent">Fluent second language</option>
-              <option value="learning">Still learning</option>
-            </select></label>
+            <Choice name="englishBackground" defaultValue={profile.englishBackground ?? "fluent"} options={[{ value: "first_language", label: "First language" }, { value: "fluent", label: "Fluent second language" }, { value: "learning", label: "Still learning" }]} /></label>
         </div>
         <fieldset className="flex flex-col gap-2 text-sm">
           <legend className="mb-2">Subjects you&apos;re studying now</legend>
