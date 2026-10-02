@@ -98,7 +98,10 @@ export function TestRunner({ sessionId, module: m, items: initial, serverNow, br
     submitted.current = true;
     setSubmitting(true);
     if (debounce.current) clearTimeout(debounce.current);
-    void submitModule(m.id).then(() => router.refresh());
+    void submitModule(m.id).then((r) => {
+      if (r && typeof r === "object" && r.finished) router.replace(`/test/${sessionId}/results`);
+      else router.refresh(); // next module
+    });
   }, [m.id, router]);
 
   // Countdown; auto-submit at zero.

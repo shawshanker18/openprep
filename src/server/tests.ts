@@ -270,7 +270,8 @@ export async function submitModule(userId: string, moduleId: string) {
     const r = await ownedModule(tx, userId, moduleId);
     if (!r) return false;
     await submitModuleTx(tx, userId, r.s.id, moduleId, new Date());
-    return true;
+    const [after] = await tx.select({ status: testSessions.status }).from(testSessions).where(eq(testSessions.id, r.s.id));
+    return { finished: after?.status !== "in_progress" }; // the runner goes straight to results when the test is over
   });
 }
 
