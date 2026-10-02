@@ -25,18 +25,20 @@ type Result = {
 type Base = { seen: string[]; answered: number; correct: number; ms: number };
 type State =
   | ({ phase: "loading" } & Base)
+  | ({ phase: "error"; error: string } & Base)
   | ({ phase: "done" } & Base)
   | ({ phase: "answering"; q: PublicQuestion; value: string | null; limitS: number | null } & Base)
   | ({ phase: "revealed"; q: PublicQuestion; value: string | null; limitS: number | null; r: Result; mistake: string | null } & Base);
 type Action =
   | { type: "loaded"; q: PublicQuestion; limitS: number | null } | { type: "done" } | { type: "select"; value: string | null }
-  | { type: "revealed"; r: Result; timeMs: number } | { type: "mistake"; m: string } | { type: "next" };
+  | { type: "revealed"; r: Result; timeMs: number } | { type: "mistake"; m: string } | { type: "next" } | { type: "failed"; error: string };
 
 const base = (s: State): Base => ({ seen: s.seen, answered: s.answered, correct: s.correct, ms: s.ms });
 function reducer(s: State, a: Action): State {
   switch (a.type) {
     case "loaded": return { ...base(s), phase: "answering", seen: [...s.seen, a.q.id], q: a.q, value: null, limitS: a.limitS };
     case "done": return { ...base(s), phase: "done" };
+    case "failed": return { ...base(s), phase: "error", error: a.error };
     case "select": return s.phase === "answering" ? { ...s, value: a.value } : s;
     case "revealed": return s.phase === "answering" ? {
       ...s, phase: "revealed", r: a.r, mistake: a.r.mistakeGuess, answered: s.answered + 1,
@@ -79,8 +81,9 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block, set, b
     const res = await nextQuestion(sim
       ? { mode: "skill", skillId: sim, exclude }
       : mode === "list" ? { mode, exclude, ids }
-      : { mode, skillId, difficulty, exclude, skillIds: set?.skillIds, tags: set?.tags, timing: set?.timing });
-    if (!res.ok) { toast.error(res.error); return; }
+      : { mode, skillId, difficulty, exclude, skillIds: set?.skillIds, tags: set?.tags, timing: set?.timing })
+      .catch(() => ({ ok: false as const, error: "Couldn't load the next question. Check your connection and try again." }));
+    if (!res.ok) { dispatch({ type: "failed", error: res.error }); return; }
     if ("done" in res.data) dispatch({ type: "done" });
     else { dispatch({ type: "loaded", q: res.data.question, limitS: res.data.timeLimitS }); shownAt.current = performance.now(); hiddenMs.current = 0; }
   }), [mode, skillId, difficulty, set, ids]);
@@ -129,6 +132,14 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block, set, b
   }, [s, next]);
 
   if (s.phase === "loading") return <p className="text-muted-foreground">Loading…</p>;
+  if (s.phase === "error") {
+    return (
+      <div className="flex flex-col items-start gap-3">
+        <p role="alert" className="text-sm">{s.error}</p>
+        <Button variant="outline" onClick={() => dispatch({ type: "next" })}>Try again</Button>
+      </div>
+    );
+  }
   if (s.phase === "done" && set) {
     return (
       <div className="flex flex-col items-start gap-3">

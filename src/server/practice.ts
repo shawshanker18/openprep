@@ -75,16 +75,15 @@ async function timeLimitFor(userId: string, q: Question, timing: Timing | undefi
 }
 
 /**
- * Anti-scraping: how many different questions one account may be handed. A student answering as fast as possible
- * stays under these; a script pulling the whole bank does not. (questionServes keeps one row per question, so this
- * counts distinct questions.)
+ * Anti-scraping speed limit, not a quota: students can do as many questions as they like, but no more than this
+ * many new ones in any minute (2 seconds each, faster than anyone can read and answer). A script pulling the bank
+ * hits it at once. (questionServes keeps one row per question, so this counts distinct questions.)
  */
-export const SERVE_LIMITS = { hour: { ms: 3_600_000, max: 20 }, day: { ms: 86_400_000, max: 250 } };
-export async function overServeLimit(userId: string, now = new Date()) {
-  const served = (ms: number) => db.select({ n: count() }).from(questionServes)
-    .where(and(eq(questionServes.userId, userId), gte(questionServes.servedAt, new Date(now.getTime() - ms)))).then((r) => r[0]!.n);
-  const [hour, day] = await Promise.all([served(SERVE_LIMITS.hour.ms), served(SERVE_LIMITS.day.ms)]);
-  return hour >= SERVE_LIMITS.hour.max || day >= SERVE_LIMITS.day.max;
+export const SPEED_LIMIT = { ms: 60_000, max: 30 };
+export async function tooFast(userId: string, now = new Date()) {
+  const [{ n }] = (await db.select({ n: count() }).from(questionServes)
+    .where(and(eq(questionServes.userId, userId), gte(questionServes.servedAt, new Date(now.getTime() - SPEED_LIMIT.ms))))) as [{ n: number }];
+  return n >= SPEED_LIMIT.max;
 }
 
 export async function nextQuestion(userId: string, profile: Profile, input: {
