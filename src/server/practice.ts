@@ -144,16 +144,33 @@ export async function nextQuestion(userId: string, profile: Profile, input: {
   return { question: toPublic(q), reviewsDue: await countDueReviews(userId, now), timeLimitS };
 }
 
+/**
+ * Has this question already been handed to this student (served in practice, or answered anywhere)? Answers,
+ * bookmarks and tutor hints only work on those, so a script can't read the bank by sending question ids directly
+ * and skipping the serve limits.
+ */
+export async function wasGiven(userId: string, questionId: string) {
+  const [served, answered] = await Promise.all([
+    db.select({ id: questionServes.questionId }).from(questionServes)
+      .where(and(eq(questionServes.userId, userId), eq(questionServes.questionId, questionId))).limit(1),
+    db.select({ id: attempts.id }).from(attempts)
+      .where(and(eq(attempts.userId, userId), eq(attempts.questionId, questionId))).limit(1),
+  ]);
+  return served.length > 0 || answered.length > 0;
+}
+
 export async function submitAnswer(userId: string, input: {
   questionId: string; response: string | null; timeMs: number; confidence: 1 | 2 | 3;
 }) {
-  const [[q], live, [served]] = await Promise.all([
+  const [[q], live, [served], given] = await Promise.all([
     db.select().from(questions).where(eq(questions.id, input.questionId)),
     inRunningTest(userId, input.questionId), // practice would reveal the answer to a question in a live test
     db.select({ at: questionServes.servedAt }).from(questionServes)
       .where(and(eq(questionServes.userId, userId), eq(questionServes.questionId, input.questionId))),
+    wasGiven(userId, input.questionId),
   ]);
-  if (!q || live) return null;
+  // Never reveal the answer to a question this student wasn't given.
+  if (!q || live || !given) return null;
   const timeMs = serverCappedTime(input.timeMs, served?.at ?? null, new Date());
   return db.transaction(async (tx) => {
     // A question in the user's review queue is always recorded as a review, whatever the client says.

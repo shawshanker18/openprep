@@ -162,6 +162,8 @@ it("a question in a live test can't be answered (and revealed) through practice"
   const [live] = await db.select().from(schema.testSessions).where(eq(schema.testSessions.id, r.id));
   expect((live!.config as { focusLost?: number }).focusLost).toBe(2);
   await T.abandonTest(USER, r.id);
+  // Once the test is over, practice can serve and reveal it as usual.
+  await P.nextQuestion(USER, {} as schema.Profile, { mode: "list", ids: [first!.questionId], exclude: [] });
   expect(await P.submitAnswer(USER, { questionId: first!.questionId, response: "A", timeMs: 5000, confidence: 3 })).not.toBeNull();
 });
 
