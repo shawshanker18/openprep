@@ -18,6 +18,7 @@ const Start = z.discriminatedUnion("kind", [
     kind: z.literal("custom"), skillIds: z.array(skill).min(1).max(29), count: z.coerce.number().int().min(5).max(30), timed: z.boolean(),
     tags: z.array(z.string().min(1).max(64)).max(50),
     difficulty: z.enum(["mixed", "1", "2", "3"]).default("mixed").transform((d) => (d === "mixed" ? d : (Number(d) as 1 | 2 | 3))),
+    title: z.string().trim().max(80).optional(), // course quizzes, unit tests and challenges
   }),
 ]);
 

@@ -29,7 +29,9 @@ export default async function PracticePage({ searchParams }: PageProps<"/practic
     const timing = sp.timing === "on" || sp.timing === "off" ? sp.timing : "auto";
     const title = skillIds.length === 1 ? SKILL_BY_ID[skillIds[0]!]!.name : skillIds.length ? "Custom practice" : "Custom practice (focus skills)";
     const set = { skillIds, tags, count, timing } as const;
-    return <PracticeRunner key={JSON.stringify([set, difficulty])} mode="set" difficulty={difficulty} title={title} block={block} set={set} />;
+    // Exercises started from the course return there (only course paths are accepted).
+    const back = typeof sp.from === "string" && /^\/course(\/[a-z-]+)?$/.test(sp.from) ? sp.from : undefined;
+    return <PracticeRunner key={JSON.stringify([set, difficulty])} mode="set" difficulty={difficulty} title={title} block={block} set={set} back={back} />;
   }
 
   const plain = difficulty === "mixed" ? undefined : difficulty;

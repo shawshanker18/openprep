@@ -63,9 +63,9 @@ function Countdown({ limitS }: { limitS: number }) {
   return <span className={cn("tabular-nums", left <= 0 && "text-red-700")}>{left > 0 ? clock(left) : `Time's up +${clock(-left)}`}</span>;
 }
 
-export function PracticeRunner({ mode, skillId, difficulty, title, block, set }: {
+export function PracticeRunner({ mode, skillId, difficulty, title, block, set, back }: {
   mode: Mode; skillId?: string; difficulty?: 1 | 2 | 3 | "mixed"; title: string; block?: { index: number; target: number } | null;
-  set?: SetConfig;
+  set?: SetConfig; back?: string;
 }) {
   const [s, dispatch] = useReducer(reducer, { phase: "loading", seen: [], answered: 0, correct: 0, ms: 0 });
   const [pending, start] = useTransition();
@@ -134,12 +134,12 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block, set }:
   if (s.phase === "done" && set) {
     return (
       <div className="flex flex-col items-start gap-3">
-        <h1 className="text-xl font-semibold">{s.answered >= set.count ? "Set complete" : "No more matching questions"}</h1>
+        <h1 className="text-xl font-semibold">{s.answered >= set.count ? (back ? "Exercise complete" : "Set complete") : "No more matching questions"}</h1>
         <p className="text-muted-foreground tabular-nums">
           {s.answered > 0 ? `${s.correct}/${s.answered} correct · average ${Math.round(s.ms / s.answered / 1000)}s per question.` : "Try other skills or sub-topics."}
         </p>
         <div className="flex flex-wrap gap-2">
-          <Button render={<Link href="/practice/custom" />}>New custom set</Button>
+          {back ? <Button render={<Link href={back} />}>Back to the course</Button> : <Button render={<Link href="/practice/custom" />}>New custom set</Button>}
           <Button variant="outline" render={<Link href="/dashboard" />}>Back to dashboard</Button>
         </div>
       </div>

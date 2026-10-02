@@ -20,8 +20,8 @@ const SECTION = { rw: "Reading and Writing", math: "Math", mixed: "Mixed practic
 const now = () => performance.now();
 const clock = (ms: number) => { const s = Math.max(0, Math.ceil(ms / 1000)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
 
-export function TestRunner({ sessionId, module: m, items: initial, serverNow, breakBefore }: {
-  sessionId: string; module: Mod; items: Item[]; serverNow: string; breakBefore: boolean;
+export function TestRunner({ sessionId, module: m, items: initial, serverNow, breakBefore, heading }: {
+  sessionId: string; module: Mod; items: Item[]; serverNow: string; breakBefore: boolean; heading?: string | null;
 }) {
   const router = useRouter();
   const [items, setItems] = useState(initial);
@@ -130,7 +130,8 @@ export function TestRunner({ sessionId, module: m, items: initial, serverNow, br
     return () => window.removeEventListener("keydown", onKey);
   });
 
-  const title = `${SECTION[m.section] ?? m.section}${m.adaptive ? ` · Module ${m.route === "base" ? 1 : 2}` : ""}`;
+  // Course checks carry their own title ("Algebra: quiz 1"); otherwise name the section and module.
+  const title = heading ?? `${SECTION[m.section] ?? m.section}${m.adaptive ? ` · Module ${m.route === "base" ? 1 : 2}` : ""}`;
 
   if (screen === "break") return <Break onDone={() => setScreen("intro")} />;
   if (screen === "intro") {

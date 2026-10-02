@@ -15,7 +15,7 @@ import { toPublic, toRevealed } from "./questions";
 
 export type TestKind = "full" | "section" | "module" | "mini" | "weakness" | "custom";
 type Section = "rw" | "math";
-type Config = { sections: Section[]; adaptive: boolean; timed: boolean; skillIds?: string[]; count?: number; tags?: string[]; difficulty?: Difficulty | "mixed" };
+type Config = { sections: Section[]; adaptive: boolean; timed: boolean; skillIds?: string[]; count?: number; tags?: string[]; difficulty?: Difficulty | "mixed"; title?: string };
 const GRACE_MS = 10_000;
 
 /**
@@ -76,7 +76,7 @@ const MAX_STARTS_PER_HOUR = 30;
 
 export async function startTest(userId: string, input: {
   kind: TestKind; section?: Section; skillId?: string; skillIds?: string[]; count?: number; timed?: boolean; focus?: string[];
-  tags?: string[]; difficulty?: Difficulty | "mixed";
+  tags?: string[]; difficulty?: Difficulty | "mixed"; title?: string;
 }): Promise<{ ok: true; id: string } | { ok: false; error: string; resumeId?: string }> {
   const [{ n }] = (await db.select({ n: sql<number>`count(*)::int` }).from(testSessions)
     .where(and(eq(testSessions.userId, userId), gte(testSessions.startedAt, new Date(Date.now() - 3_600_000))))) as [{ n: number }];
@@ -90,7 +90,7 @@ export async function startTest(userId: string, input: {
   return db.transaction(async (tx) => {
     const sections: Section[] = input.kind === "full" ? ["rw", "math"] : input.section ? [input.section] : [];
     const config: Config = { sections, adaptive: input.kind === "full" || input.kind === "section", timed };
-    if (input.kind === "custom") Object.assign(config, { skillIds: input.skillIds, count: input.count, tags: input.tags ?? [], difficulty: input.difficulty ?? "mixed" });
+    if (input.kind === "custom") Object.assign(config, { skillIds: input.skillIds, count: input.count, tags: input.tags ?? [], difficulty: input.difficulty ?? "mixed", ...(input.title ? { title: input.title } : {}) });
     const [s] = await tx.insert(testSessions).values({ userId, kind: input.kind, config }).returning({ id: testSessions.id });
     const id = s!.id;
 
@@ -212,7 +212,7 @@ export async function getTestState(userId: string, sessionId: string) {
       const prev = mods[mods.indexOf(cur) - 1];
       const items = await moduleItems(tx, cur.id);
       return {
-        kind: "module" as const, session: { id: s.id, kind: s.kind },
+        kind: "module" as const, session: { id: s.id, kind: s.kind, title: (s.config as Config).title ?? null },
         module: { id: cur.id, idx: cur.idx, section: cur.section, route: cur.route, timeLimitS: cur.timeLimitS,
           startedAt: cur.startedAt?.toISOString() ?? null, deadlineAt: cur.deadlineAt?.toISOString() ?? null, adaptive: (s.config as Config).adaptive },
         breakBefore: s.kind === "full" && !cur.startedAt && prev?.section === "rw" && cur.section === "math",

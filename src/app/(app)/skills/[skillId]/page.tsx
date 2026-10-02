@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Markdown } from "@/components/markdown";
+import { Markdown, slugify } from "@/components/markdown";
 import { MasteryBar } from "@/components/mastery-bar";
 import { DOMAINS, SKILL_BY_ID } from "@/content/taxonomy";
 import { certaintyLabel, certaintyPct } from "@/engine/mastery";
@@ -72,7 +72,8 @@ export default async function SkillPage({ params, searchParams }: PageProps<"/sk
         <div className="flex flex-col gap-2">
           {lesson.minutes && <p className="text-sm text-muted-foreground">About {lesson.minutes} minutes</p>}
           {lesson.sections.map((sec, i) => (
-            <details key={sec.heading} open={i === 0} className="rounded-lg border px-4 py-3">
+            <details key={sec.heading} id={slugify(sec.heading)} className="scroll-mt-20 rounded-lg border px-4 py-3"
+              open={typeof sp.section === "string" && lesson.sections.some((x) => slugify(x.heading) === sp.section) ? slugify(sec.heading) === sp.section : i === 0}>
               <summary className="cursor-pointer font-medium">{sec.heading}</summary>
               <Markdown className="mt-3 text-[15px]">{sec.md}</Markdown>
             </details>
