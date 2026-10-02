@@ -34,6 +34,14 @@ public class MainActivity extends BridgeActivity {
                 pageReady = true; // the offline page counts too
                 if (LockdownPlugin.instance != null) LockdownPlugin.instance.pageLoaded(webView);
             }
+
+            // The page's renderer died (out of memory, etc.): rebuild the screen instead of letting Android close the
+            // app. A locked test reopens (and re-locks) through resumeLockedTest.
+            @Override
+            public boolean onRenderProcessGone(WebView webView, android.webkit.RenderProcessGoneDetail detail) {
+                runOnUiThread(MainActivity.this::recreate);
+                return true;
+            }
         });
         // Questions can't be screenshotted or screen recorded, and the app is blank in the recent apps view.
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
