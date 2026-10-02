@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { formatDate } from "@/lib/dates";
 import { Button } from "@/components/ui/button";
 import { DOMAINS, SKILL_BY_ID, type DomainId } from "@/content/taxonomy";
 import { timingStats, type TestResult } from "@/engine/score";
@@ -56,7 +57,7 @@ function TimingChart({ items }: { items: Data["items"] }) {
   );
 }
 
-export function TestResults({ data }: { data: Data }) {
+export function TestResults({ data, timeZone }: { data: Data; timeZone: string }) {
   const s = data.session;
   const r = s.result as TestResult | null;
   if (s.status === "abandoned" || !r) {
@@ -73,7 +74,7 @@ export function TestResults({ data }: { data: Data }) {
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-8 px-4 py-10">
       <div className="flex flex-col gap-1">
-        <p className="text-sm text-muted-foreground">{(s.config as { title?: string }).title ?? KIND[s.kind] ?? s.kind} · {s.completedAt?.toLocaleDateString()}</p>
+        <p className="text-sm text-muted-foreground">{(s.config as { title?: string }).title ?? KIND[s.kind] ?? s.kind} · {s.completedAt && formatDate(s.completedAt, timeZone)}</p>
         {s.kind === "custom" && (() => {
           const c = s.config as { skillIds?: string[]; tags?: string[]; difficulty?: string; timed?: boolean; count?: number };
           return (

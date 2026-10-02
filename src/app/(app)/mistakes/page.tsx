@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { formatDate } from "@/lib/dates";
 import { and, desc, eq, lte, sql } from "drizzle-orm";
 import { Button } from "@/components/ui/button";
 import { Markdown } from "@/components/markdown";
@@ -17,7 +18,7 @@ export default async function MistakesPage({ searchParams }: PageProps<"/mistake
   const view = sp.view === "all" ? "all" : "due";
   const section = sp.section === "rw" || sp.section === "math" ? sp.section : null;
   const type = MISTAKE_TYPES.includes(sp.type as MistakeType) ? (sp.type as MistakeType) : null;
-  const { userId } = await requireUser();
+  const { userId, profile } = await requireUser();
   const now = new Date();
 
   // Latest wrong attempt per question, joined to its review-queue state.
@@ -67,8 +68,8 @@ export default async function MistakesPage({ searchParams }: PageProps<"/mistake
               <Markdown className="line-clamp-2">{m.stem}</Markdown>
               <span className="text-xs text-muted-foreground">
                 <Link className="underline" href={`/skills/${m.skillId}?tab=mistakes`}>{SKILL_BY_ID[m.skillId]?.name}</Link>
-                {m.mistakeType && ` · ${MISTAKE_LABEL[m.mistakeType as MistakeType]}`} · missed {m.at.toLocaleDateString()}
-                {" · "}{m.dueAt ? (m.dueAt <= now ? "due now" : `review ${m.dueAt.toLocaleDateString()}`) : "cleared"}
+                {m.mistakeType && ` · ${MISTAKE_LABEL[m.mistakeType as MistakeType]}`} · missed {formatDate(m.at, profile.timezone)}
+                {" · "}{m.dueAt ? (m.dueAt <= now ? "due now" : `review ${formatDate(m.dueAt, profile.timezone)}`) : "cleared"}
               </span>
             </li>
           ))}

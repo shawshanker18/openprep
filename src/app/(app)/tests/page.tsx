@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { formatDate } from "@/lib/dates";
 import { Button } from "@/components/ui/button";
 import { SKILLS } from "@/content/taxonomy";
 import type { TestResult } from "@/engine/score";
@@ -48,7 +49,7 @@ export default async function TestsPage({ searchParams }: PageProps<"/tests">) {
 
       {open.map((t) => (
         <div key={t.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-primary p-4">
-          <span className="text-sm"><b>{KIND[t.kind]}</b> in progress · started {t.startedAt.toLocaleString()}</span>
+          <span className="text-sm"><b>{KIND[t.kind]}</b> in progress · started {formatDate(t.startedAt, profile.timezone, true)}</span>
           <div className="flex gap-2">
             <Button render={<Link href={`/test/${t.id}`} />}>Resume</Button>
             <form action={abandon.bind(null, t.id)}><Button variant="outline" type="submit">Abandon</Button></form>
@@ -105,7 +106,7 @@ export default async function TestsPage({ searchParams }: PageProps<"/tests">) {
                   : r?.sections ? Object.values(r.sections).map((x) => `${x!.correct}/${x!.total}`).join(" · ") : "Not scored";
                 return (
                   <tr key={t.id} className="border-t">
-                    <td className="py-2 tabular-nums">{t.startedAt.toLocaleDateString()}</td>
+                    <td className="py-2 tabular-nums">{formatDate(t.startedAt, profile.timezone)}</td>
                     <td>{KIND[t.kind] ?? t.kind}</td>
                     <td className="tabular-nums">{label}</td>
                     <td className="text-right"><Link className="underline" href={t.status === "in_progress" ? `/test/${t.id}` : `/test/${t.id}/results`}>{t.status === "in_progress" ? "Resume" : "View"}</Link></td>

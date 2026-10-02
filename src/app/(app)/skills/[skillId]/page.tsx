@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { formatDate } from "@/lib/dates";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Markdown, slugify } from "@/components/markdown";
@@ -42,7 +43,7 @@ export default async function SkillPage({ params, searchParams }: PageProps<"/sk
   if (!skill) notFound();
   const sp = await searchParams;
   const tab = TABS.includes(sp.tab as never) ? (sp.tab as (typeof TABS)[number]) : "learn";
-  const { userId } = await requireUser();
+  const { userId, profile } = await requireUser();
   const [{ skills }, detail, lesson, stats, tags] = await Promise.all([
     getSkillSummary(userId), getSkillDetail(userId, skillId), getLesson(skillId), skillStats(userId, skillId), tagsBySkill(),
   ]);
@@ -119,7 +120,7 @@ export default async function SkillPage({ params, searchParams }: PageProps<"/sk
               ["Accuracy", s.accuracy != null ? `${s.accuracy}%` : "Not yet"],
               ["Recent accuracy", stats.recent.n ? `${Math.round((100 * stats.recent.correct) / stats.recent.n)}% (last ${stats.recent.n})` : "Not yet"],
               ["Answered", `${s.n}`],
-              ["Last practiced", s.lastPracticedAt ? s.lastPracticedAt.toLocaleDateString() : "Not yet"],
+              ["Last practiced", s.lastPracticedAt ? formatDate(s.lastPracticedAt, profile.timezone) : "Not yet"],
               ["Diagnostic", stats.diagnostic.n ? `${stats.diagnostic.c}/${stats.diagnostic.n} correct` : "Not yet"],
               ["Average time", s.avgMs != null ? fmt(s.avgMs) : "Not yet"],
               ["Pace", s.pace ?? "Not yet"],
@@ -166,7 +167,7 @@ export default async function SkillPage({ params, searchParams }: PageProps<"/sk
                 <li key={m.id} className="rounded-md border p-3 text-sm">
                   <Markdown className="line-clamp-2">{m.stem}</Markdown>
                   <span className="text-xs text-muted-foreground">
-                    Missed {m.at.toLocaleDateString()} · {m.dueAt ? `review due ${m.dueAt.toLocaleDateString()}` : "cleared from review"}
+                    Missed {formatDate(m.at, profile.timezone)} · {m.dueAt ? `review due ${formatDate(m.dueAt, profile.timezone)}` : "cleared from review"}
                   </span>
                 </li>
               ))}
