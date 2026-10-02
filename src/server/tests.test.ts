@@ -1,10 +1,10 @@
 // Test-session lifecycle against real Postgres (PGlite): routing, idempotent submit, deadlines, scoring.
 import fs from "node:fs";
 import path from "node:path";
-import { beforeAll, expect, it, vi } from "vitest";
+import { beforeAll, beforeEach, expect, it, vi } from "vitest";
 import { PGlite } from "@electric-sql/pglite";
 import { drizzle } from "drizzle-orm/pglite";
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, sql } from "drizzle-orm";
 import * as schema from "@/db/schema";
 import { SKILLS } from "@/content/taxonomy";
 
@@ -31,6 +31,11 @@ beforeAll(async () => {
         type: "mcq", passageMd: null, stemMd: "s", choices: [], answer: { choice: "A" }, explanationMd: "e", choiceRationales: null,
         fastMethodMd: null, desmos: null, tags: [], status: "active", version: 1 });
   await db.insert(schema.questions).values(qs);
+});
+
+// Each case starts its own tests: age earlier ones so the start speed limit (4 per 5 minutes) applies per case.
+beforeEach(async () => {
+  await db.update(schema.testSessions).set({ startedAt: sql`${schema.testSessions.startedAt} - interval '10 minutes'` });
 });
 
 const modules = (sessionId: string) =>
@@ -211,4 +216,15 @@ it("lockdown binds a test to the first app install that locks it", async () => {
   expect((await config()).lockKey).toBe("hash-of-install-A");
   await T.markLocked(USER, r.id, "someone-else"); // not their test
   expect((await config()).lockKey).toBe("hash-of-install-A");
+});
+
+it("test starts have a speed limit, not a quota", async () => {
+  const U = "00000000-0000-0000-0000-0000000000cd";
+  await db.insert(schema.profiles).values({ id: U });
+  await db.insert(schema.skillState).values(SKILLS.map((k) => ({ userId: U, skillId: k.id })));
+  const start = () => T.startTest(U, { kind: "module", section: "math" });
+  for (let i = 0; i < 4; i++) expect((await start()).ok).toBe(true);
+  expect(await start()).toMatchObject({ ok: false, error: "rate" }); // a 5th within 5 minutes
+  await db.update(schema.testSessions).set({ startedAt: sql`${schema.testSessions.startedAt} - interval '6 minutes'` }).where(eq(schema.testSessions.userId, U));
+  expect((await start()).ok).toBe(true); // a few minutes later: fine, however many they did before
 });

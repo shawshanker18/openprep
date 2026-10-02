@@ -9,7 +9,18 @@ process.env.OPENPREP_URL ||= "http://localhost:3000";
 const SITE = process.env.OPENPREP_URL;
 const fs = require("node:fs");
 const path = require("node:path");
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, screen } = require("electron");
+// STAGE=screens pretends a second monitor exists, to check it gets covered during the test.
+if (process.env.STAGE === "screens") {
+  app.whenReady().then(() => {
+    const real = screen.getAllDisplays.bind(screen);
+    const primary = real()[0];
+    const fake = { ...primary, id: 999, bounds: { x: primary.bounds.width, y: 0, width: 1280, height: 720 } };
+    screen.getAllDisplays = () => [...real(), fake];
+    const matching = screen.getDisplayMatching.bind(screen);
+    screen.getDisplayMatching = (rect) => (rect.x >= primary.bounds.width ? fake : matching(rect));
+  });
+}
 
 let win = null;
 app.on("browser-window-created", (_e, w) => { win ??= w; });
@@ -66,6 +77,11 @@ app.whenReady().then(async () => {
     await until("End test button on the intro", () => js(`[...document.querySelectorAll("button")].some((b) => b.textContent.trim() === "End test")`));
     await wait(1000);
     r.lockedOnIntro = win.isKiosk() && win.isAlwaysOnTop();
+    if (STAGE === "screens") {
+      const others = BrowserWindow.getAllWindows().filter((w) => w !== win);
+      r.secondScreenCovered = others.length === 1 && others[0].getBounds().x >= 1000 && others[0].isAlwaysOnTop() && !others[0].isFocused();
+      r.testKeptFocus = win.isFocused();
+    }
     r.resumeSaved = state().lockedUrl === testUrl;
     if (STAGE === "kill") { console.log("E2E", JSON.stringify(r)); app.exit(0); return; }
     if (STAGE === "escape") {
@@ -109,6 +125,7 @@ app.whenReady().then(async () => {
     await until("back on the tests page", () => /\/tests$/.test(win.webContents.getURL()));
     await wait(2500);
     r.unlockedAfterEnd = !win.isKiosk() && !win.isAlwaysOnTop() && state().lockedUrl == null;
+    if (STAGE === "screens") r.coversRemoved = BrowserWindow.getAllWindows().filter((w) => w !== win && !w.isDestroyed()).length === 0;
   } catch (e) {
     r.error = String(e);
   }
