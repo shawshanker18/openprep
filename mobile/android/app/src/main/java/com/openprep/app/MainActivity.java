@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.WindowManager;
+import android.webkit.WebSettings;
 import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
@@ -16,6 +17,11 @@ public class MainActivity extends BridgeActivity {
         super.onCreate(savedInstanceState);
         // Questions can't be screenshotted or screen recorded, and the app is blank in the recent apps view.
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
+        // The site needs no files, content providers or location: switch them off in the WebView.
+        WebSettings web = getBridge().getWebView().getSettings();
+        web.setAllowFileAccess(false);
+        web.setAllowContentAccess(false);
+        web.setGeolocationEnabled(false);
         if (!openAuthLink(getIntent())) resumeLockedTest();
     }
 
