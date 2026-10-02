@@ -157,6 +157,15 @@ export const signupTickets = pgTable("signup_tickets", {
   usedAt: ts("used_at"),
 }, (t) => [index("signup_tickets_email_idx").on(t.email, t.createdAt), index("signup_tickets_ip_idx").on(t.ip, t.usedAt)]);
 
+/** Vulnerability reports from /security (the security.txt contact). Read them in the database console. */
+export const securityReports = pgTable("security_reports", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  ip: text("ip").notNull(),
+  contact: text("contact"),
+  message: text("message").notNull(),
+  createdAt: ts("created_at").notNull().defaultNow(),
+}, (t) => [index("security_reports_ip_idx").on(t.ip, t.createdAt)]);
+
 /* ───────── progress, plan, misc ───────── */
 export const scoreSnapshots = pgTable("score_snapshots", {
   id: uuid("id").primaryKey().defaultRandom(),
