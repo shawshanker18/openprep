@@ -6,21 +6,13 @@ import { z } from "zod";
 import { SKILL_BY_ID } from "@/content/taxonomy";
 import type { PlanBlock } from "@/engine/plan";
 import { diagnosticPending, requireUser } from "@/server/auth";
-import { completeBlock, editTodayPlan, nextDesmosLesson, resetTodayPlan } from "@/server/daily";
+import { editTodayPlan, nextDesmosLesson, resetTodayPlan } from "@/server/daily";
 
-const MAX_BLOCKS = 11; // setBlockDone accepts indexes 0–10
+const MAX_BLOCKS = 11; // removePlanBlock accepts indexes 0–10
 
 function refresh() {
   revalidatePath("/dashboard");
   revalidatePath("/plan");
-}
-
-export async function setBlockDone(index: number, done: boolean) {
-  const { userId, profile } = await requireUser();
-  const p = z.object({ index: z.number().int().min(0).max(10), done: z.boolean() }).safeParse({ index, done });
-  if (!p.success) return;
-  await completeBlock(userId, profile, p.data.index, p.data.done);
-  refresh();
 }
 
 const NewBlock = z.object({

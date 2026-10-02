@@ -2,6 +2,9 @@
 
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { eq } from "drizzle-orm";
+import { db } from "@/db";
+import { profiles } from "@/db/schema";
 import { requireUser } from "@/server/auth";
 import { answerDiagnostic as answer } from "@/server/diagnostic";
 import { abandonTest, markLocked, recordFocusLoss, saveResponse as save, startModule as start, submitModule as submit } from "@/server/tests";
@@ -42,6 +45,15 @@ export async function submitModule(moduleId: string) {
   const { userId } = await requireUser();
   if (!z.uuid().safeParse(moduleId).success) return false;
   return submit(userId, moduleId);
+}
+
+/** End a diagnostic early: answers so far are kept, the student carries on (as if skipped) and can retake it later. */
+export async function endDiagnostic(sessionId: string) {
+  const { userId, profile } = await requireUser();
+  if (z.uuid().safeParse(sessionId).success) await abandonTest(userId, sessionId);
+  if (profile.onboardingStep === "diagnostic")
+    await db.update(profiles).set({ onboardingStep: "diagnostic_skipped" }).where(eq(profiles.id, userId));
+  redirect("/dashboard");
 }
 
 export async function abandon(sessionId: string) {

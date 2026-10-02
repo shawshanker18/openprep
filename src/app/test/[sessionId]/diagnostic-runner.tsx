@@ -7,13 +7,15 @@ import { Button } from "@/components/ui/button";
 import { QuestionView } from "@/components/question-view";
 import { DIAGNOSTIC_LENGTH } from "@/engine/diagnostic";
 import type { PublicQuestion } from "@/server/questions";
-import { answerDiagnostic } from "./actions";
+import { answerDiagnostic, endDiagnostic } from "./actions";
+import { EndTest, useTestLockdown } from "./lockdown";
 
 /** One question at a time, no feedback, no going back (spec 04 §5.2 item 5). */
 export function DiagnosticRunner({ sessionId, initial, initialIndex }: {
   sessionId: string; initial: PublicQuestion; initialIndex: number;
 }) {
   const router = useRouter();
+  useTestLockdown(sessionId);
   const [q, setQ] = useState(initial);
   const [index, setIndex] = useState(initialIndex);
   const [value, setValue] = useState<string | null>(null);
@@ -33,7 +35,10 @@ export function DiagnosticRunner({ sessionId, initial, initialIndex }: {
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between text-sm text-muted-foreground">
         <span>Diagnostic</span>
-        <span>Question {index + 1} of up to {DIAGNOSTIC_LENGTH}</span>
+        <span className="flex items-center gap-2">
+          Question {index + 1} of up to {DIAGNOSTIC_LENGTH}
+          <EndTest action={endDiagnostic.bind(null, sessionId)} detail="The answers you've given so far are kept. You can take the diagnostic again later from your dashboard." />
+        </span>
       </div>
       <div className="h-1 overflow-hidden rounded bg-muted">
         <div className="h-full bg-primary transition-all" style={{ width: `${(100 * index) / DIAGNOSTIC_LENGTH}%` }} />

@@ -4,7 +4,7 @@ import "server-only";
 import { cache } from "react";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { and, desc, eq, gte, inArray, like, sql } from "drizzle-orm";
+import { and, count, desc, eq, gte, inArray, like, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { attempts, dailyPlans, lessonProgress, scoreSnapshots, skillState, testSessions, type Profile } from "@/db/schema";
 import { SKILL_BY_ID } from "@/content/taxonomy";
@@ -100,7 +100,43 @@ export async function ensureDaily(userId: string, profile: Profile, now = new Da
       await db.insert(scoreSnapshots).values({ userId, source: "model", rw: rw.score, math: math.score, halfWidth: totalEstimate(rw, math).half, takenAt: now });
     }
   }
-  return { day, focus, blocks: plan.blocks as PlanBlock[] };
+  return { day, focus, blocks: await withProgress(userId, profile, day, plan.blocks as PlanBlock[]) };
+}
+
+export type PlanBlockStatus = PlanBlock & { progress: { n: number; target: number } | null };
+
+/** Answers that complete a practice, check-in or review block (review blocks use the R&W pace). */
+const blockTarget = (b: PlanBlock) => questionsForBlock(b.minutes, "skillId" in b ? SKILL_BY_ID[b.skillId]?.section ?? "rw" : "rw");
+
+/**
+ * A plan block is done only when the work is really there, worked out from the database every time (a click can't
+ * tick it): practice and check-in blocks need that many answers on the skill today, review blocks that many review
+ * answers today, learn and Desmos blocks the lesson finished today. Blocks on the same skill share today's answers
+ * in order, so one set of answers never completes two blocks.
+ */
+export async function withProgress(userId: string, profile: Profile, day: string, blocks: PlanBlock[]): Promise<PlanBlockStatus[]> {
+  const onDay = (col: typeof attempts.createdAt | typeof lessonProgress.completedAt) => sql`(${col} at time zone ${profile.timezone})::date = ${day}::date`;
+  const [answered, lessons] = await Promise.all([
+    db.select({ skillId: attempts.skillId, context: attempts.context, n: count() }).from(attempts)
+      .where(and(eq(attempts.userId, userId), inArray(attempts.context, ["practice", "review"]), onDay(attempts.createdAt)))
+      .groupBy(attempts.skillId, attempts.context),
+    db.select({ skillId: lessonProgress.skillId }).from(lessonProgress)
+      .where(and(eq(lessonProgress.userId, userId), onDay(lessonProgress.completedAt))),
+  ]);
+  const pool = new Map<string, number>(); // "review" or "practice:<skillId>" → answers not yet used by a block
+  for (const a of answered) {
+    const key = a.context === "review" ? "review" : `practice:${a.skillId}`;
+    pool.set(key, (pool.get(key) ?? 0) + a.n);
+  }
+  const read = new Set(lessons.map((l) => l.skillId));
+  return blocks.map((b) => {
+    if (b.kind === "learn") return { ...b, done: read.has(b.skillId), progress: null };
+    if (b.kind === "desmos") return { ...b, done: read.has(`desmos:${b.lessonSlug}`), progress: null };
+    const key = b.kind === "review" ? "review" : `practice:${b.skillId}`;
+    const target = blockTarget(b), have = pool.get(key) ?? 0, n = Math.min(have, target);
+    pool.set(key, have - n);
+    return { ...b, done: n >= target, progress: { n, target } };
+  });
 }
 
 export async function getDashboard(userId: string, profile: Profile, now = new Date()) {
@@ -131,28 +167,18 @@ export async function getDashboard(userId: string, profile: Profile, now = new D
   };
 }
 
-export async function completeBlock(userId: string, profile: Profile, index: number, done = true) {
-  const day = localDate(new Date(), profile.timezone);
-  await db.update(dailyPlans)
-    .set({ blocks: sql`jsonb_set(${dailyPlans.blocks}, ${`{${index},done}`}::text[], ${done ? "true" : "false"}::jsonb)` })
-    .where(and(eq(dailyPlans.userId, userId), eq(dailyPlans.day, day), sql`jsonb_array_length(${dailyPlans.blocks}) > ${index}`));
-}
-
-/** Today's plan block by index, with how many answers complete it (spec 03 §10 block completion). */
+/** Today's plan block by index, with how many more answers complete it (spec 03 §10 block completion). */
 export async function getTodayBlock(userId: string, profile: Profile, index: number) {
-  const day = localDate(new Date(), profile.timezone);
-  const [plan] = await db.select().from(dailyPlans).where(and(eq(dailyPlans.userId, userId), eq(dailyPlans.day, day)));
-  const b = (plan?.blocks as PlanBlock[] | undefined)?.[index];
-  if (!b || b.done) return null;
-  const section = "skillId" in b ? SKILL_BY_ID[b.skillId]?.section ?? "rw" : "rw";
-  return { index, target: questionsForBlock(b.minutes, section) };
+  const b = (await getTodayPlan(userId, profile))?.[index];
+  if (!b || b.done || !b.progress) return null;
+  return { index, target: b.progress.target - b.progress.n };
 }
 
-/** Today's plan row, without generating one. */
+/** Today's plan with real progress, without generating one. */
 export async function getTodayPlan(userId: string, profile: Profile) {
   const day = localDate(new Date(), profile.timezone);
   const [plan] = await db.select().from(dailyPlans).where(and(eq(dailyPlans.userId, userId), eq(dailyPlans.day, day)));
-  return plan ? (plan.blocks as PlanBlock[]) : null;
+  return plan ? withProgress(userId, profile, day, plan.blocks as PlanBlock[]) : null;
 }
 
 /** Hand-edit today's plan (it stays frozen for the day). Every block is marked custom so the UI can say so. */
