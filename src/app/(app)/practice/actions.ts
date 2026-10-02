@@ -2,13 +2,14 @@
 
 import { and, count, eq, gte } from "drizzle-orm";
 import { z } from "zod";
+import { text } from "@/lib/text";
 import { db } from "@/db";
 import { attempts, bookmarks, questionReports, questions } from "@/db/schema";
 import { MISTAKE_TYPES } from "@/engine/mistakes";
 import { diagnosticPending, requireUser } from "@/server/auth";
 import { nextQuestion as next, overServeLimit, submitAnswer as submit } from "@/server/practice";
 
-const id = z.string().min(1).max(64);
+const id = text().min(1).max(64);
 
 const Next = z.object({
   mode: z.enum(["skill", "smart", "review", "set", "list"]),
@@ -32,7 +33,7 @@ export async function nextQuestion(input: z.input<typeof Next>) {
 
 const Submit = z.object({
   questionId: id,
-  response: z.string().max(8).nullable(),
+  response: text().max(8).nullable(),
   timeMs: z.number().int().min(0).max(24 * 3_600_000),
   confidence: z.union([z.literal(1), z.literal(2), z.literal(3)]),
 });
@@ -65,7 +66,7 @@ export async function toggleBookmark(input: { questionId: string }) {
 }
 
 const Report = z.object({
-  questionId: id, reason: z.enum(["wrong_answer", "unclear", "typo", "other"]), note: z.string().max(500).optional(),
+  questionId: id, reason: z.enum(["wrong_answer", "unclear", "typo", "other"]), note: text().max(500).optional(),
 });
 export async function reportQuestion(input: z.input<typeof Report>) {
   const { userId } = await requireUser();

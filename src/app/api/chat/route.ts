@@ -2,6 +2,7 @@
 import { after } from "next/server";
 import { streamText } from "ai";
 import { z } from "zod";
+import { text as safeText } from "@/lib/text";
 import { AI_INPUT_MAX_CHARS } from "@/engine/constants";
 import { getUserId } from "@/server/auth";
 import { cacheKey, checkAccess, getCached, getModel, loadQuestion, logMessage, MODES, saveCache, systemPrompt, usedToday } from "@/server/ai";
@@ -10,10 +11,10 @@ import { profiles } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 const Body = z.object({
-  questionId: z.string().min(1).max(64),
+  questionId: safeText().min(1).max(64),
   mode: z.enum(MODES),
   choice: z.enum(["A", "B", "C", "D"]).optional(),
-  messages: z.array(z.object({ role: z.enum(["user", "assistant"]), content: z.string().min(1).max(4000) })).max(20).default([]),
+  messages: z.array(z.object({ role: z.enum(["user", "assistant"]), content: safeText().min(1).max(4000) })).max(20).default([]),
 });
 
 const text = (body: string, status = 200) => new Response(body, { status, headers: { "content-type": "text/plain; charset=utf-8" } });
