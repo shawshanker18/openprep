@@ -315,8 +315,14 @@ export async function inRunningTest(userId: string, questionId: string) {
   return !!r;
 }
 
-export async function markLocked(userId: string, sessionId: string) {
-  await db.update(testSessions).set({ config: sql`jsonb_set(${testSessions.config}, '{lockdown}', 'true')` })
+/**
+ * The test is running in an app's lockdown. The first app install to lock it is the only one that can carry it on
+ * (keyHash: see server/lockdown.ts); a later call can't rebind it to another install.
+ */
+export async function markLocked(userId: string, sessionId: string, keyHash: string | null) {
+  const key = keyHash ? sql`coalesce(${testSessions.config}->'lockKey', to_jsonb(${keyHash}::text))` : sql`${testSessions.config}->'lockKey'`;
+  await db.update(testSessions)
+    .set({ config: sql`jsonb_strip_nulls(jsonb_set(jsonb_set(${testSessions.config}, '{lockdown}', 'true'), '{lockKey}', coalesce(${key}, 'null'::jsonb)))` })
     .where(and(eq(testSessions.id, sessionId), eq(testSessions.userId, userId), eq(testSessions.status, "in_progress")));
 }
 
