@@ -58,3 +58,32 @@ it("stops handing out questions once an account pulls too many too fast", async 
   // An hour later the burst window has passed (the daily cap is far away).
   expect(await P.overServeLimit(U2, new Date(now.getTime() + 3_600_000))).toBe(false);
 });
+
+it("plan blocks are done only from real work today (a click can't tick them)", async () => {
+  const D = await import("./daily");
+  const U3 = "00000000-0000-0000-0000-0000000000ee";
+  await db.insert(schema.profiles).values({ id: U3 });
+  await db.insert(schema.skillState).values(SKILLS.map((s) => ({ userId: U3, skillId: s.id })));
+  const profile = { timezone: "UTC" } as schema.Profile;
+  const today = new Date().toISOString().slice(0, 10);
+  const blocks = [
+    { kind: "practice", minutes: 5, skillId: skill.id, done: true },  // a stored "done" is ignored
+    { kind: "mini", minutes: 5, skillId: skill.id, done: false },     // same skill: must not reuse the same answers
+    { kind: "review", minutes: 5, done: false },
+    { kind: "learn", minutes: 10, skillId: skill.id, done: false },
+    { kind: "desmos", minutes: 10, lessonSlug: "graphing-basics", done: false },
+  ] as const;
+
+  const before = await D.withProgress(U3, profile, today, [...blocks]);
+  expect(before.map((b) => b.done)).toEqual([false, false, false, false, false]);
+  expect(before[0]!.progress).toEqual({ n: 0, target: 3 }); // 5 minutes of math ≈ 3 questions
+
+  for (const q of [...ids, `${skill.id}-bulk0`]) await P.submitAnswer(U3, { questionId: q, response: "A", timeMs: 30_000, confidence: 2 });
+  await db.insert(schema.lessonProgress).values([
+    { userId: U3, skillId: skill.id },                                                                   // read today
+    { userId: U3, skillId: "desmos:graphing-basics", completedAt: new Date(Date.now() - 2 * 86_400_000) }, // read days ago
+  ]);
+  const after = await D.withProgress(U3, profile, today, [...blocks]);
+  expect(after.map((b) => b.done)).toEqual([true, false, false, true, false]);
+  expect(after[1]!.progress).toEqual({ n: 1, target: 3 }); // 4 answers: 3 finish the first block, 1 left for the check-in
+});

@@ -5,7 +5,6 @@ import { lessonProgress } from "@/db/schema";
 import { DesmosCalculator } from "@/components/desmos-panel";
 import { Markdown } from "@/components/markdown";
 import { requireUser } from "@/server/auth";
-import { completeBlock } from "@/server/daily";
 import { listDesmosLessons } from "@/server/lessons";
 
 export async function generateMetadata({ params }: PageProps<"/desmos/[slug]">) {
@@ -13,15 +12,14 @@ export async function generateMetadata({ params }: PageProps<"/desmos/[slug]">) 
   return { title: (await listDesmosLessons()).find((l) => l.slug === slug)?.title ?? "Desmos lesson" };
 }
 
-export default async function DesmosLessonPage({ params, searchParams }: PageProps<"/desmos/[slug]">) {
-  const [{ slug }, sp] = await Promise.all([params, searchParams]);
+export default async function DesmosLessonPage({ params }: PageProps<"/desmos/[slug]">) {
+  const { slug } = await params;
   const lesson = (await listDesmosLessons()).find((l) => l.slug === slug);
   if (!lesson) notFound();
-  const { userId, profile } = await requireUser();
-  // Opening the lesson marks it seen and completes the plan block that linked here.
-  await db.insert(lessonProgress).values({ userId, skillId: `desmos:${slug}` }).onConflictDoNothing();
-  const block = Number(sp.block);
-  if (Number.isInteger(block) && block >= 0) await completeBlock(userId, profile, block);
+  const { userId } = await requireUser();
+  // Opening the lesson records it (with today's date, so a Desmos block in today's plan counts as done).
+  await db.insert(lessonProgress).values({ userId, skillId: `desmos:${slug}` })
+    .onConflictDoUpdate({ target: [lessonProgress.userId, lessonProgress.skillId], set: { completedAt: new Date() } });
   return (
     <div className="flex flex-col gap-6">
       <Link href="/desmos" className="text-sm text-muted-foreground">← Desmos lessons</Link>

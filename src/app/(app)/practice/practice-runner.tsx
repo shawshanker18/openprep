@@ -13,7 +13,6 @@ import { FocusToggle } from "@/components/focus-toggle";
 import { MISTAKE_LABEL, MISTAKE_TYPES, type MistakeType } from "@/engine/mistakes";
 import { cn } from "@/lib/utils";
 import type { PublicQuestion, RevealedQuestion } from "@/server/questions";
-import { setBlockDone } from "../plan/actions";
 import { nextQuestion, reportQuestion, setMistakeType, submitAnswer, toggleBookmark } from "./actions";
 
 type Mode = "skill" | "smart" | "review" | "set" | "list";
@@ -90,11 +89,9 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block, set, b
 
   useEffect(() => { if (s.phase === "loading") load(s.seen); }, [s.phase, s.seen, load]);
 
-  // Today's plan block is done once enough questions are answered.
+  // Today's plan block is done once enough questions are answered (the server counts them; this just says so).
   useEffect(() => {
-    if (block && s.answered === block.target) {
-      setBlockDone(block.index, true).then(() => toast.success("Plan block complete. Keep going, or head back to your dashboard."));
-    }
+    if (block && s.answered === block.target) toast.success("Plan block complete. Keep going, or head back to your dashboard.");
   }, [block, s.answered]);
 
   // Pause the silent timer while the tab is hidden.

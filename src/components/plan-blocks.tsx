@@ -3,8 +3,9 @@ import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SKILL_BY_ID } from "@/content/taxonomy";
 import type { PlanBlock } from "@/engine/plan";
+import type { PlanBlockStatus } from "@/server/daily";
 import { cn } from "@/lib/utils";
-import { removePlanBlock, setBlockDone } from "@/app/(app)/plan/actions";
+import { removePlanBlock } from "@/app/(app)/plan/actions";
 
 function describe(b: PlanBlock, i: number): { label: string; href: string } {
   switch (b.kind) {
@@ -16,7 +17,7 @@ function describe(b: PlanBlock, i: number): { label: string; href: string } {
   }
 }
 
-export function PlanBlocks({ blocks, removable }: { blocks: PlanBlock[]; removable?: boolean }) {
+export function PlanBlocks({ blocks, removable }: { blocks: PlanBlockStatus[]; removable?: boolean }) {
   if (!blocks.length) return <p className="text-sm text-muted-foreground">Nothing planned today. Try smart practice.</p>;
   return (
     <ol className="flex flex-col gap-2">
@@ -24,15 +25,16 @@ export function PlanBlocks({ blocks, removable }: { blocks: PlanBlock[]; removab
         const { label, href } = describe(b, i);
         return (
           <li key={i} className={cn("flex items-center gap-3 rounded-lg border p-3", b.done && "opacity-60")}>
-            <form action={setBlockDone.bind(null, i, !b.done)}>
-              <button type="submit" aria-label={b.done ? `Mark "${label}" not done` : `Mark "${label}" done`}
-                className={cn("flex size-6 items-center justify-center rounded-full border", b.done && "bg-primary text-primary-foreground")}>
-                {b.done && <Check className="size-4" />}
-              </button>
-            </form>
+            {/* Done is worked out from real answers and lessons, so this is a status, not a button. */}
+            <span role="img" aria-label={b.done ? "Done" : "Not done yet"}
+              className={cn("flex size-6 shrink-0 items-center justify-center rounded-full border", b.done && "bg-primary text-primary-foreground")}>
+              {b.done && <Check className="size-4" />}
+            </span>
             <div className="flex-1 text-sm">
               <span className={cn(b.done && "line-through")}>{label}</span>
-              <span className="ml-2 text-muted-foreground tabular-nums">{b.minutes} min</span>
+              <span className="ml-2 text-muted-foreground tabular-nums">
+                {b.minutes} min{b.progress && !b.done ? ` · ${b.progress.n} of ${b.progress.target} questions` : ""}
+              </span>
             </div>
             {!b.done && <Button size="sm" variant="outline" render={<Link href={href} />}>Start</Button>}
             {removable && (
