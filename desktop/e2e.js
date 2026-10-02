@@ -3,6 +3,7 @@
 // Starts a real course quiz, then checks: locked for the whole test, can't close/quit, focus is taken back,
 // the test can't be continued in a plain browser, the resume address is saved, and "End test" unlocks.
 // STAGE=offline cuts the network mid-test. STAGE=escape also checks outside page switches are ignored while locked.
+// STAGE=report checks "Report question" (the dialog opens, Cancel sends nothing, Send works).
 // STAGE=kill stops right after the test locks (like killing the app); STAGE=resume then checks the app reopens into it.
 const STAGE = process.env.STAGE;
 process.env.OPENPREP_URL ||= "http://localhost:3000";
@@ -64,11 +65,32 @@ async function diagnostic(r) {
   app.exit(0);
 }
 
+// STAGE=report: "Report question" works in the app (it used window.prompt, which Electron doesn't have).
+async function report(r) {
+  await win.loadURL(`${SITE}/practice`);
+  const open = `(() => { const b = document.querySelector('button[aria-label="Report question"]'); b?.click(); return !!b; })()`;
+  await until("report button", () => js(open));
+  r.dialogOpens = await until("report dialog", () => js(`document.body.innerText.includes("Report this question")`));
+  await click("Cancel");
+  await until("dialog closed", () => js(`!!document.querySelector('[role=dialog][data-closed]') || !document.querySelector('[role=dialog]')`));
+  await wait(1000);
+  r.cancelSendsNothing = !(await js(`document.body.innerText.includes("Thanks, we'll take a look.")`));
+  await js(open);
+  await until("report dialog again", () => js(`!!document.querySelector('[role=dialog]:not([data-closed]) textarea')`));
+  await js(`(() => { const t = document.querySelector('[role=dialog]:not([data-closed]) textarea');
+    Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, "value").set.call(t, "e2e: please ignore"); t.dispatchEvent(new Event("input", { bubbles: true })); })()`);
+  await click("Send report");
+  r.sent = await until("thanks toast", () => js(`document.body.innerText.includes("Thanks, we'll take a look.")`), 15_000);
+  console.log("E2E", JSON.stringify(r));
+  app.exit(0);
+}
+
 app.whenReady().then(async () => {
   const r = {};
   try {
     await until("window", () => win);
     if (STAGE === "diag") return await diagnostic(r);
+    if (STAGE === "report") return await report(r);
     if (STAGE !== "resume") {
       await win.loadURL(`${SITE}/course/m-alg`);
       await until("Start quiz button", () => click("Start quiz"));
