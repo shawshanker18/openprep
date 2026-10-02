@@ -90,7 +90,8 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block, set, b
   // A set stops after `count` answers.
   const next = useCallback(() => dispatch({ type: set && s.answered >= set.count ? "done" : "next" }), [set, s.answered]);
 
-  useEffect(() => { if (s.phase === "loading") load(s.seen); }, [s.phase, s.seen, load]);
+  // Only the most recent 200 (the server's limit): a very long session keeps going instead of failing at question 201.
+  useEffect(() => { if (s.phase === "loading") load(s.seen.slice(-200)); }, [s.phase, s.seen, load]);
 
   // Today's plan block is done once enough questions are answered (the server counts them; this just says so).
   useEffect(() => {
