@@ -38,7 +38,8 @@
     },
     "nsis": {
       "oneClick": true,
-      "perMachine": false
+      "perMachine": false,
+      "include": "installer.nsh"
     },
     "directories": {
       "output": "dist"
