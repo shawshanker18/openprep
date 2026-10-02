@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { SUBJECTS, TOPICS } from "@/content/taxonomy";
 import { submitSurvey } from "./actions";
+import { Choice } from "@/components/ui/choice";
 
 const field = "flex flex-col gap-1.5 text-sm";
 const control = "h-9 rounded-md border bg-background px-2 text-sm";
@@ -44,16 +45,10 @@ export function SurveyForm() {
     <form onSubmit={onSubmit} className="flex flex-col gap-6">
       <div className="grid gap-4 sm:grid-cols-2">
         <label className={field}>Grade
-          <select name="grade" defaultValue="11" className={control}>
-            {[8, 9, 10, 11, 12].map((g) => <option key={g} value={g}>Grade {g}</option>)}
-            <option value="13">Other / gap year</option>
-          </select>
+          <Choice name="grade" defaultValue="11" options={[...[8, 9, 10, 11, 12].map((g) => ({ value: String(g), label: `Grade ${g}` })), { value: "13", label: "Other / gap year" }]} />
         </label>
         <label className={field}>School curriculum
-          <select name="curriculum" defaultValue="cbse" className={control}>
-            <option value="cbse">CBSE</option><option value="icse">ICSE</option><option value="ib">IB</option>
-            <option value="gcse">GCSE / A-Levels</option><option value="american">American</option><option value="other">Other</option>
-          </select>
+          <Choice name="curriculum" defaultValue="cbse" options={[{ value: "cbse", label: "CBSE" }, { value: "icse", label: "ICSE" }, { value: "ib", label: "IB" }, { value: "gcse", label: "GCSE / A-Levels" }, { value: "american", label: "American" }, { value: "other", label: "Other" }]} />
         </label>
       </div>
 
@@ -76,11 +71,7 @@ export function SurveyForm() {
       </fieldset>
 
       <label className={field}>English is my…
-        <select name="english" defaultValue="fluent" className={control}>
-          <option value="first_language">First language</option>
-          <option value="fluent">Fluent second language</option>
-          <option value="learning">Still learning</option>
-        </select>
+        <Choice name="english" defaultValue="fluent" className="sm:w-72" options={[{ value: "first_language", label: "First language" }, { value: "fluent", label: "Fluent second language" }, { value: "learning", label: "Still learning" }]} />
       </label>
 
       <fieldset className="flex flex-col gap-2 text-sm">
@@ -113,14 +104,10 @@ export function SurveyForm() {
 
       <div className="grid gap-4 sm:grid-cols-2">
         <label className={field}>Study time per day
-          <select name="minutes" defaultValue="45" className={control}>
-            {[15, 30, 45, 60, 90, 120].map((m) => <option key={m} value={m}>{m} minutes</option>)}
-          </select>
+          <Choice name="minutes" defaultValue="45" options={[15, 30, 45, 60, 90, 120].map((m) => ({ value: String(m), label: `${m} minutes` }))} />
         </label>
         <label className={field}>Days per week
-          <select name="days" defaultValue="5" className={control}>
-            {[3, 4, 5, 6, 7].map((d) => <option key={d} value={d}>{d} days</option>)}
-          </select>
+          <Choice name="days" defaultValue="5" options={[3, 4, 5, 6, 7].map((d) => ({ value: String(d), label: `${d} days` }))} />
         </label>
       </div>
 

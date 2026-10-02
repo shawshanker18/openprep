@@ -3,7 +3,7 @@ import "server-only";
 import { skillStatesOf } from "./daily";
 import { and, desc, eq, gte, isNotNull, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { attempts, lessonProgress, questions, reviewItems, satAttempts, scoreSnapshots, skillState } from "@/db/schema";
+import { attempts, lessonProgress, questions, reviewItems, satAttempts, scoreSnapshots } from "@/db/schema";
 import { SKILLS, SKILL_BY_ID } from "@/content/taxonomy";
 import { masteryPct, pace, status, trend, type Status } from "@/engine/mastery";
 import { calibration, type SelfRating } from "@/engine/prior";

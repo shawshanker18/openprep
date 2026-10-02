@@ -6,6 +6,7 @@ import { DiagnosticGate } from "@/components/diagnostic-gate";
 import { diagnosticPending, requireUser } from "@/server/auth";
 import { getDashboard } from "@/server/daily";
 import { addPlanBlock, resetPlan } from "./actions";
+import { Choice } from "@/components/ui/choice";
 
 export const metadata = { title: "Study plan" };
 
@@ -43,14 +44,10 @@ export default async function PlanPage({ searchParams }: PageProps<"/plan">) {
         <h2 className="font-medium">Customize today</h2>
         <form action={addPlanBlock} className="flex flex-wrap items-end gap-2">
           <label className="flex flex-col gap-1 text-sm">Block
-            <select name="kind" defaultValue="practice" className={control}>
-              <option value="practice">Practice</option><option value="learn">Learn</option><option value="review">Review mistakes</option>
-              <option value="mini">Check-in</option><option value="desmos">Desmos</option>
-            </select></label>
+            <Choice name="kind" defaultValue="practice" className="w-44" options={[{ value: "practice", label: "Practice" }, { value: "learn", label: "Learn" },
+              { value: "review", label: "Review mistakes" }, { value: "mini", label: "Check-in" }, { value: "desmos", label: "Desmos" }]} /></label>
           <label className="flex max-w-full flex-col gap-1 text-sm">Skill (practice, learn, check-in)
-            <select name="skillId" defaultValue={d.focus[0]} className={`${control} max-w-full`}>
-              {SKILLS.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
-            </select></label>
+            <Choice name="skillId" defaultValue={d.focus[0]} className="max-w-full sm:w-80" options={SKILLS.map((s) => ({ value: s.id, label: s.name }))} /></label>
           <label className="flex flex-col gap-1 text-sm">Minutes
             <input name="minutes" type="number" min={5} max={60} step={5} defaultValue={15} required className={`${control} w-24`} /></label>
           <Button type="submit" variant="outline">Add</Button>

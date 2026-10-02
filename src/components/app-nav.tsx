@@ -4,8 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import {
-  BarChart3, Bookmark, BookOpen, Calculator, CalendarCheck, ClipboardList, Home, Menu, Settings, SlidersHorizontal, Sparkles, XCircle,
+  BarChart3, Bookmark, BookOpen, Calculator, CalendarCheck, Check, ClipboardList, Home, Menu, Settings, SlidersHorizontal, Sparkles, XCircle,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import type { ChecklistItem } from "@/server/notifications";
 
@@ -53,24 +55,47 @@ function isActive(path: string, href: string) {
   return path.startsWith(`${href}/`);
 }
 
+/** Sidebar button that opens the full "Getting started" checklist in its own window. Hidden once everything is done. */
 function Checklist({ items, onNavigate }: { items: ChecklistItem[]; onNavigate?: () => void }) {
+  const [open, setOpen] = useState(false);
   const done = items.filter((i) => i.done).length;
   if (done === items.length) return null;
+  const next = items.find((i) => !i.done);
   return (
-    <details className="rounded-md border p-2 text-sm">
-      <summary className="flex cursor-pointer list-none items-center justify-between px-1">
-        <span>Getting started</span><span className="tabular-nums text-muted-foreground">{done}/{items.length}</span>
-      </summary>
-      <ul className="mt-2 flex flex-col gap-0.5">
-        {items.map((i) => (
-          <li key={i.id}>
-            <Link href={i.href} onClick={onNavigate} className={`flex items-start gap-2 rounded-md px-1 py-1 hover:bg-muted ${i.done ? "text-muted-foreground line-through" : ""}`}>
-              <span aria-hidden className="mt-0.5">{i.done ? "✓" : "○"}</span>{i.label}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </details>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger className="flex flex-col gap-2 rounded-md border p-2 text-left text-sm hover:bg-muted">
+        <span className="flex items-center justify-between px-1">
+          <span>Getting started</span><span className="tabular-nums text-muted-foreground">{done}/{items.length}</span>
+        </span>
+        <span className="mx-1 h-1.5 overflow-hidden rounded-full bg-muted"><span className="block h-full bg-primary" style={{ width: `${(100 * done) / items.length}%` }} /></span>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>Getting started</DialogTitle>
+          <DialogDescription>
+            {done} of {items.length} done. {next ? `Next up: ${next.label.toLowerCase()}.` : ""}
+          </DialogDescription>
+        </DialogHeader>
+        <div className="h-2 overflow-hidden rounded-full bg-muted"><div className="h-full bg-primary" style={{ width: `${(100 * done) / items.length}%` }} /></div>
+        <ol className="flex flex-col gap-2">
+          {items.map((i, n) => (
+            <li key={i.id} className="flex items-center gap-3 rounded-lg border p-3">
+              <span aria-hidden className={`flex size-7 shrink-0 items-center justify-center rounded-full border text-xs ${i.done ? "bg-primary text-primary-foreground" : ""}`}>
+                {i.done ? <Check className="size-4" /> : n + 1}
+              </span>
+              <span className="flex min-w-0 flex-1 flex-col">
+                <span className={`font-medium ${i.done ? "text-muted-foreground line-through" : ""}`}>{i.label}</span>
+                <span className="text-xs text-muted-foreground">{i.hint}</span>
+              </span>
+              {!i.done && (
+                <Button size="sm" variant={i === next ? "default" : "outline"}
+                  render={<Link href={i.href} onClick={() => { setOpen(false); onNavigate?.(); }} />}>Go</Button>
+              )}
+            </li>
+          ))}
+        </ol>
+      </DialogContent>
+    </Dialog>
   );
 }
 

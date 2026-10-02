@@ -10,6 +10,7 @@ import { listTests } from "@/server/tests";
 import { SkillTagPicker } from "../practice/skill-tag-picker";
 import { abandon } from "@/app/test/[sessionId]/actions";
 import { startTestAction } from "./actions";
+import { Choice } from "@/components/ui/choice";
 
 export const metadata = { title: "Practice tests" };
 
@@ -36,7 +37,7 @@ export default async function TestsPage({ searchParams }: PageProps<"/tests">) {
   const open = history.filter((t) => t.status === "in_progress" && t.kind !== "diagnostic");
   const skills = SKILLS.filter((s) => available.has(s.id));
   const sectionPick = (
-    <select name="section" className={control} defaultValue="rw"><option value="rw">Reading and Writing</option><option value="math">Math</option></select>
+    <Choice name="section" defaultValue="rw" aria-label="Section" className="sm:w-56" options={[{ value: "rw", label: "Reading and Writing" }, { value: "math", label: "Math" }]} />
   );
 
   return (
@@ -67,7 +68,7 @@ export default async function TestsPage({ searchParams }: PageProps<"/tests">) {
         </StartCard>
         <StartCard title="Mini test" time="12 to 15 min · 10 questions" fields={<>
           <input type="hidden" name="kind" value="mini" />
-          <select name="skillId" className={`${control} max-w-full`} required>{skills.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}</select>
+          <Choice name="skillId" required aria-label="Skill" defaultValue={skills[0]?.id} className="max-w-full" options={skills.map((s) => ({ value: s.id, label: s.name }))} />
         </>}>
           A quick check on one skill.
         </StartCard>
@@ -78,9 +79,8 @@ export default async function TestsPage({ searchParams }: PageProps<"/tests">) {
           <input type="hidden" name="kind" value="custom" />
           <SkillTagPicker skills={skills} tagsBySkill={tags} name="skillIds" />
           <div className="flex flex-wrap items-center gap-3 text-sm">
-            <select name="difficulty" className={control} defaultValue="mixed" aria-label="Difficulty">
-              <option value="mixed">Mixed</option><option value="1">Easy</option><option value="2">Medium</option><option value="3">Hard</option>
-            </select>
+            <Choice name="difficulty" defaultValue="mixed" aria-label="Difficulty" className="w-32" options={[{ value: "mixed", label: "Mixed" }, { value: "1", label: "Easy" },
+              { value: "2", label: "Medium" }, { value: "3", label: "Hard" }]} />
             <label className="flex items-center gap-2">Questions <input name="count" type="number" min={5} max={30} defaultValue={10} className={`${control} w-20`} /></label>
             <label className="flex items-center gap-2"><input type="checkbox" name="timed" defaultChecked /> Timed</label>
           </div>

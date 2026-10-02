@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { DOMAINS, skillsIn, type DomainId } from "@/content/taxonomy";
 import { cn } from "@/lib/utils";
 import { submitSelfAssessment } from "./actions";
+import { Choice } from "@/components/ui/choice";
 
 type Rating = 0 | 1 | 2 | 3;
 const LABELS = ["Don't know", "A little", "Know it", "Very confident"] as const;
@@ -31,14 +32,12 @@ export function SelfAssessment() {
             <div key={d} className="flex flex-col gap-2">
               <div className="flex items-center justify-between gap-2">
                 <h3 className="text-sm font-medium">{DOMAINS[d].name}</h3>
-                <select aria-label={`Set all in ${DOMAINS[d].name}`} className="h-7 rounded border bg-background px-1 text-xs"
-                  value="" onChange={(e) => {
-                    const v = Number(e.target.value) as Rating;
-                    setRatings((r) => ({ ...r, ...Object.fromEntries(skillsIn(d).map((s) => [s.id, v])) }));
-                  }}>
-                  <option value="" disabled>Set all…</option>
-                  {LABELS.map((l, i) => <option key={l} value={i}>{l}</option>)}
-                </select>
+                <Choice size="sm" aria-label={`Set all in ${DOMAINS[d].name}`} className="w-36 text-xs" value={null} placeholder="Set all…"
+                  options={LABELS.map((l, i) => ({ value: String(i), label: l }))}
+                  onValueChange={(v) => {
+                    const n = Number(v) as Rating;
+                    setRatings((r) => ({ ...r, ...Object.fromEntries(skillsIn(d).map((s) => [s.id, n])) }));
+                  }} />
               </div>
               {skillsIn(d).map((s) => (
                 <div key={s.id} className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
