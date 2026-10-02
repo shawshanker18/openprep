@@ -189,6 +189,11 @@ function createWindow() {
     applyLockdown(null);
     void win.loadURL(OFFLINE(`${SITE}/dashboard`, false));
   });
+  // A frozen page (a stuck script) would leave a locked window with no way out: after 10 seconds of not responding,
+  // restart the renderer, which the crash handling above reloads.
+  let frozen = null;
+  win.on("unresponsive", () => { frozen ??= setTimeout(() => { frozen = null; win?.webContents.forcefullyCrashRenderer(); }, 10_000); });
+  win.on("responsive", () => { clearTimeout(frozen); frozen = null; });
   // A full page load away from a running test (a crash, a sign out) releases the lock; the test page locks again when
   // it loads. The offline page keeps it: it retries the test by itself, and Ctrl+Alt+Del or shutting down still work.
   win.webContents.on("did-navigate", (_e, url) => {
