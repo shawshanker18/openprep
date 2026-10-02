@@ -38,6 +38,13 @@ export function TestRunner({ sessionId, module: m, items: initial, serverNow, br
   const loadedAt = useRef(0);
   const offset = useRef(0);
   useEffect(() => { loadedAt.current = now(); offset.current = new Date(serverNow).getTime(); }, [serverNow]);
+  // performance.now() pauses while a phone or laptop sleeps, so the countdown would show time that's already gone.
+  // When the page is visible again, re-render from the server, which brings a fresh serverNow to re-sync from.
+  useEffect(() => {
+    const resync = () => { if (!document.hidden) router.refresh(); };
+    document.addEventListener("visibilitychange", resync);
+    return () => document.removeEventListener("visibilitychange", resync);
+  }, [router]);
   const submitted = useRef(false);
 
   // Per-question time, flushed with each save.
