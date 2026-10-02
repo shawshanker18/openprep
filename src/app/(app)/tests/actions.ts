@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { text } from "@/lib/text";
 import { SKILL_BY_ID } from "@/content/taxonomy";
 import { diagnosticPending, requireUser } from "@/server/auth";
 import { ensureWeeklyFocus } from "@/server/plan";
@@ -16,9 +17,9 @@ const Start = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("weakness") }),
   z.object({
     kind: z.literal("custom"), skillIds: z.array(skill).min(1).max(29), count: z.coerce.number().int().min(5).max(30), timed: z.boolean(),
-    tags: z.array(z.string().min(1).max(64)).max(50),
+    tags: z.array(text().min(1).max(64)).max(50),
     difficulty: z.enum(["mixed", "1", "2", "3"]).default("mixed").transform((d) => (d === "mixed" ? d : (Number(d) as 1 | 2 | 3))),
-    title: z.string().trim().max(80).optional(), // course quizzes, unit tests and challenges
+    title: text().trim().max(80).optional(), // course quizzes, unit tests and challenges
   }),
 ]);
 

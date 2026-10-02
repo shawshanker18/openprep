@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { text } from "@/lib/text";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { profiles } from "@/db/schema";
@@ -11,8 +12,8 @@ import { abandonTest, markLocked, recordFocusLoss, saveResponse as save, startMo
 
 const Answer = z.object({
   sessionId: z.uuid(),
-  questionId: z.string().min(1).max(64),
-  response: z.string().max(8).nullable(),
+  questionId: text().min(1).max(64),
+  response: text().max(8).nullable(),
   timeMs: z.number().int().min(0).max(24 * 3_600_000),
   confidence: z.union([z.literal(1), z.literal(2), z.literal(3)]).nullable().optional(),
 });
@@ -32,7 +33,7 @@ export async function startModule(moduleId: string) {
 
 const Save = z.object({
   moduleId: z.uuid(), position: z.number().int().min(0).max(100),
-  response: z.string().max(8).nullable(), flagged: z.boolean(), timeMsDelta: z.number().int().min(0).max(3_600_000),
+  response: text().max(8).nullable(), flagged: z.boolean(), timeMsDelta: z.number().int().min(0).max(3_600_000),
 });
 export async function saveResponse(input: z.input<typeof Save>) {
   const { userId } = await requireUser();
