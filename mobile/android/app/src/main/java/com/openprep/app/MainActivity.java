@@ -5,7 +5,10 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.WindowManager;
+import android.util.Base64;
+import android.webkit.CookieManager;
 import android.webkit.WebSettings;
+import java.security.SecureRandom;
 import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
@@ -14,6 +17,7 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         registerPlugin(LockdownPlugin.class);
+        ensureInstallCookie();
         super.onCreate(savedInstanceState);
         // Questions can't be screenshotted or screen recorded, and the app is blank in the recent apps view.
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
@@ -29,6 +33,22 @@ public class MainActivity extends BridgeActivity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         openAuthLink(intent);
+    }
+
+    /**
+     * This install's lockdown secret: an HttpOnly cookie in the app's private WebView storage. A test locked here can
+     * only be carried on with it (see the site's server/lockdown.ts), so a browser faking the app gets nothing.
+     */
+    private void ensureInstallCookie() {
+        CookieManager cookies = CookieManager.getInstance();
+        String existing = cookies.getCookie(SITE);
+        if (existing != null && existing.contains("openprep_app=")) return;
+        byte[] secret = new byte[24];
+        new SecureRandom().nextBytes(secret);
+        String value = Base64.encodeToString(secret, Base64.URL_SAFE | Base64.NO_PADDING | Base64.NO_WRAP);
+        cookies.setCookie(SITE, "openprep_app=" + value + "; Path=/; Max-Age=315360000; HttpOnly; SameSite=Strict"
+            + (SITE.startsWith("https:") ? "; Secure" : ""));
+        cookies.flush();
     }
 
     /** The app was closed during a locked test: open that test again (it locks itself; if it has ended it moves on). */

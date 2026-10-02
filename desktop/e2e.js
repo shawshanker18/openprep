@@ -39,8 +39,8 @@ async function diagnostic(r) {
   win.close(); app.quit();
   await wait(500);
   r.diagCloseRefused = !win.isDestroyed() && win.isVisible();
-  const cookies = (await win.webContents.session.cookies.get({ url: SITE })).map((c) => `${c.name}=${c.value}`).join("; ");
-  r.diagBrowserBlocked = (await fetch(url, { headers: { cookie: cookies, "user-agent": "Mozilla/5.0 Chrome/140" } }).then((x) => x.text())).includes("This test is in lockdown mode");
+  const cookies = (await win.webContents.session.cookies.get({ url: SITE })).filter((c) => c.name !== "openprep_app").map((c) => `${c.name}=${c.value}`).join("; ");
+  r.diagBrowserBlocked = (await fetch(url, { headers: { cookie: cookies, "user-agent": "Mozilla/5.0 Chrome/140 OpenPrepApp/desktop" } }).then((x) => x.text())).includes("This test is in lockdown mode");
   await click("I don't know"); // one answer, kept after ending
   await wait(2000);
   await click("End test");
@@ -87,10 +87,15 @@ app.whenReady().then(async () => {
     other.destroy();
 
     // The same signed-in session from a plain browser must not get the test.
-    const cookies = (await win.webContents.session.cookies.get({ url: SITE })).map((c) => `${c.name}=${c.value}`).join("; ");
-    const page = (ua) => fetch(testUrl, { headers: { cookie: cookies, "user-agent": ua } }).then((x) => x.text());
-    r.browserBlocked = (await page("Mozilla/5.0 Chrome/140")).includes("This test is in lockdown mode");
-    r.appAllowed = !(await page("Mozilla/5.0 Chrome/140 OpenPrepApp/desktop")).includes("This test is in lockdown mode");
+    // A browser with the student's sign-in cookies, but not this install's lockdown secret.
+    const all = await win.webContents.session.cookies.get({ url: SITE });
+    const jar = (withSecret) => all.filter((c) => withSecret || c.name !== "openprep_app").map((c) => `${c.name}=${c.value}`).join("; ");
+    const page = (ua, withSecret) => fetch(testUrl, { headers: { cookie: jar(withSecret), "user-agent": ua } }).then((x) => x.text());
+    const blocked = (t) => t.includes("This test is in lockdown mode");
+    r.installSecretSet = all.some((c) => c.name === "openprep_app" && c.httpOnly);
+    r.browserBlocked = blocked(await page("Mozilla/5.0 Chrome/140", false));
+    r.fakedAppUaBlocked = blocked(await page("Mozilla/5.0 Chrome/140 OpenPrepApp/desktop", false)); // the old bypass
+    r.appAllowed = !blocked(await page("Mozilla/5.0 Chrome/140 OpenPrepApp/desktop", true));
 
     // Start the module: still locked while answering.
     await click("Start");

@@ -1,4 +1,3 @@
-import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
@@ -6,6 +5,7 @@ import { testSessions } from "@/db/schema";
 import { requireUser } from "@/server/auth";
 import { getDiagnostic } from "@/server/diagnostic";
 import { getTestState } from "@/server/tests";
+import { mayContinue } from "@/server/lockdown";
 import { DiagnosticRunner } from "./diagnostic-runner";
 import { TestRunner } from "./test-runner";
 import { Button } from "@/components/ui/button";
@@ -22,8 +22,7 @@ export default async function TestPage({ params }: PageProps<"/test/[sessionId]"
   if (!s) notFound();
 
   // Started in an app's lockdown mode: it can't be carried on in a plain browser, only in the app (or ended).
-  const inApp = ((await headers()).get("user-agent") ?? "").includes("OpenPrepApp");
-  if ((s.config as { lockdown?: boolean }).lockdown && !inApp && s.status === "in_progress") {
+  if (s.status === "in_progress" && !(await mayContinue(s.config))) {
     return (
       <main className="mx-auto flex max-w-lg flex-col gap-4 px-4 py-16 text-center">
         <h1 className="text-2xl font-semibold">This test is in lockdown mode</h1>

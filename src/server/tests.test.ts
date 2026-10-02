@@ -196,3 +196,19 @@ it("full mock freshness: false when a section doesn't have enough unseen questio
   // The test bank has plenty of math but no Reading and Writing questions at all.
   expect(await T.freshFullMock(OTHER)).toBe(false);
 });
+
+it("lockdown binds a test to the first app install that locks it", async () => {
+  const r = await T.startTest(OTHER, { kind: "module", section: "math" });
+  if (!r.ok) throw new Error(r.error);
+  const config = async () => (await db.select().from(schema.testSessions).where(eq(schema.testSessions.id, r.id)))[0]!.config as Record<string, unknown>;
+  await T.markLocked(OTHER, r.id, null); // an app too old to have the secret
+  expect(await config()).toMatchObject({ lockdown: true });
+  expect((await config()).lockKey).toBeUndefined();
+  await T.markLocked(OTHER, r.id, "hash-of-install-A");
+  expect((await config()).lockKey).toBe("hash-of-install-A");
+  await T.markLocked(OTHER, r.id, "hash-of-install-B"); // another install (or a browser faking one) can't take it over
+  await T.markLocked(OTHER, r.id, null);
+  expect((await config()).lockKey).toBe("hash-of-install-A");
+  await T.markLocked(USER, r.id, "someone-else"); // not their test
+  expect((await config()).lockKey).toBe("hash-of-install-A");
+});

@@ -1,6 +1,7 @@
 // OpenPrep desktop: the live website in a locked-down window, plus test lockdown (kiosk) and local daily reminders.
 const path = require("node:path");
 const fs = require("node:fs");
+const crypto = require("node:crypto");
 const { app, BrowserWindow, Menu, Notification, Tray, dialog, ipcMain, nativeImage, screen, session, shell } = require("electron");
 const { parseAuthLink, isAppUrl, isTestPage, isExternalWebUrl, localDay, reminderDue } = require("./lib");
 
@@ -252,7 +253,22 @@ const fromSite = (e) => !!e.senderFrame && e.senderFrame === e.sender.mainFrame 
 ipcMain.on("lockdown", (e, on, kind) => { if (fromSite(e)) setLockdown(on === true ? (kind === "focus" ? "focus" : "test") : null); });
 ipcMain.on("reminder", (e, hour) => { if (fromSite(e)) setReminder(Number.isInteger(hour) && hour >= 0 && hour <= 23 ? hour : null); });
 
-app.whenReady().then(() => {
+/**
+ * This install's lockdown secret: an HttpOnly cookie in Electron's own cookie store (encrypted by Windows; the fuse
+ * enables cookie encryption). A test locked here can only be carried on with it (see the site's server/lockdown.ts),
+ * so a browser faking the app's user agent gets nothing. Never written anywhere else.
+ */
+async function ensureInstallCookie() {
+  const ses = session.defaultSession;
+  if ((await ses.cookies.get({ url: SITE, name: "openprep_app" })).length) return;
+  await ses.cookies.set({
+    url: SITE, name: "openprep_app", value: crypto.randomBytes(24).toString("base64url"), path: "/",
+    httpOnly: true, secure: SITE.startsWith("https:"), sameSite: "strict", expirationDate: Math.floor(Date.now() / 1000) + 10 * 365 * 86400,
+  });
+  await ses.cookies.flushStore();
+}
+
+app.whenReady().then(async () => {
   Menu.setApplicationMenu(null);
   app.setAppUserModelId("com.openprep.desktop"); // Windows notifications need it
   // The site needs no camera, mic, location, etc.
@@ -264,6 +280,7 @@ app.whenReady().then(() => {
   session.defaultSession.on("select-hid-device", (e, _d, cb) => { e.preventDefault(); cb(""); });
   session.defaultSession.on("select-serial-port", (e, _p, _wc, cb) => { e.preventDefault(); cb(""); });
   session.defaultSession.on("select-usb-device", (e, _d, cb) => { e.preventDefault(); cb(""); });
+  await ensureInstallCookie().catch(() => {}); // without it a locked test still works, just bound by user agent
   createWindow();
   createTray();
   setInterval(checkReminder, 60_000);
