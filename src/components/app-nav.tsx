@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import {
-  BarChart3, Bookmark, BookOpen, Calculator, CalendarCheck, Check, ClipboardList, Home, Menu, Settings, SlidersHorizontal, Sparkles, XCircle,
+  BarChart3, Bookmark, BookOpen, Calculator, CalendarCheck, Check, ClipboardList, GraduationCap, Home, Menu, Settings, SlidersHorizontal, Sparkles, XCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -25,6 +25,7 @@ export const NAV_GROUPS = [
   {
     label: "Learn",
     items: [
+      { href: "/course", label: "SAT course", icon: GraduationCap },
       { href: "/skills", label: "Skills", icon: BookOpen },
       { href: "/desmos", label: "Desmos", icon: Calculator },
     ],
@@ -43,7 +44,7 @@ export const NAV_GROUPS = [
 export const MOBILE_TABS = [
   { href: "/dashboard", label: "Home", icon: Home },
   { href: "/practice", label: "Practice", icon: Sparkles },
-  { href: "/skills", label: "Skills", icon: BookOpen },
+  { href: "/course", label: "Course", icon: GraduationCap },
   { href: "/tests", label: "Tests", icon: ClipboardList },
   { href: "/progress", label: "Progress", icon: BarChart3 },
 ] as const;

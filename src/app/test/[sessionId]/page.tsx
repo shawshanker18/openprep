@@ -33,7 +33,7 @@ export default async function TestPage({ params }: PageProps<"/test/[sessionId]"
   return (
     <main className="w-full">
       <TestRunner key={st.module.id} sessionId={sessionId} module={st.module} items={st.items}
-        serverNow={st.serverNow} breakBefore={st.breakBefore} />
+        serverNow={st.serverNow} breakBefore={st.breakBefore} heading={st.session.title} />
     </main>
   );
 }
