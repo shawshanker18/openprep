@@ -11,7 +11,7 @@ import { DesmosCalculator, DesmosToggle } from "@/components/desmos-panel";
 import { TutorPanel } from "@/components/tutor-panel";
 import { FocusToggle } from "@/components/focus-toggle";
 import { MISTAKE_LABEL, MISTAKE_TYPES, type MistakeType } from "@/engine/mistakes";
-import { cn } from "@/lib/utils";
+import { cn, isTyping } from "@/lib/utils";
 import type { PublicQuestion, RevealedQuestion } from "@/server/questions";
 import { nextQuestion, setMistakeType, submitAnswer, toggleBookmark } from "./actions";
 import { ReportQuestion } from "./report-question";
@@ -134,7 +134,7 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block, set, b
   // Keyboard: 1–4 / A–D choose, Enter = next after reveal.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.metaKey || e.ctrlKey) return;
+      if (isTyping(e) || e.metaKey || e.ctrlKey) return;
       if (s.phase === "answering" && s.q.type === "mcq") {
         const i = "1234".indexOf(e.key) >= 0 ? "1234".indexOf(e.key) : "abcd".indexOf(e.key.toLowerCase());
         if (i >= 0) dispatch({ type: "select", value: "ABCD"[i]! });

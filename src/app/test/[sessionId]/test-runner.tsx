@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { QuestionView } from "@/components/question-view";
 import { ReferenceSheet } from "@/components/reference-sheet";
 import { DesmosToggle } from "@/components/desmos-panel";
-import { cn } from "@/lib/utils";
+import { cn, isTyping } from "@/lib/utils";
 import type { PublicQuestion } from "@/server/questions";
 import { abandon, reportFocusLoss, saveResponse, startModule, submitModule } from "./actions";
 import { EndTest, useTestLockdown } from "./lockdown";
@@ -130,7 +130,7 @@ export function TestRunner({ sessionId, module: m, items: initial, serverNow, br
   useEffect(() => {
     if (screen !== "question") return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.metaKey || e.ctrlKey) return;
+      if (isTyping(e) || e.metaKey || e.ctrlKey) return;
       const it = items[pos]!;
       if (e.key.toLowerCase() === "f") update({ flagged: !it.flagged });
       if (it.question.type === "mcq") {
