@@ -95,6 +95,14 @@ app.whenReady().then(async () => {
       await wait(1500);
       r.resumeRecordedAndCleaned = !(await js("location.search")).includes("resumed");
     }
+    if (STAGE === "crash") {
+      // The page's renderer dies mid-test: the app reloads it and the test is locked again.
+      win.webContents.forcefullyCrashRenderer();
+      await wait(1000);
+      await until("test reloaded", () => js(`[...document.querySelectorAll("button")].some((b) => b.textContent.trim() === "End test")`), 30_000);
+      await wait(1500);
+      r.recoveredFromCrash = win.webContents.getURL().startsWith(testUrl) && win.isKiosk();
+    }
     if (STAGE === "offline") {
       // Wi-Fi off mid-test: the lock must hold, and the app must get back to the test on its own once it's back.
       let offline = true; // every request to the site fails, like a dropped connection

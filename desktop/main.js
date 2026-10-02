@@ -179,6 +179,16 @@ function createWindow() {
     const back = readState().lockedUrl;
     void win.loadURL(OFFLINE(back && isAppUrl(back, SITE) ? back : `${SITE}/dashboard`, locked === "test"));
   });
+  // The page's renderer crashed (out of memory, a GPU hiccup): reload it; the test page re-locks itself when it loads.
+  // If it keeps crashing, stop looping: release the lock and show the offline page with a way home.
+  let crashes = [];
+  win.webContents.on("render-process-gone", (_e, details) => {
+    if (details.reason === "clean-exit") return;
+    crashes = [...crashes.filter((t) => Date.now() - t < 60_000), Date.now()];
+    if (crashes.length <= 3) { win.webContents.reload(); return; }
+    applyLockdown(null);
+    void win.loadURL(OFFLINE(`${SITE}/dashboard`, false));
+  });
   // A full page load away from a running test (a crash, a sign out) releases the lock; the test page locks again when
   // it loads. The offline page keeps it: it retries the test by itself, and Ctrl+Alt+Del or shutting down still work.
   win.webContents.on("did-navigate", (_e, url) => {
