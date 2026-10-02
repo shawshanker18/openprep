@@ -4,7 +4,7 @@ import "server-only";
 import { cache } from "react";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { and, count, desc, eq, gte, inArray, like, sql } from "drizzle-orm";
+import { and, count, desc, eq, gte, inArray, like, lt, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { attempts, dailyPlans, lessonProgress, scoreSnapshots, skillState, testSessions, type Profile } from "@/db/schema";
 import { SKILL_BY_ID } from "@/content/taxonomy";
@@ -118,7 +118,11 @@ export async function withProgress(userId: string, profile: Profile, day: string
   const onDay = (col: typeof attempts.createdAt | typeof lessonProgress.completedAt) => sql`(${col} at time zone ${profile.timezone})::date = ${day}::date`;
   const [answered, lessons] = await Promise.all([
     db.select({ skillId: attempts.skillId, context: attempts.context, n: count() }).from(attempts)
-      .where(and(eq(attempts.userId, userId), inArray(attempts.context, ["practice", "review"]), onDay(attempts.createdAt)))
+      // The UTC range (the local day, widened 14 hours each way for any time zone) lets the (user_id, created_at)
+      // index skip the student's older answers; onDay then picks the exact local day.
+      .where(and(eq(attempts.userId, userId), inArray(attempts.context, ["practice", "review"]),
+        gte(attempts.createdAt, new Date(Date.parse(`${day}T00:00:00Z`) - 14 * 3_600_000)),
+        lt(attempts.createdAt, new Date(Date.parse(`${day}T00:00:00Z`) + 38 * 3_600_000)), onDay(attempts.createdAt)))
       .groupBy(attempts.skillId, attempts.context),
     db.select({ skillId: lessonProgress.skillId }).from(lessonProgress)
       .where(and(eq(lessonProgress.userId, userId), onDay(lessonProgress.completedAt))),
