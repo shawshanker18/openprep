@@ -69,6 +69,13 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block, set, b
   set?: SetConfig; back?: string; ids?: string[];
 }) {
   const [s, dispatch] = useReducer(reducer, { phase: "loading", seen: [], answered: 0, correct: 0, ms: 0 });
+  // On a phone the confidence buttons (and later the explanation) are often below the screen: bring them into view
+  // after the first tap on a choice, and when the answer is revealed. Only as far as needed, never while typing.
+  const confidenceRef = useRef<HTMLDivElement>(null);
+  const resultRef = useRef<HTMLDivElement>(null);
+  const picked = s.phase === "answering" && s.value !== null && s.q.type === "mcq";
+  useEffect(() => { if (picked) confidenceRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" }); }, [picked]);
+  useEffect(() => { if (s.phase === "revealed") resultRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" }); }, [s.phase]);
   const [pending, start] = useTransition();
   const shownAt = useRef(0);
   const hiddenMs = useRef(0);
@@ -200,7 +207,7 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block, set, b
         onChange={(v) => dispatch({ type: "select", value: v })} correct={correctChoice} />
 
       {s.phase === "answering" && (
-        <div className="flex flex-col gap-2">
+        <div ref={confidenceRef} className="flex flex-col gap-2">
           <div className="flex flex-wrap items-start gap-2">
             <TutorPanel questionId={s.q.id} answered={false} isMath={s.q.section === "math"} />
             {s.q.section === "math" && <DesmosToggle />}
@@ -216,7 +223,7 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block, set, b
       )}
 
       {r && (
-        <div className="flex flex-col gap-4 rounded-lg border p-4">
+        <div ref={resultRef} className="flex flex-col gap-4 rounded-lg border p-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className={cn("font-semibold", r.correct ? "text-emerald-700" : "text-red-700")}>
               {r.correct ? "✓ Correct" : `✗ Not quite${"accepted" in r.revealed.answer ? `. The accepted answer is ${r.revealed.answer.accepted.join(" or ")}` : ""}`}

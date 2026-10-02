@@ -128,7 +128,17 @@
   }
   html {
     @apply font-sans;
+    /* Phones: scrolling something into view (focus, scrollIntoView) clears the fixed bottom nav. */
+    scroll-padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
   }
+  @media (width >= 48rem) {
+    html { scroll-padding-bottom: 0; }
+  }
+}
+/* Phones: while typing, the keyboard is up and the bottom nav would ride on top of it (a stray tap loses the answer).
+   Unlayered so it beats the nav's `flex` utility. */
+body:has(:is(input:not([type=checkbox], [type=radio], [type=range]), textarea, [contenteditable=true]):focus) .bottom-nav {
+  display: none;
 }
 /* Content typography for <Markdown> (questions, lessons, AI output). */
 .prose-op { line-height: 1.65; }

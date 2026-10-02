@@ -306,6 +306,15 @@ export async function listTests(userId: string) {
 }
 
 /** Is any of this question's test sessions still running for this user? (No AI help during tests.) */
+/** Questions in this student's unfinished tests (practice mustn't serve them). */
+export async function runningTestQuestionIds(userId: string) {
+  const rows = await db.selectDistinct({ id: testItems.questionId }).from(testItems)
+    .innerJoin(testModules, eq(testModules.id, testItems.moduleId))
+    .innerJoin(testSessions, eq(testSessions.id, testModules.sessionId))
+    .where(and(eq(testSessions.userId, userId), eq(testSessions.status, "in_progress")));
+  return rows.map((r) => r.id);
+}
+
 export async function inRunningTest(userId: string, questionId: string) {
   const [r] = await db.select({ id: testSessions.id }).from(testItems)
     .innerJoin(testModules, eq(testModules.id, testItems.moduleId))

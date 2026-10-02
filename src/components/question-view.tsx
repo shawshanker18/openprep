@@ -47,7 +47,8 @@ export function QuestionView({ question: q, value, onChange, disabled, correct }
         ) : (
           <label className="flex flex-col gap-1 text-sm">
             Your answer
-            <input inputMode="decimal" autoComplete="off" disabled={disabled} value={value ?? ""}
+            {/* No inputMode="decimal": phone number pads have no "/" (and iOS no "-"), so fractions couldn't be typed. */}
+            <input autoComplete="off" autoCapitalize="off" autoCorrect="off" spellCheck={false} disabled={disabled} value={value ?? ""}
               onChange={(e) => { const v = e.target.value.replace(/\s/g, ""); if (isValidSprInput(v)) onChange(v || null); }}
               className="h-11 w-40 rounded-md border bg-background px-3 font-mono text-lg" />
             <span className="text-xs text-muted-foreground">Fractions or decimals. Enter 3 1/2 as 7/2 or 3.5.</span>
