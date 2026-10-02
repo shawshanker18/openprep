@@ -8,7 +8,7 @@ type LocalNotifications = {
 declare global {
   interface Window {
     openprepDesktop?: { setLockdown(on: boolean, kind?: "test" | "focus"): void; setReminder(hour: number | null): void };
-    Capacitor?: { isNativePlatform?(): boolean; Plugins?: { LocalNotifications?: LocalNotifications; Lockdown?: { start(): Promise<void>; stop(): Promise<void> } } };
+    Capacitor?: { isNativePlatform?(): boolean; Plugins?: { LocalNotifications?: LocalNotifications; Lockdown?: { start(o: { kind: "test" | "focus" }): Promise<void>; stop(): Promise<void> } } };
   }
 }
 
@@ -24,13 +24,13 @@ export function setLockdown(on: boolean, kind: "test" | "focus" = "test") {
   if (!android) return;
   // Between test modules the page remounts (unlock, then lock): a late release keeps Android from asking to pin again.
   clearTimeout(androidRelease);
-  if (!on) { androidRelease = setTimeout(() => { androidPinned = false; void android.stop().catch(() => {}); }, 1500); return; }
-  if (androidPinned) return;
-  androidPinned = true;
-  void android.start().catch(() => { androidPinned = false; });
+  if (!on) { androidRelease = setTimeout(() => { androidPinned = null; void android.stop().catch(() => {}); }, 1500); return; }
+  if (androidPinned === kind) return; // (focus → test re-tells the app: a test is stricter)
+  androidPinned = kind;
+  void android.start({ kind }).catch(() => { androidPinned = null; });
 }
 let androidRelease: ReturnType<typeof setTimeout> | undefined;
-let androidPinned = false;
+let androidPinned: "test" | "focus" | null = null;
 
 /** Android app: may OpenPrep show notifications? (The desktop app and the website handle this themselves: true.) */
 export async function nativeNotificationsAllowed() {

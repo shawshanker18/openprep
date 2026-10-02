@@ -224,11 +224,11 @@ function createWindow() {
   win.on("close", (e) => {
     if (quitting) return;
     if (locked === "test") return e.preventDefault(); // only finishing or ending the test unlocks
-    if (locked) {
+    if (locked) { // a focus session (a locked test returned above)
       e.preventDefault();
       const r = dialog.showMessageBoxSync(win, {
-        type: "warning", buttons: ["Stay in the test", "Leave anyway"], defaultId: 0, cancelId: 0,
-        message: "You're in a locked test or focus session.", detail: "Leaving now counts as leaving the test window.",
+        type: "warning", buttons: ["Keep studying", "End focus and close"], defaultId: 0, cancelId: 0,
+        message: "You're in a focus session.", detail: "Closing OpenPrep ends it.",
       });
       if (r === 1) { applyLockdown(null); win.close(); }
       return;
