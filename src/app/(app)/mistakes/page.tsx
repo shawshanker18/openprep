@@ -8,6 +8,7 @@ import { SKILL_BY_ID } from "@/content/taxonomy";
 import { MISTAKE_LABEL, MISTAKE_TYPES, type MistakeType } from "@/engine/mistakes";
 import { cn } from "@/lib/utils";
 import { requireUser } from "@/server/auth";
+import { publicId } from "@/server/questions";
 
 export const metadata = { title: "Mistakes" };
 
@@ -62,7 +63,7 @@ export default async function MistakesPage({ searchParams }: PageProps<"/mistake
       ) : (
         <ul className="flex flex-col gap-2">
           {rows.map((m) => (
-            <li key={m.id} className="flex flex-col gap-1 rounded-md border p-3 text-sm">
+            <li key={publicId(m.id)} className="flex flex-col gap-1 rounded-md border p-3 text-sm">
               <Markdown className="line-clamp-2">{m.stem}</Markdown>
               <span className="text-xs text-muted-foreground">
                 <Link className="underline" href={`/skills/${m.skillId}?tab=mistakes`}>{SKILL_BY_ID[m.skillId]?.name}</Link>

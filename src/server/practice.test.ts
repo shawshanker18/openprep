@@ -11,6 +11,7 @@ const pg = new PGlite();
 const db = drizzle(pg, { schema });
 vi.mock("@/db", () => ({ db }));
 const P = await import("./practice");
+const Q = await import("./questions");
 
 const USER = "00000000-0000-0000-0000-0000000000cc";
 const skill = SKILLS.find((k) => k.section === "math")!;
@@ -31,9 +32,9 @@ it("list mode walks the given ids in order, and the bank shows last result and s
   const profile = {} as schema.Profile; // list mode never reads the profile
   const order = [ids[1]!, ids[0]!];
   const first = await P.nextQuestion(USER, profile, { mode: "list", ids: order, exclude: [] });
-  expect(first?.question.id).toBe(ids[1]);
+  expect(first?.question.id).toBe(Q.publicId(ids[1]!));
   await P.submitAnswer(USER, { questionId: ids[1]!, response: "A", timeMs: 5000, confidence: 2 });
-  expect((await P.nextQuestion(USER, profile, { mode: "list", ids: order, exclude: [ids[1]!] }))?.question.id).toBe(ids[0]);
+  expect((await P.nextQuestion(USER, profile, { mode: "list", ids: order, exclude: [ids[1]!] }))?.question.id).toBe(Q.publicId(ids[0]!));
   expect(await P.nextQuestion(USER, profile, { mode: "list", ids: order, exclude: order })).toBeNull();
 
   await db.insert(schema.bookmarks).values({ userId: USER, questionId: ids[2]! });
@@ -46,7 +47,7 @@ it("list mode walks the given ids in order, and the bank shows last result and s
 it("stops handing out questions once an account pulls too many too fast", async () => {
   const U2 = "00000000-0000-0000-0000-0000000000dd";
   await db.insert(schema.profiles).values({ id: U2 });
-  const many = Array.from({ length: P.SERVE_LIMITS.burst.max }, (_, i) => `${skill.id}-bulk${i}`);
+  const many = Array.from({ length: P.SERVE_LIMITS.hour.max }, (_, i) => `${skill.id}-bulk${i}`);
   await db.insert(schema.questions).values(many.map((id) => ({ id, skillId: skill.id, section: "math" as const, domain: skill.domain, difficulty: 2,
     type: "mcq" as const, passageMd: null, stemMd: "s", choices: [], answer: { choice: "A" }, explanationMd: "e", choiceRationales: null,
     fastMethodMd: null, desmos: null, tags: [], status: "active" as const, version: 1 })));
@@ -55,8 +56,8 @@ it("stops handing out questions once an account pulls too many too fast", async 
   expect(await P.overServeLimit(U2, now)).toBe(false);
   await db.insert(schema.questionServes).values({ userId: U2, questionId: many.at(-1)!, servedAt: now });
   expect(await P.overServeLimit(U2, now)).toBe(true);
-  // An hour later the burst window has passed (the daily cap is far away).
-  expect(await P.overServeLimit(U2, new Date(now.getTime() + 3_600_000))).toBe(false);
+  // Just over an hour later the hourly window has passed (the daily cap is far away).
+  expect(await P.overServeLimit(U2, new Date(now.getTime() + 3_600_001))).toBe(false);
 });
 
 it("plan blocks are done only from real work today (a click can't tick them)", async () => {
@@ -99,8 +100,26 @@ it("answers are only revealed for questions this student was given (no reading t
   expect(await P.submitAnswer(U4, { questionId: never, response: "A", timeMs: 5000, confidence: 2 })).toBeNull();
 
   const served = await P.nextQuestion(U4, {} as schema.Profile, { mode: "list", ids: [never], exclude: [] });
-  expect(served?.question.id).toBe(never);
+  expect(served?.question.id).toBe(Q.publicId(never));
   expect(await P.wasGiven(U4, never)).toBe(true);
   const r = await P.submitAnswer(U4, { questionId: never, response: "A", timeMs: 5000, confidence: 2 });
   expect(r?.revealed.answer).toEqual({ choice: "A" });
+
+  // One answer per serve: trying again (B, C, ...) is refused until the question is served again.
+  expect(await P.submitAnswer(U4, { questionId: never, response: "B", timeMs: 5000, confidence: 2 })).toBeNull();
+  await new Promise((r) => setTimeout(r, 5));
+  await P.nextQuestion(U4, {} as schema.Profile, { mode: "list", ids: [never], exclude: [] });
+  expect(await P.submitAnswer(U4, { questionId: never, response: "B", timeMs: 5000, confidence: 2 })).not.toBeNull();
+});
+
+it("question ids sent to the browser are opaque and map back only through the server", async () => {
+  const Q2 = await import("./questions");
+  const pub = Q2.publicId(ids[0]!);
+  expect(pub).toMatch(/^[\w-]{22}$/);
+  expect(pub).not.toContain(skill.id); // nothing about the skill or numbering leaks
+  expect(await Q2.internalId(pub)).toBe(ids[0]);
+  expect(await Q2.internalId(ids[0]!)).toBeNull(); // the internal id itself is not accepted from the browser
+  expect(await Q2.internalId("A".repeat(22))).toBeNull(); // a guess maps to nothing
+  const q = (await P.nextQuestion(USER, {} as schema.Profile, { mode: "list", ids: [ids[2]!], exclude: [] }))!.question;
+  expect(JSON.stringify(q)).not.toMatch(/answer|explanation|difficulty|choiceRationales/);
 });

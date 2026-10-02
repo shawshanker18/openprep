@@ -148,3 +148,7 @@
 @media print {
   body { display: none; }
 }
+
+/* Question text can't be selected, copied by long-press or dragged; typed answers stay editable. */
+.question-content { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+.question-content input, .question-content textarea { -webkit-user-select: text; user-select: text; }

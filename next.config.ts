@@ -22,6 +22,8 @@ const csp = [
 const nextConfig: NextConfig = {
   // Don't advertise the framework in an X-Powered-By header.
   poweredByHeader: false,
+  // No source maps in production: the original source can't be read from the browser.
+  productionBrowserSourceMaps: false,
   // The Android emulator reaches the dev server as 10.0.2.2 (dev only; ignored in production builds).
   allowedDevOrigins: ["10.0.2.2"],
   // Lessons are read from disk at request time; make sure they ship with the server bundle.

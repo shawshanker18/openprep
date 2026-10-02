@@ -7,6 +7,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { profiles } from "@/db/schema";
 import { requireUser } from "@/server/auth";
+import { internalId } from "@/server/questions";
 import { answerDiagnostic as answer } from "@/server/diagnostic";
 import { abandonTest, markLocked, recordFocusLoss, saveResponse as save, startModule as start, submitModule as submit } from "@/server/tests";
 
@@ -22,7 +23,9 @@ export async function answerDiagnostic(input: z.input<typeof Answer>) {
   const { userId } = await requireUser();
   const parsed = Answer.safeParse(input);
   if (!parsed.success) return { ok: false as const, error: "Invalid answer." };
-  return answer(userId, parsed.data);
+  const questionId = await internalId(parsed.data.questionId);
+  if (!questionId) return { ok: false as const, error: "That question was already answered. Reload to continue." };
+  return answer(userId, { ...parsed.data, questionId });
 }
 
 export async function startModule(moduleId: string) {
