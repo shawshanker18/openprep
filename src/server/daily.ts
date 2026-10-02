@@ -177,6 +177,8 @@ export const DASHBOARD_CARDS = [
   { id: "pace", label: "Pace check" },
   { id: "mistakes", label: "Mistakes to review" },
   { id: "week", label: "Last 7 days" },
+  { id: "course", label: "SAT course" },
+  { id: "official", label: "Add your SAT scores" },
 ] as const;
 export type DashboardCardId = (typeof DASHBOARD_CARDS)[number]["id"];
 

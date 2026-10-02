@@ -1,5 +1,6 @@
 // Read-side numbers for the student model (spec 03 §11–12). Plain SQL over indexed columns.
 import "server-only";
+import { cache } from "react";
 import { skillStatesOf } from "./daily";
 import { and, desc, eq, gte, isNotNull, sql } from "drizzle-orm";
 import { db } from "@/db";
@@ -9,7 +10,7 @@ import { masteryPct, pace, status, trend, type Status } from "@/engine/mastery";
 import { calibration, type SelfRating } from "@/engine/prior";
 import { sectionEstimate, superscore, totalEstimate } from "@/engine/score";
 
-export async function getSkillSummary(userId: string) {
+export const getSkillSummary = cache(async (userId: string) => {
   const [states, byDomain] = await Promise.all([
     skillStatesOf(userId),
     db.select({ skillId: attempts.skillId, n: sql<number>`count(*)::int` }).from(attempts)
@@ -33,7 +34,7 @@ export async function getSkillSummary(userId: string) {
   });
   const rw = sectionEstimate(states, "rw"), math = sectionEstimate(states, "math");
   return { skills, estimate: { rw, math, total: totalEstimate(rw, math) } };
-}
+});
 
 export type SkillSummary = Awaited<ReturnType<typeof getSkillSummary>>["skills"][number];
 

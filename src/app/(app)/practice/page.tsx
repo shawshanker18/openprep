@@ -15,11 +15,29 @@ export default async function PracticePage({ searchParams }: PageProps<"/practic
   const d = sp.difficulty === "mixed" ? "mixed" : Number(sp.difficulty);
   const difficulty = d === 1 || d === 2 || d === 3 || d === "mixed" ? d : undefined;
   if (skillId && !SKILL_BY_ID[skillId]) notFound();
-  const mode = sp.mode === "review" ? "review" : sp.mode === "set" ? "set" : skillId ? "skill" : "smart";
+  const mode = sp.mode === "review" ? "review" : sp.mode === "set" || sp.preset ? "set" : sp.mode === "list" ? "list" : skillId ? "skill" : "smart";
   const { userId, profile } = await requireUser();
   if (diagnosticPending(profile)) return <DiagnosticGate />;
   const bi = Number(sp.block);
   const block = Number.isInteger(bi) && bi >= 0 ? await getTodayBlock(userId, profile, bi) : null;
+
+  // Where to go when the set is finished: the course or the question bank (only these paths are accepted).
+  const back = typeof sp.from === "string" && /^\/(course(\/[a-z-]+)?|question-bank(\?[\w=&%.,-]*)?)$/.test(sp.from) ? sp.from : undefined;
+
+  if (mode === "list") {
+    const ids = list(sp.ids).filter((id) => /^[a-z0-9-]{3,64}$/.test(id)).slice(0, 50);
+    const set = { skillIds: [] as string[], tags: [] as string[], count: ids.length, timing: "off" as const };
+    return <PracticeRunner key={ids.join(",")} mode="list" ids={ids} title="Question bank" block={null} set={set} back={back} />;
+  }
+
+  // Presets from the sidebar: a quick timed rush on your focus skills, or hard questions from every skill.
+  if (sp.preset === "rush" || sp.preset === "challenge") {
+    const rush = sp.preset === "rush";
+    const set = rush
+      ? { skillIds: [] as string[], tags: [] as string[], count: 10, timing: "on" as const }
+      : { skillIds: Object.keys(SKILL_BY_ID), tags: [] as string[], count: 10, timing: "off" as const };
+    return <PracticeRunner key={sp.preset} mode="set" difficulty={rush ? "mixed" : 3} title={rush ? "Question rush" : "Challenge questions"} block={null} set={set} back={back} />;
+  }
 
   if (mode === "set") {
     const skillIds = list(sp.skills).filter((s) => SKILL_BY_ID[s]).slice(0, 29);
@@ -29,8 +47,6 @@ export default async function PracticePage({ searchParams }: PageProps<"/practic
     const timing = sp.timing === "on" || sp.timing === "off" ? sp.timing : "auto";
     const title = skillIds.length === 1 ? SKILL_BY_ID[skillIds[0]!]!.name : skillIds.length ? "Custom practice" : "Custom practice (focus skills)";
     const set = { skillIds, tags, count, timing } as const;
-    // Exercises started from the course return there (only course paths are accepted).
-    const back = typeof sp.from === "string" && /^\/course(\/[a-z-]+)?$/.test(sp.from) ? sp.from : undefined;
     return <PracticeRunner key={JSON.stringify([set, difficulty])} mode="set" difficulty={difficulty} title={title} block={block} set={set} back={back} />;
   }
 

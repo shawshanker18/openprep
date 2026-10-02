@@ -102,7 +102,7 @@ export function TestRunner({ sessionId, module: m, items: initial, serverNow, br
       if (r && typeof r === "object" && r.finished) router.replace(`/test/${sessionId}/results`);
       else router.refresh(); // next module
     });
-  }, [m.id, router]);
+  }, [m.id, router, sessionId]);
 
   // Countdown; auto-submit at zero.
   useEffect(() => {

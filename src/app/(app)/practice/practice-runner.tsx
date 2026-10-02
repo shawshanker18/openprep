@@ -16,7 +16,7 @@ import type { PublicQuestion, RevealedQuestion } from "@/server/questions";
 import { setBlockDone } from "../plan/actions";
 import { nextQuestion, reportQuestion, setMistakeType, submitAnswer, toggleBookmark } from "./actions";
 
-type Mode = "skill" | "smart" | "review" | "set";
+type Mode = "skill" | "smart" | "review" | "set" | "list";
 type SetConfig = { skillIds: string[]; tags: string[]; count: number; timing: "auto" | "off" | "on" };
 type Result = {
   correct: boolean; attemptId: string; revealed: RevealedQuestion; masteryBefore: number; masteryAfter: number;
@@ -63,9 +63,9 @@ function Countdown({ limitS }: { limitS: number }) {
   return <span className={cn("tabular-nums", left <= 0 && "text-red-700")}>{left > 0 ? clock(left) : `Time's up +${clock(-left)}`}</span>;
 }
 
-export function PracticeRunner({ mode, skillId, difficulty, title, block, set, back }: {
+export function PracticeRunner({ mode, skillId, difficulty, title, block, set, back, ids }: {
   mode: Mode; skillId?: string; difficulty?: 1 | 2 | 3 | "mixed"; title: string; block?: { index: number; target: number } | null;
-  set?: SetConfig; back?: string;
+  set?: SetConfig; back?: string; ids?: string[];
 }) {
   const [s, dispatch] = useReducer(reducer, { phase: "loading", seen: [], answered: 0, correct: 0, ms: 0 });
   const [pending, start] = useTransition();
@@ -79,11 +79,12 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block, set, b
     similarTo.current = null;
     const res = await nextQuestion(sim
       ? { mode: "skill", skillId: sim, exclude }
+      : mode === "list" ? { mode, exclude, ids }
       : { mode, skillId, difficulty, exclude, skillIds: set?.skillIds, tags: set?.tags, timing: set?.timing });
     if (!res.ok) { toast.error(res.error); return; }
     if ("done" in res.data) dispatch({ type: "done" });
     else { dispatch({ type: "loaded", q: res.data.question, limitS: res.data.timeLimitS }); shownAt.current = performance.now(); hiddenMs.current = 0; }
-  }), [mode, skillId, difficulty, set]);
+  }), [mode, skillId, difficulty, set, ids]);
   // A set stops after `count` answers.
   const next = useCallback(() => dispatch({ type: set && s.answered >= set.count ? "done" : "next" }), [set, s.answered]);
 
@@ -134,12 +135,12 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block, set, b
   if (s.phase === "done" && set) {
     return (
       <div className="flex flex-col items-start gap-3">
-        <h1 className="text-xl font-semibold">{s.answered >= set.count ? (back ? "Exercise complete" : "Set complete") : "No more matching questions"}</h1>
+        <h1 className="text-xl font-semibold">{s.answered >= set.count ? (back ? "Exercise complete" : "Set complete") : mode === "list" ? "You've finished these questions" : "No more matching questions"}</h1>
         <p className="text-muted-foreground tabular-nums">
           {s.answered > 0 ? `${s.correct}/${s.answered} correct · average ${Math.round(s.ms / s.answered / 1000)}s per question.` : "Try other skills or sub-topics."}
         </p>
         <div className="flex flex-wrap gap-2">
-          {back ? <Button render={<Link href={back} />}>Back to the course</Button> : <Button render={<Link href="/practice/custom" />}>New custom set</Button>}
+          {back ? <Button render={<Link href={back} />}>{back.startsWith("/question-bank") ? "Back to the question bank" : "Back to the course"}</Button> : <Button render={<Link href="/practice/custom" />}>New custom set</Button>}
           <Button variant="outline" render={<Link href="/dashboard" />}>Back to dashboard</Button>
         </div>
       </div>
