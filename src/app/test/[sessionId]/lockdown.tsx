@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { inNativeApp, setLockdown } from "@/lib/native";
-import { markLockdown } from "./actions";
+import { markLockdown, reportFocusLoss } from "./actions";
 
 /**
  * In the apps the whole test (or diagnostic) is locked: the only way out is to finish or end it. The session is
@@ -15,6 +16,15 @@ export function useTestLockdown(sessionId: string) {
     setLockdown(true);
     if (inNativeApp()) void markLockdown(sessionId);
     return () => setLockdown(false);
+  }, [sessionId]);
+  // The app reopens a locked test with ?resumed=1 after it was closed or killed mid-test: that counts as leaving.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("resumed") !== "1") return;
+    url.searchParams.delete("resumed");
+    window.history.replaceState(null, "", url.pathname + url.search);
+    void reportFocusLoss(sessionId);
+    toast.warning("The app was closed during your test. This is noted on your results.");
   }, [sessionId]);
 }
 

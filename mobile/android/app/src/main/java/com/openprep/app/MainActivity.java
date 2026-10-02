@@ -30,7 +30,10 @@ public class MainActivity extends BridgeActivity {
         super.onCreate(savedInstanceState);
         getBridge().addWebViewListener(new WebViewListener() {
             @Override
-            public void onPageLoaded(WebView webView) { pageReady = true; } // the offline page counts too
+            public void onPageLoaded(WebView webView) {
+                pageReady = true; // the offline page counts too
+                if (LockdownPlugin.instance != null) LockdownPlugin.instance.pageLoaded(webView);
+            }
         });
         // Questions can't be screenshotted or screen recorded, and the app is blank in the recent apps view.
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
@@ -54,12 +57,20 @@ public class MainActivity extends BridgeActivity {
      */
     private void ensureInstallCookie() {
         CookieManager cookies = CookieManager.getInstance();
+        String value = null;
         String existing = cookies.getCookie(SITE);
-        if (existing != null && existing.contains("openprep_app=")) return;
-        byte[] secret = new byte[24];
-        new SecureRandom().nextBytes(secret);
-        String value = Base64.encodeToString(secret, Base64.URL_SAFE | Base64.NO_PADDING | Base64.NO_WRAP);
-        cookies.setCookie(SITE, "openprep_app=" + value + "; Path=/; Max-Age=315360000; HttpOnly; SameSite=Strict"
+        if (existing != null) for (String part : existing.split(";")) {
+            String p = part.trim();
+            if (p.startsWith("openprep_app=")) value = p.substring("openprep_app=".length());
+        }
+        if (value == null || value.isEmpty()) {
+            byte[] secret = new byte[24];
+            new SecureRandom().nextBytes(secret);
+            value = Base64.encodeToString(secret, Base64.URL_SAFE | Base64.NO_PADDING | Base64.NO_WRAP);
+        }
+        // Set every launch (keeping the value) so older installs get these attributes too. Lax, not strict: the
+        // offline page's "Try again" counts as coming from another site, and strict cookies aren't sent then.
+        cookies.setCookie(SITE, "openprep_app=" + value + "; Path=/; Max-Age=315360000; HttpOnly; SameSite=Lax"
             + (SITE.startsWith("https:") ? "; Secure" : ""));
         cookies.flush();
     }
@@ -68,13 +79,16 @@ public class MainActivity extends BridgeActivity {
     private void resumeLockedTest() {
         String url = getSharedPreferences(LockdownPlugin.PREFS, Context.MODE_PRIVATE).getString(LockdownPlugin.LOCKED_URL, null);
         if (url == null || !url.matches("\\Q" + SITE + "\\E/test/[0-9a-fA-F-]{36}")) return;
-        getBridge().getWebView().post(() -> getBridge().getWebView().loadUrl(url));
+        // ?resumed=1: the test page counts the app having been closed mid-test as leaving the test window.
+        getBridge().getWebView().post(() -> getBridge().getWebView().loadUrl(url + "?resumed=1"));
     }
 
     /** openprep://auth?code=… finishes an email sign-in that was requested inside this app (the PKCE verifier is here). */
     private boolean openAuthLink(Intent intent) {
         Uri data = intent == null ? null : intent.getData();
         if (data == null || !"openprep".equals(data.getScheme()) || !"auth".equals(data.getHost())) return false;
+        // Never during a locked test: loading another page would be a way out of it.
+        if (LockdownPlugin.instance != null && LockdownPlugin.instance.isLocked()) return false;
         String code = data.getQueryParameter("code");
         if (code == null || !code.matches("[A-Za-z0-9_-]{8,200}")) return false;
         getBridge().getWebView().post(() -> getBridge().getWebView().loadUrl(SITE + "/auth/callback?code=" + code));

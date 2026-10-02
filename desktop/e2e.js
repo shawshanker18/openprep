@@ -2,7 +2,7 @@
 //   OPENPREP_URL=http://localhost:3000 npx electron e2e.js     (the app's window must already be signed in)
 // Starts a real course quiz, then checks: locked for the whole test, can't close/quit, focus is taken back,
 // the test can't be continued in a plain browser, the resume address is saved, and "End test" unlocks.
-// STAGE=escape also checks outside page switches are ignored while locked.
+// STAGE=offline cuts the network mid-test. STAGE=escape also checks outside page switches are ignored while locked.
 // STAGE=kill stops right after the test locks (like killing the app); STAGE=resume then checks the app reopens into it.
 const STAGE = process.env.STAGE;
 process.env.OPENPREP_URL ||= "http://localhost:3000";
@@ -73,7 +73,7 @@ app.whenReady().then(async () => {
       await win.loadURL(`${SITE}/course/m-alg`);
       await until("Start quiz button", () => click("Start quiz"));
     }
-    const testUrl = await until("test page", () => /\/test\/[0-9a-f-]{36}$/.test(win.webContents.getURL()) && win.webContents.getURL());
+    const testUrl = await until("test page", () => { const u = new URL(win.webContents.getURL()); return /^\/test\/[0-9a-f-]{36}$/.test(u.pathname) && u.origin + u.pathname; });
     await until("End test button on the intro", () => js(`[...document.querySelectorAll("button")].some((b) => b.textContent.trim() === "End test")`));
     await wait(1000);
     r.lockedOnIntro = win.isKiosk() && win.isAlwaysOnTop();
@@ -88,9 +88,26 @@ app.whenReady().then(async () => {
       // A sign-in link opened from outside (Win+R, another app) must not pull the window off the test.
       app.emit("second-instance", {}, [process.execPath, "openprep://auth?code=abcdefgh12345"]);
       await wait(3000);
-      r.deepLinkIgnored = win.webContents.getURL() === testUrl && win.isKiosk();
+      r.deepLinkIgnored = win.webContents.getURL().startsWith(testUrl) && win.isKiosk();
     }
-    if (STAGE === "resume") r.reopenedIntoTest = true;
+    if (STAGE === "resume") {
+      r.reopenedIntoTest = true;
+      await wait(1500);
+      r.resumeRecordedAndCleaned = !(await js("location.search")).includes("resumed");
+    }
+    if (STAGE === "offline") {
+      // Wi-Fi off mid-test: the lock must hold, and the app must get back to the test on its own once it's back.
+      let offline = true; // every request to the site fails, like a dropped connection
+      win.webContents.session.webRequest.onBeforeRequest({ urls: [`${SITE}/*`] }, (_d, cb) => cb({ cancel: offline }));
+      win.webContents.reload();
+      await until("offline page", () => win.webContents.getURL().startsWith("data:"), 20_000);
+      await wait(1500);
+      r.offlineStillLocked = win.isKiosk() && win.isAlwaysOnTop();
+      offline = false;
+      await until("back on the test", () => win.webContents.getURL().startsWith(testUrl), 30_000);
+      await wait(2000);
+      r.backOnTestAndLocked = win.isKiosk();
+    }
 
     win.close(); app.quit();
     await wait(500);
@@ -128,6 +145,7 @@ app.whenReady().then(async () => {
     if (STAGE === "screens") r.coversRemoved = BrowserWindow.getAllWindows().filter((w) => w !== win && !w.isDestroyed()).length === 0;
   } catch (e) {
     r.error = String(e);
+    try { r.screen = (await js("document.body.innerText")).replace(/\s+/g, " ").slice(0, 300); } catch { /* window gone */ }
   }
   console.log("E2E", JSON.stringify(r));
   app.exit(0);
