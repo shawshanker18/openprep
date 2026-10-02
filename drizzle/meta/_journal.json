@@ -57,6 +57,13 @@
       "when": 1790930008442,
       "tag": "0007_server_timer",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1790956413532,
+      "tag": "0008_signup_cap",
+      "breakpoints": true
     }
   ]
 }

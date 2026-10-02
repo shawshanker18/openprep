@@ -1,6 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
 import { sendDueReminders } from "@/server/push";
 import { sweepTests } from "@/server/tests";
+import { deleteOldSignupTickets } from "@/server/signup";
 
 export const maxDuration = 60;
 
@@ -18,5 +19,6 @@ export async function POST(req: Request) {
   if (!authorized(req)) return new Response("Unauthorized", { status: 401 });
   const tests = await sweepTests();
   const reminders = await sendDueReminders();
+  await deleteOldSignupTickets();
   return Response.json({ tests, reminders });
 }
