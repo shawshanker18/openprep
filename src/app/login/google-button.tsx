@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { signInWithGoogle } from "@/app/auth/actions";
 
 type Gsi = {
   initialize(o: object): void;
@@ -39,8 +39,8 @@ export function GoogleButton({ enabled }: { enabled: boolean }) {
         use_fedcm_for_prompt: true,
         callback: async ({ credential }: { credential: string }) => {
           setError(null);
-          const { error } = await createClient().auth.signInWithIdToken({ provider: "google", token: credential, nonce: raw });
-          if (error) { setError("Google sign-in didn't work. Please try again or use the email link."); return; }
+          const { ok } = await signInWithGoogle({ credential, nonce: raw }).catch(() => ({ ok: false }));
+          if (!ok) { setError("Google sign-in didn't work. Please try again or use the email link."); return; }
           router.replace("/dashboard");
           router.refresh();
         },
