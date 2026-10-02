@@ -4,7 +4,8 @@ import { MasteryBar } from "@/components/mastery-bar";
 import { PlanBlocks } from "@/components/plan-blocks";
 import { DiagnosticGate } from "@/components/diagnostic-gate";
 import { diagnosticPending, getAuthUser, requireUser } from "@/server/auth";
-import { dashboardLayout, getDashboard, getStreak, type DashboardCardId } from "@/server/daily";
+import { dashboardLayout, getDashboard, type DashboardCardId } from "@/server/daily";
+import { levelOf, points } from "@/engine/course";
 import { getSkillSummary } from "@/server/analytics";
 import { SatCountdown } from "@/components/sat-countdown";
 import { readyBy } from "@/engine/plan";
@@ -31,7 +32,11 @@ export default async function DashboardPage() {
   const first = user?.name?.split(" ")[0];
   const hello = <h1 className="text-2xl font-semibold">{greeting(profile.timezone)}{first ? `, ${first}` : ""}</h1>;
   if (diagnosticPending(profile)) return <div className="flex flex-col gap-6">{hello}<DiagnosticGate /></div>;
-  const [d, summary, days] = await Promise.all([getDashboard(userId, profile), getSkillSummary(userId), getStreak(userId, profile.timezone)]);
+  const [d, summary] = await Promise.all([getDashboard(userId, profile), getSkillSummary(userId)]);
+  const levels = Object.fromEntries(summary.skills.map((k) => [k.id, levelOf(k.n, k.status)]));
+  const coursePoints = (sec: "math" | "rw") => points(summary.skills.filter((k) => k.section === sec).map((k) => levels[k.id]!));
+  const nextCourseSkill = summary.skills.filter((k) => k.section === "math").concat(summary.skills.filter((k) => k.section === "rw"))
+    .find((k) => !["proficient", "mastered"].includes(levels[k.id]!));
   const planLeft = d.blocks.filter((b) => !b.done).length;
   const sectionMastery = (section: "math" | "rw") => {
     const measured = summary.skills.filter((k) => k.section === section && k.status !== "unknown");
@@ -46,11 +51,17 @@ export default async function DashboardPage() {
   const cards: Record<DashboardCardId, React.ReactNode> = {
     score: (
       <Card key="score" title="Your score" className="lg:col-span-2">
-        <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1">
-          <p className="text-3xl font-semibold tabular-nums">Estimated {d.estimate.lo} to {d.estimate.hi}</p>
-          {profile.targetScore && <p className="text-muted-foreground">Target {profile.targetScore}</p>}
-          {d.daysLeft != null && d.daysLeft >= 0 && <p className="text-muted-foreground">{d.daysLeft} days to go</p>}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <p className="text-3xl font-semibold tabular-nums">{d.estimate.lo} to {d.estimate.hi}</p>
+            <p className="text-sm text-muted-foreground">Current score (estimate)</p>
+          </div>
+          <div>
+            <p className="text-3xl font-semibold tabular-nums">{profile.targetScore ?? "Not set"}</p>
+            <p className="text-sm text-muted-foreground">Target score{d.daysLeft != null && d.daysLeft >= 0 ? ` · ${d.daysLeft} days to go` : ""}</p>
+          </div>
         </div>
+        <Button variant="outline" size="sm" className="self-start" render={<Link href="/settings#goal" />}>{profile.targetScore ? "Change goal" : "Set goal"}</Button>
         <p className="text-sm text-muted-foreground">Reading &amp; Writing ≈ {d.estimate.rw} · Math ≈ {d.estimate.math} · <Link className="underline" href="/about">how estimates work</Link></p>
         <p className="text-sm text-muted-foreground tabular-nums">Math: {sectionMastery("math")} skill mastery · Reading &amp; Writing: {sectionMastery("rw")}</p>
       </Card>
@@ -107,6 +118,27 @@ export default async function DashboardPage() {
         {d.dueReviews > 0 && <Button className="self-start" render={<Link href="/practice?mode=review" />}>Review now</Button>}
       </Card>
     ),
+    course: (
+      <Card key="course" title="SAT course">
+        {(["math", "rw"] as const).map((sec) => {
+          const p = coursePoints(sec);
+          const pct = p.max ? Math.round((100 * p.earned) / p.max) : 0;
+          return (
+            <Link key={sec} href={`/course?section=${sec}`} className="flex flex-col gap-1 rounded-md p-1 hover:bg-muted">
+              <span className="flex justify-between text-sm"><span>{sec === "math" ? "Math" : "Reading and Writing"}</span><span className="tabular-nums text-muted-foreground">{pct}% mastered</span></span>
+              <span className="h-2 overflow-hidden rounded-full bg-muted"><span className="block h-full bg-primary" style={{ width: `${pct}%` }} /></span>
+            </Link>
+          );
+        })}
+        {nextCourseSkill && <Button size="sm" className="self-start" render={<Link href={`/course/${nextCourseSkill.domain}`} />}>Continue: {nextCourseSkill.name}</Button>}
+      </Card>
+    ),
+    official: (
+      <Card key="official" title="Took the SAT already?">
+        <p className="text-sm">Add your official section scores to track your superscore and see real results next to your estimates.</p>
+        <Button variant="outline" size="sm" className="self-start" render={<Link href="/settings#scores" />}>Add my scores</Button>
+      </Card>
+    ),
     week: (
       <Card key="week" title="Last 7 days">
         <p className="text-sm tabular-nums">
@@ -124,12 +156,7 @@ export default async function DashboardPage() {
           {planLeft ? `${planLeft} block${planLeft === 1 ? "" : "s"} left in today's plan.` : "Today's plan is done. Any extra practice still counts."}
         </p>
       </div>
-      <div className="flex items-center gap-3">
-        <span className="rounded-full border px-3 py-1 text-sm tabular-nums" title="Days in a row with practice">
-          {days ? `🔥 ${days}-day streak` : "Start a streak today"}
-        </span>
-        <Button render={<Link href={planLeft ? "/plan" : "/practice"} />}>{planLeft ? "Continue today's plan" : "Smart practice"}</Button>
-      </div>
+      <Button render={<Link href={planLeft ? "/plan" : "/practice"} />}>{planLeft ? "Continue today's plan" : "Smart practice"}</Button>
     </div>
   );
 
@@ -145,11 +172,13 @@ export default async function DashboardPage() {
       {cards.today}
       <div className="flex flex-col gap-4">
         {cards.score}
+        {cards.course}
         {cards.focus}
         {cards["mock-due"]}
         {cards.pace}
         {cards.mistakes}
         {cards.week}
+        {cards.official}
       </div>
     </div>
     </div>

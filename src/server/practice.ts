@@ -13,7 +13,7 @@ import { ensureWeeklyFocus, skillsByPriority } from "./plan";
 import { toPublic, toRevealed } from "./questions";
 import { inRunningTest, serverCappedTime } from "./tests";
 
-export type PracticeMode = "skill" | "smart" | "review" | "set";
+export type PracticeMode = "skill" | "smart" | "review" | "set" | "list";
 export type SetDifficulty = Difficulty | "mixed"; // undefined = auto (targetDifficulty from theta)
 export type Timing = "auto" | "off" | "on";
 
@@ -75,14 +75,18 @@ async function timeLimitFor(userId: string, q: Question, timing: Timing | undefi
 }
 
 export async function nextQuestion(userId: string, profile: Profile, input: {
-  mode: PracticeMode; skillId?: string; exclude: string[]; difficulty?: SetDifficulty;
+  mode: PracticeMode; skillId?: string; exclude: string[]; difficulty?: SetDifficulty; ids?: string[];
   skillIds?: string[]; tags?: string[]; timing?: Timing;
 }) {
   const now = new Date();
   let q: Question | null = null;
   const forced = input.difficulty === "mixed" ? undefined : input.difficulty;
 
-  if (input.mode === "review") {
+  if (input.mode === "list") {
+    // A hand-picked list (question bank): the first one not answered yet in this session, in the given order.
+    const nextId = (input.ids ?? []).find((id) => !input.exclude.includes(id));
+    if (nextId) q = (await db.select().from(questions).where(and(eq(questions.id, nextId), eq(questions.status, "active"))))[0] ?? null;
+  } else if (input.mode === "review") {
     q = await dueReview(userId, now, input.exclude, input.skillId);
   } else if (input.mode === "set") {
     // Rotate through the chosen skills (Auto = this week's focus, then priority order as a fallback).
@@ -183,4 +187,18 @@ export async function skillStats(userId: string, skillId: string) {
     diagnostic: diagnostic ?? { n: 0, c: 0 },
     byTag,
   };
+}
+
+export type BankStatus = "new" | "correct" | "incorrect";
+/** Every active question with this student's last result and saved flag (question bank). Answers are not included. */
+export async function questionBank(userId: string) {
+  // Written as "questions"."id": Drizzle prints ${questions.id} as a bare "id", which the subquery would read as its own id.
+  const rows = await db.select({
+    id: questions.id, skillId: questions.skillId, section: questions.section, difficulty: questions.difficulty,
+    type: questions.type, passage: questions.passageMd, stem: questions.stemMd,
+    last: sql<boolean | null>`(select a.correct from attempts a where a.user_id = ${userId} and a.question_id = "questions"."id"
+      order by a.created_at desc limit 1)`,
+    saved: sql<boolean>`exists(select 1 from bookmarks b where b.user_id = ${userId} and b.question_id = "questions"."id")`,
+  }).from(questions).where(eq(questions.status, "active")).orderBy(asc(questions.skillId), asc(questions.difficulty), asc(questions.id));
+  return rows.map((r) => ({ ...r, status: (r.last == null ? "new" : r.last ? "correct" : "incorrect") as BankStatus }));
 }

@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import {
-  BarChart3, Bookmark, BookOpen, Calculator, CalendarCheck, Check, ClipboardList, GraduationCap, Home, Menu, Settings, SlidersHorizontal, Sparkles, XCircle,
+  BarChart3, Bookmark, BookOpen, Calculator, CalendarCheck, Check, ClipboardList, GraduationCap, Home, Library, Menu, Mountain, Settings, SlidersHorizontal, Sparkles, XCircle, Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -34,6 +34,9 @@ export const NAV_GROUPS = [
     label: "Practice",
     items: [
       { href: "/practice", label: "Smart practice", icon: Sparkles },
+      { href: "/question-bank", label: "Question bank", icon: Library },
+      { href: "/practice?preset=rush", label: "Question rush", icon: Zap },
+      { href: "/practice?preset=challenge", label: "Challenge questions", icon: Mountain },
       { href: "/practice/custom", label: "Custom practice", icon: SlidersHorizontal },
       { href: "/tests", label: "Practice tests", icon: ClipboardList },
     ],
@@ -50,10 +53,17 @@ export const MOBILE_TABS = [
 ] as const;
 
 /** Exact match, or a sub-page — except /practice, whose sub-page /practice/custom has its own entry. */
-function isActive(path: string, href: string) {
-  if (path === href) return true;
-  if (href === "/practice") return false;
-  return path.startsWith(`${href}/`);
+/**
+ * Exact match, or a sub-page. Links with a query (practice presets) match on the query too, and plain
+ * /practice stays inactive while a preset or a question-bank list is running there.
+ */
+function isActive(path: string, search: URLSearchParams, href: string) {
+  if (href.includes("?")) {
+    const [p, q] = href.split("?");
+    return path === p && [...new URLSearchParams(q)].every(([k, v]) => search.get(k) === v);
+  }
+  if (href === "/practice") return path === href && !search.has("preset") && search.get("mode") !== "list";
+  return path === href || path.startsWith(`${href}/`);
 }
 
 /** Sidebar button that opens the full "Getting started" checklist in its own window. Hidden once everything is done. */
@@ -104,13 +114,14 @@ export function NavLinks({ checklist, user, signOut, onNavigate }: {
   checklist: ChecklistItem[]; user: string; signOut: () => Promise<void>; onNavigate?: () => void;
 }) {
   const path = usePathname();
+  const search = useSearchParams();
   return (
     <div className="flex flex-1 flex-col gap-4">
       {NAV_GROUPS.map((g) => (
         <div key={g.label ?? "main"} className="flex flex-col gap-0.5">
           {g.label && <p className="px-2 pb-1 text-xs font-medium text-muted-foreground">{g.label}</p>}
           {g.items.map(({ href, label, icon: Icon }) => (
-            <Link key={href} href={href} onClick={onNavigate} aria-current={isActive(path, href) ? "page" : undefined}
+            <Link key={href} href={href} onClick={onNavigate} aria-current={isActive(path, search, href) ? "page" : undefined}
               className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:font-medium">
               <Icon className="size-4" />{label}
             </Link>
@@ -119,7 +130,7 @@ export function NavLinks({ checklist, user, signOut, onNavigate }: {
       ))}
       <div className="mt-auto flex flex-col gap-2">
         <Checklist items={checklist} onNavigate={onNavigate} />
-        <Link href="/settings" onClick={onNavigate} aria-current={isActive(path, "/settings") ? "page" : undefined}
+        <Link href="/settings" onClick={onNavigate} aria-current={isActive(path, search, "/settings") ? "page" : undefined}
           className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:font-medium">
           <Settings className="size-4" /><span className="truncate">{user}</span>
         </Link>
@@ -145,10 +156,11 @@ export function MobileMenu(props: { checklist: ChecklistItem[]; user: string; si
 
 export function MobileTabs() {
   const path = usePathname();
+  const search = useSearchParams();
   return (
     <nav className="fixed inset-x-0 bottom-0 z-10 flex justify-around border-t bg-background pb-[env(safe-area-inset-bottom)] md:hidden">
       {MOBILE_TABS.map(({ href, label, icon: Icon }) => (
-        <Link key={href} href={href} aria-current={isActive(path, href) ? "page" : undefined}
+        <Link key={href} href={href} aria-current={isActive(path, search, href) ? "page" : undefined}
           className="flex flex-1 flex-col items-center gap-0.5 py-2 text-xs text-muted-foreground aria-[current=page]:text-foreground">
           <Icon className="size-5" />{label}
         </Link>

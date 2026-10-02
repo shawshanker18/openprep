@@ -11,13 +11,14 @@ import { nextQuestion as next, submitAnswer as submit } from "@/server/practice"
 const id = z.string().min(1).max(64);
 
 const Next = z.object({
-  mode: z.enum(["skill", "smart", "review", "set"]),
+  mode: z.enum(["skill", "smart", "review", "set", "list"]),
   skillId: id.optional(),
   exclude: z.array(id).max(200),
   difficulty: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal("mixed")]).optional(),
   skillIds: z.array(id).max(29).optional(),
   tags: z.array(id).max(50).optional(),
   timing: z.enum(["auto", "off", "on"]).optional(),
+  ids: z.array(id).max(50).optional(),
 });
 export async function nextQuestion(input: z.input<typeof Next>) {
   const { userId, profile } = await requireUser();
