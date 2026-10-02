@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Choice } from "@/components/ui/choice";
-import { inNativeApp, setNativeReminder } from "@/lib/native";
+import { inNativeApp, nativeNotificationsAllowed, setNativeReminder } from "@/lib/native";
 import { setReminderHour, subscribePush, testPush, unsubscribePush } from "./actions";
 
 const KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
@@ -15,7 +15,7 @@ function keyBytes(base64: string) {
   return Uint8Array.from(b, (c) => c.charCodeAt(0));
 }
 
-type State = "loading" | "native" | "unsupported" | "ios-install" | "denied" | "off" | "on";
+type State = "loading" | "native" | "native-blocked" | "unsupported" | "ios-install" | "denied" | "off" | "on";
 
 export function Reminders({ hour }: { hour: number | null }) {
   const [state, setState] = useState<State>("loading");
@@ -24,7 +24,8 @@ export function Reminders({ hour }: { hour: number | null }) {
 
   useEffect(() => {
     (async () => {
-      if (inNativeApp()) return setState("native"); // the app schedules its own daily notification
+      // The app schedules its own daily notification (if the phone lets it show notifications).
+      if (inNativeApp()) return setState(hour != null && !(await nativeNotificationsAllowed()) ? "native-blocked" : "native");
       const ios = /iPad|iPhone|iPod/.test(navigator.userAgent);
       const standalone = window.matchMedia("(display-mode: standalone)").matches;
       if (!KEY || !("serviceWorker" in navigator) || !("PushManager" in window)) return setState(ios && !standalone ? "ios-install" : "unsupported");
@@ -34,7 +35,7 @@ export function Reminders({ hour }: { hour: number | null }) {
       setSub(s);
       setState(s ? "on" : "off");
     })().catch(() => setState("unsupported"));
-  }, []);
+  }, [hour]);
 
   async function enable() {
     setBusy(true);
@@ -75,11 +76,20 @@ export function Reminders({ hour }: { hour: number | null }) {
           options={[{ value: "off", label: "Off" }, ...Array.from({ length: 24 }, (_, h) => ({ value: String(h), label: hourLabel(h) }))]}
           onValueChange={(v) => {
             const h = v === "off" ? null : Number(v);
-            void setReminderHour(h);
-            if (state === "native") void setNativeReminder(h);
+            setReminderHour(h).catch(() => toast.error("Couldn't save your reminder time. Check your connection and try again."));
+            if (state === "native" || state === "native-blocked") {
+              void setNativeReminder(h).then(async () => setState(h != null && !(await nativeNotificationsAllowed()) ? "native-blocked" : "native"));
+            }
           }} />
       </label>
-      {state === "native" && <p className="text-sm text-muted-foreground">This app reminds you on this device at the time above.</p>}
+      {state === "native" && (
+        <p className="text-sm text-muted-foreground">
+          {hour == null ? "Pick a time above to get a daily reminder on this device." : "This app reminds you on this device every day at the time above."}
+        </p>
+      )}
+      {state === "native-blocked" && (
+        <p role="alert" className="text-sm">Notifications are off for OpenPrep, so reminders can&apos;t show. Turn them on in your phone&apos;s <b>Settings → Apps → OpenPrep → Notifications</b>, then pick the time again.</p>
+      )}
       {state === "loading" && <p className="text-sm text-muted-foreground">Checking this browser…</p>}
       {state === "unsupported" && <p className="text-sm text-muted-foreground">This browser can&apos;t receive notifications.</p>}
       {state === "ios-install" && <p className="text-sm">On iPhone and iPad: tap Share → <b>Add to Home Screen</b>, open OpenPrep from your home screen, then come back here.</p>}

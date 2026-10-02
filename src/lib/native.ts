@@ -1,6 +1,7 @@
 // Bridges to the OpenPrep desktop (Electron preload) and Android (Capacitor) shells. Absent on the plain website.
 type LocalNotifications = {
   requestPermissions(): Promise<{ display: string }>;
+  checkPermissions(): Promise<{ display: string }>;
   cancel(o: { notifications: { id: number }[] }): Promise<void>;
   schedule(o: { notifications: { id: number; title: string; body: string; isExactNotification?: boolean; schedule: { on: { hour: number; minute: number } } }[] }): Promise<void>;
 };
@@ -30,6 +31,12 @@ export function setLockdown(on: boolean, kind: "test" | "focus" = "test") {
 }
 let androidRelease: ReturnType<typeof setTimeout> | undefined;
 let androidPinned = false;
+
+/** Android app: may OpenPrep show notifications? (The desktop app and the website handle this themselves: true.) */
+export async function nativeNotificationsAllowed() {
+  const ln = window.Capacitor?.isNativePlatform?.() ? window.Capacitor.Plugins?.LocalNotifications : undefined;
+  return !ln || (await ln.checkPermissions()).display === "granted";
+}
 
 const REMINDER_ID = 1;
 // Updates run one at a time (overlapping cancel/schedule pairs would cancel each other) and repeats are skipped.
