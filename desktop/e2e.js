@@ -95,6 +95,20 @@ app.whenReady().then(async () => {
       await wait(1500);
       r.resumeRecordedAndCleaned = !(await js("location.search")).includes("resumed");
     }
+    if (STAGE === "freeze") {
+      // A stuck script freezes the page mid-test: the app restarts the renderer and the test comes back, locked.
+      const t0 = Date.now();
+      void win.webContents.executeJavaScript("setTimeout(() => { for (;;) {} }, 0)").catch(() => {});
+      await wait(3000);
+      // Chromium notices a hang when the page stops handling input, so keep "clicking" like a student would.
+      const poke = setInterval(() => { try { win.webContents.sendInputEvent({ type: "mouseMove", x: 200, y: 200 }); } catch { /* reloading */ } }, 1500);
+      await until("test back after freeze", async () => {
+        try { return await Promise.race([js(`[...document.querySelectorAll("button")].some((b) => b.textContent.trim() === "End test")`), wait(1500).then(() => false)]); } catch { return false; }
+      }, 90_000);
+      clearInterval(poke);
+      r.recoveredFromFreeze = win.isKiosk();
+      r.freezeRecoverySeconds = Math.round((Date.now() - t0) / 1000);
+    }
     if (STAGE === "crash") {
       // The page's renderer dies mid-test: the app reloads it and the test is locked again.
       win.webContents.forcefullyCrashRenderer();
