@@ -1,7 +1,7 @@
 // Tests: assembly, module lifecycle, server-authoritative timing, scoring at completion (spec 03 §7–8, 04 §5).
 // Mastery is only updated when the whole session completes; abandoned sessions change nothing.
 import "server-only";
-import { and, asc, desc, eq, gte, inArray, isNull, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gte, inArray, isNull, lt, sql } from "drizzle-orm";
 import { db, type Tx } from "@/db";
 import { attempts, questions, scoreSnapshots, skillState, testItems, testModules, testSessions } from "@/db/schema";
 import { SKILL_BY_ID } from "@/content/taxonomy";
@@ -325,12 +325,12 @@ export async function sweepTests(now = new Date()) {
   const expired = await db.select({ moduleId: testModules.id, sessionId: testSessions.id, userId: testSessions.userId })
     .from(testModules).innerJoin(testSessions, eq(testSessions.id, testModules.sessionId))
     .where(and(eq(testSessions.status, "in_progress"), isNull(testModules.submittedAt),
-      sql`${testModules.deadlineAt} < ${new Date(now.getTime() - GRACE_MS)}`))
+      lt(testModules.deadlineAt, new Date(now.getTime() - GRACE_MS))))
     .limit(200);
   for (const e of expired) await db.transaction((tx) => submitModuleTx(tx, e.userId, e.sessionId, e.moduleId, now));
   const stale = await db.update(testSessions).set({ status: "abandoned", completedAt: now })
     .where(and(eq(testSessions.status, "in_progress"), sql`${testSessions.kind} <> 'diagnostic'`,
-      sql`${testSessions.startedAt} < ${new Date(now.getTime() - 3 * 86_400_000)}`))
+      lt(testSessions.startedAt, new Date(now.getTime() - 3 * 86_400_000))))
     .returning({ id: testSessions.id });
   return { submitted: expired.length, abandoned: stale.length };
 }
