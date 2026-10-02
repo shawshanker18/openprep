@@ -21,6 +21,8 @@ public class LockdownPlugin extends Plugin {
     static final String LOCKED_URL = "lockedUrl";
 
     private boolean on = false;
+    /** A test (strict) rather than a focus session, which the student started and can end whenever they like. */
+    private boolean test = false;
     /** The running instance, for MainActivity's page-load listener (Capacitor drops listeners added from load()). */
     static LockdownPlugin instance;
     private OnBackPressedCallback back;
@@ -51,7 +53,11 @@ public class LockdownPlugin extends Plugin {
     void pageLoaded(WebView webView) {
         String url = webView.getUrl();
         if (!on || url == null) return;
-        if (url.startsWith("https://localhost")) { offlineDuringTest(webView); return; }
+        if (url.startsWith("https://localhost")) {
+            // Offline: a test stays locked and retries; a focus session just ends (its exit button is gone with the page).
+            if (test) offlineDuringTest(webView); else release();
+            return;
+        }
         if (url.startsWith("http") && !url.matches(".*/test/[0-9a-fA-F-]{36}(\\?.*)?$")) release();
     }
 
@@ -73,8 +79,11 @@ public class LockdownPlugin extends Plugin {
     public void start(PluginCall call) {
         getActivity().runOnUiThread(() -> {
             on = true;
-            String url = getBridge().getWebView().getUrl();
-            prefs().edit().putString(LOCKED_URL, url == null || url.indexOf('?') < 0 ? url : url.substring(0, url.indexOf('?'))).apply();
+            test = !"focus".equals(call.getString("kind"));
+            // Only a test reopens where it was if the app is closed.
+            String url = test ? getBridge().getWebView().getUrl() : null;
+            if (url == null) prefs().edit().remove(LOCKED_URL).apply();
+            else prefs().edit().putString(LOCKED_URL, url.indexOf('?') < 0 ? url : url.substring(0, url.indexOf('?'))).apply();
             pin();
             call.resolve();
         });
