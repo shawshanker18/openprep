@@ -10,6 +10,7 @@ import { SKILL_BY_ID } from "@/content/taxonomy";
 import { masteryPct, status } from "@/engine/mastery";
 import { localDate } from "@/engine/plan";
 import { inRunningTest } from "./tests";
+import { wasGiven } from "./practice";
 
 export const MODES = ["hint", "explain", "byhand", "fast", "desmos", "why_wrong", "vocab", "similar", "chat"] as const;
 export type Mode = (typeof MODES)[number];
@@ -42,7 +43,7 @@ export function getModel() {
 
 export async function checkAccess(userId: string, q: Question, mode: Mode): Promise<string | null> {
   if (await inRunningTest(userId, q.id)) return "The tutor isn't available during a test.";
-  if (mode === "hint") return null;
+  if (mode === "hint") return (await wasGiven(userId, q.id)) ? null : "Question not found.";
   const [a] = await db.select({ id: attempts.id }).from(attempts)
     .where(and(eq(attempts.userId, userId), eq(attempts.questionId, q.id))).limit(1);
   return a ? null : "Answer the question first, then the tutor can explain it.";

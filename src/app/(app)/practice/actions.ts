@@ -7,7 +7,7 @@ import { db } from "@/db";
 import { attempts, bookmarks, questionReports, questions } from "@/db/schema";
 import { MISTAKE_TYPES } from "@/engine/mistakes";
 import { diagnosticPending, requireUser } from "@/server/auth";
-import { nextQuestion as next, overServeLimit, submitAnswer as submit } from "@/server/practice";
+import { nextQuestion as next, overServeLimit, submitAnswer as submit, wasGiven } from "@/server/practice";
 
 const id = text().min(1).max(64);
 
@@ -59,6 +59,7 @@ export async function toggleBookmark(input: { questionId: string }) {
   const { userId } = await requireUser();
   const p = z.object({ questionId: id }).safeParse(input);
   if (!p.success) return { ok: false as const, error: "Invalid question." };
+  if (!(await wasGiven(userId, p.data.questionId))) return { ok: false as const, error: "Question not found." };
   const key = and(eq(bookmarks.userId, userId), eq(bookmarks.questionId, p.data.questionId));
   const removed = await db.delete(bookmarks).where(key).returning();
   if (!removed.length) await db.insert(bookmarks).values({ userId, questionId: p.data.questionId }).onConflictDoNothing();

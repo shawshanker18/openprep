@@ -78,7 +78,9 @@ it("plan blocks are done only from real work today (a click can't tick them)", a
   expect(before.map((b) => b.done)).toEqual([false, false, false, false, false]);
   expect(before[0]!.progress).toEqual({ n: 0, target: 3 }); // 5 minutes of math ≈ 3 questions
 
-  for (const q of [...ids, `${skill.id}-bulk0`]) await P.submitAnswer(U3, { questionId: q, response: "A", timeMs: 30_000, confidence: 2 });
+  const four = [...ids, `${skill.id}-bulk0`];
+  await db.insert(schema.questionServes).values(four.map((questionId) => ({ userId: U3, questionId, servedAt: new Date() })));
+  for (const q of four) await P.submitAnswer(U3, { questionId: q, response: "A", timeMs: 30_000, confidence: 2 });
   await db.insert(schema.lessonProgress).values([
     { userId: U3, skillId: skill.id },                                                                   // read today
     { userId: U3, skillId: "desmos:graphing-basics", completedAt: new Date(Date.now() - 2 * 86_400_000) }, // read days ago
@@ -86,4 +88,19 @@ it("plan blocks are done only from real work today (a click can't tick them)", a
   const after = await D.withProgress(U3, profile, today, [...blocks]);
   expect(after.map((b) => b.done)).toEqual([true, false, false, true, false]);
   expect(after[1]!.progress).toEqual({ n: 1, target: 3 }); // 4 answers: 3 finish the first block, 1 left for the check-in
+});
+
+it("answers are only revealed for questions this student was given (no reading the bank by id)", async () => {
+  const U4 = "00000000-0000-0000-0000-0000000000ff";
+  await db.insert(schema.profiles).values({ id: U4 });
+  await db.insert(schema.skillState).values(SKILLS.map((s) => ({ userId: U4, skillId: s.id })));
+  const never = `${skill.id}-bulk7`;
+  expect(await P.wasGiven(U4, never)).toBe(false);
+  expect(await P.submitAnswer(U4, { questionId: never, response: "A", timeMs: 5000, confidence: 2 })).toBeNull();
+
+  const served = await P.nextQuestion(U4, {} as schema.Profile, { mode: "list", ids: [never], exclude: [] });
+  expect(served?.question.id).toBe(never);
+  expect(await P.wasGiven(U4, never)).toBe(true);
+  const r = await P.submitAnswer(U4, { questionId: never, response: "A", timeMs: 5000, confidence: 2 });
+  expect(r?.revealed.answer).toEqual({ choice: "A" });
 });
