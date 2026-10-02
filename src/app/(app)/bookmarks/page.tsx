@@ -7,13 +7,15 @@ import { db } from "@/db";
 import { attempts, bookmarks, questions } from "@/db/schema";
 import { SKILL_BY_ID } from "@/content/taxonomy";
 import { requireUser } from "@/server/auth";
+import { internalId, publicId } from "@/server/questions";
 
 export const metadata = { title: "Saved questions" };
 
-async function removeBookmark(questionId: string) {
+async function removeBookmark(pub: string) {
   "use server";
   const { userId } = await requireUser();
-  await db.delete(bookmarks).where(and(eq(bookmarks.userId, userId), eq(bookmarks.questionId, questionId)));
+  const questionId = await internalId(pub);
+  if (questionId) await db.delete(bookmarks).where(and(eq(bookmarks.userId, userId), eq(bookmarks.questionId, questionId)));
   revalidatePath("/bookmarks");
 }
 
@@ -35,7 +37,7 @@ export default async function BookmarksPage() {
       ) : (
         <ul className="flex flex-col gap-3">
           {rows.map((r) => (
-            <li key={r.id} className="flex flex-col gap-2 rounded-lg border p-4 text-sm">
+            <li key={publicId(r.id)} className="flex flex-col gap-2 rounded-lg border p-4 text-sm">
               {r.passage && <Markdown className="line-clamp-3 text-muted-foreground">{r.passage}</Markdown>}
               <Markdown>{r.stem}</Markdown>
               {r.answered && (
@@ -51,7 +53,7 @@ export default async function BookmarksPage() {
                 <span className="text-xs text-muted-foreground">saved {r.at.toLocaleDateString()}</span>
                 <span className="flex-1" />
                 <Button size="sm" variant="outline" render={<Link href={`/practice?skill=${r.skillId}`} />}>Practise this skill</Button>
-                <form action={removeBookmark.bind(null, r.id)}><Button size="sm" variant="ghost" type="submit">Remove</Button></form>
+                <form action={removeBookmark.bind(null, publicId(r.id))}><Button size="sm" variant="ghost" type="submit">Remove</Button></form>
               </div>
             </li>
           ))}

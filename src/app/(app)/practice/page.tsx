@@ -25,7 +25,7 @@ export default async function PracticePage({ searchParams }: PageProps<"/practic
   const back = typeof sp.from === "string" && /^\/(course(\/[a-z-]+)?|question-bank(\?[\w=&%.,-]*)?)$/.test(sp.from) ? sp.from : undefined;
 
   if (mode === "list") {
-    const ids = list(sp.ids).filter((id) => /^[a-z0-9-]{3,64}$/.test(id)).slice(0, 50);
+    const ids = list(sp.ids).filter((id) => /^[\w-]{22}$/.test(id)).slice(0, 50);
     const set = { skillIds: [] as string[], tags: [] as string[], count: ids.length, timing: "off" as const };
     return <PracticeRunner key={ids.join(",")} mode="list" ids={ids} title="Question bank" block={null} set={set} back={back} />;
   }

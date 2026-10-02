@@ -6,10 +6,11 @@ import { DiagnosticGate } from "@/components/diagnostic-gate";
 import { DOMAINS, SKILLS, SKILL_BY_ID, type DomainId } from "@/content/taxonomy";
 import { diagnosticPending, requireUser } from "@/server/auth";
 import { questionBank, type BankStatus } from "@/server/practice";
+import { publicId } from "@/server/questions";
 
 export const metadata = { title: "Question bank" };
 
-const PAGE = 25;
+const PAGE = 20; // and no totals anywhere: nothing here tells a scraper how big the bank is
 const DIFF = { 1: "Easy", 2: "Medium", 3: "Hard" } as Record<number, string>;
 const one = (v: string | string[] | undefined) => (typeof v === "string" ? v : "");
 
@@ -34,13 +35,13 @@ export default async function QuestionBankPage({ searchParams }: PageProps<"/que
   const rows = all.filter((q) => (!section || q.section === section) && (!skill || q.skillId === skill)
     && (!difficulty || q.difficulty === Number(difficulty))
     && (!status || (status === "saved" ? q.saved : q.status === (status as BankStatus))));
-  const pages = Math.max(1, Math.ceil(rows.length / PAGE));
   const shown = rows.slice((page - 1) * PAGE, page * PAGE);
+  const hasMore = rows.length > page * PAGE;
   const query = new URLSearchParams(Object.entries({ section, skill, difficulty, status }).filter(([, v]) => v)).toString();
   const here = `/question-bank${query ? `?${query}` : ""}`;
   // Practice starting at a question, then on through the rest of the filtered list (50 at most).
-  const practiceFrom = (i: number) => `/practice?mode=list&ids=${rows.slice(i, i + 50).map((q) => q.id).join(",")}&from=${encodeURIComponent(here)}`;
-  const counts = { new: all.filter((q) => q.status === "new").length, correct: all.filter((q) => q.status === "correct").length, incorrect: all.filter((q) => q.status === "incorrect").length };
+  const practiceFrom = (i: number) => `/practice?mode=list&ids=${rows.slice(i, i + PAGE).map((q) => publicId(q.id)).join(",")}&from=${encodeURIComponent(here)}`;
+  const counts = { correct: all.filter((q) => q.status === "correct").length, incorrect: all.filter((q) => q.status === "incorrect").length };
   const skillOptions = SKILLS.filter((s) => !section || s.section === section).map((s) => ({ value: s.id, label: s.name }));
 
   return (
@@ -48,7 +49,7 @@ export default async function QuestionBankPage({ searchParams }: PageProps<"/que
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold">Question bank</h1>
         <p className="text-sm text-muted-foreground">
-          All {all.length} OpenPrep questions. {counts.correct} answered right, {counts.incorrect} to retry, {counts.new} you haven&apos;t seen yet.
+          Pick a question to practise, or filter by section, skill and difficulty. So far: {counts.correct} answered right, {counts.incorrect} to retry.
         </p>
       </div>
 
@@ -69,8 +70,8 @@ export default async function QuestionBankPage({ searchParams }: PageProps<"/que
       </form>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-muted-foreground">{rows.length} question{rows.length === 1 ? "" : "s"}</p>
-        {rows.length > 0 && <Button render={<Link href={practiceFrom(0)} />}>Practise {Math.min(rows.length, 50)} in a row</Button>}
+        <p className="text-sm text-muted-foreground">{page > 1 ? `Page ${page}` : " "}</p>
+        {shown.length > 0 && <Button render={<Link href={practiceFrom((page - 1) * PAGE)} />}>Practise this page in a row</Button>}
       </div>
 
       {rows.length === 0 ? <p className="rounded-xl border p-5 text-sm text-muted-foreground">No questions match these filters.</p> : (
@@ -79,7 +80,7 @@ export default async function QuestionBankPage({ searchParams }: PageProps<"/que
             const at = (page - 1) * PAGE + i;
             const skillInfo = SKILL_BY_ID[q.skillId]!;
             return (
-              <li key={q.id}>
+              <li key={at}>
                 <Link href={practiceFrom(at)} className="flex items-start gap-3 p-4 hover:bg-muted">
                   <span className="mt-0.5 shrink-0" title={q.status === "correct" ? "Got it right" : q.status === "incorrect" ? "Got it wrong" : "Not seen yet"}>
                     {q.status === "correct" ? <Check className="size-4" /> : q.status === "incorrect" ? <X className="size-4 text-destructive" /> : <Circle className="size-4 text-muted-foreground" />}
@@ -99,11 +100,11 @@ export default async function QuestionBankPage({ searchParams }: PageProps<"/que
         </ol>
       )}
 
-      {pages > 1 && (
+      {(page > 1 || hasMore) && (
         <nav className="flex items-center justify-between text-sm" aria-label="Pages">
           {page > 1 ? <Link className="underline" href={`/question-bank?${new URLSearchParams({ ...Object.fromEntries(new URLSearchParams(query)), page: String(page - 1) })}`}>Previous</Link> : <span />}
-          <span className="text-muted-foreground">Page {page} of {pages}</span>
-          {page < pages ? <Link className="underline" href={`/question-bank?${new URLSearchParams({ ...Object.fromEntries(new URLSearchParams(query)), page: String(page + 1) })}`}>Next</Link> : <span />}
+          <span className="text-muted-foreground">Page {page}</span>
+          {hasMore ? <Link className="underline" href={`/question-bank?${new URLSearchParams({ ...Object.fromEntries(new URLSearchParams(query)), page: String(page + 1) })}`}>Next</Link> : <span />}
         </nav>
       )}
     </div>

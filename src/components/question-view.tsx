@@ -15,7 +15,7 @@ export function QuestionView({ question: q, value, onChange, disabled, correct }
   correct?: string | null; // choice letter, once revealed (MCQ only)
 }) {
   return (
-    <div className={cn("grid gap-6", q.passageMd && "md:grid-cols-2")}>
+    <div className={cn("question-content grid gap-6", q.passageMd && "md:grid-cols-2")}>
       {q.passageMd && <Markdown className="rounded-lg bg-muted/50 p-4 text-[15px]">{q.passageMd}</Markdown>}
       <div className="flex flex-col gap-4">
         <Markdown className="text-[15px]">{q.stemMd}</Markdown>

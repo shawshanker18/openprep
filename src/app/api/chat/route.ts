@@ -7,6 +7,7 @@ import { AI_INPUT_MAX_CHARS } from "@/engine/constants";
 import { getUserId } from "@/server/auth";
 import { cacheKey, checkAccess, getCached, getModel, loadQuestion, logMessage, MODES, saveCache, systemPrompt, usedToday } from "@/server/ai";
 import { db } from "@/db";
+import { internalId } from "@/server/questions";
 import { profiles } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
@@ -35,7 +36,8 @@ export async function POST(req: Request) {
   if (lastUser && lastUser.content.length > AI_INPUT_MAX_CHARS) return text(`Please keep questions under ${AI_INPUT_MAX_CHARS} characters.`, 400);
   if (mode === "why_wrong" && !choice) return text("Which choice did you pick?", 400);
 
-  const q = await loadQuestion(questionId);
+  const internal = await internalId(questionId);
+  const q = internal ? await loadQuestion(internal) : null;
   if (!q) return text("Question not found.", 404);
   if (mode === "vocab" && q.section !== "rw") return text("Vocabulary help is for Reading & Writing questions.", 400);
   const denied = await checkAccess(userId, q, mode);

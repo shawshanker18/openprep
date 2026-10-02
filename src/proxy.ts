@@ -2,6 +2,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { SESSION_COOKIE_OPTIONS } from "@/lib/supabase/cookies";
+import { anonymousLimited } from "@/server/ratelimit";
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -17,6 +18,12 @@ export async function proxy(request: NextRequest) {
     },
   });
   const { data: { user } } = await supabase.auth.getUser(); // verifies the session and refreshes it if needed
+  // Signed-out writes (server actions, forms) are capped per IP before any of our code runs.
+  const ip = (request.headers.get("x-forwarded-for")?.split(",")[0] ?? "").trim() || "unknown";
+  if (!user && request.method === "POST" && (await anonymousLimited(ip)))
+    return new NextResponse("Too many requests.", { status: 429, headers: { "Retry-After": "60" } });
+  // Only the landing and sign-in pages may appear in search results; nothing inside the app or its API.
+  if (!["/", "/login"].includes(request.nextUrl.pathname)) response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive, nosnippet");
   // The landing page is static; signed-in visitors go straight to the app from here instead.
   const devUser = process.env.NODE_ENV === "development" && !!process.env.DEV_USER_ID;
   if (request.nextUrl.pathname === "/" && (user || devUser)) {

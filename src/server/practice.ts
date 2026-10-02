@@ -79,12 +79,12 @@ async function timeLimitFor(userId: string, q: Question, timing: Timing | undefi
  * stays under these; a script pulling the whole bank does not. (questionServes keeps one row per question, so this
  * counts distinct questions.)
  */
-export const SERVE_LIMITS = { burst: { ms: 10 * 60_000, max: 60 }, day: { ms: 86_400_000, max: 250 } };
+export const SERVE_LIMITS = { hour: { ms: 3_600_000, max: 20 }, day: { ms: 86_400_000, max: 250 } };
 export async function overServeLimit(userId: string, now = new Date()) {
   const served = (ms: number) => db.select({ n: count() }).from(questionServes)
     .where(and(eq(questionServes.userId, userId), gte(questionServes.servedAt, new Date(now.getTime() - ms)))).then((r) => r[0]!.n);
-  const [burst, day] = await Promise.all([served(SERVE_LIMITS.burst.ms), served(SERVE_LIMITS.day.ms)]);
-  return burst >= SERVE_LIMITS.burst.max || day >= SERVE_LIMITS.day.max;
+  const [hour, day] = await Promise.all([served(SERVE_LIMITS.hour.ms), served(SERVE_LIMITS.day.ms)]);
+  return hour >= SERVE_LIMITS.hour.max || day >= SERVE_LIMITS.day.max;
 }
 
 export async function nextQuestion(userId: string, profile: Profile, input: {
@@ -162,15 +162,17 @@ export async function wasGiven(userId: string, questionId: string) {
 export async function submitAnswer(userId: string, input: {
   questionId: string; response: string | null; timeMs: number; confidence: 1 | 2 | 3;
 }) {
-  const [[q], live, [served], given] = await Promise.all([
+  const [[q], live, [served], [last]] = await Promise.all([
     db.select().from(questions).where(eq(questions.id, input.questionId)),
     inRunningTest(userId, input.questionId), // practice would reveal the answer to a question in a live test
     db.select({ at: questionServes.servedAt }).from(questionServes)
       .where(and(eq(questionServes.userId, userId), eq(questionServes.questionId, input.questionId))),
-    wasGiven(userId, input.questionId),
+    db.select({ at: attempts.createdAt }).from(attempts)
+      .where(and(eq(attempts.userId, userId), eq(attempts.questionId, input.questionId))).orderBy(desc(attempts.createdAt)).limit(1),
   ]);
-  // Never reveal the answer to a question this student wasn't given.
-  if (!q || live || !given) return null;
+  // One answer per serve: the question must have been handed to this student and not answered since. No answering
+  // questions you weren't given, and no trying A, then B, then C on the same serve.
+  if (!q || live || !served || (last && last.at >= served.at)) return null;
   const timeMs = serverCappedTime(input.timeMs, served?.at ?? null, new Date());
   return db.transaction(async (tx) => {
     // A question in the user's review queue is always recorded as a review, whatever the client says.
