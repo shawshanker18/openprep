@@ -12,7 +12,7 @@ declare global { interface Window { google?: { accounts: { id: Gsi } } } }
 
 const CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
-async function sha256Hex(s: string) {
+export async function sha256Hex(s: string) {
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
   return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
@@ -21,7 +21,11 @@ async function sha256Hex(s: string) {
  * Google Identity Services button: Google signs the user in on this site's own origin and returns an ID token,
  * which Supabase verifies against the Client ID. No redirect through the Supabase domain, no client secret.
  */
-export function GoogleButton({ enabled }: { enabled: boolean }) {
+/**
+ * `nonceHash` + `onToken`: the browser half of signing in from the desktop/Android app (see /auth/google). The app
+ * keeps the nonce; Google embeds its hash in the token, which is handed back to the app instead of signing in here.
+ */
+export function GoogleButton({ enabled, nonceHash, onToken }: { enabled: boolean; nonceHash?: string; onToken?: (credential: string) => void }) {
   const router = useRouter();
   const el = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
@@ -35,10 +39,11 @@ export function GoogleButton({ enabled }: { enabled: boolean }) {
       if (!g || cancelled || !el.current) return;
       g.initialize({
         client_id: CLIENT_ID,
-        nonce: await sha256Hex(raw), // Google embeds the hash; Supabase checks it against the raw nonce
+        nonce: nonceHash ?? (await sha256Hex(raw)), // Google embeds the hash; Supabase checks it against the raw nonce
         use_fedcm_for_prompt: true,
         callback: async ({ credential }: { credential: string }) => {
           setError(null);
+          if (onToken) return onToken(credential);
           const r = await signInWithGoogle({ credential, nonce: raw }).catch(() => ({ ok: false, error: undefined }));
           if (!r.ok) { setError(("error" in r && r.error) || "Google sign-in didn't work. Please try again or use the email link."); return; }
           router.replace("/dashboard");
@@ -56,7 +61,7 @@ export function GoogleButton({ enabled }: { enabled: boolean }) {
       document.head.appendChild(s);
     }
     return () => { cancelled = true; };
-  }, [enabled, router]);
+  }, [enabled, router, nonceHash, onToken]);
 
   if (!CLIENT_ID) return null;
   return (

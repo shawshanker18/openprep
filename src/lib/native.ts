@@ -7,8 +7,9 @@ type LocalNotifications = {
 };
 declare global {
   interface Window {
-    openprepDesktop?: { setLockdown(on: boolean, kind?: "test" | "focus"): void; setReminder(hour: number | null): void };
-    Capacitor?: { isNativePlatform?(): boolean; Plugins?: { LocalNotifications?: LocalNotifications; Lockdown?: { start(o: { kind: "test" | "focus" }): Promise<void>; stop(): Promise<void> } } };
+    openprepDesktop?: { setLockdown(on: boolean, kind?: "test" | "focus"): void; setReminder(hour: number | null): void; googleSignIn?: boolean };
+    Capacitor?: { isNativePlatform?(): boolean; isPluginAvailable?(name: string): boolean; Plugins?: {
+      SignIn?: { openInBrowser(o: { url: string }): Promise<void> }; LocalNotifications?: LocalNotifications; Lockdown?: { start(o: { kind: "test" | "focus" }): Promise<void>; stop(): Promise<void> } } };
   }
 }
 

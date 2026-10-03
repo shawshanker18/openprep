@@ -1,15 +1,19 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { parseAuthLink, isAppUrl, isTestPage, isExternalWebUrl, reminderDue, localDay } = require("./lib");
+const { authLinkPath, isAppUrl, isTestPage, isExternalWebUrl, reminderDue, localDay } = require("./lib");
 
 const SITE = "https://openprep-opal.vercel.app";
 
 test("auth deep link", () => {
-  assert.equal(parseAuthLink("openprep://auth?code=abc123def"), "abc123def");
-  assert.equal(parseAuthLink("openprep://auth?code=a%22b%3Cscript"), null); // not a plain token
-  assert.equal(parseAuthLink("openprep://evil?code=abc123def"), null);
-  assert.equal(parseAuthLink("https://x.com/auth?code=abc123def"), null);
-  assert.equal(parseAuthLink("not a url"), null);
+  assert.equal(authLinkPath("openprep://auth?code=abc123def"), "/auth/callback?code=abc123def");
+  assert.equal(authLinkPath("openprep://auth?code=a%22b%3Cscript"), null); // not a plain token
+  assert.equal(authLinkPath("openprep://evil?code=abc123def"), null);
+  assert.equal(authLinkPath("https://x.com/auth?code=abc123def"), null);
+  assert.equal(authLinkPath("not a url"), null);
+  assert.equal(authLinkPath("openprep://auth?google=eyJh.eyJz.c2ln_-"), "/auth/google/finish#t=eyJh.eyJz.c2ln_-");
+  assert.equal(authLinkPath("openprep://auth?google=a.b.c%23x"), null); // not a JWT
+  assert.equal(authLinkPath("openprep://auth?google=a.b"), null);
+  assert.equal(authLinkPath(`openprep://auth?google=a.b.${"c".repeat(9000)}`), null);
 });
 
 test("navigation policy", () => {

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { GoogleButton } from "./google-button";
+import { AppGoogleButton } from "./app-google-button";
 import { prepareEmailSignIn } from "@/app/auth/actions";
 
 export function LoginForm({ google: showGoogle, inApp = false }: { google: boolean; inApp?: boolean }) {
@@ -36,6 +37,11 @@ export function LoginForm({ google: showGoogle, inApp = false }: { google: boole
     );
   }
 
+  const or = (
+    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+      <span className="h-px flex-1 bg-border" />or<span className="h-px flex-1 bg-border" />
+    </div>
+  );
   return (
     <div className="flex flex-col gap-6">
       <label className="flex items-start gap-2.5 text-sm text-muted-foreground">
@@ -46,12 +52,7 @@ export function LoginForm({ google: showGoogle, inApp = false }: { google: boole
         </span>
       </label>
 
-      {showGoogle && <>
-        <GoogleButton enabled={age} />
-        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-          <span className="h-px flex-1 bg-border" />or<span className="h-px flex-1 bg-border" />
-        </div>
-      </>}
+      {showGoogle && (inApp ? <AppGoogleButton enabled={age}>{or}</AppGoogleButton> : <><GoogleButton enabled={age} />{or}</>)}
 
       <form onSubmit={magic} className="flex flex-col gap-5">
         <label className="flex flex-col gap-2 text-sm font-medium">
