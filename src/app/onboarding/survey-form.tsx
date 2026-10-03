@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { SUBJECTS, TOPICS } from "@/content/taxonomy";
 import { submitSurvey } from "./actions";
 import { Choice } from "@/components/ui/choice";
+import { DateField } from "@/components/ui/date-field";
 
 const field = "flex flex-col gap-1.5 text-sm";
 const control = "h-9 rounded-md border bg-background px-2 text-sm";
@@ -82,7 +83,7 @@ export function SurveyForm() {
           <div className="grid gap-3 sm:grid-cols-3">
             <label className={field}>Math score<input name="priorMath" type="number" min={200} max={800} step={10} required className={control} /></label>
             <label className={field}>Reading &amp; Writing<input name="priorRw" type="number" min={200} max={800} step={10} required className={control} /></label>
-            <label className={field}>Date taken<input name="priorDate" type="date" required className={control} /></label>
+            <label className={field}>Date taken<DateField name="priorDate" required max={new Date().toISOString().slice(0, 10)} /></label>
           </div>
         )}
       </fieldset>
@@ -94,8 +95,7 @@ export function SurveyForm() {
 
       <div className="flex flex-col gap-2 text-sm">
         <label className={field}>Test date
-          <input name="testDate" type="date" disabled={unsureDate} required={!unsureDate} className={control}
-            min={new Date().toISOString().slice(0, 10)} />
+          <DateField name="testDate" disabled={unsureDate} required={!unsureDate} min={new Date().toISOString().slice(0, 10)} />
         </label>
         <label className="flex items-center gap-2">
           <input type="checkbox" checked={unsureDate} onChange={(e) => setUnsureDate(e.target.checked)} /> Not sure yet

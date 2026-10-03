@@ -20,13 +20,13 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
   const nav = { checklist, user: user?.name ?? user?.email ?? "Settings", signOut };
   const mastery = points(summary.skills.map((k) => levelOf(k.n, k.status))).earned;
 
-  // Top utility bar: streak and SAT course mastery points (plus the bell on desktop).
+  // Top utility bar: streak and skill mastery points (plus the bell on desktop).
   const chips = (
     <>
       <span className="flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm tabular-nums" title="Days in a row with practice">
         <Flame className="size-4" />{streak ? `${streak}-day streak` : "Start a streak"}
       </span>
-      <Link href="/course" className="flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm tabular-nums hover:bg-muted" title="Mastery points in the SAT course">
+      <Link href="/skills" className="flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm tabular-nums hover:bg-muted" title="Mastery points across your skills">
         <Award className="size-4" />{mastery.toLocaleString("en-US")} points
       </Link>
     </>

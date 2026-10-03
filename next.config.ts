@@ -32,6 +32,15 @@ const nextConfig: NextConfig = {
     "/dashboard": ["./content/**/*.md"],
     "/plan": ["./content/**/*.md"],
     "/desmos/*": ["./content/desmos/**/*.md"],
+    "/start": ["./content/desmos/**/*.md"],
+    "/start/*": ["./content/**/*.md"],
+  },
+  // The SAT course was replaced by Start from scratch; old links land on the new path.
+  async redirects() {
+    return [
+      { source: "/course", destination: "/start", permanent: false },
+      { source: "/course/:path*", destination: "/start", permanent: false },
+    ];
   },
   // Security headers (spec 05 §5).
   async headers() {

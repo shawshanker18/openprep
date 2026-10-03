@@ -12,6 +12,7 @@ import {
   addOfficialScore, deleteAccount, removeOfficialScore, resetDashboard, retakeDiagnostic, saveDashboard, updateProfile, updateSettings,
 } from "./actions";
 import { Choice } from "@/components/ui/choice";
+import { DateField } from "@/components/ui/date-field";
 
 export const metadata = { title: "Settings" };
 
@@ -52,7 +53,7 @@ export default async function SettingsPage({ searchParams }: PageProps<"/setting
           <label className="flex flex-col gap-1 text-sm">Target score
             <input name="targetScore" type="number" min={400} max={1600} step={10} defaultValue={profile.targetScore ?? 1400} className={control} /></label>
           <label className="flex flex-col gap-1 text-sm">Test date
-            <input name="testDate" type="date" defaultValue={profile.testDate ?? ""} className={control} /></label>
+            <DateField name="testDate" defaultValue={profile.testDate} /></label>
           <label className="flex flex-col gap-1 text-sm">Minutes per day
             <Choice name="minutesPerDay" defaultValue={String(profile.minutesPerDay)} options={[15, 30, 45, 60, 90, 120].map((m) => ({ value: String(m), label: `${m} minutes` }))} /></label>
           <label className="flex flex-col gap-1 text-sm">Days per week
@@ -135,7 +136,7 @@ export default async function SettingsPage({ searchParams }: PageProps<"/setting
           </ul>
         ) : <p className="text-sm text-muted-foreground">None yet.</p>}
         <form action={addOfficialScore} className="flex flex-wrap items-end gap-2">
-          <label className="flex flex-col gap-1 text-sm">Date<input name="takenOn" type="date" required className={control} /></label>
+          <label className="flex flex-col gap-1 text-sm">Date<DateField name="takenOn" required max={new Date().toISOString().slice(0, 10)} className="w-40" /></label>
           <label className="flex flex-col gap-1 text-sm">Math<input name="math" type="number" min={200} max={800} step={10} required className={`${control} w-24`} /></label>
           <label className="flex flex-col gap-1 text-sm">R&amp;W<input name="rw" type="number" min={200} max={800} step={10} required className={`${control} w-24`} /></label>
           <Button type="submit" variant="outline">Add</Button>
