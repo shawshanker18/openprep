@@ -10,14 +10,16 @@ import { getChecklist, getNotifications } from "@/server/notifications";
 import { getStreak } from "@/server/daily";
 import { getSkillSummary } from "@/server/analytics";
 import { levelOf, points } from "@/engine/course";
+import { isAdmin } from "@/server/admin";
 
 export default async function AppLayout({ children }: LayoutProps<"/">) {
   const { userId, profile } = await requireUser();
   if (profile.onboardingStep !== "done" && profile.onboardingStep !== "diagnostic_skipped") redirect("/onboarding");
-  const [notifications, checklist, user, streak, summary] = await Promise.all([
+  const [notifications, checklist, user, streak, summary, admin] = await Promise.all([
     getNotifications(userId, profile), getChecklist(userId, profile), getAuthUser(), getStreak(userId, profile.timezone), getSkillSummary(userId),
+    isAdmin(userId),
   ]);
-  const nav = { checklist, user: user?.name ?? user?.email ?? "Settings", signOut };
+  const nav = { checklist, user: user?.name ?? user?.email ?? "Settings", signOut, isAdmin: admin };
   const mastery = points(summary.skills.map((k) => levelOf(k.n, k.status))).earned;
 
   // Top utility bar: streak and SAT course mastery points (plus the bell on desktop).
