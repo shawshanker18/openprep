@@ -28,7 +28,7 @@ export default async function CoursePage({ searchParams }: PageProps<"/course">)
       <div className="flex flex-col gap-1">
         <p className="text-sm text-muted-foreground">SAT course</p>
         <h1 className="text-2xl font-semibold">{section === "math" ? "SAT Math" : "SAT Reading and Writing"}</h1>
-        <p className="text-sm text-muted-foreground">{skills.length} skills · learn each one, practise it, then check yourself with quizzes and unit tests.</p>
+        <p className="text-sm text-muted-foreground">{skills.length} skills · learn each one, practice it, then check yourself with quizzes and unit tests.</p>
       </div>
 
       <nav className="flex gap-1 rounded-lg border p-1 text-sm sm:self-start" aria-label="Course section">

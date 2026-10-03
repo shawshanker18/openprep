@@ -71,6 +71,20 @@
       "when": 1790956836636,
       "tag": "0009_security_reports",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1791038017774,
+      "tag": "0010_feedback_admin",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1791038198933,
+      "tag": "0011_admin_directory",
+      "breakpoints": true
     }
   ]
 }

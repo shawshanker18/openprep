@@ -44,14 +44,14 @@ export function buildDailyPlan(x: {
     // The last focus skill takes whatever is left, so the day adds up to exactly the student's minutes.
     const m = i === picks.length - 1 ? left : Math.min(left, round5(pool * shares[i]!));
     if (m < 5) return;
-    // Final week: no new lessons, practise and check in instead.
+    // Final week: no new lessons, practice and check in instead.
     let kind: "learn" | "practice" | "mini" = !within7 && !f.lessonDone && f.masteryPct < 45 ? "learn" : "practice";
-    // A mini test needs 15 minutes; below that, practise instead (keeps the plan inside the budget).
+    // A mini test needs 15 minutes; below that, practice instead (keeps the plan inside the budget).
     // Within 4 weeks of the test the first practice block always becomes a timed check-in.
     if (kind === "practice" && !miniDone && m >= 15 && (within28 || (i === 0 && f.attemptsThisWeek >= 20))) kind = "mini";
     if (kind === "mini") miniDone = true;
     if (kind === "learn" && m >= LEARN_MAX + 10) {
-      // A lesson takes ~15 minutes; use the rest of the slot to practise the same skill straight away.
+      // A lesson takes ~15 minutes; use the rest of the slot to practice the same skill straight away.
       blocks.push({ kind, minutes: LEARN_MAX, skillId: f.skillId, done: false });
       blocks.push({ kind: "practice", minutes: m - LEARN_MAX, skillId: f.skillId, done: false });
     } else blocks.push({ kind, minutes: m, skillId: f.skillId, done: false });

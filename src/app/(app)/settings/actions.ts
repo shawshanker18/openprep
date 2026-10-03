@@ -12,6 +12,7 @@ import { requireUser, type ActionResult } from "@/server/auth";
 import { PushSubscriptionInput, removeSubscription, saveSubscription, sendTest } from "@/server/push";
 import { DASHBOARD_CARDS } from "@/server/daily";
 import { startDiagnostic } from "@/server/diagnostic";
+import { localDate } from "@/engine/plan";
 
 const Settings = z.object({
   targetScore: z.coerce.number().int().min(400).max(1600).multipleOf(10),
@@ -21,9 +22,15 @@ const Settings = z.object({
 });
 
 export async function updateSettings(form: FormData) {
-  const { userId } = await requireUser();
+  const { userId, profile } = await requireUser();
   const p = Settings.safeParse(Object.fromEntries(form));
   if (!p.success) redirect("/settings?error=settings");
+  // A test date is an upcoming SAT: from today (the student's day) to three years out.
+  if (p.data.testDate) {
+    const today = localDate(new Date(), profile.timezone);
+    const latest = `${Number(today.slice(0, 4)) + 3}${today.slice(4)}`;
+    if (p.data.testDate < today || p.data.testDate > latest) redirect("/settings?error=testdate");
+  }
   await db.update(profiles).set({ ...p.data, testDate: p.data.testDate || null }).where(eq(profiles.id, userId));
   revalidatePath("/", "layout");
   redirect("/settings?saved=1");

@@ -50,7 +50,7 @@ export function GoogleButton({ enabled, nonceHash, onToken }: { enabled: boolean
           router.refresh();
         },
       });
-      g.renderButton(el.current, { theme: "outline", size: "large", text: "continue_with", shape: "pill", width: 400, locale: "en" });
+      g.renderButton(el.current, { theme: "outline", size: "large", text: "continue_with", shape: "pill", width: Math.max(200, Math.min(400, el.current.offsetWidth || 400)), locale: "en" }); // never wider than a phone
     };
     if (window.google?.accounts?.id) void render();
     else {
@@ -65,8 +65,8 @@ export function GoogleButton({ enabled, nonceHash, onToken }: { enabled: boolean
 
   if (!CLIENT_ID) return null;
   return (
-    <div className="flex flex-col items-center gap-1">
-      {enabled ? <div ref={el} className="min-h-10" /> : (
+    <div className="flex w-full flex-col items-center gap-1">
+      {enabled ? <div ref={el} className="flex min-h-10 w-full justify-center" /> : (
         <div className="flex h-11 w-full items-center justify-center rounded-full border text-sm text-muted-foreground">
           Tick the box above to continue with Google
         </div>

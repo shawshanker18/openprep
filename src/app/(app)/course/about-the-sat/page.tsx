@@ -46,10 +46,10 @@ You can use a calculator for the whole Math section, and the Desmos graphing cal
 ## How to use this course
 
 1. **Take the diagnostic** if you haven't yet. It finds your starting level for every skill, so the course can point you to the right place.
-2. **Work through the units.** For each skill, read the lesson, look at the two worked examples, then practise. Your level for the skill goes from Not started to Attempted, Familiar, Proficient and finally Mastered.
+2. **Work through the units.** For each skill, read the lesson, look at the two worked examples, then practice. Your level for the skill goes from Not started to Attempted, Familiar, Proficient and finally Mastered.
 3. **Take the quizzes and unit tests.** They mix skills together like the real test and raise your levels faster.
 4. **Try the course challenge** when you've worked through the units, to check every skill at once.
-5. **Take full practice tests** on the Tests page to practise pacing and stamina for the real thing.
+5. **Take full practice tests** on the Tests page to practice pacing and stamina for the real thing.
 
 Your study plan on the Home page already picks the skills worth the most points for you, so you can follow it day by day and use the course whenever you want to go deeper on a topic.
 `;

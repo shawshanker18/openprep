@@ -70,7 +70,7 @@ export function Reminders({ hour }: { hour: number | null }) {
   return (
     <section id="reminders" className="flex scroll-mt-20 flex-col gap-3">
       <h2 className="font-medium">Study reminders</h2>
-      <p className="text-sm text-muted-foreground">A notification at your study time on days you haven&apos;t practised yet. Turn it on for each device you use.</p>
+      <p className="text-sm text-muted-foreground">A notification at your study time on days you haven&apos;t practiced yet. Turn it on for each device you use.</p>
       <label className="flex flex-col gap-1 text-sm sm:w-60">Remind me at
         <Choice className="sm:w-60" value={hour == null ? "off" : String(hour)}
           options={[{ value: "off", label: "Off" }, ...Array.from({ length: 24 }, (_, h) => ({ value: String(h), label: hourLabel(h) }))]}

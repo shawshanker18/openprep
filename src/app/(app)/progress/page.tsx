@@ -29,6 +29,10 @@ function ScoreChart({ points, target, timeZone }: { points: Point[]; target: num
       {points.map((p, i) => p.source === "mock" || p.source === "official"
         ? <rect key={i} x={x(p.t) - 4} y={y(p.total) - 4} width="8" height="8" transform={`rotate(45 ${x(p.t)} ${y(p.total)})`} className={p.source === "official" ? "fill-foreground" : "fill-primary"} />
         : <circle key={i} cx={x(p.t)} cy={y(p.total)} r="3" className="fill-primary" />)}
+      {/* The score itself, first and latest, so the line can be read without hovering. */}
+      {[points[0]!, points.at(-1)!].map((p, i) => (
+        <text key={i} x={x(p.t)} y={y(p.total) - 8} textAnchor={i ? "end" : "start"} className="fill-foreground text-[11px] font-medium tabular-nums">{p.total}</text>
+      ))}
       <text x={P} y={H - 8} className="fill-muted-foreground text-[10px]">{formatDate(t0, timeZone)}</text>
       <text x={W - P} y={H - 8} textAnchor="end" className="fill-muted-foreground text-[10px]">{formatDate(t1, timeZone)}</text>
     </svg>
@@ -40,8 +44,8 @@ function Bars({ rows }: { rows: { label: string; value: number; suffix?: string 
   return (
     <ul className="flex flex-col gap-1.5 text-sm">
       {rows.map((r) => (
-        <li key={r.label} className="grid grid-cols-[8rem_1fr_3rem] items-center gap-2">
-          <span className="truncate">{r.label}</span>
+        <li key={r.label} className="grid grid-cols-[minmax(8rem,max-content)_1fr_3rem] items-center gap-2">
+          <span>{r.label}</span>
           <span className="h-2 rounded-full bg-primary" style={{ width: `${(100 * r.value) / max}%` }} />
           <span className="text-right tabular-nums text-muted-foreground">{r.value}{r.suffix}</span>
         </li>
@@ -107,7 +111,7 @@ export default async function ProgressPage() {
 
       <section className="flex flex-col gap-3">
         <h2 className="font-medium">Activity · 30 days</h2>
-        {p.daily.length ? <Bars rows={p.daily.map((d) => ({ label: d.day, value: d.n, suffix: "" }))} />
+        {p.daily.length ? <Bars rows={p.daily.map((d) => ({ label: new Date(`${d.day}T12:00:00Z`).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" }), value: d.n, suffix: "" }))} />
           : <p className="text-sm text-muted-foreground">No activity yet.</p>}
       </section>
     </div>

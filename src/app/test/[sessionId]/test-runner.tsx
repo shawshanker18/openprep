@@ -77,41 +77,56 @@ export function TestRunner({ sessionId, module: m, items: initial, serverNow, br
     return () => { window.removeEventListener("blur", lost); document.removeEventListener("visibilitychange", onVis); };
   }, [running, sessionId]);
 
+  // The latest answer for each question the server may not have yet (waiting to save, or a save failed). They are
+  // sent again on every move and before submitting, so a network blip never loses one. (Server actions run one at a
+  // time, in order, so a newer save can't be overtaken by an older one.)
+  const unsaved = useRef(new Map<number, Item>());
   const save = useCallback(async (position: number, it: Item) => {
     const delta = Math.round(acc.current[position] ?? 0);
     acc.current[position] = 0;
     setSaving("saving");
-    const res = await saveResponse({ moduleId: m.id, position, response: it.response, flagged: it.flagged, timeMsDelta: delta });
-    if (res.ok) setSaving("saved");
-    else { acc.current[position] = (acc.current[position] ?? 0) + delta; setSaving("error"); toast.error(res.error); }
+    const res = await saveResponse({ moduleId: m.id, position, response: it.response, flagged: it.flagged, timeMsDelta: delta })
+      .catch(() => ({ ok: false as const, error: "Your answer isn't saved yet (no connection). It will be saved when you continue." }));
+    if (res.ok) {
+      if (unsaved.current.get(position) === it) unsaved.current.delete(position);
+      setSaving(unsaved.current.size ? "error" : "saved");
+    } else { acc.current[position] = (acc.current[position] ?? 0) + delta; setSaving("error"); toast.error(res.error); }
   }, [m.id]);
+  const saveAll = useCallback(() => Promise.all([...unsaved.current].map(([p, it]) => save(p, it))), [save]);
 
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
   const update = (patch: Partial<Item>) => {
     const it = { ...items[pos]!, ...patch };
     setItems((xs) => xs.map((x, i) => (i === pos ? it : x)));
     accrue();
-    if (debounce.current) clearTimeout(debounce.current);
     const p = pos;
-    debounce.current = setTimeout(() => save(p, it), 400);
+    unsaved.current.set(p, it);
+    if (debounce.current) clearTimeout(debounce.current);
+    debounce.current = setTimeout(() => { debounce.current = null; void save(p, it); }, 400);
   };
   const go = (to: number | "review") => {
     accrue();
     if (debounce.current) { clearTimeout(debounce.current); debounce.current = null; }
-    void save(pos, items[pos]!);
+    if (!unsaved.current.has(pos)) unsaved.current.set(pos, items[pos]!); // sends the time spent on it too
+    void saveAll();
     if (to === "review") setScreen("review"); else { setPos(to); setScreen("question"); }
   };
 
-  const submit = useCallback(() => {
+  // `auto`: time ran out. Then it goes ahead whatever happens (the server closes the module anyway); a student's own
+  // submit waits until every answer is saved.
+  const submit = useCallback(async (auto = false) => {
     if (submitted.current) return;
     submitted.current = true;
     setSubmitting(true);
-    if (debounce.current) clearTimeout(debounce.current);
-    void submitModule(m.id).then((r) => {
-      if (r && typeof r === "object" && r.finished) router.replace(`/test/${sessionId}/results`);
-      else router.refresh(); // next module
-    });
-  }, [m.id, router, sessionId]);
+    if (debounce.current) { clearTimeout(debounce.current); debounce.current = null; }
+    await saveAll();
+    const fail = (msg: string) => { submitted.current = false; setSubmitting(false); if (!auto) toast.error(msg); };
+    if (!auto && unsaved.current.size) return fail("Some answers aren't saved yet. Check your connection, then submit again.");
+    const r = await submitModule(m.id).catch(() => null);
+    if (r === null) return fail("Couldn't submit. Check your connection and try again.");
+    if (r && typeof r === "object" && r.finished) router.replace(`/test/${sessionId}/results`);
+    else router.refresh(); // next module
+  }, [m.id, router, sessionId, saveAll]);
 
   // Countdown; auto-submit at zero.
   useEffect(() => {
@@ -119,7 +134,7 @@ export function TestRunner({ sessionId, module: m, items: initial, serverNow, br
     const tick = () => {
       const remaining = new Date(m.deadlineAt!).getTime() - (offset.current + (now() - loadedAt.current));
       setLeft(remaining);
-      if (remaining <= 0) submit();
+      if (remaining <= 0) void submit(true);
     };
     tick();
     const t = setInterval(tick, 1000);
@@ -198,7 +213,7 @@ export function TestRunner({ sessionId, module: m, items: initial, serverNow, br
             <h2 className="text-xl font-semibold">Check your work</h2>
             <p className="text-sm text-muted-foreground">{answered} of {items.length} answered. Select a question to go back to it.</p>
             <Navigator items={items} current={-1} onPick={go} />
-            <Button size="lg" className="self-start" disabled={submitting} onClick={submit}>
+            <Button size="lg" className="self-start" disabled={submitting} onClick={() => void submit()}>
               {submitting ? "Submitting…" : "Submit module"}
             </Button>
           </div>

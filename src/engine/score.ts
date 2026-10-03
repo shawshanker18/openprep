@@ -140,12 +140,13 @@ export function buildTestResult(
   if (top && top[1] >= 3) insights.push(`Most common mistake: ${MISTAKE_LABEL[top[0] as MistakeType] ?? top[0]}.`);
   // Most-missed skill (plan §17 "Most common mistake: Evidence questions").
   const missedBySkill = new Map<string, number>();
-  for (const i of items) if (!i.correct) missedBySkill.set(i.skillId, (missedBySkill.get(i.skillId) ?? 0) + 1);
+  // Only answered-and-wrong counts as missed: unanswered questions are the timing insight above, not a skill gap.
+  for (const i of items) if (i.answered && !i.correct) missedBySkill.set(i.skillId, (missedBySkill.get(i.skillId) ?? 0) + 1);
   const worstSkill = [...missedBySkill.entries()].sort((a, b) => b[1] - a[1])[0];
   if (worstSkill && worstSkill[1] >= 3)
-    insights.push(`Most-missed skill: ${SKILL_BY_ID[worstSkill[0]]?.name ?? worstSkill[0]} (${worstSkill[1]} wrong). Practise it next.`);
+    insights.push(`Most-missed skill: ${SKILL_BY_ID[worstSkill[0]]?.name ?? worstSkill[0]} (${worstSkill[1]} wrong). Practice it next.`);
   const easy = ofDiff(1);
-  const easyMissed = easy.filter((i) => !i.correct).length;
+  const easyMissed = easy.filter((i) => i.answered && !i.correct).length;
   if (easy.length >= 3 && easyMissed / easy.length > 0.2)
     insights.push(`You missed ${easyMissed} easy questions. Slow down on the first read.`);
 

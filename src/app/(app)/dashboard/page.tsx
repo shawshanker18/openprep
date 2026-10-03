@@ -149,13 +149,13 @@ export default async function DashboardPage() {
 
   const layout = dashboardLayout(profile);
   // Custom layout: cards in the chosen order on the two-column grid, under the numbers.
-  if (layout) return <div className="flex flex-col gap-6">{header}{stats}<div className="grid gap-4 lg:grid-cols-2">{layout.filter((c) => c.visible).map((c) => cards[c.id])}</div></div>;
+  if (layout) return <div className="flex flex-col gap-6">{header}{stats}<div className="grid items-start gap-4 lg:grid-cols-2">{layout.filter((c) => c.visible).map((c) => cards[c.id])}</div></div>;
 
   return (
     <div className="flex flex-col gap-6">
     {header}
     {stats}
-    <div className="grid gap-4 lg:grid-cols-2">
+    <div className="grid items-start gap-4 lg:grid-cols-2">
       {cards.today}
       <div className="flex flex-col gap-4">
         {cards.course}

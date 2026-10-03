@@ -301,11 +301,19 @@ export async function getTestResult(userId: string, sessionId: string) {
   };
 }
 
-export async function listTests(userId: string) {
-  return db.select().from(testSessions).where(eq(testSessions.userId, userId)).orderBy(desc(testSessions.startedAt)).limit(50);
+export const TESTS_PER_PAGE = 20;
+/** One page of the student's tests, newest first (one extra row says whether there's another page). */
+export async function listTests(userId: string, page = 1) {
+  return db.select().from(testSessions).where(eq(testSessions.userId, userId)).orderBy(desc(testSessions.startedAt))
+    .limit(TESTS_PER_PAGE + 1).offset((page - 1) * TESTS_PER_PAGE);
 }
 
-/** Is any of this question's test sessions still running for this user? (No AI help during tests.) */
+/** Every unfinished test (not just the recent page), so none drops out of "in progress". */
+export async function openTests(userId: string) {
+  return db.select().from(testSessions).where(and(eq(testSessions.userId, userId), eq(testSessions.status, "in_progress")))
+    .orderBy(desc(testSessions.startedAt));
+}
+
 /** Questions in this student's unfinished tests (practice mustn't serve them). */
 export async function runningTestQuestionIds(userId: string) {
   const rows = await db.selectDistinct({ id: testItems.questionId }).from(testItems)
@@ -315,6 +323,7 @@ export async function runningTestQuestionIds(userId: string) {
   return rows.map((r) => r.id);
 }
 
+/** Is any of this question's test sessions still running for this user? (No AI help during tests.) */
 export async function inRunningTest(userId: string, questionId: string) {
   const [r] = await db.select({ id: testSessions.id }).from(testItems)
     .innerJoin(testModules, eq(testModules.id, testItems.moduleId))

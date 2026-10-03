@@ -7,7 +7,7 @@ import { DiagnosticGate } from "@/components/diagnostic-gate";
 import { diagnosticPending, requireUser } from "@/server/auth";
 import { skillsWithQuestions } from "@/server/plan";
 import { tagsBySkill } from "@/server/practice";
-import { freshFullMock, listTests } from "@/server/tests";
+import { freshFullMock, listTests, openTests, TESTS_PER_PAGE } from "@/server/tests";
 import { SkillTagPicker } from "../practice/skill-tag-picker";
 import { abandon } from "@/app/test/[sessionId]/actions";
 import { startTestAction } from "./actions";
@@ -34,8 +34,11 @@ export default async function TestsPage({ searchParams }: PageProps<"/tests">) {
   const sp = await searchParams;
   const { userId, profile } = await requireUser();
   if (diagnosticPending(profile)) return <DiagnosticGate />;
-  const [history, available, tags, fresh] = await Promise.all([listTests(userId), skillsWithQuestions(), tagsBySkill(), freshFullMock(userId)]);
-  const open = history.filter((t) => t.status === "in_progress" && t.kind !== "diagnostic");
+  const page = Math.max(1, Math.min(1000, Number(sp.page) || 1));
+  const [found, running, available, tags, fresh] = await Promise.all([listTests(userId, page), openTests(userId), skillsWithQuestions(), tagsBySkill(), freshFullMock(userId)]);
+  const history = found.slice(0, TESTS_PER_PAGE);
+  const more = found.length > TESTS_PER_PAGE;
+  const open = running.filter((t) => t.kind !== "diagnostic");
   const skills = SKILLS.filter((s) => available.has(s.id));
   const sectionPick = (
     <Choice name="section" defaultValue="rw" aria-label="Section" className="sm:w-56" options={[{ value: "rw", label: "Reading and Writing" }, { value: "math", label: "Math" }]} />
@@ -69,7 +72,7 @@ export default async function TestsPage({ searchParams }: PageProps<"/tests">) {
         <StartCard title="Single module" time="32 to 35 min" fields={<><input type="hidden" name="kind" value="module" />{sectionPick}</>}>
           One timed module at mixed difficulty. Raw score only.
         </StartCard>
-        <StartCard title="Mini test" time="12 to 15 min · 10 questions" fields={<>
+        <StartCard title="Mini test" time="12 to 15 min · up to 10 questions" fields={<>
           <input type="hidden" name="kind" value="mini" />
           <Choice name="skillId" required aria-label="Skill" defaultValue={skills[0]?.id} className="max-w-full" options={skills.map((s) => ({ value: s.id, label: s.name }))} />
         </>}>
@@ -94,7 +97,7 @@ export default async function TestsPage({ searchParams }: PageProps<"/tests">) {
 
       <section className="flex flex-col gap-2">
         <h2 className="font-medium">History</h2>
-        {history.length === 0 ? <p className="text-sm text-muted-foreground">No tests yet.</p> : (
+        {history.length === 0 ? <p className="text-sm text-muted-foreground">{page > 1 ? "No older tests." : "No tests yet."}</p> : (
           <table className="w-full text-left text-sm">
             <thead className="text-muted-foreground"><tr><th className="py-1 font-normal">Date</th><th className="font-normal">Test</th><th className="font-normal">Result</th><th /></tr></thead>
             <tbody>
@@ -115,6 +118,13 @@ export default async function TestsPage({ searchParams }: PageProps<"/tests">) {
               })}
             </tbody>
           </table>
+        )}
+        {(page > 1 || more) && (
+          <nav className="flex items-center justify-between text-sm" aria-label="History pages">
+            {page > 1 ? <Link className="underline" href={page === 2 ? "/tests" : `/tests?page=${page - 1}`}>Newer</Link> : <span />}
+            <span className="text-muted-foreground">Page {page}</span>
+            {more ? <Link className="underline" href={`/tests?page=${page + 1}`}>Older</Link> : <span />}
+          </nav>
         )}
       </section>
     </div>

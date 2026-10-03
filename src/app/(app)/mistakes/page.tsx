@@ -12,18 +12,20 @@ import { requireUser } from "@/server/auth";
 import { publicId } from "@/server/questions";
 
 export const metadata = { title: "Mistakes" };
+const PER_PAGE = 30;
 
 export default async function MistakesPage({ searchParams }: PageProps<"/mistakes">) {
   const sp = await searchParams;
   const view = sp.view === "all" ? "all" : "due";
   const section = sp.section === "rw" || sp.section === "math" ? sp.section : null;
   const type = MISTAKE_TYPES.includes(sp.type as MistakeType) ? (sp.type as MistakeType) : null;
+  const page = Math.max(1, Math.min(1000, Number(sp.page) || 1));
   const { userId, profile } = await requireUser();
   const now = new Date();
 
-  // Latest wrong attempt per question, joined to its review-queue state.
-  const rows = await db.selectDistinctOn([attempts.questionId], {
-    id: attempts.questionId, skillId: attempts.skillId, section: questions.section, stem: sql<string>`coalesce(${questions.passageMd}, ${questions.stemMd})`,
+  // Latest wrong attempt per question, joined to its review-queue state; newest first, a page at a time.
+  const latest = db.selectDistinctOn([attempts.questionId], {
+    id: attempts.questionId, skillId: attempts.skillId, section: questions.section, stem: sql<string>`coalesce(${questions.passageMd}, ${questions.stemMd})`.as("stem"),
     mistakeType: attempts.mistakeType, at: attempts.createdAt, dueAt: reviewItems.dueAt,
   }).from(attempts)
     .innerJoin(questions, eq(questions.id, attempts.questionId))
@@ -34,13 +36,15 @@ export default async function MistakesPage({ searchParams }: PageProps<"/mistake
       type ? eq(attempts.mistakeType, type) : undefined,
       view === "due" ? lte(reviewItems.dueAt, now) : undefined,
     ))
-    .orderBy(attempts.questionId, desc(attempts.createdAt));
-  rows.sort((a, b) => +b.at - +a.at);
+    .orderBy(attempts.questionId, desc(attempts.createdAt)).as("m");
+  const found = await db.select().from(latest).orderBy(desc(latest.at)).limit(PER_PAGE + 1).offset((page - 1) * PER_PAGE);
+  const rows = found.slice(0, PER_PAGE);
+  const more = found.length > PER_PAGE;
   const [{ due }] = (await db.select({ due: sql<number>`count(*)::int` }).from(reviewItems)
     .where(and(eq(reviewItems.userId, userId), lte(reviewItems.dueAt, now)))) as [{ due: number }];
 
   const href = (o: Record<string, string | null>) => {
-    const q = new URLSearchParams(Object.entries({ view, section, type, ...o }).filter(([, v]) => v) as [string, string][]);
+    const q = new URLSearchParams(Object.entries({ view, section, type, page: null, ...o }).filter(([, v]) => v) as [string, string][]);
     return `/mistakes?${q}`;
   };
   const chip = (active: boolean) => cn("rounded-full border px-3 py-1 text-xs", active ? "bg-primary text-primary-foreground" : "hover:bg-muted");
@@ -74,6 +78,13 @@ export default async function MistakesPage({ searchParams }: PageProps<"/mistake
             </li>
           ))}
         </ul>
+      )}
+      {(page > 1 || more) && (
+        <nav className="flex items-center justify-between text-sm" aria-label="Pages">
+          {page > 1 ? <Link className="underline" href={href({ page: page === 2 ? null : String(page - 1) })}>Newer</Link> : <span />}
+          <span className="text-muted-foreground">Page {page}</span>
+          {more ? <Link className="underline" href={href({ page: String(page + 1) })}>Older</Link> : <span />}
+        </nav>
       )}
     </div>
   );

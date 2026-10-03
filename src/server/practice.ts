@@ -48,7 +48,7 @@ async function pickInSkill(userId: string, skillId: string, exclude: string[], n
   ]);
   const lastSeen = new Map(seen.map((s) => [s.id, new Date(s.at)]));
   const blocked = new Set([...exclude, ...queued.map((r) => r.id)]);
-  // Review-queue questions are held back for review — unless that would leave nothing to practise (thin bank).
+  // Review-queue questions are held back for review — unless that would leave nothing to practice (thin bank).
   const tagged = tags.length ? pool.filter((q) => q.tags.some((t) => tags.includes(t))) : pool;
   const open = tagged.filter((q) => !blocked.has(q.id));
   const candidates = (open.length ? open : tagged.filter((q) => !exclude.includes(q.id)))

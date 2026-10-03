@@ -57,7 +57,7 @@ export function LoginForm({ google: showGoogle, inApp = false }: { google: boole
       <form onSubmit={magic} className="flex flex-col gap-5">
         <label className="flex flex-col gap-2 text-sm font-medium">
           Email
-          <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com"
+          <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Your email address"
             autoComplete="email"
             className="h-12 rounded-xl bg-muted px-4 text-base font-normal outline-none ring-ring placeholder:text-muted-foreground focus:ring-2" />
         </label>

@@ -83,14 +83,14 @@ export default async function SkillPage({ params, searchParams }: PageProps<"/sk
             {detail.lessonDone ? <span className="text-sm text-muted-foreground">✓ Lesson complete</span> : (
               <form action={markLessonDone.bind(null, skillId)}><Button type="submit" variant="outline">Mark lesson complete</Button></form>
             )}
-            <Button render={<Link href={`/practice?skill=${skillId}`} />}>Practise this skill</Button>
+            <Button render={<Link href={`/practice?skill=${skillId}`} />}>Practice this skill</Button>
           </div>
         </div>
       ) : <p className="text-muted-foreground">The lesson for this skill is coming soon.</p>)}
 
       {tab === "practice" && (
         <div className="flex flex-col gap-3">
-          <Button size="lg" className="self-start" render={<Link href={`/practice?skill=${skillId}`} />}>Practise (adaptive)</Button>
+          <Button size="lg" className="self-start" render={<Link href={`/practice?skill=${skillId}`} />}>Practice (adaptive)</Button>
           <div className="flex flex-wrap gap-2">
             {[1, 2, 3].map((d) => (
               <Button key={d} variant="outline" render={<Link href={`/practice?skill=${skillId}&difficulty=${d}`} />}>{DIFF[d]}</Button>
