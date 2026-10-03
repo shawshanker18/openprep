@@ -13,6 +13,9 @@ export default function AppError({ error, retry }: { error: Error & { digest?: s
       <div className="flex flex-wrap gap-2">
         <Button onClick={() => retry()}>Try again</Button>
         <Button variant="outline" render={<Link href="/dashboard" />}>Dashboard</Button>
+        <Button variant="ghost" render={<Link href={`/feedback?kind=error${error.digest ? `&ref=${encodeURIComponent(error.digest)}` : ""}&from=${encodeURIComponent(typeof window === "undefined" ? "/" : window.location.pathname)}`} />}>
+          Report this problem
+        </Button>
       </div>
     </section>
   );

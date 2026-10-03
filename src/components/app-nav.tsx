@@ -1,10 +1,11 @@
 "use client";
 
+import { FeedbackDialog } from "@/components/feedback-dialog";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import {
-  BarChart3, Bookmark, BookOpen, Calculator, CalendarCheck, Check, ClipboardList, GraduationCap, Home, Library, Menu, Mountain, Settings, SlidersHorizontal, Sparkles, XCircle, Zap,
+  BarChart3, Bookmark, BookOpen, Calculator, CalendarCheck, Check, ClipboardList, GraduationCap, Home, Library, Menu, Mountain, Settings, ShieldCheck, SlidersHorizontal, Sparkles, XCircle, Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -110,8 +111,8 @@ function Checklist({ items, onNavigate }: { items: ChecklistItem[]; onNavigate?:
   );
 }
 
-export function NavLinks({ checklist, user, signOut, onNavigate }: {
-  checklist: ChecklistItem[]; user: string; signOut: () => Promise<void>; onNavigate?: () => void;
+export function NavLinks({ checklist, user, signOut, isAdmin = false, onNavigate }: {
+  checklist: ChecklistItem[]; user: string; signOut: () => Promise<void>; isAdmin?: boolean; onNavigate?: () => void;
 }) {
   const path = usePathname();
   const search = useSearchParams();
@@ -130,6 +131,13 @@ export function NavLinks({ checklist, user, signOut, onNavigate }: {
       ))}
       <div className="mt-auto flex flex-col gap-2">
         <Checklist items={checklist} onNavigate={onNavigate} />
+        <FeedbackDialog />
+        {isAdmin && (
+          <Link href="/admin" onClick={onNavigate} aria-current={path.startsWith("/admin") ? "page" : undefined}
+            className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:font-medium">
+            <ShieldCheck className="size-4" />Admin
+          </Link>
+        )}
         <Link href="/settings" onClick={onNavigate} aria-current={isActive(path, search, "/settings") ? "page" : undefined}
           className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:font-medium">
           <Settings className="size-4" /><span className="truncate">{user}</span>
@@ -141,7 +149,7 @@ export function NavLinks({ checklist, user, signOut, onNavigate }: {
 }
 
 /** Phone/tablet: hamburger that opens the full sidebar as a sheet. */
-export function MobileMenu(props: { checklist: ChecklistItem[]; user: string; signOut: () => Promise<void> }) {
+export function MobileMenu(props: { checklist: ChecklistItem[]; user: string; signOut: () => Promise<void>; isAdmin?: boolean }) {
   const [open, setOpen] = useState(false);
   return (
     <Sheet open={open} onOpenChange={setOpen}>

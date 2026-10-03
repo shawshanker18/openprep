@@ -52,6 +52,21 @@ Questions (`content/questions/<skill-id>.json`) and lessons (`content/lessons/<s
 `content/AUTHORING.md`. `npm run content:seed` upserts them (idempotent; removed questions are retired, never deleted).
 All content must be original.
 
+## Admins
+
+`/admin` (inbox for feedback, question reports and security reports; users; activity; audit log) is only for
+accounts in the `admins` table. The site's database role can read that table but never write it, so admin can only
+be granted from the backend. The account must have signed in once. Either:
+
+- Supabase → SQL editor:
+  `insert into public.admins (user_id, note) select id, 'owner' from auth.users where email = 'you@gmail.com';`
+  (revoke: `delete from public.admins where user_id = (select id from auth.users where email = 'you@gmail.com');`)
+- or locally, with `MIGRATE_DATABASE_URL` (the owner connection) in `.env.local`:
+  `npm run admin -- grant you@gmail.com "note"`, `npm run admin -- revoke you@gmail.com`, `npm run admin -- list`.
+
+Everyone else gets a 404 on every admin page and action. Every admin change is recorded in `admin_audit`, which the
+site can append to but never edit.
+
 ## Deploy (Vercel)
 
 Import the repo, region `bom1` (set in `vercel.json`, next to Supabase `ap-south-1`). Environment variables:
