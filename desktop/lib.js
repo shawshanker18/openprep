@@ -1,12 +1,20 @@
 // Pure helpers for the desktop shell (unit-tested in lib.test.js).
 
-/** openprep://auth?code=XYZ → "XYZ" (only plain tokens; anything else is ignored). */
-function parseAuthLink(url) {
+/**
+ * A sign-in coming back to the app → the site page that finishes it (only plain tokens; anything else is ignored).
+ * openprep://auth?code=XYZ (email link) → /auth/callback?code=XYZ
+ * openprep://auth?google=<ID token> (Google, from /auth/google) → /auth/google/finish#t=<token> (in the fragment:
+ * never sent to a server in the address; it's only usable with the nonce this app kept).
+ */
+function authLinkPath(url) {
   try {
     const u = new URL(url);
     if (u.protocol !== "openprep:" || u.hostname !== "auth") return null;
     const code = u.searchParams.get("code");
-    return code && /^[A-Za-z0-9_-]{8,200}$/.test(code) ? code : null;
+    if (code && /^[A-Za-z0-9_-]{8,200}$/.test(code)) return `/auth/callback?code=${code}`;
+    const google = u.searchParams.get("google");
+    if (google && google.length <= 8192 && /^[\w-]+\.[\w-]+\.[\w-]+$/.test(google)) return `/auth/google/finish#t=${google}`;
+    return null;
   } catch { return null; }
 }
 
@@ -33,4 +41,4 @@ function reminderDue(now, hour, lastFiredDay) {
   return hour != null && now.getHours() === hour && lastFiredDay !== localDay(now);
 }
 
-module.exports = { parseAuthLink, isAppUrl, isTestPage, isExternalWebUrl, localDay, reminderDue };
+module.exports = { authLinkPath, isAppUrl, isTestPage, isExternalWebUrl, localDay, reminderDue };

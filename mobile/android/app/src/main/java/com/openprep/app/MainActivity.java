@@ -17,7 +17,7 @@ import java.security.SecureRandom;
 import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
-    private static final String SITE = "https://openprep-opal.vercel.app";
+    static final String SITE = "https://openprep-opal.vercel.app";
     private volatile boolean pageReady = false;
 
     @Override
@@ -26,6 +26,7 @@ public class MainActivity extends BridgeActivity {
         SplashScreen.installSplashScreen(this).setKeepOnScreenCondition(() -> !pageReady);
         new Handler(Looper.getMainLooper()).postDelayed(() -> pageReady = true, 10_000);
         registerPlugin(LockdownPlugin.class);
+        registerPlugin(SignInPlugin.class);
         ensureInstallCookie();
         super.onCreate(savedInstanceState);
         getBridge().addWebViewListener(new WebViewListener() {
@@ -91,15 +92,23 @@ public class MainActivity extends BridgeActivity {
         getBridge().getWebView().post(() -> getBridge().getWebView().loadUrl(url + "?resumed=1"));
     }
 
-    /** openprep://auth?code=… finishes an email sign-in that was requested inside this app (the PKCE verifier is here). */
+    /**
+     * openprep://auth?code=… finishes an email sign-in requested inside this app (the PKCE verifier is here), and
+     * openprep://auth?google=<ID token> a Google one (only usable with the nonce this app kept; it goes in the fragment
+     * so it's never sent to a server in the address).
+     */
     private boolean openAuthLink(Intent intent) {
         Uri data = intent == null ? null : intent.getData();
         if (data == null || !"openprep".equals(data.getScheme()) || !"auth".equals(data.getHost())) return false;
         // Never during a locked test: loading another page would be a way out of it.
         if (LockdownPlugin.instance != null && LockdownPlugin.instance.isLocked()) return false;
         String code = data.getQueryParameter("code");
-        if (code == null || !code.matches("[A-Za-z0-9_-]{8,200}")) return false;
-        getBridge().getWebView().post(() -> getBridge().getWebView().loadUrl(SITE + "/auth/callback?code=" + code));
+        String google = data.getQueryParameter("google");
+        String to;
+        if (code != null && code.matches("[A-Za-z0-9_-]{8,200}")) to = SITE + "/auth/callback?code=" + code;
+        else if (google != null && google.length() <= 8192 && google.matches("[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+")) to = SITE + "/auth/google/finish#t=" + google;
+        else return false;
+        getBridge().getWebView().post(() -> getBridge().getWebView().loadUrl(to));
         return true;
     }
 }

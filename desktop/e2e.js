@@ -4,13 +4,17 @@
 // the test can't be continued in a plain browser, the resume address is saved, and "End test" unlocks.
 // STAGE=offline cuts the network mid-test. STAGE=escape also checks outside page switches are ignored while locked.
 // STAGE=report checks "Report question" (the dialog opens, Cancel sends nothing, Send works).
+// STAGE=google checks Google sign-in's app half: the browser is asked to open /auth/google (recorded, not opened),
+// and the openprep:// link coming back is finished in the app (a fake token, so the server must refuse it).
 // STAGE=kill stops right after the test locks (like killing the app); STAGE=resume then checks the app reopens into it.
 const STAGE = process.env.STAGE;
 process.env.OPENPREP_URL ||= "http://localhost:3000";
 const SITE = process.env.OPENPREP_URL;
 const fs = require("node:fs");
 const path = require("node:path");
-const { app, BrowserWindow, screen } = require("electron");
+const { app, BrowserWindow, screen, shell } = require("electron");
+const opened = []; // STAGE=google: what the app asked the system browser to open
+if (STAGE === "google") shell.openExternal = async (url) => { opened.push(url); };
 // STAGE=screens pretends a second monitor exists, to check it gets covered during the test.
 if (process.env.STAGE === "screens") {
   app.whenReady().then(() => {
@@ -85,12 +89,43 @@ async function report(r) {
   app.exit(0);
 }
 
+// STAGE=google: signed out for the check (the session cookies are put back afterwards).
+async function google(r) {
+  const ses = win.webContents.session;
+  const saved = (await ses.cookies.get({ url: SITE })).filter((c) => c.name.startsWith("sb-"));
+  for (const c of saved) await ses.cookies.remove(SITE, c.name);
+  try {
+    await win.loadURL(`${SITE}/login`);
+    await until("Google button", () => js(`[...document.querySelectorAll("button")].some((b) => /continue with google/i.test(b.textContent))`));
+    await js(`document.querySelector('input[type=checkbox]').click()`);
+    await wait(300);
+    await js(`[...document.querySelectorAll("button")].find((b) => b.textContent.trim() === "Continue with Google").click()`);
+    await until("browser asked", () => opened.length > 0, 10_000);
+    const asked = new URL(opened[0]);
+    r.opensGooglePageInBrowser = asked.origin + asked.pathname === `${SITE}/auth/google` && /^[0-9a-f]{64}$/.test(asked.searchParams.get("n") ?? "");
+    r.stayedInApp = new URL(win.webContents.getURL()).pathname === "/login";
+    r.nonceKept = await js(`!!localStorage.getItem("openprep_google_nonce")`);
+    app.emit("second-instance", {}, [process.execPath, "openprep://auth?google=eyJhbGciOiJSUzI1NiJ9.eyJlbWFpbCI6ImZha2VAZXhhbXBsZS5jb20ifQ.c2ln"]);
+    await until("finish page", () => js(`location.pathname === "/auth/google/finish" && document.body.innerText.includes("didn't finish")`), 20_000);
+    r.fakeTokenRefused = await js(`document.body.innerText.includes("Google sign-in didn't work")`);
+    r.tokenNotInAddress = !win.webContents.getURL().includes("#");
+    r.nonceUsedUp = !(await js(`!!localStorage.getItem("openprep_google_nonce")`));
+  } finally {
+    for (const c of saved) {
+      await ses.cookies.set({ url: SITE, name: c.name, value: c.value, path: c.path, secure: c.secure, httpOnly: c.httpOnly, sameSite: c.sameSite, expirationDate: c.expirationDate });
+    }
+  }
+  console.log("E2E", JSON.stringify(r));
+  app.exit(0);
+}
+
 app.whenReady().then(async () => {
   const r = {};
   try {
     await until("window", () => win);
     if (STAGE === "diag") return await diagnostic(r);
     if (STAGE === "report") return await report(r);
+    if (STAGE === "google") return await google(r);
     if (STAGE !== "resume") {
       await win.loadURL(`${SITE}/course/m-alg`);
       await until("Start quiz button", () => click("Start quiz"));

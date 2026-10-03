@@ -3,7 +3,7 @@ const path = require("node:path");
 const fs = require("node:fs");
 const crypto = require("node:crypto");
 const { app, BrowserWindow, Menu, Notification, Tray, dialog, ipcMain, nativeImage, screen, session, shell } = require("electron");
-const { parseAuthLink, isAppUrl, isTestPage, isExternalWebUrl, localDay, reminderDue } = require("./lib");
+const { authLinkPath, isAppUrl, isTestPage, isExternalWebUrl, localDay, reminderDue } = require("./lib");
 
 // The installed app always loads the real site; OPENPREP_URL only works when running from source (development).
 const SITE = (!app.isPackaged && process.env.OPENPREP_URL) || "https://openprep-opal.vercel.app";
@@ -39,11 +39,11 @@ function openPage(url) {
   void win.loadURL(url);
 }
 
-/* ───────── deep links: openprep://auth?code=… finishes an email sign-in started in this app ───────── */
+/* ───────── deep links: openprep://auth?… finishes an email or Google sign-in started in this app ───────── */
 function handleDeepLink(url) {
-  const code = parseAuthLink(url);
-  if (!code || !win) return;
-  openPage(`${SITE}/auth/callback?code=${encodeURIComponent(code)}`);
+  const to = authLinkPath(url);
+  if (!to || !win) return;
+  openPage(`${SITE}${to}`);
   showWindow();
 }
 

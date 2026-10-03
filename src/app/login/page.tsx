@@ -55,7 +55,8 @@ function Scene() {
 export default async function LoginPage({ searchParams }: PageProps<"/login">) {
   if (await getUserId()) redirect("/dashboard");
   const [{ error }, p, h] = await Promise.all([searchParams, providers(), headers()]);
-  // Desktop/Android shells add "OpenPrepApp" to their user agent. Google blocks its sign-in inside embedded browsers.
+  // Desktop/Android shells add "OpenPrepApp" to their user agent. Google blocks its sign-in inside embedded browsers,
+  // so there it runs in the real browser and comes back to the app (see /auth/google).
   const inApp = (h.get("user-agent") ?? "").includes("OpenPrepApp");
   return (
     <main className="grid flex-1 lg:grid-cols-2">
@@ -70,7 +71,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
             <p className="text-sm text-muted-foreground">Adaptive SAT prep. Free forever.</p>
           </div>
           {error && <p role="alert" className="rounded-xl border border-destructive p-3 text-sm text-destructive">That sign-in link didn&apos;t work or has expired. Request a new one below.</p>}
-          <LoginForm google={p.google && !inApp} inApp={inApp} />
+          <LoginForm google={p.google} inApp={inApp} />
         </div>
       </div>
       <div className="hidden p-3 lg:block">
