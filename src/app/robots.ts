@@ -9,7 +9,7 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*", allow: ["/", "/about", "/privacy", "/terms", "/login", "/security"],
       // Everything inside the app (and paths that don't exist here, in case a crawler guesses them).
       disallow: ["/api/", "/trpc/", "/auth/", "/test/", "/tests", "/practice", "/question-bank", "/dashboard", "/onboarding", "/plan",
-        "/progress", "/mistakes", "/bookmarks", "/skills", "/course", "/desmos", "/settings", "/admin", "/dev/"],
+        "/progress", "/mistakes", "/bookmarks", "/skills", "/start", "/course", "/desmos", "/settings", "/admin", "/dev/"],
     },
     sitemap: `${SITE}/sitemap.xml`,
   };

@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { formatDate } from "@/lib/dates";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Markdown, slugify } from "@/components/markdown";
+import { Markdown } from "@/components/markdown";
 import { MasteryBar } from "@/components/mastery-bar";
 import { DOMAINS, SKILL_BY_ID } from "@/content/taxonomy";
 import { certaintyLabel, certaintyPct } from "@/engine/mastery";
@@ -10,12 +10,11 @@ import { MISTAKE_LABEL, type MistakeType } from "@/engine/mistakes";
 import { cn } from "@/lib/utils";
 import { requireUser } from "@/server/auth";
 import { getSkillDetail, getSkillSummary } from "@/server/analytics";
-import { getLesson } from "@/server/lessons";
 import { skillStats, tagsBySkill } from "@/server/practice";
 import { startTestAction } from "../../tests/actions";
-import { markLessonDone } from "./actions";
 
-const TABS = ["learn", "practice", "performance", "mistakes"] as const;
+// Lessons live in Start from scratch; this page is only the student's standing on the skill.
+const TABS = ["performance", "practice", "mistakes"] as const;
 const SELF = ["Don't know", "A little", "Know it", "Very confident"];
 const DIFF = ["", "Easy", "Medium", "Hard"];
 const CONF = ["", "Guessed", "Unsure", "Sure"];
@@ -42,10 +41,11 @@ export default async function SkillPage({ params, searchParams }: PageProps<"/sk
   const skill = SKILL_BY_ID[skillId];
   if (!skill) notFound();
   const sp = await searchParams;
-  const tab = TABS.includes(sp.tab as never) ? (sp.tab as (typeof TABS)[number]) : "learn";
+  if (sp.tab === "learn") redirect(`/start/${skillId}`);
+  const tab = TABS.includes(sp.tab as never) ? (sp.tab as (typeof TABS)[number]) : "performance";
   const { userId, profile } = await requireUser();
-  const [{ skills }, detail, lesson, stats, tags] = await Promise.all([
-    getSkillSummary(userId), getSkillDetail(userId, skillId), getLesson(skillId), skillStats(userId, skillId), tagsBySkill(),
+  const [{ skills }, detail, stats, tags] = await Promise.all([
+    getSkillSummary(userId), getSkillDetail(userId, skillId), skillStats(userId, skillId), tagsBySkill(),
   ]);
   const confTotal = stats.confidence.reduce((a, r) => a + r.n, 0);
   const s = skills.find((k) => k.id === skillId)!;
@@ -59,6 +59,7 @@ export default async function SkillPage({ params, searchParams }: PageProps<"/sk
         <div className="flex items-center gap-3">
           <div className="w-48"><MasteryBar pct={s.mastery} measured={measured} selfRating={s.selfRating} /></div>
           <span className="text-sm text-muted-foreground tabular-nums">{measured ? `${s.mastery}% mastery` : "Not measured yet"}</span>
+          <Link href={`/start/${skillId}`} className="text-sm underline underline-offset-4">{detail.lessonDone ? "Read the lesson again" : "Learn this topic"}</Link>
         </div>
       </div>
 
@@ -68,25 +69,6 @@ export default async function SkillPage({ params, searchParams }: PageProps<"/sk
             className={cn("-mb-px border-b-2 px-3 py-2 capitalize", t === tab ? "border-primary font-medium" : "border-transparent text-muted-foreground")}>{t}</Link>
         ))}
       </nav>
-
-      {tab === "learn" && (lesson ? (
-        <div className="flex flex-col gap-2">
-          {lesson.minutes && <p className="text-sm text-muted-foreground">About {lesson.minutes} minutes</p>}
-          {lesson.sections.map((sec, i) => (
-            <details key={sec.heading} id={slugify(sec.heading)} className="scroll-mt-20 rounded-lg border px-4 py-3"
-              open={typeof sp.section === "string" && lesson.sections.some((x) => slugify(x.heading) === sp.section) ? slugify(sec.heading) === sp.section : i === 0}>
-              <summary className="cursor-pointer font-medium">{sec.heading}</summary>
-              <Markdown className="mt-3 text-[15px]">{sec.md}</Markdown>
-            </details>
-          ))}
-          <div className="mt-2 flex gap-2">
-            {detail.lessonDone ? <span className="text-sm text-muted-foreground">✓ Lesson complete</span> : (
-              <form action={markLessonDone.bind(null, skillId)}><Button type="submit" variant="outline">Mark lesson complete</Button></form>
-            )}
-            <Button render={<Link href={`/practice?skill=${skillId}`} />}>Practice this skill</Button>
-          </div>
-        </div>
-      ) : <p className="text-muted-foreground">The lesson for this skill is coming soon.</p>)}
 
       {tab === "practice" && (
         <div className="flex flex-col gap-3">
