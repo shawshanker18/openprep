@@ -106,18 +106,18 @@ export default async function DashboardPage() {
       </Card>
     ),
     course: (
-      <Card key="course" title="SAT course">
+      <Card key="course" title="Skill mastery">
         {(["math", "rw"] as const).map((sec) => {
           const p = coursePoints(sec);
           const pct = p.max ? Math.round((100 * p.earned) / p.max) : 0;
           return (
-            <Link key={sec} href={`/course?section=${sec}`} className="flex flex-col gap-1 rounded-md p-1 hover:bg-muted">
+            <Link key={sec} href="/skills" className="flex flex-col gap-1 rounded-md p-1 hover:bg-muted">
               <span className="flex justify-between text-sm"><span>{sec === "math" ? "Math" : "Reading and Writing"}</span><span className="tabular-nums text-muted-foreground">{pct}% mastered</span></span>
               <span className="h-2 overflow-hidden rounded-full bg-muted"><span className="block h-full bg-primary" style={{ width: `${pct}%` }} /></span>
             </Link>
           );
         })}
-        {nextCourseSkill && <Button size="sm" className="self-start" render={<Link href={`/course/${nextCourseSkill.domain}`} />}>Continue: {nextCourseSkill.name}</Button>}
+        {nextCourseSkill && <Button size="sm" className="self-start" render={<Link href={`/start/${nextCourseSkill.id}`} />}>Learn next: {nextCourseSkill.name}</Button>}
       </Card>
     ),
     official: (

@@ -26,8 +26,8 @@ export const NAV_GROUPS = [
   {
     label: "Learn",
     items: [
-      { href: "/course", label: "SAT course", icon: GraduationCap },
-      { href: "/skills", label: "Skills", icon: BookOpen },
+      { href: "/start", label: "Start from scratch", icon: GraduationCap },
+      { href: "/skills", label: "Your skills", icon: BookOpen },
       { href: "/desmos", label: "Desmos", icon: Calculator },
     ],
   },
@@ -48,7 +48,7 @@ export const NAV_GROUPS = [
 export const MOBILE_TABS = [
   { href: "/dashboard", label: "Home", icon: Home },
   { href: "/practice", label: "Practice", icon: Sparkles },
-  { href: "/course", label: "Course", icon: GraduationCap },
+  { href: "/start", label: "Learn", icon: GraduationCap },
   { href: "/tests", label: "Tests", icon: ClipboardList },
   { href: "/progress", label: "Progress", icon: BarChart3 },
 ] as const;

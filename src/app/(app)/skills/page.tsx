@@ -1,15 +1,15 @@
 import Link from "next/link";
-import { DOMAINS, type DomainId } from "@/content/taxonomy";
+import { DOMAINS, SKILLS, type DomainId } from "@/content/taxonomy";
 import { MasteryBar } from "@/components/mastery-bar";
 import { requireUser } from "@/server/auth";
 import { getSkillSummary } from "@/server/analytics";
-import { and, count, eq, notLike } from "drizzle-orm";
+import { and, count, eq, inArray } from "drizzle-orm";
 import { db } from "@/db";
 import { lessonProgress } from "@/db/schema";
 import { skillsByPriority } from "@/server/plan";
 import { cn } from "@/lib/utils";
 
-export const metadata = { title: "Skills" };
+export const metadata = { title: "Your skills" };
 
 const STATUS_LABEL = { unknown: "Not measured yet", weak: "Needs work", developing: "Developing", strong: "Strong", mastered: "Mastered" };
 
@@ -20,7 +20,8 @@ export default async function SkillsPage({ searchParams }: PageProps<"/skills">)
   const [{ skills }, [{ lessons }], ranked] = await Promise.all([
     getSkillSummary(userId),
     db.select({ lessons: count() }).from(lessonProgress)
-      .where(and(eq(lessonProgress.userId, userId), notLike(lessonProgress.skillId, "desmos:%"))).then((r) => r as [{ lessons: number }]),
+      // Only skill lessons count here (lesson_progress also holds Desmos lessons and Start from scratch skips).
+      .where(and(eq(lessonProgress.userId, userId), inArray(lessonProgress.skillId, SKILLS.map((k) => k.id)))).then((r) => r as [{ lessons: number }]),
     byPriority ? skillsByPriority(userId, profile) : Promise.resolve([]),
   ]);
   const measured = skills.filter((s) => s.status !== "unknown").length;
@@ -29,7 +30,7 @@ export default async function SkillsPage({ searchParams }: PageProps<"/skills">)
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold">Skills</h1>
+        <h1 className="text-2xl font-semibold">Your skills</h1>
         <p className="text-sm text-muted-foreground">
           Syllabus progress: {lessons}/{skills.length} lessons completed · {measured}/{skills.length} skills measured · {strong} strong or mastered
         </p>
