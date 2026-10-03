@@ -7,9 +7,8 @@ import { diagnosticPending, getAuthUser, requireUser } from "@/server/auth";
 import { dashboardLayout, getDashboard, type DashboardCardId } from "@/server/daily";
 import { levelOf, points } from "@/engine/course";
 import { getSkillSummary } from "@/server/analytics";
-import { SatCountdown } from "@/components/sat-countdown";
-import { readyBy } from "@/engine/plan";
-import { POINTS_PER_STUDY_HOUR } from "@/engine/constants";
+import { predictedScore, readyBy } from "@/engine/plan";
+import { formatDate } from "@/lib/dates";
 
 export const metadata = { title: "Home" };
 
@@ -20,6 +19,19 @@ function Card({ title, children, className }: { title: string; children: React.R
       {children}
     </section>
   );
+}
+
+/** One number at the top of the dashboard. Missing data links to where the student sets it. */
+function Stat({ label, value, sub, href, warn, className = "" }: { label: string; value: React.ReactNode; sub?: React.ReactNode; href?: string; warn?: boolean; className?: string }) {
+  const body = (
+    <>
+      <span className="text-sm text-muted-foreground">{label}</span>
+      <span className={`text-xl font-semibold tabular-nums sm:text-2xl ${href ? "underline decoration-dotted underline-offset-4" : ""}`}>{value}</span>
+      {sub && <span className={`text-xs ${warn ? "text-red-700 dark:text-red-400" : "text-muted-foreground"}`}>{sub}</span>}
+    </>
+  );
+  const cls = `flex min-w-0 flex-col gap-1 rounded-xl border p-4 ${className}`;
+  return href ? <Link href={href} className={`${cls} hover:bg-muted`}>{body}</Link> : <div className={cls}>{body}</div>;
 }
 
 function greeting(timeZone: string) {
@@ -38,53 +50,28 @@ export default async function DashboardPage() {
   const nextCourseSkill = summary.skills.filter((k) => k.section === "math").concat(summary.skills.filter((k) => k.section === "rw"))
     .find((k) => !["proficient", "mastered"].includes(levels[k.id]!));
   const planLeft = d.blocks.filter((b) => !b.done).length;
-  const sectionMastery = (section: "math" | "rw") => {
-    const measured = summary.skills.filter((k) => k.section === section && k.status !== "unknown");
-    return measured.length ? `${Math.round(measured.reduce((a, k) => a + k.mastery, 0) / measured.length)}%` : "not measured yet";
-  };
   const ready = profile.targetScore ? readyBy({ estimate: d.estimate.total, target: profile.targetScore,
     minutesPerDay: profile.minutesPerDay, daysPerWeek: profile.daysPerWeek, now: new Date() }) : null;
-  const month = (dt: Date) => dt.toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: profile.timezone });
+  const month = (dt: Date) => dt.toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: profile.timezone });
   const testDay = profile.testDate ? new Date(`${profile.testDate}T12:00:00Z`) : null;
   const tooSoon = !!(ready && testDay && testDay < ready.date);
+  const upcoming = testDay && d.daysLeft != null && d.daysLeft >= 0;
+  const predicted = upcoming ? predictedScore({ estimate: d.estimate.total, minutesPerDay: profile.minutesPerDay, daysPerWeek: profile.daysPerWeek, daysLeft: d.daysLeft! }) : null;
+  const stats = (
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+      <Stat label="Goal" value={profile.targetScore ?? "Set goal"} href={profile.targetScore ? undefined : "/settings#goal"} />
+      <Stat label="Current score" value={d.estimate.total} />
+      <Stat label="Predicted" value={predicted ?? "Add test date"} sub={predicted != null && "on test day"} href={predicted == null ? "/settings#goal" : undefined} />
+      <Stat label="Best time to take it" value={ready ? month(ready.date) : profile.targetScore ? "2+ years" : "Set goal"}
+        sub={tooSoon ? "after your test date" : !ready && profile.targetScore ? "add study time" : undefined} warn={tooSoon}
+        href={!profile.targetScore || !ready ? "/settings#goal" : undefined} />
+      <Stat label="Next SAT" value={upcoming ? formatDate(testDay!, "UTC") : "Add date"}
+        sub={upcoming ? (d.daysLeft === 0 ? "today" : `in ${d.daysLeft} day${d.daysLeft === 1 ? "" : "s"}`) : testDay ? "your last date has passed" : undefined}
+        href={upcoming ? undefined : "/settings#goal"} className="col-span-2 sm:col-span-1" />
+    </div>
+  );
 
   const cards: Record<DashboardCardId, React.ReactNode> = {
-    score: (
-      <Card key="score" title="Your score" className="lg:col-span-2">
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <p className="text-3xl font-semibold tabular-nums">{d.estimate.lo} to {d.estimate.hi}</p>
-            <p className="text-sm text-muted-foreground">Current score (estimate)</p>
-          </div>
-          <div>
-            <p className="text-3xl font-semibold tabular-nums">{profile.targetScore ?? "Not set"}</p>
-            <p className="text-sm text-muted-foreground">Target score{d.daysLeft != null && d.daysLeft >= 0 ? ` · ${d.daysLeft} days to go` : ""}</p>
-          </div>
-        </div>
-        <Button variant="outline" size="sm" className="self-start" render={<Link href="/settings#goal" />}>{profile.targetScore ? "Change goal" : "Set goal"}</Button>
-        <p className="text-sm text-muted-foreground">Reading &amp; Writing ≈ {d.estimate.rw} · Math ≈ {d.estimate.math} · <Link className="underline" href="/about">how estimates work</Link></p>
-        <p className="text-sm text-muted-foreground tabular-nums">Math: {sectionMastery("math")} skill mastery · Reading &amp; Writing: {sectionMastery("rw")}</p>
-      </Card>
-    ),
-    countdown: (
-      <Card key="countdown" title="SAT countdown" className="lg:col-span-2">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            {testDay
-              ? <p className="text-lg">{testDay.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}</p>
-              : <p className="text-sm">No test date yet. <Link className="underline" href="/settings">Add one</Link> so we can count down with you.</p>}
-            <p className="text-sm text-muted-foreground">
-              {ready
-                ? <>Predicted ready for {profile.targetScore}: <b className="text-foreground">{month(ready.date)}</b>{tooSoon && ", which is after your test date"}</>
-                : profile.targetScore ? "At your current study time, your target is more than two years away. Adding a little study time in Settings brings it much closer." : "Set a target score in Settings."}
-            </p>
-          </div>
-          {testDay && <SatCountdown testDate={profile.testDate!} timeZone={profile.timezone} />}
-        </div>
-        {tooSoon && <p className="text-sm">Book an SAT in <b>{month(ready!.date)}</b> or later, or add study time, to give yourself a realistic shot at {profile.targetScore}.</p>}
-        <p className="text-xs text-muted-foreground">How we guess this: we compare the points you still need with how much you study each week (students gain roughly {POINTS_PER_STUDY_HOUR} points per hour of focused practice), then add two weeks for a final practice test. It&apos;s a guide for planning, not a promise.</p>
-      </Card>
-    ),
     today: (
       <Card key="today" title={`Today · ${profile.minutesPerDay} minutes`}>
         <PlanBlocks blocks={d.blocks} />
@@ -161,17 +148,16 @@ export default async function DashboardPage() {
   );
 
   const layout = dashboardLayout(profile);
-  // Custom layout: cards in the chosen order on the two-column grid (score and countdown stay full width).
-  if (layout) return <div className="flex flex-col gap-6">{header}<div className="grid gap-4 lg:grid-cols-2">{layout.filter((c) => c.visible).map((c) => cards[c.id])}</div></div>;
+  // Custom layout: cards in the chosen order on the two-column grid, under the numbers.
+  if (layout) return <div className="flex flex-col gap-6">{header}{stats}<div className="grid gap-4 lg:grid-cols-2">{layout.filter((c) => c.visible).map((c) => cards[c.id])}</div></div>;
 
   return (
     <div className="flex flex-col gap-6">
     {header}
+    {stats}
     <div className="grid gap-4 lg:grid-cols-2">
-      {cards.countdown}
       {cards.today}
       <div className="flex flex-col gap-4">
-        {cards.score}
         {cards.course}
         {cards.focus}
         {cards["mock-due"]}

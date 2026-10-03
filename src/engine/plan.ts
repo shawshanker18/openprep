@@ -95,6 +95,17 @@ export function readyBy(x: { estimate: number; target: number; minutesPerDay: nu
   return { weeks, date: new Date(x.now.getTime() + weeks * 7 * 86_400_000) };
 }
 
+/**
+ * Predicted score on test day at the current study budget: the same model as readyBy (study until the final-mock
+ * buffer), so reaching the target on the "ready" date predicts at least the target. Rounded down to 10 (never
+ * promises a point it can't back up), at most 1600.
+ */
+export function predictedScore(x: { estimate: number; minutesPerDay: number; daysPerWeek: number; daysLeft: number }) {
+  const weeks = Math.max(0, x.daysLeft / 7 - READY_BUFFER_WEEKS);
+  const gain = ((x.minutesPerDay * x.daysPerWeek) / 60) * POINTS_PER_STUDY_HOUR * weeks;
+  return Math.min(1600, Math.max(x.estimate, Math.floor((x.estimate + gain) / 10) * 10));
+}
+
 /** Consecutive study days ending today (or yesterday — today isn't over yet). `days` = distinct local dates, any order. */
 export function streak(days: string[], today: string): number {
   const set = new Set(days);
