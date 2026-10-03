@@ -89,7 +89,7 @@ export default async function ResultsPage({ params }: PageProps<"/test/[sessionI
             <li key={k.id} className="flex flex-wrap items-center justify-between gap-2">
               <span>{i + 1}. {k.name} <span className="text-muted-foreground">· {k.status === "unknown" ? "not measured" : `${k.mastery}%`}</span></span>
               <span className="flex gap-3">
-                <Link className="underline" href={`/skills/${k.id}?tab=learn`}>Learn</Link>
+                <Link className="underline" href={`/start/${k.id}`}>Learn</Link>
                 <Link className="underline" href={`/practice?skill=${k.id}`}>Practise</Link>
               </span>
             </li>
