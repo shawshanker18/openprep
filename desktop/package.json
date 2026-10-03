@@ -1,7 +1,7 @@
 {
   "name": "openprep-desktop",
   "productName": "OpenPrep",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "OpenPrep desktop app \u2014 adaptive SAT prep with lockdown mode for tests and focus sessions.",
   "main": "main.js",
   "private": true,
