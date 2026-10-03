@@ -199,8 +199,6 @@ export async function resetTodayPlan(userId: string, profile: Profile) {
 }
 
 export const DASHBOARD_CARDS = [
-  { id: "score", label: "Your score" },
-  { id: "countdown", label: "SAT countdown" },
   { id: "today", label: "Today's plan" },
   { id: "focus", label: "Focus this week" },
   { id: "mock-due", label: "Full mock due" },

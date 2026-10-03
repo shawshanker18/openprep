@@ -313,6 +313,16 @@ describe("readyBy", () => {
     expect(readyBy({ estimate: 1100, target: 1400, minutesPerDay: 45, daysPerWeek: 5, now })!.weeks).toBe(22);
     expect(readyBy({ estimate: 400, target: 1600, minutesPerDay: 15, daysPerWeek: 3, now })).toBeNull(); // > 2 years
   });
+  it("predicted score agrees with it: test on the ready date → at least the target; never below now or above 1600", async () => {
+    const { readyBy, predictedScore } = await import("./plan");
+    const study = { minutesPerDay: 45, daysPerWeek: 5 };
+    const r = readyBy({ estimate: 1100, target: 1400, ...study, now })!;
+    expect(predictedScore({ estimate: 1100, ...study, daysLeft: r.weeks * 7 })).toBeGreaterThanOrEqual(1400);
+    expect(predictedScore({ estimate: 1100, ...study, daysLeft: (r.weeks - 4) * 7 })).toBeLessThan(1400);
+    expect(predictedScore({ estimate: 1100, ...study, daysLeft: 3 })).toBe(1100); // inside the final-mock buffer
+    expect(predictedScore({ estimate: 1100, ...study, daysLeft: -10 })).toBe(1100); // test date passed
+    expect(predictedScore({ estimate: 1500, minutesPerDay: 120, daysPerWeek: 7, daysLeft: 365 })).toBe(1600);
+  });
 });
 
 describe("plan near the test date", () => {
