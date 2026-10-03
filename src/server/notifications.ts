@@ -41,6 +41,6 @@ export async function getChecklist(userId: string, profile: Profile): Promise<Ch
     { id: "practice", label: "Answer 10 practice questions", hint: "Smart practice picks the questions worth the most points for you right now.", href: "/practice", done: !!r?.practiced },
     { id: "review", label: "Review a mistake", hint: "Missed questions come back after 1, 3 and 7 days, until they stick.", href: "/mistakes", done: !!r?.reviewed },
     { id: "mock", label: "Take a full practice test", hint: "A timed, adaptive mock that checks your pace and gives a score range.", href: "/tests", done: !!r?.mock },
-    { id: "reminders", label: "Turn on study reminders", hint: "A nudge at your study time on days you haven't practised yet.", href: "/settings#reminders", done: !!r?.push || profile.reminderHour != null },
+    { id: "reminders", label: "Turn on study reminders", hint: "A nudge at your study time on days you haven't practiced yet.", href: "/settings#reminders", done: !!r?.push || profile.reminderHour != null },
   ];
 }

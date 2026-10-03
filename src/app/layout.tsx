@@ -12,7 +12,7 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 
 export const metadata: Metadata = {
   title: { default: "OpenPrep: free adaptive SAT prep", template: "%s · OpenPrep" },
-  description: "Find where you are, practise what matters, and track your way to your target SAT score. Free and open source.",
+  description: "Find where you are, practice what matters, and track your way to your target SAT score. Free and open source.",
   applicationName: "OpenPrep",
   appleWebApp: { capable: true, title: "OpenPrep", statusBarStyle: "default" },
   icons: { icon: "/icon.svg", apple: "/apple-icon.png" },

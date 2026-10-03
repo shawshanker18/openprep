@@ -11,7 +11,7 @@ function describe(b: PlanBlock, i: number): { label: string; href: string } {
   switch (b.kind) {
     case "review": return { label: "Review mistakes", href: `/practice?mode=review&block=${i}` };
     case "learn": return { label: `Learn ${SKILL_BY_ID[b.skillId]?.name}`, href: `/skills/${b.skillId}?tab=learn&block=${i}` };
-    case "practice": return { label: `Practise ${SKILL_BY_ID[b.skillId]?.name}`, href: `/practice?skill=${b.skillId}&block=${i}` };
+    case "practice": return { label: `Practice ${SKILL_BY_ID[b.skillId]?.name}`, href: `/practice?skill=${b.skillId}&block=${i}` };
     case "mini": return { label: `Check-in: ${SKILL_BY_ID[b.skillId]?.name}`, href: `/practice?skill=${b.skillId}&block=${i}` };
     case "desmos": return { label: "Desmos skills", href: `/desmos/${b.lessonSlug}?block=${i}` };
   }

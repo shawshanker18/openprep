@@ -1,4 +1,5 @@
 import { eq } from "drizzle-orm";
+import { localDate } from "@/engine/plan";
 import { Button } from "@/components/ui/button";
 import { db } from "@/db";
 import { satAttempts } from "@/db/schema";
@@ -18,6 +19,7 @@ export const metadata = { title: "Settings" };
 const control = "h-9 rounded-md border bg-background px-2 text-sm";
 const ERRORS: Record<string, string> = {
   settings: "Please check your settings and try again.",
+  testdate: "Pick an upcoming test date: today or later, and within three years.",
   profile: "Please check your profile and try again.",
   dashboard: "Couldn't save the dashboard layout. Please try again.",
   score: "Each section score must be between 200 and 800 in steps of 10, with a date.",
@@ -52,7 +54,7 @@ export default async function SettingsPage({ searchParams }: PageProps<"/setting
           <label className="flex flex-col gap-1 text-sm">Target score
             <input name="targetScore" type="number" min={400} max={1600} step={10} defaultValue={profile.targetScore ?? 1400} className={control} /></label>
           <label className="flex flex-col gap-1 text-sm">Test date
-            <input name="testDate" type="date" defaultValue={profile.testDate ?? ""} className={control} /></label>
+            <input name="testDate" type="date" defaultValue={profile.testDate ?? ""} min={localDate(new Date(), profile.timezone)} className={control} /></label>
           <label className="flex flex-col gap-1 text-sm">Minutes per day
             <Choice name="minutesPerDay" defaultValue={String(profile.minutesPerDay)} options={[15, 30, 45, 60, 90, 120].map((m) => ({ value: String(m), label: `${m} minutes` }))} /></label>
           <label className="flex flex-col gap-1 text-sm">Days per week

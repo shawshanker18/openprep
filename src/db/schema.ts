@@ -158,13 +158,56 @@ export const signupTickets = pgTable("signup_tickets", {
 }, (t) => [index("signup_tickets_email_idx").on(t.email, t.createdAt), index("signup_tickets_ip_idx").on(t.ip, t.usedAt)]);
 
 /** Vulnerability reports from /security (the security.txt contact). Read them in the database console. */
+// Admin handling, shared by every inbox (security reports, question reports, feedback).
+const handled = () => ({
+  status: text("status").notNull().default("new"), // new | in_progress | resolved | dismissed
+  adminNote: text("admin_note"),
+  handledBy: uuid("handled_by"),
+  handledAt: ts("handled_at"),
+});
+
 export const securityReports = pgTable("security_reports", {
   id: uuid("id").primaryKey().defaultRandom(),
   ip: text("ip").notNull(),
   contact: text("contact"),
   message: text("message").notNull(),
   createdAt: ts("created_at").notNull().defaultNow(),
-}, (t) => [index("security_reports_ip_idx").on(t.ip, t.createdAt)]);
+  ...handled(),
+}, (t) => [index("security_reports_ip_idx").on(t.ip, t.createdAt), index("security_reports_status_idx").on(t.status, t.createdAt)]);
+
+/** Bugs, errors, reviews and ideas from students (or signed-out visitors, then `userId` is null). */
+export const feedback = pgTable("feedback", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").references(() => profiles.id, { onDelete: "set null" }),
+  kind: text("kind").notNull(), // bug | error | review | idea | other
+  rating: smallint("rating"), // 1–5, reviews only
+  message: text("message").notNull(),
+  page: text("page"), // where it was sent from
+  contact: text("contact"),
+  ip: text("ip").notNull(),
+  createdAt: ts("created_at").notNull().defaultNow(),
+  ...handled(),
+}, (t) => [index("feedback_status_idx").on(t.status, t.createdAt), index("feedback_user_idx").on(t.userId, t.createdAt), index("feedback_ip_idx").on(t.ip, t.createdAt)]);
+
+/**
+ * Admins. Granted only from the backend (SQL, or `npm run admin`): the app's database role can read this table but
+ * never write it (drizzle/0010), so no request to the site can make anyone an admin.
+ */
+export const admins = pgTable("admins", {
+  userId: uuid("user_id").primaryKey(),
+  note: text("note"),
+  grantedAt: ts("granted_at").notNull().defaultNow(),
+});
+
+/** Every admin action, append-only (the app can add rows, never change or delete them). */
+export const adminAudit = pgTable("admin_audit", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  adminId: uuid("admin_id").notNull(),
+  action: text("action").notNull(),
+  target: text("target"),
+  detail: jsonb("detail").$type<Record<string, unknown>>(),
+  createdAt: ts("created_at").notNull().defaultNow(),
+}, (t) => [index("admin_audit_time_idx").on(t.createdAt)]);
 
 /* ───────── progress, plan, misc ───────── */
 export const scoreSnapshots = pgTable("score_snapshots", {
@@ -196,7 +239,8 @@ export const questionReports = pgTable("question_reports", {
   reason: text("reason").notNull(), // wrong_answer | unclear | typo | other
   note: text("note"),
   createdAt: ts("created_at").notNull().defaultNow(),
-}, (t) => [index("qr_user_time").on(t.userId, t.createdAt)]);
+  ...handled(),
+}, (t) => [index("qr_user_time").on(t.userId, t.createdAt), index("qr_status_time").on(t.status, t.createdAt)]);
 
 export const aiMessages = pgTable("ai_messages", {
   id: uuid("id").primaryKey().defaultRandom(),

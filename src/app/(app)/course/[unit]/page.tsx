@@ -40,7 +40,7 @@ export default async function UnitPage({ params }: PageProps<"/course/[unit]">) 
         <Link href={`/course?section=${section}`} className="text-sm text-muted-foreground hover:text-foreground">{sectionName}</Link>
         <h1 className="text-2xl font-semibold">Unit {idx + 2}: {DOMAINS[unit].name}</h1>
         <p className="text-sm text-muted-foreground">
-          {skills.length} skills. For each one, read the lesson, then practise until it feels easy. The quizzes and the unit test raise your level faster.
+          {skills.length} skills. For each one, read the lesson, then practice until it feels easy. The quizzes and the unit test raise your level faster.
         </p>
       </div>
 
@@ -77,7 +77,7 @@ export default async function UnitPage({ params }: PageProps<"/course/[unit]">) 
                     <p className="text-sm text-muted-foreground">5 questions at your level, with explanations after each one.</p>
                     <Button size="sm" variant={lv.level === "not-started" ? "default" : "outline"}
                       render={<Link href={`/practice?mode=set&skills=${s.id}&count=5&from=${here}`} />}>
-                      {lv.level === "not-started" ? "Start" : "Practise again"}
+                      {lv.level === "not-started" ? "Start" : "Practice again"}
                     </Button>
                   </div>
                 </div>

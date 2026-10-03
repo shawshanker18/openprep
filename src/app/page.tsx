@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { SKILLS } from "@/content/taxonomy";
 
 const STEPS = [
-  { title: "Diagnose", body: "A short adaptive diagnostic finds your real starting point in all 29 SAT skills." },
-  { title: "Practise what matters", body: "Every question is chosen for you: the skills with the most points left to gain, at the right difficulty." },
+  { title: "Diagnose", body: `A short adaptive diagnostic finds your real starting point in all ${SKILLS.length} SAT skills.` },
+  { title: "Practice what matters", body: "Every question is chosen for you: the skills with the most points left to gain, at the right difficulty." },
   { title: "Test and track", body: "Full adaptive mocks, mistake review, and an honest score estimate that tightens as you go." },
 ];
 

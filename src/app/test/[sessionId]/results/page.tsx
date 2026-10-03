@@ -59,7 +59,7 @@ export default async function ResultsPage({ params }: PageProps<"/test/[sessionI
         <h1 className="text-3xl font-semibold tabular-nums">Estimated {estimate.total.lo} to {estimate.total.hi}</h1>
         <p className="text-muted-foreground">
           Reading &amp; Writing ≈ {estimate.rw.score} · Math ≈ {estimate.math.score}. This is an estimate from a short diagnostic;
-          it narrows as you practise.
+          it narrows as you practice.
         </p>
       </div>
 
@@ -90,7 +90,7 @@ export default async function ResultsPage({ params }: PageProps<"/test/[sessionI
               <span>{i + 1}. {k.name} <span className="text-muted-foreground">· {k.status === "unknown" ? "not measured" : `${k.mastery}%`}</span></span>
               <span className="flex gap-3">
                 <Link className="underline" href={`/skills/${k.id}?tab=learn`}>Learn</Link>
-                <Link className="underline" href={`/practice?skill=${k.id}`}>Practise</Link>
+                <Link className="underline" href={`/practice?skill=${k.id}`}>Practice</Link>
               </span>
             </li>
           ))}

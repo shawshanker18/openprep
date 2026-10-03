@@ -16,8 +16,10 @@ const one = (v: string | string[] | undefined) => (typeof v === "string" ? v : "
 
 /** Plain one line preview: drop markdown and LaTeX markers, keep the words and numbers. */
 function preview(md: string) {
-  return md.replace(/\$\$?([^$]*)\$\$?/g, "$1").replace(/\\(frac|sqrt|cdot|times|le|ge|ne|pi|theta)\b/g, (_, w: string) => ({ frac: "", sqrt: "√", cdot: "·", times: "×", le: "≤", ge: "≥", ne: "≠", pi: "π", theta: "θ" })[w] ?? "")
-    .replace(/[{}*_#>|\\]/g, "").replace(/\s+/g, " ").trim().slice(0, 160);
+  const sym: Record<string, string> = { frac: "", sqrt: "√", cdot: "·", times: "×", le: "≤", leq: "≤", ge: "≥", geq: "≥", ne: "≠", neq: "≠", lt: "<", gt: ">", pi: "π", theta: "θ" };
+  // Only a line-leading ">" is markdown (a quote); anywhere else it's maths ("x > 0").
+  return md.replace(/^>\s?/gm, "").replace(/\$\$?([^$]*)\$\$?/g, "$1").replace(/\\(frac|sqrt|cdot|times|leq|le|geq|ge|neq|ne|lt|gt|pi|theta)\b/g, (_, w: string) => sym[w] ?? "")
+    .replace(/[{}*_#|\\]/g, "").replace(/\s+/g, " ").trim().slice(0, 160);
 }
 
 export default async function QuestionBankPage({ searchParams }: PageProps<"/question-bank">) {
@@ -49,7 +51,7 @@ export default async function QuestionBankPage({ searchParams }: PageProps<"/que
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold">Question bank</h1>
         <p className="text-sm text-muted-foreground">
-          Pick a question to practise, or filter by section, skill and difficulty. So far: {counts.correct} answered right, {counts.incorrect} to retry.
+          Pick a question to practice, or filter by section, skill and difficulty. So far: {counts.correct} answered right, {counts.incorrect} to retry.
         </p>
       </div>
 
@@ -71,7 +73,7 @@ export default async function QuestionBankPage({ searchParams }: PageProps<"/que
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">{page > 1 ? `Page ${page}` : " "}</p>
-        {shown.length > 0 && <Button render={<Link href={practiceFrom((page - 1) * PAGE)} />}>Practise this page in a row</Button>}
+        {shown.length > 0 && <Button render={<Link href={practiceFrom((page - 1) * PAGE)} />}>Practice this page in a row</Button>}
       </div>
 
       {rows.length === 0 ? <p className="rounded-xl border p-5 text-sm text-muted-foreground">No questions match these filters.</p> : (
