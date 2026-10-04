@@ -7,22 +7,14 @@ import { db } from "@/db";
 import { attempts, bookmarks, questionReports, questions } from "@/db/schema";
 import { MISTAKE_TYPES } from "@/engine/mistakes";
 import { diagnosticPending, requireUser } from "@/server/auth";
-import { nextQuestion as next, submitAnswer as submit, tooFast, wasGiven } from "@/server/practice";
+import { nextQuestion as next, resumeQuestion, submitAnswer as submit, tooFast, wasGiven } from "@/server/practice";
 import { limitPractice, SLOW_DOWN } from "@/server/ratelimit";
 import { internalId, internalIds } from "@/server/questions";
+import { readPaper } from "@/server/papers";
 
 const id = text().min(1).max(64);
 
-const Next = z.object({
-  mode: z.enum(["skill", "smart", "review", "set", "list"]),
-  skillId: id.optional(),
-  exclude: z.array(id).max(200),
-  difficulty: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal("mixed")]).optional(),
-  skillIds: z.array(id).max(29).optional(),
-  tags: z.array(id).max(50).optional(),
-  timing: z.enum(["auto", "off", "on"]).optional(),
-  ids: z.array(id).max(50).optional(),
-});
+const Next = z.object({ paperId: z.string().max(12000), exclude: z.array(id).max(200), similarTo: id.optional(), resumeId:id.optional() });
 export async function nextQuestion(input: z.input<typeof Next>) {
   const { userId, profile } = await requireUser();
   if (diagnosticPending(profile)) return { ok: false as const, error: "Take the diagnostic first." };
@@ -31,8 +23,21 @@ export async function nextQuestion(input: z.input<typeof Next>) {
   const limited = await limitPractice(userId, "request");
   if (limited) return { ok: false as const, error: limited };
   if (await tooFast(userId)) return { ok: false as const, error: SLOW_DOWN };
-  const [exclude, ids] = await Promise.all([internalIds(p.data.exclude), p.data.ids ? internalIds(p.data.ids) : undefined]);
-  const r = await next(userId, profile, { ...p.data, exclude, ids });
+  const config = readPaper(userId, p.data.paperId);
+  if (!config) return { ok: false as const, error: "This practice link has expired. Reload the page to continue." };
+  if(p.data.resumeId) {
+    const restoredId=await internalId(p.data.resumeId);
+    const restored=restoredId?await resumeQuestion(userId,restoredId,config.timing):null;
+    if(restored) return {ok:true as const,data:restored};
+  }
+  const [exclude, ids] = await Promise.all([internalIds(p.data.exclude), config.ids ? internalIds(config.ids) : undefined]);
+  if (p.data.similarTo) {
+    const previous = await internalId(p.data.similarTo);
+    if (!previous || !(await wasGiven(userId, previous))) return { ok: false as const, error: "Question not found." };
+    const [q] = await db.select({ skillId: questions.skillId }).from(questions).where(eq(questions.id, previous));
+    if (q) { config.mode = "skill"; config.skillId = q.skillId; }
+  }
+  const r = await next(userId, profile, { ...config, exclude, ids });
   return { ok: true as const, data: r ?? { done: true as const } };
 }
 

@@ -17,9 +17,13 @@ export function gradeSpr(input: string, accepted: string[]): boolean {
     const v = parseNum(acc);
     if (v === null) return false;
     if (Math.abs(x - v) < 1e-9) return true;
-    // SAT rule: a long decimal may be truncated or rounded but must fill the field (>= 4 digits).
-    // ponytail: 0.001 tolerance also accepts e.g. 0.334 for 1/3; tighten to a last-digit check if reports come in.
-    return !input.includes("/") && digits >= 4 && Math.abs(x - v) < 0.001;
+    // Accept only the actual rounded or truncated representation at the entered decimal precision.
+    // A broad tolerance incorrectly accepted nearby answers, e.g. 0.334 for 1/3.
+    if(input.includes('/') || digits<4 || !input.includes('.')) return false;
+    const places=input.split('.')[1]!.length,scale=10**places;
+    const truncated=Math.trunc(v*scale)/scale;
+    const rounded=Math.sign(v)*Math.round(Math.abs(v)*scale)/scale;
+    return Math.abs(x-truncated)<1e-9 || Math.abs(x-rounded)<1e-9;
   });
 }
 

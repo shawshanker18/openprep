@@ -8,7 +8,7 @@ export default function AppError({ error, retry }: { error: Error & { digest?: s
     <section className="flex flex-col items-start gap-3 rounded-xl border p-5">
       <h1 className="text-xl font-semibold">Something went wrong</h1>
       <p className="text-sm text-muted-foreground">
-        Your progress is saved. Try again, or head back to your dashboard.{error.digest && ` (Reference: ${error.digest})`}
+        Previously saved progress is kept. Unsaved changes may need to be entered again. Try again, or head back to your dashboard.{error.digest && ` (Reference: ${error.digest})`}
       </p>
       <div className="flex flex-wrap gap-2">
         <Button onClick={() => retry()}>Try again</Button>

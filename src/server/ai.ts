@@ -20,7 +20,7 @@ const MODE_RULE: Record<Mode, string> = {
   explain: "explain: explain the solution a different way from the official explanation.",
   byhand: "byhand: every algebra step, one per line.",
   fast: "fast: the quickest legitimate test-day method.",
-  desmos: "desmos: exact things to type into the Desmos calculator and what to click.",
+  desmos: "geogebra: exact things to type into the GeoGebra calculator and what to click.",
   why_wrong: "why_wrong: explain the specific mistake that leads to the student's choice, then the fix.",
   vocab: "vocab: explain the key vocabulary or grammar rule this question tests (word in context, punctuation, agreement, transitions) in plain language, with 1-2 short original example sentences.",
   similar: "similar: write ONE new original practice question testing the same skill at the same difficulty in the same SAT format (a short passage if Reading & Writing; 4 choices A-D, or a student-produced response if the original is one). Start with the heading \"**AI-generated practice (not scored)**\", then the question, then a line \"Answer: X\", then a short worked solution. Do not reuse the original's wording or numbers. Up to 300 words.",
@@ -116,4 +116,3 @@ export async function logMessage(userId: string, questionId: string, role: "user
 export async function saveCache(key: string, content: string) {
   await db.insert(aiCache).values({ key, content }).onConflictDoNothing();
 }
-

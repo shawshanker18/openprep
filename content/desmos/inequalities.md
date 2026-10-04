@@ -3,7 +3,7 @@ title: Inequalities
 order: 5
 expressions: ['y<2x+1', 'y\ge -x+4']
 ---
-Type an inequality and Desmos shades every point that makes it true. Where two shadings overlap is the solution region of the system.
+Type an inequality and GeoGebra shades every point that makes it true. Where two shadings overlap is the solution region of the system.
 
 **Try it:** $y < 2x + 1$ and $y \ge -x + 4$ are loaded. The darker overlapping area is where both hold.
 

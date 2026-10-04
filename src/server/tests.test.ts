@@ -9,7 +9,8 @@ import * as schema from "@/db/schema";
 import { SKILLS } from "@/content/taxonomy";
 
 const pg = new PGlite();
-const db = drizzle(pg, { schema });
+const queries: string[] = [];
+const db = drizzle(pg, { schema, logger: { logQuery(query) { queries.push(query); } } });
 vi.mock("@/db", () => ({ db }));
 const T = await import("./tests");
 
@@ -229,4 +230,21 @@ it("test starts have a speed limit, not a quota", async () => {
   expect(await start()).toMatchObject({ ok: false, error: "rate" }); // a 5th within 5 minutes
   await db.update(schema.testSessions).set({ startedAt: sql`${schema.testSessions.startedAt} - interval '6 minutes'` }).where(eq(schema.testSessions.userId, U));
   expect((await start()).ok).toBe(true); // a few minutes later: fine, however many they did before
+});
+
+
+it("custom test selects multiple skills with one narrow metadata query", async () => {
+  const skills = SKILLS.filter((s) => s.section === "math").slice(0, 2).map((s) => s.id);
+  queries.length = 0;
+  const result = await T.startTest(OTHER, { kind: "custom", skillIds: skills, count: 8, timed: false });
+  if (!result.ok) throw new Error(result.error);
+  const selection = queries.filter((query) => query.includes('from "questions" left join "attempts"'));
+  expect(selection).toHaveLength(1);
+  for (const field of ["stem_md", "passage_md", "choices", "answer", "explanation_md", "choice_rationales", "fast_method_md", "desmos"])
+    expect(selection[0]).not.toContain(`"${field}"`);
+  const [module] = await modules(result.id);
+  const selected = await items(module!.id);
+  expect(selected).toHaveLength(8);
+  for (const skill of skills) expect(selected.filter((item) => item.questionId.startsWith(skill))).toHaveLength(4);
+  await T.abandonTest(OTHER, result.id);
 });

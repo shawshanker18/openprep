@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import {
-  BarChart3, Bookmark, BookOpen, Calculator, CalendarCheck, Check, ClipboardList, GraduationCap, Home, Library, Menu, Mountain, Settings, ShieldCheck, SlidersHorizontal, Sparkles, XCircle, Zap,
+  BarChart3, Bookmark, BookOpen, Calculator, Check, ClipboardList, GraduationCap, Home, Library, Menu, Settings, ShieldCheck, SlidersHorizontal, Sparkles, XCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -17,7 +17,6 @@ export const NAV_GROUPS = [
     label: null,
     items: [
       { href: "/dashboard", label: "Home", icon: Home },
-      { href: "/plan", label: "Study plan", icon: CalendarCheck },
       { href: "/progress", label: "Progress", icon: BarChart3 },
       { href: "/mistakes", label: "Mistakes", icon: XCircle },
       { href: "/bookmarks", label: "Saved", icon: Bookmark },
@@ -36,8 +35,6 @@ export const NAV_GROUPS = [
     items: [
       { href: "/practice", label: "Smart practice", icon: Sparkles },
       { href: "/question-bank", label: "Question bank", icon: Library },
-      { href: "/practice?preset=rush", label: "Question rush", icon: Zap },
-      { href: "/practice?preset=challenge", label: "Challenge questions", icon: Mountain },
       { href: "/practice/custom", label: "Custom practice", icon: SlidersHorizontal },
       { href: "/tests", label: "Practice tests", icon: ClipboardList },
     ],

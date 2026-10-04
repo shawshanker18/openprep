@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import postgres from "postgres";
 import { drizzle } from "drizzle-orm/postgres-js";
-import { and, eq, notInArray, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import { questions } from "../src/db/schema";
 import { validateContent } from "./content-validate";
 
@@ -16,11 +16,12 @@ if (errors.length) {
 
 const client = postgres(process.env.MIGRATE_DATABASE_URL || process.env.DATABASE_URL!, { prepare: false, max: 1 });
 const db = drizzle(client);
-let inserted = 0, updated = 0, retired = 0;
+let inserted = 0, updated = 0;
+const retired = 0;
 
 await db.transaction(async (tx) => {
   for (let i = 0; i < rows.length; i += 500) {
-    const res = await tx.insert(questions).values(rows.slice(i, i + 500)).onConflictDoUpdate({
+    const res = await tx.insert(questions).values(rows.slice(i, i + 500).map((row) => ({ ...row, status: "retired" as const }))).onConflictDoUpdate({
       target: questions.id,
       set: Object.fromEntries(
         ["skill_id", "section", "domain", "difficulty", "type", "passage_md", "stem_md", "choices", "answer",
@@ -30,11 +31,8 @@ await db.transaction(async (tx) => {
     }).returning({ isNew: sql<boolean>`(xmax = 0)` });
     for (const r of res) if (r.isNew) inserted++; else updated++;
   }
-  const ids = rows.map((r) => r.id);
-  const gone = await tx.update(questions).set({ status: "retired" })
-    .where(and(eq(questions.status, "active"), ids.length ? notInArray(questions.id, ids) : undefined))
-    .returning({ id: questions.id });
-  retired = gone.length;
+  // The private SAT import is managed separately from repository content.
+  // Never retire imported UUID rows during a Vercel build.
 });
 
 const figs = path.resolve(import.meta.dirname, "..", "content", "figures");

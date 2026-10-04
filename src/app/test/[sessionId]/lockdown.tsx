@@ -36,7 +36,7 @@ export function EndTest({ action, detail }: { action: () => Promise<void>; detai
       <DialogContent>
         <DialogHeader>
           <DialogTitle>End this test?</DialogTitle>
-          <DialogDescription>{detail} Lockdown ends with it.</DialogDescription>
+          <DialogDescription>{detail}</DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <DialogClose render={<Button variant="outline" />}>Keep going</DialogClose>

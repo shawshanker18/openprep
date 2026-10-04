@@ -11,9 +11,13 @@ const pad = (n: number) => String(n).padStart(2, "0")
 const iso = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
 const parse = (s?: string | null) => {
   const m = s && /^(\d{4})-(\d{2})-(\d{2})$/.exec(s)
-  return m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : null
+  if (!m) return null
+  const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]))
+  return iso(d) === s ? d : null
 }
 const WEEKDAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
+const boundedDate = (date: Date, min?: string, max?: string) =>
+  min && iso(date) < min ? parse(min) ?? date : max && iso(date) > max ? parse(max) ?? date : date
 
 export function DateField({ name, defaultValue, required, disabled, min, max, className, placeholder = "Pick a date" }: {
   name: string; defaultValue?: string | null; required?: boolean; disabled?: boolean; min?: string; max?: string; className?: string; placeholder?: string
@@ -22,15 +26,23 @@ export function DateField({ name, defaultValue, required, disabled, min, max, cl
   const [open, setOpen] = React.useState(false)
   const selected = parse(value)
   const today = new Date()
-  const [view, setView] = React.useState(() => { const d = selected ?? parse(min) ?? today; return { y: d.getFullYear(), m: d.getMonth() } })
+  const [view, setView] = React.useState(() => { const d = boundedDate(selected ?? parse(min) ?? today, min, max); return { y: d.getFullYear(), m: d.getMonth() } })
   const [focus, setFocus] = React.useState<string | null>(null)
   const grid = React.useRef<HTMLDivElement>(null)
+  const trigger = React.useRef<HTMLButtonElement>(null)
+  const [invalid, setInvalid] = React.useState(false)
 
   const allowed = (s: string) => (!min || s >= min) && (!max || s <= max)
   const first = new Date(view.y, view.m, 1)
   const days = Array.from({ length: 42 }, (_, i) => new Date(view.y, view.m, i - first.getDay() + 1))
-  const shift = (months: number) => setView((v) => { const d = new Date(v.y, v.m + months, 1); return { y: d.getFullYear(), m: d.getMonth() } })
-  const pick = (s: string) => { if (!allowed(s)) return; setValue(s); setOpen(false) }
+  const shift = (months: number) => {
+    let d = new Date(view.y, view.m + months, 1)
+    const last = new Date(d.getFullYear(), d.getMonth()+1, 0)
+    if((min && iso(last)<min) || (max && iso(d)>max)) return
+    if(min && iso(d)<min) d=parse(min)!
+    setView({y:d.getFullYear(),m:d.getMonth()});setFocus(iso(d))
+  }
+  const pick = (s: string) => { if (!allowed(s)) return; setValue(s); setInvalid(false); setOpen(false) }
 
   React.useEffect(() => {
     if (focus) grid.current?.querySelector<HTMLButtonElement>(`[data-day="${focus}"]`)?.focus()
@@ -42,6 +54,7 @@ export function DateField({ name, defaultValue, required, disabled, min, max, cl
     if (!step) return
     e.preventDefault()
     const d = new Date(at.getFullYear(), at.getMonth(), at.getDate() + step)
+    if (!allowed(iso(d))) return
     if (d.getMonth() !== view.m || d.getFullYear() !== view.y) setView({ y: d.getFullYear(), m: d.getMonth() })
     setFocus(iso(d))
   }
@@ -49,10 +62,10 @@ export function DateField({ name, defaultValue, required, disabled, min, max, cl
   return (
     <Popover.Root open={open} onOpenChange={(o) => {
       setOpen(o)
-      if (o) { const d = selected ?? parse(min) ?? today; setView({ y: d.getFullYear(), m: d.getMonth() }); setFocus(iso(d)) }
+      if (o) { const d = boundedDate(selected ?? parse(min) ?? today, min, max); setView({ y: d.getFullYear(), m: d.getMonth() }); setFocus(iso(d)) }
     }}>
-      <span className="relative flex">
-        <Popover.Trigger disabled={disabled}
+      <span className="relative flex flex-col">
+        <Popover.Trigger ref={trigger} aria-label={name.replace(/_/g, " ")} aria-invalid={invalid} disabled={disabled}
           className={cn("flex h-9 w-full items-center justify-between gap-2 rounded-md border bg-background px-2 text-left text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50", className)}>
           <span className={selected ? "" : "text-muted-foreground"}>
             {selected ? selected.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : placeholder}
@@ -60,8 +73,9 @@ export function DateField({ name, defaultValue, required, disabled, min, max, cl
           <CalendarIcon className="size-4 text-muted-foreground" />
         </Popover.Trigger>
         {/* Carries the value into the form and lets the browser enforce `required`. */}
-        <input name={name} value={value} onChange={() => {}} required={required} disabled={disabled} tabIndex={-1} aria-hidden
+        <input onInvalid={(event) => { event.preventDefault(); setInvalid(true); trigger.current?.focus(); setOpen(true) }} name={name} value={value} onChange={() => {}} required={required} disabled={disabled} tabIndex={-1} aria-hidden
           className="pointer-events-none absolute inset-x-0 bottom-0 h-px opacity-0" />
+        {invalid && <span role="alert" className="mt-1 text-xs text-destructive">Choose a date.</span>}
       </span>
       <Popover.Portal>
         <Popover.Positioner sideOffset={4} align="start" className="z-50">
@@ -77,7 +91,7 @@ export function DateField({ name, defaultValue, required, disabled, min, max, cl
               <button type="button" onClick={() => shift(1)} className="rounded-md p-1.5 hover:bg-muted" aria-label="Next month"><ChevronRightIcon className="size-4" /></button>
             </div>
             <div className="grid grid-cols-7 text-center text-xs text-muted-foreground">{WEEKDAYS.map((w) => <span key={w} className="py-1">{w}</span>)}</div>
-            <div ref={grid} role="grid" onKeyDown={onKey} className="grid grid-cols-7 gap-0.5">
+            <div ref={grid} role="group" aria-label="Choose a date" onKeyDown={onKey} className="grid grid-cols-7 gap-0.5">
               {days.map((d) => {
                 const s = iso(d), inMonth = d.getMonth() === view.m, isSel = s === value, isToday = s === iso(today), ok = allowed(s)
                 return (

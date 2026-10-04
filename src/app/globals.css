@@ -140,6 +140,11 @@
 body:has(:is(input:not([type=checkbox], [type=radio], [type=range]), textarea, [contenteditable=true]):focus) .bottom-nav {
   display: none;
 }
+body.lesson-focus-mode .app-sidebar,
+body.lesson-focus-mode .app-topbar,
+body.lesson-focus-mode .app-mobile-header,
+body.lesson-focus-mode .bottom-nav { display: none; }
+body.lesson-focus-mode main { max-width: none; padding-top: 1rem; }
 /* Content typography for <Markdown> (questions, lessons, AI output). */
 .prose-op { line-height: 1.65; }
 .prose-op > * + * { margin-top: 0.75em; }

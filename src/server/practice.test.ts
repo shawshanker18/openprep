@@ -38,7 +38,7 @@ it("list mode walks the given ids in order, and the bank shows last result and s
   expect(await P.nextQuestion(USER, profile, { mode: "list", ids: order, exclude: order })).toBeNull();
 
   await db.insert(schema.bookmarks).values({ userId: USER, questionId: ids[2]! });
-  const bank = Object.fromEntries((await P.questionBank(USER)).map((q) => [q.id, q]));
+  const bank = Object.fromEntries((await P.questionBank(USER)).rows.map((q) => [q.id, q]));
   expect(bank[ids[1]!]).toMatchObject({ status: "correct", saved: false });
   expect(bank[ids[0]!]).toMatchObject({ status: "new", saved: false });
   expect(bank[ids[2]!]).toMatchObject({ status: "new", saved: true });
@@ -122,4 +122,55 @@ it("question ids sent to the browser are opaque and map back only through the se
   expect(await Q2.internalId("A".repeat(22))).toBeNull(); // a guess maps to nothing
   const q = (await P.nextQuestion(USER, {} as schema.Profile, { mode: "list", ids: [ids[2]!], exclude: [] }))!.question;
   expect(JSON.stringify(q)).not.toMatch(/answer|explanation|difficulty|choiceRationales/);
+});
+
+it('retrying the same submitted answer returns its result without recording another attempt',async()=>{
+  await P.nextQuestion(USER,{} as schema.Profile,{mode:'list',ids:[ids[2]!],exclude:[]});
+  const input={questionId:ids[2]!,response:'A',timeMs:5000,confidence:2 as const};
+  const first=await P.submitAnswer(USER,input),retry=await P.submitAnswer(USER,input);
+  expect(first).not.toBeNull();expect(retry?.attemptId).toBe(first?.attemptId);
+});
+
+
+it("paginates ten rows after filtering and keeps global counters and student results", async () => {
+  const target = SKILLS.find((s) => s.section === "rw")!;
+  const other = "00000000-0000-0000-0000-000000000011";
+  await db.insert(schema.profiles).values({ id: other });
+  const batch = Array.from({ length: 23 }, (_, i) => `pagination-${String(i).padStart(2, "0")}`);
+  await db.insert(schema.questions).values(batch.map((id, i) => ({
+    id, skillId: target.id, section: target.section, domain: target.domain, difficulty: i < 12 ? 1 : 3,
+    type: "mcq", stemMd: `Preview ${id}`, answer: { choice: "A" }, explanationMd: "Explanation",
+  })));
+  // The latest answer wins, and another student's answer must not change this student's status.
+  await db.insert(schema.attempts).values([
+    { userId: USER, questionId: batch[0]!, skillId: target.id, context: "practice", correct: true, timeMs: 1000,
+      thetaBefore: 0, thetaAfter: 0, createdAt: new Date("2026-01-01") },
+    { userId: USER, questionId: batch[0]!, skillId: target.id, context: "practice", correct: false, timeMs: 1000,
+      thetaBefore: 0, thetaAfter: 0, createdAt: new Date("2026-01-02") },
+    { userId: other, questionId: batch[1]!, skillId: target.id, context: "practice", correct: true, timeMs: 1000,
+      thetaBefore: 0, thetaAfter: 0 },
+  ]);
+  await db.insert(schema.bookmarks).values({ userId: USER, questionId: batch[2]! });
+  const filter = { skillId: target.id };
+  const first = await P.questionBank(USER, filter);
+  const second = await P.questionBank(USER, { ...filter, page: 2 });
+  const third = await P.questionBank(USER, { ...filter, page: 3 });
+  expect(first.rows.map((q) => q.id)).toEqual(batch.slice(0, 10));
+  expect(second.rows.map((q) => q.id)).toEqual(batch.slice(10, 20));
+  expect(third.rows.map((q) => q.id)).toEqual(batch.slice(20));
+  expect([first.hasMore, second.hasMore, third.hasMore]).toEqual([true, true, false]);
+  expect(first.counts.filtered).toBe(23);
+  expect(first.counts).toEqual(second.counts);
+  expect(first.rows[0]).toMatchObject({ status: "incorrect", stem: `Preview ${batch[0]}` });
+  expect(first.rows[1]).toMatchObject({ status: "new", stem: null });
+  expect(first.rows[2]).toMatchObject({ saved: true, stem: `Preview ${batch[2]}` });
+  expect((await P.questionBank(USER, { ...filter, status: "incorrect" })).rows.map((q) => q.id)).toEqual([batch[0]]);
+  expect((await P.questionBank(USER, { ...filter, status: "correct" })).rows).toEqual([]);
+  expect((await P.questionBank(USER, { ...filter, status: "saved" })).rows.map((q) => q.id)).toEqual([batch[2]]);
+  expect((await P.questionBank(USER, { ...filter, status: "new" })).counts.filtered).toBe(22);
+  expect((await P.questionBank(USER, { ...filter, difficulty: 3 })).counts.filtered).toBe(11);
+  expect((await P.questionBank(USER, { ...filter, section: "math" })).rows).toEqual([]);
+  expect((await P.questionBank(USER, { ...filter, page: Infinity })).page).toBe(1);
+  expect((await P.questionBank(USER, { ...filter, page: 1.5 })).page).toBe(1);
+  expect((await P.questionBank(USER, { ...filter, page: 999 })).page).toBe(3);
 });

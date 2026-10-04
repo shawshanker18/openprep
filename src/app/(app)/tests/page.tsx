@@ -12,6 +12,7 @@ import { SkillTagPicker } from "../practice/skill-tag-picker";
 import { abandon } from "@/app/test/[sessionId]/actions";
 import { startTestAction } from "./actions";
 import { Choice } from "@/components/ui/choice";
+import { StartTestButton } from "@/components/start-test-button";
 
 export const metadata = { title: "Practice tests" };
 
@@ -25,7 +26,7 @@ function StartCard({ title, time, children, fields }: { title: string; time: str
       <div><h2 className="font-medium">{title}</h2><p className="text-sm text-muted-foreground">{time}</p></div>
       <p className="text-sm">{children}</p>
       {fields}
-      <Button type="submit" className="mt-auto self-start">Start</Button>
+      <StartTestButton />
     </form>
   );
 }

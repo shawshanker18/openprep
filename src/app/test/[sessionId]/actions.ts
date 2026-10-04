@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { text } from "@/lib/text";
 import { and, eq } from "drizzle-orm";
@@ -77,6 +78,10 @@ export async function endDiagnostic(sessionId: string) {
 export async function abandon(sessionId: string) {
   const { userId } = await requireUser();
   if (z.uuid().safeParse(sessionId).success) await abandonTest(userId, sessionId);
+  // Server actions can otherwise leave the tests page showing the old in-progress row
+  // until a hard refresh, which also makes the start guard look like it did not clear.
+  revalidatePath("/tests");
+  revalidatePath("/dashboard");
   redirect("/tests");
 }
 

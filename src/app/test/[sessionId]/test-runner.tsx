@@ -12,6 +12,7 @@ import { cn, isTyping } from "@/lib/utils";
 import type { PublicQuestion } from "@/server/questions";
 import { abandon, reportFocusLoss, saveResponse, startModule, submitModule } from "./actions";
 import { EndTest, useTestLockdown } from "./lockdown";
+import { readDraft, writeDraft } from "@/lib/answer-drafts";
 
 type Item = { position: number; question: PublicQuestion; response: string | null; flagged: boolean };
 type Mod = { id: string; idx: number; section: string; route: string; timeLimitS: number | null; startedAt: string | null; deadlineAt: string | null; adaptive: boolean };
@@ -20,8 +21,8 @@ const SECTION = { rw: "Reading and Writing", math: "Math", mixed: "Mixed practic
 const now = () => performance.now();
 const clock = (ms: number) => { const s = Math.max(0, Math.ceil(ms / 1000)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
 
-export function TestRunner({ sessionId, module: m, items: initial, serverNow, breakBefore, heading }: {
-  sessionId: string; module: Mod; items: Item[]; serverNow: string; breakBefore: boolean; heading?: string | null;
+export function TestRunner({ userId, sessionId, module: m, items: initial, serverNow, breakBefore, heading }: {
+  userId: string; sessionId: string; module: Mod; items: Item[]; serverNow: string; breakBefore: boolean; heading?: string | null;
 }) {
   const router = useRouter();
   const [items, setItems] = useState(initial);
@@ -46,6 +47,7 @@ export function TestRunner({ sessionId, module: m, items: initial, serverNow, br
     return () => document.removeEventListener("visibilitychange", resync);
   }, [router]);
   const submitted = useRef(false);
+  const autoRetryAt=useRef(0);
 
   // Per-question time, flushed with each save.
   const enteredAt = useRef(0);
@@ -68,19 +70,39 @@ export function TestRunner({ sessionId, module: m, items: initial, serverNow, br
     const lost = () => {
       if (Date.now() - last < 3000) return; // blur + visibilitychange fire together
       last = Date.now();
-      void reportFocusLoss(sessionId);
-      toast.warning("You left the test window. This is noted on your results.");
+      void reportFocusLoss(sessionId).catch(()=>undefined);
+      toast.warning("Return to the test window to continue.");
     };
     const onVis = () => { if (document.hidden) lost(); };
-    window.addEventListener("blur", lost);
+
     document.addEventListener("visibilitychange", onVis);
-    return () => { window.removeEventListener("blur", lost); document.removeEventListener("visibilitychange", onVis); };
+    return () => {  document.removeEventListener("visibilitychange", onVis); };
   }, [running, sessionId]);
 
   // The latest answer for each question the server may not have yet (waiting to save, or a save failed). They are
   // sent again on every move and before submitting, so a network blip never loses one. (Server actions run one at a
   // time, in order, so a newer save can't be overtaken by an older one.)
   const unsaved = useRef(new Map<number, Item>());
+  const draftKey = `openprep:unsaved:${userId}:${sessionId}:${m.id}`;
+  const persist = useCallback(() => writeDraft(draftKey,[...unsaved.current].map(([position,it])=>({position,id:it.question.id,response:it.response,flagged:it.flagged,timeMs:Math.round(acc.current[position]??0)}))),[draftKey]);
+  useEffect(()=>{
+    let alive=true;
+    queueMicrotask(()=>{
+      if(!alive) return;
+      const restored=readDraft(draftKey).filter(a=>initial[a.position]?.question.id===a.id);
+      if(!restored.length) return;
+      const recovered=initial.map((it,position)=>{
+        const a=restored.find(a=>a.position===position);
+        if(!a) return it;
+        const next={...it,response:a.response,flagged:a.flagged};
+        unsaved.current.set(position,next);acc.current[position]=a.timeMs;return next;
+      });
+      setItems(recovered);setSaving('error');toast.info('Recovered unsaved answers. Continue to save them.');
+    });
+    const beforeLeave=(event:BeforeUnloadEvent)=>{if(unsaved.current.size){persist();event.preventDefault();event.returnValue='';}};
+    window.addEventListener('beforeunload',beforeLeave);
+    return ()=>{alive=false;window.removeEventListener('beforeunload',beforeLeave);};
+  },[draftKey,initial,persist]);
   const save = useCallback(async (position: number, it: Item) => {
     const delta = Math.round(acc.current[position] ?? 0);
     acc.current[position] = 0;
@@ -91,20 +113,29 @@ export function TestRunner({ sessionId, module: m, items: initial, serverNow, br
       if (unsaved.current.get(position) === it) unsaved.current.delete(position);
       setSaving(unsaved.current.size ? "error" : "saved");
     } else { acc.current[position] = (acc.current[position] ?? 0) + delta; setSaving("error"); toast.error(res.error); }
-  }, [m.id]);
+    persist();
+  }, [m.id,persist]);
   const saveAll = useCallback(() => Promise.all([...unsaved.current].map(([p, it]) => save(p, it))), [save]);
+  useEffect(()=>{
+    const retry=()=>{void saveAll();};
+    window.addEventListener('online',retry);
+    return ()=>window.removeEventListener('online',retry);
+  },[saveAll]);
 
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
   const update = (patch: Partial<Item>) => {
+    if(submitted.current || submitting) return;
     const it = { ...items[pos]!, ...patch };
     setItems((xs) => xs.map((x, i) => (i === pos ? it : x)));
     accrue();
     const p = pos;
     unsaved.current.set(p, it);
+    if(!persist()) toast.warning('Browser storage is unavailable. Keep this tab open until your answers are saved.');
     if (debounce.current) clearTimeout(debounce.current);
     debounce.current = setTimeout(() => { debounce.current = null; void save(p, it); }, 400);
   };
   const go = (to: number | "review") => {
+    if(submitted.current || submitting) return;
     accrue();
     if (debounce.current) { clearTimeout(debounce.current); debounce.current = null; }
     if (!unsaved.current.has(pos)) unsaved.current.set(pos, items[pos]!); // sends the time spent on it too
@@ -115,18 +146,23 @@ export function TestRunner({ sessionId, module: m, items: initial, serverNow, br
   // `auto`: time ran out. Then it goes ahead whatever happens (the server closes the module anyway); a student's own
   // submit waits until every answer is saved.
   const submit = useCallback(async (auto = false) => {
-    if (submitted.current) return;
+    if (submitted.current || auto && Date.now()<autoRetryAt.current) return;
     submitted.current = true;
     setSubmitting(true);
+    if (screen === "question") {
+      accrue();
+      if (!unsaved.current.has(pos)) unsaved.current.set(pos, items[pos]!);
+    }
     if (debounce.current) { clearTimeout(debounce.current); debounce.current = null; }
     await saveAll();
-    const fail = (msg: string) => { submitted.current = false; setSubmitting(false); if (!auto) toast.error(msg); };
+    const fail = (msg: string) => { submitted.current = false; setSubmitting(false); if (auto) {autoRetryAt.current=Date.now()+10_000;setSaving('error');} else toast.error(msg); };
     if (!auto && unsaved.current.size) return fail("Some answers aren't saved yet. Check your connection, then submit again.");
     const r = await submitModule(m.id).catch(() => null);
     if (r === null) return fail("Couldn't submit. Check your connection and try again.");
     if (r && typeof r === "object" && r.finished) router.replace(`/test/${sessionId}/results`);
     else router.refresh(); // next module
-  }, [m.id, router, sessionId, saveAll]);
+    writeDraft(draftKey,[]);
+  }, [m.id, router, sessionId, saveAll, screen, accrue, pos, items,draftKey]);
 
   // Countdown; auto-submit at zero.
   useEffect(() => {
@@ -145,10 +181,10 @@ export function TestRunner({ sessionId, module: m, items: initial, serverNow, br
   useEffect(() => {
     if (screen !== "question") return;
     const onKey = (e: KeyboardEvent) => {
-      if (isTyping(e) || e.metaKey || e.ctrlKey) return;
+      if (submitted.current || submitting || isTyping(e) || e.metaKey || e.ctrlKey) return;
       const it = items[pos]!;
       if (e.key.toLowerCase() === "f") update({ flagged: !it.flagged });
-      if (it.question.type === "mcq") {
+      if (!!it.question.choices?.length) {
         const i = "1234".indexOf(e.key) >= 0 ? "1234".indexOf(e.key) : "abcd".indexOf(e.key.toLowerCase());
         if (i >= 0) update({ response: "ABCD"[i]! });
       }
@@ -171,7 +207,11 @@ export function TestRunner({ sessionId, module: m, items: initial, serverNow, br
         </p>
         <Button size="lg" className="self-center" disabled={starting} onClick={async () => {
           setStarting(true);
-          if (await startModule(m.id)) { setScreen("question"); router.refresh(); } else { toast.error("Couldn't start this module."); setStarting(false); }
+          try {
+            if (await startModule(m.id)) { setScreen("question"); router.refresh(); }
+            else toast.error("Couldn't start this module. Please try again.");
+          } catch { toast.error("Couldn't start this module. Check your connection and try again."); }
+          finally { setStarting(false); }
         }}>Start</Button>
         <EndTest action={abandon.bind(null, sessionId)} detail="It won't be scored and your answers so far won't count." />
       </div>
@@ -182,16 +222,16 @@ export function TestRunner({ sessionId, module: m, items: initial, serverNow, br
   const answered = items.filter((x) => x.response !== null).length;
   return (
     <div className="flex min-h-[calc(100vh-4rem)] flex-col">
-      <header className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b bg-background px-4 py-2 text-sm">
-        <span className="font-medium">{title}</span>
+      <header className="sticky top-0 z-10 grid grid-cols-[minmax(0,1fr)_auto] sm:grid-cols-[minmax(0,1fr)_7rem_auto] items-center gap-2 border-b bg-background px-4 py-2 text-sm">
+        <span className="min-w-0 truncate font-medium">{title}</span>
         {left != null && (
-          <button className={cn("tabular-nums", left < 5 * 60_000 && "font-bold")} onClick={() => setShowTimer((v) => !v)} aria-live="off">
+          <button className={cn("w-20 justify-self-center text-center tabular-nums", left < 5 * 60_000 && "font-bold")} onClick={() => setShowTimer((v) => !v)} aria-live="off">
             {showTimer ? clock(left) : "Show time"}
           </button>
         )}
-        <div className="flex items-center gap-2">
+        <div className="col-span-2 flex flex-wrap items-center justify-end gap-2 sm:col-span-1">
           {(m.section === "math" || m.section === "mixed") && <ReferenceSheet />}
-          <span className="text-xs text-muted-foreground">{saving === "saving" ? "Saving…" : saving === "error" ? "Not saved" : "Saved"}</span>
+          <span className="w-16 text-center text-xs text-muted-foreground">{saving === "saving" ? "Saving…" : saving === "error" ? "Not saved" : "Saved"}</span>
           <EndTest action={abandon.bind(null, sessionId)} detail="It won't be scored and your answers so far won't count." />
         </div>
       </header>
@@ -205,7 +245,7 @@ export function TestRunner({ sessionId, module: m, items: initial, serverNow, br
                 <Flag className={cn(it.flagged && "fill-current")} /> {it.flagged ? "Flagged" : "Flag for review"}
               </Button>
             </div>
-            {it.question.section === "math" && <DesmosToggle />}
+            {true && <DesmosToggle className="h-64" />}
             <QuestionView key={it.question.id} question={it.question} value={it.response} onChange={(v) => update({ response: v })} disabled={submitting} />
           </div>
         ) : (

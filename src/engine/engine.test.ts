@@ -9,7 +9,7 @@ import { pickQuestion, skillPriority, weeklyFocus, type Candidate } from "./sele
 import { afterReview } from "./review";
 import { assembleModule, largestRemainder, moduleBlueprint, RW_DOMAIN_ORDER, type PoolQ } from "./assemble";
 import { buildTestResult, mockSectionScore, sectionEstimate, timingStats } from "./score";
-import { buildDailyPlan, streak, weekOf } from "./plan";
+import { buildDailyPlan, weekOf } from "./plan";
 
 // Deterministic RNG for tests (mulberry32).
 const rngFrom = (seed: number) => () => {
@@ -99,7 +99,8 @@ describe("grade", () => {
   });
   it("applies SAT SPR rules", () => {
     for (const ok of ["2/3", ".6666", ".6667", "0.666", "0.667", "4/6"]) expect(gradeSpr(ok, ["2/3"]), ok).toBe(true);
-    for (const bad of ["0.66", "0.67", ".6", "abc", ""]) expect(gradeSpr(bad, ["2/3"]), bad).toBe(false);
+    for (const bad of ["0.66", "0.67", ".6", "abc", "", "0.668", ".6668"]) expect(gradeSpr(bad, ["2/3"]), bad).toBe(false);
+    expect(gradeSpr("0.334",["1/3"])).toBe(false);
     expect(gradeSpr("-3", ["-3"])).toBe(true);
     expect(gradeSpr("-3.0", ["-3"])).toBe(true);
     expect(gradeSpr("3", ["3", "-3"])).toBe(true);
@@ -313,6 +314,15 @@ describe("readyBy", () => {
     expect(readyBy({ estimate: 1100, target: 1400, minutesPerDay: 45, daysPerWeek: 5, now })!.weeks).toBe(22);
     expect(readyBy({ estimate: 400, target: 1600, minutesPerDay: 15, daysPerWeek: 3, now })).toBeNull(); // > 2 years
   });
+  it("best test date is never more than 6 months away", async () => {
+    const { readyBy, bestTestDate } = await import("./plan");
+    const soon = bestTestDate(readyBy({ estimate: 1350, target: 1400, minutesPerDay: 45, daysPerWeek: 5, now })!, now);
+    expect(soon.capped).toBe(false);
+    expect(soon.date < new Date("2027-04-01T00:00:00Z")).toBe(true);
+    const far = bestTestDate(readyBy({ estimate: 590, target: 1400, minutesPerDay: 45, daysPerWeek: 5, now }), now);
+    expect(far).toEqual({ date: new Date("2027-04-01T00:00:00Z"), capped: true }); // Oct 1 + 6 months
+    expect(bestTestDate(null, now).capped).toBe(true); // more than two years away
+  });
   it("predicted score agrees with it: test on the ready date → at least the target; never below now or above 1600", async () => {
     const { readyBy, predictedScore } = await import("./plan");
     const study = { minutesPerDay: 45, daysPerWeek: 5 };
@@ -354,16 +364,6 @@ describe("plan near the test date", () => {
   it("a past test date is ignored", () => {
     const input = { ...base, minutes: 60, focus: focus(false) };
     expect(buildDailyPlan({ ...input, daysToTest: -3 })).toEqual(buildDailyPlan(input));
-  });
-});
-
-describe("streak", () => {
-  it("counts back from today, or from yesterday if today has no practice yet", () => {
-    expect(streak(["2026-10-01", "2026-09-30", "2026-09-29", "2026-09-27"], "2026-10-01")).toBe(3);
-    expect(streak(["2026-09-30", "2026-09-29"], "2026-10-01")).toBe(2);
-    expect(streak(["2026-09-29"], "2026-10-01")).toBe(0);
-    expect(streak([], "2026-10-01")).toBe(0);
-    expect(streak(["2026-03-01", "2026-02-28"], "2026-03-01")).toBe(2); // month boundary
   });
 });
 

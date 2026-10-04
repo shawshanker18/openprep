@@ -35,16 +35,24 @@ export async function internalIds(pubs: string[]) {
 }
 
 export type PublicQuestion = Pick<Question,
-  "id" | "skillId" | "section" | "domain" | "type" | "passageMd" | "stemMd" | "choices">;
+  "id" | "passageMd" | "stemMd" | "choices">;
 export type RevealedQuestion = PublicQuestion & Pick<Question,
-  "answer" | "explanationMd" | "choiceRationales" | "fastMethodMd" | "desmos" | "difficulty">;
+  "answer" | "explanationMd" | "choiceRationales" | "fastMethodMd" | "desmos">;
 
-export const toPublic = (q: Question): PublicQuestion => ({
-  id: publicId(q.id), skillId: q.skillId, section: q.section, domain: q.domain,
-  type: q.type, passageMd: q.passageMd, stemMd: q.stemMd, choices: q.choices,
-});
+export function toPublic(q: Question): PublicQuestion {
+  const md = (s: string) => questionMarkdown(q,s);
+  return { id: publicId(q.id), passageMd: q.passageMd ? md(q.passageMd) : null, stemMd: md(q.stemMd),
+    choices: q.choices?.map(c=>({...c,md:md(c.md)})) ?? null };
+}
+export function questionMarkdown(q:Pick<Question,'id'|'stemMd'|'passageMd'|'choices'>,s:string) {
+  const ids=questionAssetIds(q);
+  return s.replace(/asset:\/\/([\w-]+)/g,(_,id:string)=>`/api/question-assets/${publicId(q.id)}/${ids.indexOf(id)}`);
+}
+export function questionAssetIds(q: Pick<Question,'stemMd'|'passageMd'|'choices'>) {
+  return [...new Set([q.stemMd,q.passageMd??'',...(q.choices?.map(c=>c.md)??[])].flatMap(s=>[...s.matchAll(/asset:\/\/([\w-]+)/g)].map(m=>m[1]!)))];
+}
 
 export const toRevealed = (q: Question): RevealedQuestion => ({
   ...toPublic(q), answer: q.answer, explanationMd: q.explanationMd, choiceRationales: q.choiceRationales,
-  fastMethodMd: q.fastMethodMd, desmos: q.desmos, difficulty: q.difficulty,
+  fastMethodMd: q.fastMethodMd, desmos: q.desmos,
 });

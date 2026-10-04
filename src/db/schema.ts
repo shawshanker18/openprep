@@ -1,4 +1,5 @@
 // Complete database schema (spec 01 §4). Text columns instead of enums; values validated by zod at the edge.
+import { sql } from "drizzle-orm";
 import {
   pgTable, uuid, text, integer, smallint, real, boolean, timestamp, date, jsonb, primaryKey, index,
 } from "drizzle-orm/pg-core";
@@ -55,7 +56,10 @@ export const questions = pgTable("questions", {
   tags: jsonb("tags").$type<string[]>().notNull().default([]),
   status: text("status").notNull().default("active"), // active | retired
   version: integer("version").notNull().default(1),
-}, (t) => [index("q_skill_diff").on(t.skillId, t.difficulty, t.status)]);
+}, (t) => [
+  index("q_skill_diff").on(t.skillId, t.difficulty, t.status),
+  index("questions_active_skill_difficulty_id_idx").on(t.skillId, t.difficulty, t.id).where(sql`${t.status} = 'active'`),
+]);
 
 /* ───────── student model ───────── */
 export const skillState = pgTable("skill_state", {
@@ -88,6 +92,7 @@ export const attempts = pgTable("attempts", {
   index("att_user_time").on(t.userId, t.createdAt),
   index("att_user_skill_time").on(t.userId, t.skillId, t.createdAt),
   index("att_user_question").on(t.userId, t.questionId),
+  index("att_user_question_created_idx").on(t.userId, t.questionId, t.createdAt.desc(), t.id.desc()),
 ]);
 
 export const reviewItems = pgTable("review_items", {
@@ -142,7 +147,10 @@ export const questionServes = pgTable("question_serves", {
   userId: userRef(),
   questionId: text("question_id").notNull(),
   servedAt: ts("served_at").notNull().defaultNow(),
-}, (t) => [primaryKey({ columns: [t.userId, t.questionId] })]);
+}, (t) => [
+  primaryKey({ columns: [t.userId, t.questionId] }),
+  index("qs_user_served_at_idx").on(t.userId, t.servedAt.desc()),
+]);
 
 /**
  * Sign-up cap: our server issues a short-lived ticket (email + the requester's real IP) before every sign-in
@@ -270,3 +278,4 @@ export const aiCache = pgTable("ai_cache", {
 export type Question = typeof questions.$inferSelect;
 export type Profile = typeof profiles.$inferSelect;
 export type SkillStateRow = typeof skillState.$inferSelect;
+export { r2Files } from "./storage-schema";

@@ -1,5 +1,5 @@
 // Daily plan: generated once per local day, never rearranged (spec 03 §10).
-import { POINTS_PER_STUDY_HOUR, READY_BUFFER_WEEKS, TARGET_SECONDS } from "./constants";
+import { MAX_PREP_MONTHS, POINTS_PER_STUDY_HOUR, READY_BUFFER_WEEKS, TARGET_SECONDS } from "./constants";
 
 /** `custom` marks blocks of a plan the student edited by hand (today only). */
 export type PlanBlock = (
@@ -96,6 +96,16 @@ export function readyBy(x: { estimate: number; target: number; minutesPerDay: nu
 }
 
 /**
+ * When to sit the SAT: when the target is in reach (readyBy), but never more than MAX_PREP_MONTHS away. `capped`:
+ * the target needs longer than that at the current study time (so: study more, or aim a little lower for then).
+ */
+export function bestTestDate(ready: { date: Date } | null, now: Date) {
+  const limit = new Date(now);
+  limit.setMonth(limit.getMonth() + MAX_PREP_MONTHS);
+  return !ready || ready.date > limit ? { date: limit, capped: true } : { date: ready.date, capped: false };
+}
+
+/**
  * Predicted score on test day at the current study budget: the same model as readyBy (study until the final-mock
  * buffer), so reaching the target on the "ready" date predicts at least the target. Rounded down to 10 (never
  * promises a point it can't back up), at most 1600.
@@ -104,14 +114,4 @@ export function predictedScore(x: { estimate: number; minutesPerDay: number; day
   const weeks = Math.max(0, x.daysLeft / 7 - READY_BUFFER_WEEKS);
   const gain = ((x.minutesPerDay * x.daysPerWeek) / 60) * POINTS_PER_STUDY_HOUR * weeks;
   return Math.min(1600, Math.max(x.estimate, Math.floor((x.estimate + gain) / 10) * 10));
-}
-
-/** Consecutive study days ending today (or yesterday — today isn't over yet). `days` = distinct local dates, any order. */
-export function streak(days: string[], today: string): number {
-  const set = new Set(days);
-  const prev = (d: string) => { const x = new Date(`${d}T00:00:00Z`); x.setUTCDate(x.getUTCDate() - 1); return x.toISOString().slice(0, 10); };
-  let d = set.has(today) ? today : prev(today);
-  let n = 0;
-  while (set.has(d)) { n++; d = prev(d); }
-  return n;
 }

@@ -30,13 +30,16 @@ export function NotificationBell({ items, align = "left" }: { items: Notificatio
     if (!pos) return;
     const outside = (e: PointerEvent) => { if (!ref.current?.contains(e.target as Node)) close(); };
     const esc = (e: KeyboardEvent) => { if (e.key === "Escape") close(); };
+    const scroll = (e: Event) => { if (!ref.current?.contains(e.target as Node)) close(); };
     document.addEventListener("pointerdown", outside);
     document.addEventListener("keydown", esc);
     window.addEventListener("resize", close);
+    document.addEventListener("scroll", scroll, true);
     return () => {
       document.removeEventListener("pointerdown", outside);
       document.removeEventListener("keydown", esc);
       window.removeEventListener("resize", close);
+      document.removeEventListener("scroll", scroll, true);
     };
   }, [pos]);
 
@@ -47,8 +50,8 @@ export function NotificationBell({ items, align = "left" }: { items: Notificatio
         {items.length > 0 && <span className="rounded-full bg-primary px-1.5 text-xs text-primary-foreground tabular-nums">{items.length}</span>}
       </summary>
       {pos && (
-        <div style={{ top: pos.top, left: pos.left, width: Math.min(PANEL_W, window.innerWidth - 16) }}
-          className="fixed z-50 rounded-lg border bg-background p-2 text-sm text-foreground shadow-sm">
+        <div style={{ top: pos.top, left: pos.left, width: Math.min(PANEL_W, window.innerWidth - 16), maxHeight: Math.max(80, window.innerHeight - pos.top - 8) }}
+          className="fixed z-50 overflow-y-auto rounded-lg border bg-background p-2 text-sm text-foreground shadow-sm">
           {items.length ? (
             <ul className="flex flex-col gap-1">
               {items.map((n) => (
