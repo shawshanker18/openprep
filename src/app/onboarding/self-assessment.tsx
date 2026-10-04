@@ -18,7 +18,7 @@ export function SelfAssessment() {
   const [ratings, setRatings] = useState<Record<string, Rating | null>>({});
 
   const save = (r: Record<string, Rating | null>) => start(async () => {
-    const res = await submitSelfAssessment(r);
+    const res = await submitSelfAssessment(r).catch(() => ({ ok: false as const, error: "Couldn't save your ratings. Check your connection and try again." }));
     if (!res.ok) toast.error(res.error);
     else router.refresh();
   });
@@ -44,7 +44,15 @@ export function SelfAssessment() {
                   <span className="text-sm">{s.name}</span>
                   <div role="radiogroup" aria-label={s.name} className="inline-flex shrink-0 overflow-hidden rounded-md border text-xs">
                     {LABELS.map((l, i) => (
-                      <button key={l} type="button" role="radio" aria-checked={ratings[s.id] === i}
+                      <button key={l} type="button" role="radio" disabled={pending} aria-checked={ratings[s.id] === i}
+                        tabIndex={ratings[s.id]===i || (ratings[s.id]==null && i===0)?0:-1}
+                        onKeyDown={(event)=>{
+                          const step=event.key==='ArrowRight'||event.key==='ArrowDown'?1:event.key==='ArrowLeft'||event.key==='ArrowUp'?-1:0;
+                          if(!step || pending)return;
+                          event.preventDefault();const next=(i+step+LABELS.length)%LABELS.length;
+                          setRatings(r=>({...r,[s.id]:next as Rating}));
+                          event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('button[role=radio]')[next]?.focus();
+                        }}
                         onClick={() => setRatings((r) => ({ ...r, [s.id]: i as Rating }))}
                         className={cn("border-l px-2 py-1.5 first:border-l-0", ratings[s.id] === i ? "bg-primary text-primary-foreground" : "hover:bg-muted")}>
                         {l}

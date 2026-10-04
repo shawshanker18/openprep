@@ -10,6 +10,6 @@ it("toPublic never leaks the answer or its hints", () => {
     tags: ["t"], status: "active", version: 1,
   };
   const pub = toPublic(q);
-  for (const k of ["answer", "explanationMd", "choiceRationales", "fastMethodMd", "desmos", "difficulty", "tags"])
+  for (const k of ["answer", "explanationMd", "choiceRationales", "fastMethodMd", "desmos", "difficulty", "tags", "skillId", "section", "domain", "type"])
     expect(pub).not.toHaveProperty(k);
 });

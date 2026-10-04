@@ -3,7 +3,7 @@ title: Vertex and roots of a quadratic
 order: 4
 expressions: ["y=-2x^2+8x-6"]
 ---
-For a parabola, Desmos marks the **vertex** (highest or lowest point) and the **$x$-intercepts** (roots) with grey dots.
+For a parabola, GeoGebra marks the **vertex** (highest or lowest point) and the **$x$-intercepts** (roots) with grey dots.
 
 **Try it:** for $y = -2x^2 + 8x - 6$, click the top of the curve: the vertex is $(2, 2)$, so the maximum value is $2$. The roots are $x = 1$ and $x = 3$.
 

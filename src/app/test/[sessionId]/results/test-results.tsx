@@ -2,7 +2,7 @@ import Link from "next/link";
 import { formatDate } from "@/lib/dates";
 import { Button } from "@/components/ui/button";
 import { DOMAINS, SKILL_BY_ID, type DomainId } from "@/content/taxonomy";
-import { timingStats, type TestResult } from "@/engine/score";
+import { type TestResult } from "@/engine/score";
 import type { getTestResult } from "@/server/tests";
 import { ReviewItem } from "./review-item";
 
@@ -13,8 +13,7 @@ const ROUTE = { hard: "You reached the harder second module.", easy: "You were r
 /** 75000 → "1:15" */
 const mmss = (ms: number) => { const s = Math.round(ms / 1000); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
 
-function TimingStats({ items }: { items: Data["items"] }) {
-  const t = timingStats(items.map((i) => ({ section: i.question.section as "rw" | "math", timeMs: i.timeMs, correct: i.correct, answered: i.response != null })));
+function TimingStats({ timing: t }: { timing: Data["timing"] }) {
   return (
     <div className="flex flex-col gap-3">
       <div className="grid gap-3 sm:grid-cols-2">
@@ -127,7 +126,7 @@ export function TestResults({ data, timeZone }: { data: Data; timeZone: string }
 
       <section className="flex flex-col gap-2">
         <h2 className="font-medium">Time per question</h2>
-        <TimingStats items={data.items} />
+        <TimingStats timing={data.timing} />
         <TimingChart items={data.items} />
         <p className="text-xs text-muted-foreground">Taller bars took longer. Blue means correct, red means incorrect, and grey means not answered. Hover over a bar for details.</p>
       </section>

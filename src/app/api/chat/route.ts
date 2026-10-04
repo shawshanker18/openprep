@@ -51,11 +51,11 @@ export async function POST(req: Request) {
   }
 
   const model = getModel();
-  if (!model) return text("The tutor isn't set up on this server yet. The written explanations are always available.", 503);
+  if (!model) return text("The tutor isn't set up on this server yet. You can still review the correct answer.", 503);
   const [profile] = await db.select({ tz: profiles.timezone }).from(profiles).where(eq(profiles.id, userId));
   const limit = Number(process.env.AI_DAILY_LIMIT) || 30;
   if ((await usedToday(userId, profile?.tz ?? "UTC")) >= limit)
-    return text("You've used today's tutor questions. The written explanations and methods are always here for you.", 429);
+    return text("You've used today's tutor questions. You can still review the correct answer and any included explanation.", 429);
 
   const prompt = mode === "chat" ? lastUser!.content : `Help me with this question (${mode}).`;
   await logMessage(userId, q.id, "user", prompt);

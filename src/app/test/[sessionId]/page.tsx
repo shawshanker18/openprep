@@ -41,7 +41,7 @@ export default async function TestPage({ params }: PageProps<"/test/[sessionId]"
     if (!d || d.status !== "in_progress" || !d.current) redirect(`/test/${sessionId}/results`);
     return (
       <main className="mx-auto w-full max-w-5xl px-4 py-8">
-        <DiagnosticRunner sessionId={sessionId} initial={d.current} initialIndex={d.index} />
+        <DiagnosticRunner key={d.current.id} sessionId={sessionId} initial={d.current} initialIndex={d.index} />
       </main>
     );
   }
@@ -50,7 +50,7 @@ export default async function TestPage({ params }: PageProps<"/test/[sessionId]"
   if (st.kind !== "module") redirect(`/test/${sessionId}/results`);
   return (
     <main className="w-full">
-      <TestRunner key={st.module.id} sessionId={sessionId} module={st.module} items={st.items}
+      <TestRunner key={st.module.id} userId={userId} sessionId={sessionId} module={st.module} items={st.items}
         serverNow={st.serverNow} breakBefore={st.breakBefore} heading={st.session.title} />
     </main>
   );

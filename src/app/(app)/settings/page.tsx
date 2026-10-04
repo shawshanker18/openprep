@@ -5,12 +5,11 @@ import { db } from "@/db";
 import { satAttempts } from "@/db/schema";
 import { SUBJECTS, TOPICS } from "@/content/taxonomy";
 import { requireUser } from "@/server/auth";
-import { DASHBOARD_CARDS, dashboardLayout } from "@/server/daily";
 import { signOut } from "@/app/auth/actions";
 import { ThemeSelect } from "@/components/theme";
 import { Reminders } from "./reminders";
 import {
-  addOfficialScore, deleteAccount, removeOfficialScore, resetDashboard, retakeDiagnostic, saveDashboard, updateProfile, updateSettings,
+  addOfficialScore, deleteAccount, removeOfficialScore, retakeDiagnostic, updateProfile, updateSettings,
 } from "./actions";
 import { Choice } from "@/components/ui/choice";
 import { DateField } from "@/components/ui/date-field";
@@ -22,7 +21,6 @@ const ERRORS: Record<string, string> = {
   settings: "Please check your settings and try again.",
   testdate: "Pick an upcoming test date: today or later, and within three years.",
   profile: "Please check your profile and try again.",
-  dashboard: "Couldn't save the dashboard layout. Please try again.",
   score: "Each section score must be between 200 and 800 in steps of 10, with a date.",
   scores: "You can keep up to 20 official scores. Remove one to add another.",
   retake: "You can retake the diagnostic once every 30 days.",
@@ -32,9 +30,6 @@ const ERRORS: Record<string, string> = {
 export default async function SettingsPage({ searchParams }: PageProps<"/settings">) {
   const sp = await searchParams;
   const { userId, profile } = await requireUser();
-  const layout = dashboardLayout(profile);
-  const cards = layout ?? DASHBOARD_CARDS.map((c) => ({ id: c.id, visible: true }));
-  const cardLabel = (id: string) => DASHBOARD_CARDS.find((c) => c.id === id)!.label;
   const scores = await db.select().from(satAttempts).where(eq(satAttempts.userId, userId)).orderBy(satAttempts.takenOn);
 
   return (
@@ -100,30 +95,6 @@ export default async function SettingsPage({ searchParams }: PageProps<"/setting
         <Button type="submit" className="self-start">Save profile</Button>
       </form>
 
-      <form action={saveDashboard} className="flex flex-col gap-3">
-        <h2 className="font-medium">Dashboard</h2>
-        <p className="text-sm text-muted-foreground">
-          {layout ? "Custom layout." : "Automatic layout (recommended)."} Choose which cards show and their order.
-        </p>
-        <ul className="flex flex-col gap-1 text-sm">
-          {cards.map((c, i) => (
-            <li key={c.id} className="flex items-center justify-between gap-2">
-              <input type="hidden" name="order" value={c.id} />
-              <label className="flex items-center gap-2">
-                <input type="checkbox" name="visible" value={c.id} defaultChecked={c.visible} /> {cardLabel(c.id)}
-              </label>
-              <span className="flex gap-1">
-                <Button size="sm" variant="ghost" type="submit" name="move" value={`${c.id}:-1`} disabled={i === 0} aria-label={`Move ${cardLabel(c.id)} up`}>▲</Button>
-                <Button size="sm" variant="ghost" type="submit" name="move" value={`${c.id}:1`} disabled={i === cards.length - 1} aria-label={`Move ${cardLabel(c.id)} down`}>▼</Button>
-              </span>
-            </li>
-          ))}
-        </ul>
-        <div className="flex gap-2">
-          <Button type="submit" variant="outline">Save layout</Button>
-          {layout && <Button type="submit" variant="ghost" formAction={resetDashboard}>Reset to automatic</Button>}
-        </div>
-      </form>
 
       <section id="scores" className="flex scroll-mt-20 flex-col gap-3">
         <h2 className="font-medium">Official SAT scores</h2>

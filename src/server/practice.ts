@@ -1,7 +1,7 @@
 // Practice: which question next, and submitting an answer (spec 04 §3).
 import "server-only";
 import { memo } from "@/lib/memo";
-import { and, asc, count, desc, eq, gte, inArray, isNotNull, lte, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, gte, inArray, isNotNull, isNull, lte, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { attempts, bookmarks, questionServes, questions, reviewItems, skillState, type Profile, type Question } from "@/db/schema";
 import { SKILL_BY_ID } from "@/content/taxonomy";
@@ -165,22 +165,40 @@ export async function wasGiven(userId: string, questionId: string) {
   return served.length > 0 || answered.length > 0;
 }
 
+/** Reload an already-served, still-unanswered question without advancing or restarting its serve clock. */
+export async function resumeQuestion(userId:string,questionId:string,timing:Timing|undefined) {
+  const [[q],[served],[last],live,[saved]]=await Promise.all([
+    db.select().from(questions).where(and(eq(questions.id,questionId),eq(questions.status,'active'))),
+    db.select().from(questionServes).where(and(eq(questionServes.userId,userId),eq(questionServes.questionId,questionId))),
+    db.select({at:attempts.createdAt}).from(attempts).where(and(eq(attempts.userId,userId),eq(attempts.questionId,questionId))).orderBy(desc(attempts.createdAt)).limit(1),
+    inRunningTest(userId,questionId),
+    db.select().from(bookmarks).where(and(eq(bookmarks.userId,userId),eq(bookmarks.questionId,questionId))),
+  ]);
+  if(!q || !served || live || last && last.at>=served.servedAt) return null;
+  return {question:toPublic(q),reviewsDue:await countDueReviews(userId),timeLimitS:await timeLimitFor(userId,q,timing),bookmarked:!!saved};
+}
+
 export async function submitAnswer(userId: string, input: {
   questionId: string; response: string | null; timeMs: number; confidence: 1 | 2 | 3;
 }) {
-  const [[q], live, [served], [last]] = await Promise.all([
+  const [[q], live, [served]] = await Promise.all([
     db.select().from(questions).where(eq(questions.id, input.questionId)),
     inRunningTest(userId, input.questionId), // practice would reveal the answer to a question in a live test
     db.select({ at: questionServes.servedAt }).from(questionServes)
       .where(and(eq(questionServes.userId, userId), eq(questionServes.questionId, input.questionId))),
-    db.select({ at: attempts.createdAt }).from(attempts)
-      .where(and(eq(attempts.userId, userId), eq(attempts.questionId, input.questionId))).orderBy(desc(attempts.createdAt)).limit(1),
   ]);
   // One answer per serve: the question must have been handed to this student and not answered since. No answering
   // questions you weren't given, and no trying A, then B, then C on the same serve.
-  if (!q || live || !served || (last && last.at >= served.at)) return null;
+  if (!q || live || !served) return null;
   const timeMs = serverCappedTime(input.timeMs, served?.at ?? null, new Date());
   return db.transaction(async (tx) => {
+    const [currentServe]=await tx.select().from(questionServes)
+      .where(and(eq(questionServes.userId,userId),eq(questionServes.questionId,q.id))).for('update');
+    const [last]=await tx.select().from(attempts).where(and(eq(attempts.userId,userId),eq(attempts.questionId,q.id))).orderBy(desc(attempts.createdAt)).limit(1);
+    if(!currentServe || last && last.createdAt>=currentServe.servedAt) {
+      if(last && last.response===input.response) return {correct:last.correct,attemptId:last.id,revealed:toRevealed(q),masteryBefore:masteryPct(last.thetaBefore),masteryAfter:masteryPct(last.thetaAfter),mistakeGuess:last.mistakeType,skillName:SKILL_BY_ID[q.skillId]?.name??q.skillId};
+      return null;
+    }
     // A question in the user's review queue is always recorded as a review, whatever the client says.
     const [queued] = await tx.select().from(reviewItems)
       .where(and(eq(reviewItems.userId, userId), eq(reviewItems.questionId, q.id)));
@@ -228,15 +246,53 @@ export async function skillStats(userId: string, skillId: string) {
 }
 
 export type BankStatus = "new" | "correct" | "incorrect";
-/** Every active question with this student's last result and saved flag (question bank). Answers are not included. */
-export async function questionBank(userId: string) {
-  // Written as "questions"."id": Drizzle prints ${questions.id} as a bare "id", which the subquery would read as its own id.
+export const QUESTION_BANK_PAGE_SIZE = 10;
+export type BankFilters = {
+  section?: "math" | "rw"; skillId?: string; difficulty?: 1 | 2 | 3;
+  status?: BankStatus | "saved"; page?: number;
+};
+
+/** Aggregate counters separately; only fetch question rows for the displayed page. */
+export async function questionBank(userId: string, filters: BankFilters = {}) {
+  const latest = db.selectDistinctOn([attempts.questionId], {
+    questionId: attempts.questionId, correct: attempts.correct,
+  }).from(attempts).where(eq(attempts.userId, userId))
+    .orderBy(attempts.questionId, desc(attempts.createdAt), desc(attempts.id)).as("bank_latest");
+  const saved = sql<boolean>`exists(select 1 from bookmarks b where b.user_id = ${userId} and b.question_id = ${questions.id})`;
+  const matches = and(
+    filters.section ? eq(questions.section, filters.section) : undefined,
+    filters.skillId ? eq(questions.skillId, filters.skillId) : undefined,
+    filters.difficulty ? eq(questions.difficulty, filters.difficulty) : undefined,
+    filters.status === "saved" ? saved : filters.status === "new" ? isNull(latest.questionId)
+      : filters.status === "correct" ? eq(latest.correct, true)
+      : filters.status === "incorrect" ? eq(latest.correct, false) : undefined,
+  ) ?? sql`true`;
+
+  const [counts] = await db.select({
+    total: sql<number>`count(*)::int`,
+    attempted: sql<number>`count(${latest.questionId})::int`,
+    correct: sql<number>`count(*) filter (where ${latest.correct} = true)::int`,
+    incorrect: sql<number>`count(*) filter (where ${latest.correct} = false)::int`,
+    math: sql<number>`count(*) filter (where ${questions.section} = 'math')::int`,
+    rw: sql<number>`count(*) filter (where ${questions.section} = 'rw')::int`,
+    filtered: sql<number>`count(*) filter (where ${matches})::int`,
+  }).from(questions).leftJoin(latest, eq(latest.questionId, questions.id))
+    .where(eq(questions.status, "active"));
+  const requested = Number.isSafeInteger(filters.page) && filters.page! > 0 ? filters.page! : 1;
+  const page = Math.min(requested, Math.max(1, Math.ceil(counts!.filtered / QUESTION_BANK_PAGE_SIZE)));
+  const visibleText = sql`${latest.questionId} is not null or ${saved}`;
   const rows = await db.select({
     id: questions.id, skillId: questions.skillId, section: questions.section, difficulty: questions.difficulty,
-    type: questions.type, passage: questions.passageMd, stem: questions.stemMd,
-    last: sql<boolean | null>`(select a.correct from attempts a where a.user_id = ${userId} and a.question_id = "questions"."id"
-      order by a.created_at desc limit 1)`,
-    saved: sql<boolean>`exists(select 1 from bookmarks b where b.user_id = ${userId} and b.question_id = "questions"."id")`,
-  }).from(questions).where(eq(questions.status, "active")).orderBy(asc(questions.skillId), asc(questions.difficulty), asc(questions.id));
-  return rows.map((r) => ({ ...r, status: (r.last == null ? "new" : r.last ? "correct" : "incorrect") as BankStatus }));
+    type: questions.type,
+    passage: sql<string | null>`case when ${visibleText} then ${questions.passageMd} else null end`,
+    stem: sql<string | null>`case when ${visibleText} then ${questions.stemMd} else null end`,
+    last: latest.correct, saved,
+  }).from(questions).leftJoin(latest, eq(latest.questionId, questions.id))
+    .where(and(eq(questions.status, "active"), matches))
+    .orderBy(asc(questions.skillId), asc(questions.difficulty), asc(questions.id))
+    .limit(QUESTION_BANK_PAGE_SIZE).offset((page - 1) * QUESTION_BANK_PAGE_SIZE);
+  return {
+    rows: rows.map((r) => ({ ...r, status: (r.last == null ? "new" : r.last ? "correct" : "incorrect") as BankStatus })),
+    counts: counts!, page, hasMore: counts!.filtered > page * QUESTION_BANK_PAGE_SIZE,
+  };
 }

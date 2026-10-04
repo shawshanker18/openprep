@@ -35,7 +35,7 @@ Inside a module you can move back and forth, flag questions, and change answers 
 
 ## Tools you get on test day
 
-You can use a calculator for the whole Math section, and the Desmos graphing calculator is built into the app. A reference sheet with common formulas is available too. This course teaches the Desmos tricks that save the most time, in the Desmos lessons.
+You can use a calculator for the whole Math section, and the GeoGebra graphing calculator is built into the app. A reference sheet with common formulas is available too. This course teaches the GeoGebra tricks that save the most time, in the GeoGebra lessons.
 
 ## Scoring tips that change how you play
 

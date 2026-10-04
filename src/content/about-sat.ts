@@ -29,7 +29,7 @@ Inside a module you can move back and forth, flag questions, and change answers 
 
 ## Tools you get on test day
 
-You can use a calculator for the whole Math section, and the Desmos graphing calculator is built into the app. A reference sheet with common formulas is available too. The Desmos basics lessons right after this one show you the calculator tricks that save the most time.
+You can use a calculator for the whole Math section, and the GeoGebra graphing calculator is built into the app. A reference sheet with common formulas is available too. The GeoGebra basics lessons right after this one show you the calculator tricks that save the most time.
 
 ## Scoring tips that change how you play
 
@@ -39,7 +39,7 @@ You can use a calculator for the whole Math section, and the Desmos graphing cal
 
 ## How this path works
 
-1. **Go in order.** Next come the Desmos basics, then every Math topic, then every Reading and Writing topic. Each one assumes you are seeing it for the first time.
+1. **Go in order.** Next come the GeoGebra basics, then every Math topic, then every Reading and Writing topic. Each one assumes you are seeing it for the first time.
 2. **Read, then try it.** Every topic explains the idea, walks through two examples, and lists the common traps. Then answer a few practice questions on it.
 3. **Skip what you already know.** Every step has a Skip button, and you can come back to a skipped topic any time.
 4. **Take a practice test** on the Tests page once you've been through the topics, to practice pacing for the real thing.

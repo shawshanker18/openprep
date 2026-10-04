@@ -3,7 +3,7 @@ title: Sliders for unknown constants
 order: 7
 expressions: ["y=x^2+kx+9", "k=6"]
 ---
-When an equation contains an unknown constant, Desmos offers a **slider** for it. Drag the slider and watch the graph change.
+When an equation contains an unknown constant, GeoGebra offers a **slider** for it. Drag the slider and watch the graph change.
 
 **Try it:** $y = x^2 + kx + 9$ is loaded with $k = 6$. At $k = 6$ the parabola just touches the $x$ axis, which means exactly one solution. Drag $k$ and watch it cross the axis twice, or not at all.
 

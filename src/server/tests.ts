@@ -11,6 +11,7 @@ import { grade } from "@/engine/grade";
 import { buildTestResult, type ResultItem } from "@/engine/score";
 import { targetDifficulty } from "@/engine/select";
 import { recordAttempt } from "./attempts";
+import { timingStats } from "@/engine/score";
 import { toPublic, toRevealed } from "./questions";
 
 export type TestKind = "full" | "section" | "module" | "mini" | "weakness" | "custom";
@@ -30,7 +31,10 @@ export function serverCappedTime(clientMs: number, servedAt: Date | null, now: D
 
 /** Active questions matching a filter, with when this user last saw each. */
 async function pool(tx: Tx, userId: string, where: ReturnType<typeof and>) {
-  const rows = await tx.select({ q: questions, seen: sql<Date | null>`max(${attempts.createdAt})` }).from(questions)
+  const rows = await tx.select({ q: {
+    id: questions.id, skillId: questions.skillId, domain: questions.domain,
+    difficulty: questions.difficulty, type: questions.type, tags: questions.tags,
+  }, seen: sql<Date | null>`max(${attempts.createdAt})` }).from(questions)
     .leftJoin(attempts, and(eq(attempts.questionId, questions.id), eq(attempts.userId, userId)))
     .where(and(eq(questions.status, "active"), where)).groupBy(questions.id);
   return rows.map((r) => ({ ...r.q, difficulty: r.q.difficulty as Difficulty, type: r.q.type as "mcq" | "spr", lastSeenAt: r.seen ? new Date(r.seen) : null }));
@@ -57,10 +61,18 @@ async function skillSetModule(tx: Tx, userId: string, sessionId: string, idx: nu
   const used = await usedIds(tx, sessionId);
   const split = largestRemainder(count, skillIds.map(() => 1));
   const picked: PoolQ[] = [];
+  // Load the selected skills together instead of repeating the same join per skill.
+  const rows = skillIds.length ? await pool(tx, userId, inArray(questions.skillId, skillIds)) : [];
+  const bySkill = new Map<string, typeof rows>();
+  for (const question of rows) {
+    const group = bySkill.get(question.skillId);
+    if (group) group.push(question);
+    else bySkill.set(question.skillId, [question]);
+  }
   for (const [i, skillId] of skillIds.entries()) {
     const skill = SKILL_BY_ID[skillId]!;
     const bp: Blueprint = { section: skill.section, count: split[i]!, timeLimitS, domainCounts: { [skill.domain]: split[i]! }, difficultyCounts: mix(skillId) };
-    const all = await pool(tx, userId, eq(questions.skillId, skillId));
+    const all = bySkill.get(skillId) ?? [];
     const tagged = tags.length ? all.filter((q) => q.tags.some((t) => tags.includes(t))) : all;
     const got = assembleModule(bp, tagged, new Set([...used, ...picked.map((p) => p.id)]), Math.random);
     const short = bp.count - got.length;
@@ -285,7 +297,7 @@ export async function abandonTest(userId: string, sessionId: string) {
 /** Completed session with every question revealed (answers are only shown after the whole test). */
 export async function getTestResult(userId: string, sessionId: string) {
   const [s] = await db.select().from(testSessions).where(and(eq(testSessions.id, sessionId), eq(testSessions.userId, userId)));
-  if (!s || s.status !== "completed") return s ? { session: s, items: [] } : null;
+  if (!s || s.status !== "completed") return s ? { session: s, items: [], timing: timingStats([]) } : null;
   const rows = await db.select({ item: testItems, q: questions, m: testModules }).from(testItems)
     .innerJoin(testModules, eq(testModules.id, testItems.moduleId)).innerJoin(questions, eq(questions.id, testItems.questionId))
     .where(eq(testModules.sessionId, s.id)).orderBy(asc(testModules.idx), asc(testItems.position));
@@ -293,6 +305,7 @@ export async function getTestResult(userId: string, sessionId: string) {
     .from(attempts).where(and(eq(attempts.userId, userId), eq(attempts.sessionId, s.id)));
   return {
     session: s,
+    timing: timingStats(rows.map(({item,q})=>({section:q.section as "rw"|"math",timeMs:item.timeMs,correct:att.find(a=>a.questionId===q.id)?.correct??false,answered:item.response!=null}))),
     items: rows.map(({ item, q, m }) => {
       const a = att.find((x) => x.questionId === q.id);
       return { moduleIdx: m.idx, section: m.section, position: item.position, response: item.response, timeMs: item.timeMs,

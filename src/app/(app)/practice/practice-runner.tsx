@@ -15,9 +15,10 @@ import { cn, isTyping } from "@/lib/utils";
 import type { PublicQuestion, RevealedQuestion } from "@/server/questions";
 import { nextQuestion, setMistakeType, submitAnswer, toggleBookmark } from "./actions";
 import { ReportQuestion } from "./report-question";
+import { readDraft, writeDraft, readPracticeProgress, writePracticeProgress } from "@/lib/answer-drafts";
 
 type Mode = "skill" | "smart" | "review" | "set" | "list";
-type SetConfig = { skillIds: string[]; tags: string[]; count: number; timing: "auto" | "off" | "on" };
+type SetConfig = { count: number };
 type Result = {
   correct: boolean; attemptId: string; revealed: RevealedQuestion; masteryBefore: number; masteryAfter: number;
   mistakeGuess: string | null; skillName: string;
@@ -25,19 +26,22 @@ type Result = {
 // `correct` / `ms` = running totals for the end-of-set summary.
 type Base = { seen: string[]; answered: number; correct: number; ms: number };
 type State =
+  | ({ phase: "restoring" } & Base)
   | ({ phase: "loading" } & Base)
   | ({ phase: "error"; error: string } & Base)
   | ({ phase: "done" } & Base)
   | ({ phase: "answering"; q: PublicQuestion; value: string | null; limitS: number | null } & Base)
   | ({ phase: "revealed"; q: PublicQuestion; value: string | null; limitS: number | null; r: Result; mistake: string | null } & Base);
 type Action =
-  | { type: "loaded"; q: PublicQuestion; limitS: number | null } | { type: "done" } | { type: "select"; value: string | null }
+  | { type: "restore"; progress:Base }
+  | { type: "loaded"; q: PublicQuestion; limitS: number | null; value?:string|null } | { type: "done" } | { type: "select"; value: string | null }
   | { type: "revealed"; r: Result; timeMs: number } | { type: "mistake"; m: string } | { type: "next" } | { type: "failed"; error: string };
 
 const base = (s: State): Base => ({ seen: s.seen, answered: s.answered, correct: s.correct, ms: s.ms });
 function reducer(s: State, a: Action): State {
   switch (a.type) {
-    case "loaded": return { ...base(s), phase: "answering", seen: [...s.seen, a.q.id], q: a.q, value: null, limitS: a.limitS };
+    case "restore": return { ...a.progress, phase:"loading" };
+    case "loaded": return { ...base(s), phase: "answering", seen: s.seen.includes(a.q.id)?s.seen:[...s.seen, a.q.id], q: a.q, value: a.value??null, limitS: a.limitS };
     case "done": return { ...base(s), phase: "done" };
     case "failed": return { ...base(s), phase: "error", error: a.error };
     case "select": return s.phase === "answering" ? { ...s, value: a.value } : s;
@@ -65,16 +69,16 @@ function Countdown({ limitS }: { limitS: number }) {
   return <span className={cn("tabular-nums", left <= 0 && "text-red-700")}>{left > 0 ? clock(left) : `Time's up +${clock(-left)}`}</span>;
 }
 
-export function PracticeRunner({ mode, skillId, difficulty, title, block, set, back, ids }: {
-  mode: Mode; skillId?: string; difficulty?: 1 | 2 | 3 | "mixed"; title: string; block?: { index: number; target: number } | null;
-  set?: SetConfig; back?: string; ids?: string[];
+export function PracticeRunner({ paperId, userId, mode, title, block, set, back }: {
+  paperId: string; userId: string; mode: Mode; title: string; block?: { index: number; target: number } | null;
+  set?: SetConfig; back?: string;
 }) {
-  const [s, dispatch] = useReducer(reducer, { phase: "loading", seen: [], answered: 0, correct: 0, ms: 0 });
+  const [s, dispatch] = useReducer(reducer, { phase: "restoring", seen: [], answered: 0, correct: 0, ms: 0 });
   // On a phone the confidence buttons (and later the explanation) are often below the screen: bring them into view
   // after the first tap on a choice, and when the answer is revealed. Only as far as needed, never while typing.
   const confidenceRef = useRef<HTMLDivElement>(null);
   const resultRef = useRef<HTMLDivElement>(null);
-  const picked = s.phase === "answering" && s.value !== null && s.q.type === "mcq";
+  const picked = s.phase === "answering" && s.value !== null && !!s.q.choices?.length;
   useEffect(() => { if (picked) confidenceRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" }); }, [picked]);
   useEffect(() => { if (s.phase === "revealed") resultRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" }); }, [s.phase]);
   const [pending, start] = useTransition();
@@ -83,28 +87,45 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block, set, b
   const hiddenSince = useRef<number | null>(null);
   const similarTo = useRef<string | null>(null); // skill of a just-missed question → next pick is a similar one
   const [bookmarked, setBookmarked] = useState(false); // the current question's, from the server
+  const restored = useRef<{id:string;response:string|null}|null>(null);
+  const draftKey = useRef('');
+  useEffect(()=>{
+    draftKey.current=`openprep:practice:${userId}:${window.location.pathname}${window.location.search}`;
+    restored.current=readDraft(draftKey.current)[0]??null;
+    dispatch({type:"restore",progress:readPracticeProgress(draftKey.current)});
+  },[userId]);
 
   const load = useCallback((exclude: string[]) => start(async () => {
     const sim = similarTo.current;
     similarTo.current = null;
-    const res = await nextQuestion(sim
-      ? { mode: "skill", skillId: sim, exclude }
-      : mode === "list" ? { mode, exclude, ids }
-      : { mode, skillId, difficulty, exclude, skillIds: set?.skillIds, tags: set?.tags, timing: set?.timing })
+    const draft=restored.current;restored.current=null;
+    const res = await nextQuestion({ paperId, exclude, similarTo: sim ?? undefined, resumeId:draft?.id })
       .catch(() => ({ ok: false as const, error: "Couldn't load the next question. Check your connection and try again." }));
-    if (!res.ok) { dispatch({ type: "failed", error: res.error }); return; }
+    if (!res.ok) { restored.current=draft; dispatch({ type: "failed", error: res.error }); return; }
     if ("done" in res.data) dispatch({ type: "done" });
     else {
-      dispatch({ type: "loaded", q: res.data.question, limitS: res.data.timeLimitS });
+      dispatch({ type: "loaded", q: res.data.question, limitS: res.data.timeLimitS, value:res.data.question.id===draft?.id?draft.response:null });
       setBookmarked(res.data.bookmarked);
       shownAt.current = performance.now(); hiddenMs.current = 0;
     }
-  }), [mode, skillId, difficulty, set, ids]);
+  }), [paperId]);
   // A set stops after `count` answers.
   const next = useCallback(() => dispatch({ type: set && s.answered >= set.count ? "done" : "next" }), [set, s.answered]);
 
   // Only the most recent 200 (the server's limit): a very long session keeps going instead of failing at question 201.
-  useEffect(() => { if (s.phase === "loading") load(s.seen.slice(-200)); }, [s.phase, s.seen, load]);
+  useEffect(() => { if (s.phase === "loading") { if(set && s.answered>=set.count) dispatch({type:"done"}); else load(s.seen.slice(-200)); } }, [s.phase, s.seen, s.answered, set, load]);
+  useEffect(()=>{
+    if(!draftKey.current) return;
+    if(s.phase==='answering') writeDraft(draftKey.current,[{id:s.q.id,position:0,response:s.value,flagged:false,timeMs:0}]);
+    if(s.phase==='revealed' || s.phase==='done') writeDraft(draftKey.current,[]);
+    if(s.phase==='answering' || s.phase==='revealed') writePracticeProgress(draftKey.current,base(s));
+    if(s.phase==='done') writePracticeProgress(draftKey.current,null);
+  },[s]);
+  useEffect(()=>{
+    const leave=(event:BeforeUnloadEvent)=>{if(s.phase==='answering' && s.value!==null){event.preventDefault();event.returnValue='';}};
+    window.addEventListener('beforeunload',leave);
+    return ()=>window.removeEventListener('beforeunload',leave);
+  },[s]);
 
   // Today's plan block is done once enough questions are answered (the server counts them; this just says so).
   useEffect(() => {
@@ -122,10 +143,11 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block, set, b
   }, []);
 
   const submit = (confidence: 1 | 2 | 3) => {
-    if (s.phase !== "answering" || s.value === null) return;
+    if (pending || s.phase !== "answering" || s.value === null) return;
     const timeMs = elapsedMs(shownAt.current, hiddenMs.current);
     start(async () => {
-      const res = await submitAnswer({ questionId: s.q.id, response: s.value, timeMs, confidence });
+      const res = await submitAnswer({ questionId: s.q.id, response: s.value, timeMs, confidence })
+        .catch(() => ({ ok: false as const, error: "Couldn't submit your answer. Your selection is still here. Check your connection and try again." }));
       if (!res.ok) toast.error(res.error);
       else dispatch({ type: "revealed", r: res.data, timeMs });
     });
@@ -134,8 +156,8 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block, set, b
   // Keyboard: 1–4 / A–D choose, Enter = next after reveal.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (isTyping(e) || e.metaKey || e.ctrlKey) return;
-      if (s.phase === "answering" && s.q.type === "mcq") {
+      if (pending || isTyping(e) || e.metaKey || e.ctrlKey) return;
+      if (s.phase === "answering" && !!s.q.choices?.length) {
         const i = "1234".indexOf(e.key) >= 0 ? "1234".indexOf(e.key) : "abcd".indexOf(e.key.toLowerCase());
         if (i >= 0) dispatch({ type: "select", value: "ABCD"[i]! });
       }
@@ -143,9 +165,9 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block, set, b
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [s, next]);
+  }, [s, next, pending]);
 
-  if (s.phase === "loading") return <p className="text-muted-foreground">Loading…</p>;
+  if (s.phase === "loading" || s.phase === "restoring") return <p className="text-muted-foreground">Loading…</p>;
   if (s.phase === "error") {
     return (
       <div className="flex flex-col items-start gap-3">
@@ -162,7 +184,7 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block, set, b
           {s.answered > 0 ? `${s.correct}/${s.answered} correct · average ${Math.round(s.ms / s.answered / 1000)}s per question.` : "Try other skills or sub-topics."}
         </p>
         <div className="flex flex-wrap gap-2">
-          {back ? <Button render={<Link href={back} />}>{back.startsWith("/question-bank") ? "Back to the question bank" : "Back to the course"}</Button> : <Button render={<Link href="/practice/custom" />}>New custom set</Button>}
+          {back ? <Button render={<Link href={back} />}>{back.startsWith("/question-bank") ? "Back to the question bank" : back.startsWith('/bookmarks')?'Back to saved questions':"Back to the course"}</Button> : <Button render={<Link href="/practice/custom" />}>New custom set</Button>}
           <Button variant="outline" render={<Link href="/dashboard" />}>Back to dashboard</Button>
         </div>
       </div>
@@ -214,8 +236,8 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block, set, b
       {s.phase === "answering" && (
         <div ref={confidenceRef} className="flex flex-col gap-2">
           <div className="flex flex-wrap items-start gap-2">
-            <TutorPanel questionId={s.q.id} answered={false} isMath={s.q.section === "math"} />
-            {s.q.section === "math" && <DesmosToggle />}
+            <TutorPanel key={s.q.id} questionId={s.q.id} answered={false} />
+            {true && <DesmosToggle className="h-64" />}
           </div>
           <span className="text-sm text-muted-foreground">How sure are you? (this submits your answer)</span>
           <div className="flex flex-wrap gap-2">
@@ -256,9 +278,9 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block, set, b
           <div className="flex flex-wrap gap-2">
             <Button size="lg" onClick={next}>{set && s.answered >= set.count ? "See summary" : "Next"}</Button>
             {!r.correct && !(set && s.answered >= set.count) && (
-              <Button size="lg" variant="outline" onClick={() => { similarTo.current = s.q.skillId; next(); }}>Try a similar question</Button>
+              <Button size="lg" variant="outline" onClick={() => { similarTo.current = s.q.id; next(); }}>Try a similar question</Button>
             )}
-            <TutorPanel questionId={s.q.id} answered isMath={s.q.section === "math"} wrongChoice={!r.correct && s.q.type === "mcq" ? s.value : null} />
+            <TutorPanel key={s.q.id} questionId={s.q.id} answered wrongChoice={!r.correct && !!s.q.choices?.length ? s.value : null} />
           </div>
         </div>
       )}
@@ -269,7 +291,7 @@ export function PracticeRunner({ mode, skillId, difficulty, title, block, set, b
 function Explanation({ q }: { q: RevealedQuestion }) {
   const tabs = [
     { id: "hand", label: "By hand", md: q.explanationMd },
-    q.desmos && { id: "desmos", label: "Desmos", md: q.desmos.stepsMd },
+    q.desmos && { id: "desmos", label: "GeoGebra", md: q.desmos.stepsMd },
     q.fastMethodMd && { id: "fast", label: "Fastest", md: q.fastMethodMd },
   ].filter(Boolean) as { id: string; label: string; md: string }[];
   const [tab, setTab] = useReducer((_: string, t: string) => t, "hand");
@@ -284,7 +306,7 @@ function Explanation({ q }: { q: RevealedQuestion }) {
           ))}
         </div>
       )}
-      <Markdown className="text-sm">{cur.md}</Markdown>
+      {cur.md ? <Markdown className="text-sm">{cur.md}</Markdown> : <p className="text-sm text-muted-foreground">A worked explanation is not included in this question&apos;s source. You can review the correct answer above or ask the tutor.</p>}
       {cur.id === "desmos" && q.desmos && <DesmosCalculator expressions={q.desmos.expressions} className="h-72" />}
     </div>
   );

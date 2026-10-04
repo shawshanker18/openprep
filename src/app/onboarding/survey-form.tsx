@@ -36,7 +36,7 @@ export function SurveyForm() {
         minutesPerDay: num("minutes"),
         daysPerWeek: num("days"),
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      });
+      }).catch(() => ({ ok: false as const, error: "Couldn't save your details. Your form is still here. Check your connection and try again." }));
       if (!res.ok) toast.error(res.error);
       else router.refresh();
     });

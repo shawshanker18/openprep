@@ -56,7 +56,7 @@ export async function setNativeReminder(hour: number | null): Promise<boolean> {
     if (hour == null) return;
     if ((await ln.requestPermissions()).display !== "granted") return;
     await ln.schedule({ notifications: [{
-      id: REMINDER_ID, title: "Time for SAT practice", body: "Your plan for today is ready. Keep your streak going!",
+      id: REMINDER_ID, title: "Time for SAT practice", body: "Your plan for today is ready.",
       // Inexact on purpose: exact alarms make Android open its "Alarms & reminders" settings screen.
       isExactNotification: false, schedule: { on: { hour, minute: 0 } },
     }] });

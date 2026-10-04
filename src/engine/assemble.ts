@@ -66,7 +66,9 @@ export function assembleModule<T extends PoolQ>(
       const bySkill = new Map<string, T[]>();
       for (const q of ordered) {
         if (used.has(q.id) || (q.lastSeenAt === null) !== tier || !pred(q)) continue;
-        bySkill.set(q.skillId, [...(bySkill.get(q.skillId) ?? []), q]);
+        const group = bySkill.get(q.skillId);
+        if (group) group.push(q);
+        else bySkill.set(q.skillId, [q]);
       }
       const queues = [...bySkill.values()];
       while (out.length < n && queues.some((qs) => qs.length)) {

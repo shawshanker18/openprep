@@ -24,3 +24,4 @@ export const AI_INPUT_MAX_CHARS = 1000;
 // ponytail: rough planning assumption for the "ready by" month; recalibrate from real score gains (spec 05 §8).
 export const POINTS_PER_STUDY_HOUR = 4;
 export const READY_BUFFER_WEEKS = 2; // time to sit a final full mock before test day
+export const MAX_PREP_MONTHS = 6; // the suggested test date is never further away than this

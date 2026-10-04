@@ -95,9 +95,9 @@ export async function sendDueReminders() {
     payload: {
       title: "Time for SAT practice",
       body: r.days_left != null && r.days_left >= 0 && r.days_left <= 60
-        ? `${r.days_left} day${r.days_left === 1 ? "" : "s"} to your SAT. Your ${r.minutes}-minute plan is ready.`
-        : `Your ${r.minutes}-minute plan for today is ready.`,
-      url: "/plan",
+        ? `${r.days_left} day${r.days_left === 1 ? "" : "s"} to your SAT. Pick up where you left off.`
+        : "Pick up where you left off.",
+      url: "/dashboard",
     },
   }));
   const ok = new Set(await sendAll(targets));

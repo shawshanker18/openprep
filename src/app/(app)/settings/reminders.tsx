@@ -56,7 +56,7 @@ export function Reminders({ hour }: { hour: number | null }) {
     try {
       if (sub) { await unsubscribePush(sub.endpoint); await sub.unsubscribe(); }
       setSub(null); setState("off");
-    } finally { setBusy(false); }
+    } catch { toast.error("Couldn't turn off reminders. Check your connection and try again."); } finally { setBusy(false); }
   }
 
   async function test() {
@@ -64,7 +64,9 @@ export function Reminders({ hour }: { hour: number | null }) {
     try {
       const r = await testPush();
       if (r.ok) toast(r.data.delivered ? `Sent to ${r.data.delivered} device${r.data.delivered === 1 ? "" : "s"}.` : "Nothing was delivered. Try turning reminders off and on again.");
-    } finally { setBusy(false); }
+      else toast.error(r.error);
+    } catch { toast.error("Couldn't send a test notification. Check your connection and try again."); }
+    finally { setBusy(false); }
   }
 
   return (

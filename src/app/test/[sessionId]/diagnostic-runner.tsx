@@ -24,7 +24,8 @@ export function DiagnosticRunner({ sessionId, initial, initialIndex }: {
   useEffect(() => { shownAt.current = performance.now(); }, [q.id]);
 
   const submit = (response: string | null, confidence: 1 | 2 | 3 | null = null) => start(async () => {
-    const res = await answerDiagnostic({ sessionId, questionId: q.id, response, confidence, timeMs: Math.round(performance.now() - shownAt.current) });
+    const res = await answerDiagnostic({ sessionId, questionId: q.id, response, confidence, timeMs: Math.round(performance.now() - shownAt.current) })
+      .catch(() => ({ ok: false as const, error: "Couldn't save your answer. Your selection is still here. Check your connection and try again." }));
     if (!res.ok) { toast.error(res.error); router.refresh(); return; }
     if (res.data.done) { router.push(`/test/${sessionId}/results`); return; }
     setQ(res.data.question); setIndex(res.data.index); setValue(null);

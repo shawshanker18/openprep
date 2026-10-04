@@ -3,7 +3,7 @@ title: Graphing basics
 order: 1
 expressions: ["y=2x+1", "y=x^2-3"]
 ---
-Desmos draws anything you type that starts with `y=` (or `x=`). Each line you add gets its own colour.
+GeoGebra draws anything you type that starts with `y=` (or `x=`). Each line you add gets its own colour.
 
 **Try it:** the calculator already shows $y = 2x + 1$ and $y = x^2 - 3$.
 

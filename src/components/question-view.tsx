@@ -19,14 +19,23 @@ export function QuestionView({ question: q, value, onChange, disabled, correct }
       {q.passageMd && <Markdown className="rounded-lg bg-muted/50 p-4 text-[15px]">{q.passageMd}</Markdown>}
       <div className="flex flex-col gap-4">
         <Markdown className="text-[15px]">{q.stemMd}</Markdown>
-        {q.type === "mcq" && q.choices ? (
-          <div role="radiogroup" className="flex flex-col gap-2">
-            {q.choices.map((c) => {
+        {q.choices?.length ? (
+          <div role="radiogroup" aria-label="Answer choices" className="flex flex-col gap-2">
+            {q.choices!.map((c, index) => {
               const chosen = value === c.id;
               const isRight = correct != null && c.id === correct;
               const isWrong = correct != null && chosen && !isRight;
               return (
                 <button key={c.id} type="button" role="radio" aria-checked={chosen} disabled={disabled}
+                  tabIndex={disabled ? -1 : value === c.id || (value == null && index === 0) ? 0 : -1}
+                  onKeyDown={(event) => {
+                    const step = event.key === "ArrowDown" || event.key === "ArrowRight" ? 1 : event.key === "ArrowUp" || event.key === "ArrowLeft" ? -1 : 0;
+                    if (!step || disabled) return;
+                    event.preventDefault(); event.stopPropagation();
+                    const next = (index + step + q.choices!.length) % q.choices!.length;
+                    onChange(q.choices![next]!.id);
+                    event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>("button[role=radio]")[next]?.focus();
+                  }}
                   onClick={() => onChange(c.id)}
                   className={cn(
                     "flex items-center gap-3 rounded-lg border p-3 text-left transition-colors",

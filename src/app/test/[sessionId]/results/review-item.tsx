@@ -8,13 +8,11 @@ import { MISTAKE_LABEL, MISTAKE_TYPES } from "@/engine/mistakes";
 import { cn } from "@/lib/utils";
 import type { RevealedQuestion } from "@/server/questions";
 import { setMistakeType } from "@/app/(app)/practice/actions";
-import { TARGET_SECONDS } from "@/engine/constants";
 
 export function ReviewItem({ n, q, response, correct, attemptId, mistakeType, timeMs }: {
   n: number; q: RevealedQuestion; response: string | null; correct: boolean; attemptId: string | null; mistakeType: string | null; timeMs: number;
 }) {
   const s = Math.round(timeMs / 1000);
-  const slow = s > 1.5 * TARGET_SECONDS[q.section as "rw" | "math"];
   const [mistake, setMistake] = useState(mistakeType);
   const choice = "choice" in q.answer ? q.answer.choice : null;
   const rationale = !correct && response ? q.choiceRationales?.[response] : null;
@@ -23,8 +21,8 @@ export function ReviewItem({ n, q, response, correct, attemptId, mistakeType, ti
       <summary className="flex cursor-pointer items-center gap-3 px-4 py-2 text-sm">
         <span className="w-6 tabular-nums text-muted-foreground">{n}</span>
         <span className={correct ? "text-emerald-700" : "text-red-700"}>{correct ? "✓ Correct" : response ? "✗ Incorrect" : "Not answered"}</span>
-        <span className="ml-auto tabular-nums text-muted-foreground" title={slow ? "Longer than one and a half times the SAT pace" : "Time on this question"}>
-          {Math.floor(s / 60)}:{String(s % 60).padStart(2, "0")}{slow ? " · slow" : ""}
+        <span className="ml-auto tabular-nums text-muted-foreground" title="Time on this question">
+          {Math.floor(s / 60)}:{String(s % 60).padStart(2, "0")}
         </span>
       </summary>
       <div className="flex flex-col gap-4 border-t p-4">
@@ -33,7 +31,7 @@ export function ReviewItem({ n, q, response, correct, attemptId, mistakeType, ti
         {rationale && <p className="text-sm"><b>Why {response} is wrong:</b> {rationale}</p>}
         <Markdown className="text-sm">{q.explanationMd}</Markdown>
         {q.fastMethodMd && <Markdown className="text-sm text-muted-foreground">{`**Fastest:** ${q.fastMethodMd}`}</Markdown>}
-        <div><TutorPanel questionId={q.id} answered isMath={q.section === "math"} wrongChoice={!correct && q.type === "mcq" ? response : null} /></div>
+        <div><TutorPanel questionId={q.id} answered wrongChoice={!correct && !!q.choices?.length ? response : null} /></div>
         {!correct && attemptId && (
           <div className="flex flex-wrap gap-1.5">
             {MISTAKE_TYPES.map((m) => (
