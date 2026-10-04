@@ -45,3 +45,11 @@ Backup before import repair: work/question-repair/questions-before-repair.json, 
 ## Git and deployment
 
 Push/deployment results will be appended below once verified. GitHub push and Vercel deployment readiness are distinct; do not claim signed-in visual sign-off from a build.
+
+### Push and CI update
+
+Main repair commit abdfca57414d3c65cd047a474bb012ed1a987dec was pushed and the remote SHA verified. GitHub CI initially failed because the Windows-generated lockfile omitted Linux/WASM dependency peer entries expected by npm 12. Lock metadata was regenerated with npm 12. No source repair failure was observed in the local checks. The follow-up lockfile/tooling change and current CI/deployment status will be checked before the final response.
+
+Vercel project metadata has no Git repository link, so a GitHub push does not automatically deploy this site. Its latest production deployment remained the older release at the initial status check. Use authenticated Vercel CLI for deployment metadata; do not bypass the production browser permission.
+
+Dependency audit has 13 development-tooling advisories, including unpatched braces <=3.0.3 and older esbuild in Drizzle tooling. Avoid public development/Studio servers. Shadcn CLI was moved to devDependencies; do not force major downgrades suggested by npm audit.

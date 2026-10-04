@@ -67,3 +67,7 @@ The Downloads ZIP has 13,492 source records. Four have no usable revamped questi
 - Every student route at 320/375/390 px, 200% zoom, long content, keyboard only, light/dark themes and screen reader.
 
 The companion issue inventory records all 50 identified findings and normal error conditions. Historical descriptions are preserved as a baseline; current repair statuses take precedence.
+
+## Dependency audit
+
+The dependency audit reports 13 development-tooling advisories (9 high, 4 moderate), involving the braces/glob chain used by lint/scaffolding and the older esbuild chain in Drizzle tooling. No patched braces release was available in the registry at this check. Automatic force-fix recommendations downgrade major tooling and were not applied. The shadcn scaffolding CLI belongs in development dependencies and has been moved there. Do not expose development or Drizzle studio servers publicly. Recheck upstream patches; ordinary application tests cannot certify dependency vulnerability absence.
