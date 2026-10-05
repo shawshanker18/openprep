@@ -68,8 +68,8 @@ export async function exposeQuestions(tx: Tx, userId: string, qs: Pick<Question,
   await tx.insert(questionExposures).values(fresh.map(q => ({ userId, questionId: q.id, skillId: q.skillId, ipHash: context.ip, deviceHash: context.device, firstAt: now })));
 }
 
-export async function servePractice(userId: string, q: Question, context: DeliveryContext, paper?: { nonce: string; count: number }) {
-  await db.transaction(async tx => {
+export async function servePractice(userId: string, q: Question, context: DeliveryContext, paper?: { nonce: string; count: number }, transaction?: Tx) {
+  const run = async (tx: Tx) => {
     await lockDelivery(tx, userId, context);
     const now = new Date();
     const [pending] = await tx.select({ n: count() }).from(questionServes).where(and(eq(questionServes.userId, userId),
@@ -87,5 +87,6 @@ export async function servePractice(userId: string, q: Question, context: Delive
     await exposeQuestions(tx, userId, [q], context);
     await tx.insert(questionServes).values({ userId, questionId: q.id, servedAt: now })
       .onConflictDoUpdate({ target: [questionServes.userId, questionServes.questionId], set: { servedAt: now } });
-  });
+  };
+  return transaction ? run(transaction) : db.transaction(run);
 }

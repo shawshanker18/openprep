@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { SKILLS } from "@/content/taxonomy";
 import { requireUser } from "@/server/auth";
@@ -19,6 +20,7 @@ export default async function CustomPracticePage() {
   return (
     <div className="flex flex-col gap-8">
       <h1 className="text-2xl font-semibold">Custom practice</h1>
+      <Link href="/practice/sessions" className="text-sm underline">Resume a saved session</Link>
       <form action="/practice" method="get" className="flex flex-col gap-3 rounded-xl border p-5">
         <input type="hidden" name="mode" value="set" />
         <div><h2 className="font-medium">Skills</h2><p className="text-sm text-muted-foreground">Leave all unticked for Auto: your focus skills this week.</p></div>

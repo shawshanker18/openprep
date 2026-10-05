@@ -304,3 +304,32 @@ export const deliveryWindows = pgTable("delivery_windows", {
 export type Profile = typeof profiles.$inferSelect;
 export type SkillStateRow = typeof skillState.$inferSelect;
 export { r2Files } from "./storage-schema";
+
+
+/** Saved practice state is server-only; future questions are selected only when reached. */
+export const practiceSessions = pgTable("practice_sessions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: userRef(),
+  config: jsonb("config").$type<import("@/server/papers").PaperConfig>().notNull(),
+  title: text("title").notNull(),
+  back: text("back"),
+  cursor: integer("cursor").notNull().default(0),
+  status: text("status").notNull().default("active"),
+  createdAt: ts("created_at").notNull().defaultNow(),
+  updatedAt: ts("updated_at").notNull().defaultNow(),
+}, (t) => [index("practice_sessions_user_time").on(t.userId, t.updatedAt),
+  check("practice_sessions_cursor_check", sql`${t.cursor} >= 0 and ${t.cursor} <= 100`),
+  check("practice_sessions_status_check", sql`${t.status} in ('active', 'completed')`)]).enableRLS();
+
+export const practiceSessionItems = pgTable("practice_session_items", {
+  sessionId: uuid("session_id").notNull().references(() => practiceSessions.id, {onDelete: "cascade"}),
+  position: integer("position").notNull(),
+  questionId: text("question_id").notNull().references(() => questions.id),
+  response: text("response"),
+  timeMs: integer("time_ms").notNull().default(0),
+  attemptId: uuid("attempt_id").references(() => attempts.id),
+  servedAt: ts("served_at").notNull(),
+}, (t) => [primaryKey({columns: [t.sessionId, t.position]}),
+  check("practice_session_items_position_check", sql`${t.position} >= 0 and ${t.position} < 100`),
+  check("practice_session_items_time_check", sql`${t.timeMs} >= 0 and ${t.timeMs} <= 86400000`),
+  check("practice_session_items_response_check", sql`${t.response} is null or length(${t.response}) <= 8`)]).enableRLS();

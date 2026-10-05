@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { listPracticeSessions } from "@/server/practice-sessions";
 import { Button } from "@/components/ui/button";
 import { MasteryBar } from "@/components/mastery-bar";
 import { DiagnosticSuggestion } from "@/components/diagnostic-gate";
@@ -74,10 +75,13 @@ export default async function DashboardPage() {
   const upcoming = testDay && d.daysLeft != null && d.daysLeft >= 0;
   const predicted = hasEvidence && upcoming ? predictedScore({ estimate: d.estimate.total, minutesPerDay: profile.minutesPerDay, daysPerWeek: profile.daysPerWeek, daysLeft: d.daysLeft! }) : null;
 
+  const savedPractice=(await listPracticeSessions(userId)).find(s=>s.status==="active");
+
   // Where you left off, most urgent first.
   const resume: { title: string; detail: string; href: string; action: string }[] = [];
   if (home.openTest) resume.push({ title: KIND[home.openTest.kind] ?? "Test", detail: `In progress · started ${formatDate(home.openTest.startedAt, profile.timezone, true)}`, href: `/test/${home.openTest.id}`, action: "Resume" });
-  if (home.lastPractice) resume.push({ title: SKILL_BY_ID[home.lastPractice.skillId]?.name ?? "Practice", detail: `Last practiced ${ago(home.lastPractice.at)}`, href: `/practice?skill=${home.lastPractice.skillId}`, action: "Continue" });
+  if(savedPractice) resume.push({title:savedPractice.title,detail:"Saved practice session",href:`/practice?session=${savedPractice.id}`,action:"Resume"});
+  if (!savedPractice && home.lastPractice) resume.push({ title: SKILL_BY_ID[home.lastPractice.skillId]?.name ?? "Practice", detail: `Last practiced ${ago(home.lastPractice.at)}`, href: `/practice?skill=${home.lastPractice.skillId}`, action: "Continue" });
   if (home.course.next) resume.push({ title: home.course.next.title, detail: `Start from scratch · ${home.course.done} of ${home.course.total} done`, href: `/start/${home.course.next.key}`, action: "Continue" });
   if (d.dueReviews > 0) resume.push({ title: "Mistakes to review", detail: `${d.dueReviews} due now`, href: "/practice?mode=review", action: "Review" });
   const primary = resume[0] ?? { href: "/practice", action: "Start practicing" };

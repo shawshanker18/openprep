@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { Calculator, Expand, LoaderCircle, Minimize } from "lucide-react";
+import { watchCalculatorSize } from "@/lib/calculator-size";
 import { Button } from "@/components/ui/button";
 
 type GeoGebraApi = { evalCommand(command: string): void; setSize(width: number, height: number): void; remove():void };
@@ -17,8 +18,11 @@ function loadGeoGebra(): Promise<void> {
   loading ??= new Promise((resolve, reject) => {
     const s = document.createElement("script");
     s.src = "https://www.geogebra.org/apps/deployggb.js";
-    s.onload = () => resolve();
-    s.onerror = () => { loading = null; reject(new Error("geogebra")); };
+    s.onload = () => {
+      if(window.GGBApplet) resolve();
+      else {loading=null;s.remove();reject(new Error("geogebra"));}
+    };
+    s.onerror = () => { loading = null; s.remove(); reject(new Error("geogebra")); };
     document.head.appendChild(s);
   });
   return loading;
@@ -28,55 +32,59 @@ function loadGeoGebra(): Promise<void> {
 export function DesmosCalculator({ expressions = EMPTY_EXPRESSIONS, className = "h-96" }: { expressions?: string[]; className?: string }) {
   const el = useRef<HTMLDivElement>(null);
   const shell = useRef<HTMLDivElement>(null);
+  const sizing = useRef<ReturnType<typeof watchCalculatorSize>|null>(null);
   const id = useId().replace(/:/g, "");
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");
   const [fullscreen, setFullscreen] = useState(false);
   const expressionKey = JSON.stringify(expressions);
   useEffect(() => {
-    let cancelled = false;
-    let timedOut = false;
-    const target = el.current;
-    const timeout = window.setTimeout(() => {
-      if (!cancelled) { timedOut = true; setState("error"); }
-    }, 15_000);
-    let resizeObserver: ResizeObserver | null = null;
+    let cancelled=false, scriptReady=false, injected=false, timedOut=false;
+    const target=el.current;
+    if(!target) return;
     let apiInstance:GeoGebraApi|null=null;
-    loadGeoGebra().then(() => {
-      if (cancelled || !el.current) return;
-      if (window.GGBApplet) {
-        const applet = new window.GGBApplet({
-          id, appName: "graphing", width: 900, height: 500, showToolBar: false, showAlgebraInput: true, showMenuBar: false,
-          showResetIcon: true, showZoomButtons: true, enableLabelDrags: false, enableShiftDragZoom: true,
-          appletOnLoad: (api: GeoGebraApi) => {
-            if (cancelled || timedOut) {api.remove();return;}
+    let timeout:number|null=null;
+    const fail=()=>{if(!cancelled){timedOut=true;setState("error");}};
+    // The host is observed before injection, so hidden panels never initialize at an invented size.
+    const watcher=watchCalculatorSize(target,(width,height)=>{
+      if(cancelled || timedOut) return;
+      if(apiInstance) {
+        apiInstance.setSize(width,height);
+        setState("ready");
+      } else if(scriptReady && !injected && window.GGBApplet) {
+        injected=true;
+        timeout=window.setTimeout(fail,20_000);
+        const applet=new window.GGBApplet({
+          id, appName:"graphing", width, height, showToolBar:false, showAlgebraInput:true, showMenuBar:false,
+          showResetIcon:true, showZoomButtons:true, enableLabelDrags:false, enableShiftDragZoom:true,
+          appletOnLoad:(api:GeoGebraApi)=>{
+            if(cancelled || timedOut){api.remove();return;}
             apiInstance=api;
-            window.clearTimeout(timeout);
-            (JSON.parse(expressionKey) as string[]).forEach((expression) => api.evalCommand(expression));
-            if (shell.current) {
-              resizeObserver = new ResizeObserver(([entry]) => {
-                if (!entry) return;
-                const { width, height } = entry.contentRect;
-                api.setSize(Math.max(280, Math.floor(width)), Math.max(320, Math.floor(height)));
-              });
-              resizeObserver.observe(shell.current);
-              const { width, height } = shell.current.getBoundingClientRect();
-              api.setSize(Math.max(280, Math.floor(width)), Math.max(320, Math.floor(height)));
-            }
-            if (!cancelled) setState("ready");
+            if(timeout!==null) window.clearTimeout(timeout);
+            (JSON.parse(expressionKey) as string[]).forEach(expression=>api.evalCommand(expression));
+            // GeoGebra's callback can run before its canvas layout is painted. Re-measure over two frames.
+            watcher.refresh();
           },
-        }, true);
+        },true);
         applet.inject(id);
-      } else setState("error");
-    }, () => { if (!cancelled) { window.clearTimeout(timeout); setState("error"); } });
-    return () => {
-      cancelled = true;
-      window.clearTimeout(timeout);
-      resizeObserver?.disconnect();
-      apiInstance?.remove();
-      target?.replaceChildren();
+      }
+    });
+    sizing.current=watcher;
+    timeout=window.setTimeout(fail,15_000);
+    loadGeoGebra().then(()=>{
+      if(cancelled || timedOut) return;
+      if(timeout!==null) window.clearTimeout(timeout);
+      scriptReady=true;watcher.refresh();
+    },fail);
+    return ()=>{
+      cancelled=true;
+      if(timeout!==null) window.clearTimeout(timeout);
+      watcher.disconnect();
+      if(sizing.current===watcher) sizing.current=null;
+      apiInstance?.remove();target.replaceChildren();
     };
-  }, [expressionKey, id]);
+  },[expressionKey,id]);
   useEffect(() => {
+    sizing.current?.refresh();
     if (!fullscreen) return;
     const original = document.body.style.overflow;
     const previousFocus=document.activeElement as HTMLElement|null;
@@ -106,12 +114,12 @@ export function DesmosCalculator({ expressions = EMPTY_EXPRESSIONS, className = 
       </div>
     );
   }
-  return <div ref={shell} role={fullscreen ? "dialog" : undefined} aria-modal={fullscreen || undefined} aria-label="Graphing calculator" className={fullscreen ? "fixed inset-0 z-50 flex flex-col bg-background p-4" : `relative min-h-[320px] min-w-[280px] max-w-full resize overflow-auto rounded-md border ${className}`} title="Drag the bottom-right corner to resize">
+  return <div ref={shell} role={fullscreen ? "dialog" : undefined} aria-modal={fullscreen || undefined} aria-label="Graphing calculator" className={fullscreen ? "fixed inset-0 z-50 flex flex-col bg-background p-4" : `relative flex min-h-[320px] min-w-[280px] max-w-full resize flex-col overflow-hidden rounded-md border ${className}`} title="Drag the bottom-right corner to resize">
     <button type="button" className="absolute right-3 top-3 z-20 rounded-md border bg-background p-2 hover:bg-muted" onClick={() => setFullscreen((v) => !v)} aria-label={fullscreen ? "Exit full-screen calculator" : "Open full-screen calculator"}>
       {fullscreen ? <Minimize className="size-4" /> : <Expand className="size-4" />}
     </button>
     {state === "loading" && <div className="absolute inset-0 z-10 flex items-center justify-center gap-2 bg-background text-sm text-muted-foreground"><LoaderCircle className="size-4 animate-spin" /> Loading calculator…</div>}
-    <div ref={el} id={id} className="h-full min-h-0 w-full overflow-hidden" />
+    <div ref={el} id={id} className="min-h-0 min-w-0 w-full flex-1 overflow-hidden" />
   </div>;
 }
 
