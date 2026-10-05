@@ -1,7 +1,7 @@
 # OpenPrep
 
-Free, open-source adaptive SAT prep. A student takes a short adaptive diagnostic, gets a per-skill mastery profile and a
-score range, then practises what has the most points left to gain. Next.js 16 + Supabase (Postgres + Auth) + Drizzle.
+Free, open-source adaptive SAT prep. Students can start with the question bank, Smart Practice and tests immediately after onboarding.
+An optional diagnostic gives an initial mastery profile; practice answers also personalize the plan. Next.js 16 + Supabase (Postgres + Auth) + Drizzle.
 
 ## Run locally
 
@@ -17,7 +17,7 @@ builds), so flows can be exercised without real sign-in.
 ## Checks
 
 ```bash
-npm run typecheck && npm run lint && npm test && npm run content:validate
+npx next typegen && npm run typecheck && npm run lint && npm test && npm run content:validate
 ```
 
 Engine tests are pure; `src/server/*.test.ts` run the real SQL against in-process Postgres (PGlite).

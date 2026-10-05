@@ -6,30 +6,16 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db";
 import { profiles, satAttempts, skillState } from "@/db/schema";
-import { SKILLS, SUBJECTS, TOPICS, boardTopics } from "@/content/taxonomy";
+import { SKILLS, TOPICS, boardTopics } from "@/content/taxonomy";
 import { priorTheta, type SelfRating } from "@/engine/prior";
 import { requireUser, type ActionResult } from "@/server/auth";
 import { startDiagnostic } from "@/server/diagnostic";
 
-const MINUTES = [15, 30, 45, 60, 90, 120];
-const sectionScore =z.number().int().min(200).max(800).multipleOf(10);
-const Survey = z.object({
-  grade: z.number().int().min(8).max(13),
-  curriculum: z.enum(["cbse", "icse", "ib", "gcse", "american", "other"]),
-  topicsStudied: z.array(z.enum(TOPICS.map((t) => t.id) as [string, ...string[]])),
-  subjects: z.array(z.enum(SUBJECTS)).default([]),
-  englishBackground: z.enum(["first_language", "fluent", "learning"]),
-  prior: z.object({ math: sectionScore, rw: sectionScore, takenOn: z.iso.date() }).nullable(),
-  targetScore: z.number().int().min(400).max(1600).multipleOf(10),
-  testDate: z.iso.date().nullable(),
-  minutesPerDay: z.number().refine((n) => MINUTES.includes(n)),
-  daysPerWeek: z.number().int().min(3).max(7),
-  timezone: z.string().refine((tz) => { try { new Intl.DateTimeFormat("en", { timeZone: tz }); return true; } catch { return false; } }),
-});
+import { Survey } from "@/lib/onboarding";
 
 export async function submitSurvey(input: z.input<typeof Survey>): Promise<ActionResult> {
   const { userId, profile } = await requireUser();
-  if (profile.onboardingStep !== "survey") return { ok: false, error: "Survey already submitted." };
+  if (profile.onboardingStep !== "survey" && profile.onboardingStep !== "self") return { ok: false, error: "Survey already submitted." };
   const parsed = Survey.safeParse(input);
   if (!parsed.success) return { ok: false, error: "Please check the highlighted answers." };
   const s = parsed.data;
@@ -37,9 +23,18 @@ export async function submitSurvey(input: z.input<typeof Survey>): Promise<Actio
     await tx.update(profiles).set({
       grade: s.grade, curriculum: s.curriculum, topicsStudied: s.topicsStudied, subjects: s.subjects, englishBackground: s.englishBackground,
       priorMath: s.prior?.math ?? null, priorRw: s.prior?.rw ?? null, targetScore: s.targetScore, testDate: s.testDate,
-      minutesPerDay: s.minutesPerDay, daysPerWeek: s.daysPerWeek, timezone: s.timezone, onboardingStep: "self",
+      minutesPerDay: s.minutesPerDay, daysPerWeek: s.daysPerWeek, timezone: s.timezone, onboardingStep: "diagnostic_skipped",
     }).where(eq(profiles.id, userId));
     if (s.prior) await tx.insert(satAttempts).values({ userId, takenOn: s.prior.takenOn, math: s.prior.math, rw: s.prior.rw });
+    const studied = new Set(TOPICS.filter((t) => s.topicsStudied.includes(t.id)).flatMap((t) => t.skills));
+    const implied = new Set(TOPICS.filter((t) => boardTopics(s.curriculum, s.grade).includes(t.id)).flatMap((t) => t.skills));
+    await tx.insert(skillState).values(SKILLS.map((skill) => {
+      const selfRating = s.ratings[skill.id] ?? null;
+      return { userId, skillId: skill.id, selfRating, theta: priorTheta({
+        selfRating, topicStudied: studied.has(skill.id), boardImplied: implied.has(skill.id),
+        priorSectionScore: skill.section === "math" ? s.prior?.math ?? null : s.prior?.rw ?? null,
+      }) };
+    })).onConflictDoNothing();
   });
   revalidatePath("/onboarding");
   return { ok: true, data: undefined };

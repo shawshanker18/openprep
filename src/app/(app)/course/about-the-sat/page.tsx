@@ -45,7 +45,7 @@ You can use a calculator for the whole Math section, and the GeoGebra graphing c
 
 ## How to use this course
 
-1. **Take the diagnostic** if you haven't yet. It finds your starting level for every skill, so the course can point you to the right place.
+1. **Start with a lesson or practice.** The diagnostic is optional if you want a starting-level check; your practice answers also help personalize your plan.
 2. **Work through the units.** For each skill, read the lesson, look at the two worked examples, then practice. Your level for the skill goes from Not started to Attempted, Familiar, Proficient and finally Mastered.
 3. **Take the quizzes and unit tests.** They mix skills together like the real test and raise your levels faster.
 4. **Try the course challenge** when you've worked through the units, to check every skill at once.

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { BookOpen, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { DiagnosticGate } from "@/components/diagnostic-gate";
+import { DiagnosticSuggestion } from "@/components/diagnostic-gate";
 import { CourseCheckForm, LevelBox, LevelLegend, PointsBar } from "@/components/course-ui";
 import { DOMAINS, SKILLS, skillsIn, type Section } from "@/content/taxonomy";
 import { checkCount, LEVELS, points, unitSteps, unitsOf } from "@/engine/course";
@@ -38,7 +38,7 @@ export default async function CoursePage({ searchParams }: PageProps<"/course">)
         ))}
       </nav>
 
-      {diagnosticPending(profile) && <DiagnosticGate />}
+      {diagnosticPending(profile) && <DiagnosticSuggestion />}
 
       <section className="flex flex-col gap-3 rounded-xl border p-5">
         <PointsBar {...total} />

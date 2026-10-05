@@ -1,7 +1,7 @@
 // Complete database schema (spec 01 §4). Text columns instead of enums; values validated by zod at the edge.
 import { sql } from "drizzle-orm";
 import {
-  pgTable, uuid, text, integer, smallint, real, boolean, timestamp, date, jsonb, primaryKey, index,
+  pgTable, check, uuid, text, integer, smallint, real, boolean, timestamp, date, jsonb, primaryKey, index,
 } from "drizzle-orm/pg-core";
 
 const ts = (name: string) => timestamp(name, { withTimezone: true });
@@ -11,7 +11,7 @@ const userRef = () => uuid("user_id").notNull().references(() => profiles.id, { 
 export const profiles = pgTable("profiles", {
   id: uuid("id").primaryKey(), // = auth.users.id
   createdAt: ts("created_at").notNull().defaultNow(),
-  onboardingStep: text("onboarding_step").notNull().default("survey"), // survey | self | diagnostic | done
+  onboardingStep: text("onboarding_step").notNull().default("survey"), // survey | self (legacy) | diagnostic | diagnostic_skipped | done
   timezone: text("timezone").notNull().default("Asia/Kolkata"),
   grade: smallint("grade"),
   curriculum: text("curriculum"),
@@ -28,6 +28,13 @@ export const profiles = pgTable("profiles", {
   dashboardLayout: jsonb("dashboard_layout").$type<{ id: string; visible: boolean }[] | null>(), // null = automatic default
   weeklyFocus: jsonb("weekly_focus").$type<{ weekOf: string; skillIds: string[] } | null>(),
 });
+
+// One bounded row per student; the practice API updates this atomically.
+export const practiceRateWindows = pgTable("practice_rate_windows", {
+  userId: userRef().primaryKey(),
+  windowStart: ts("window_start").notNull(),
+  requests: integer("requests").notNull(),
+}, (table) => [check("practice_rate_windows_requests_check", sql`${table.requests} >= 0`)]).enableRLS();
 
 export const satAttempts = pgTable("sat_attempts", {
   id: uuid("id").primaryKey().defaultRandom(),
