@@ -1,100 +1,165 @@
-# OpenPrep: a CBSE-first learning plan
+# OpenPrep: grade-specific CBSE-to-SAT learning plan
 
-Prepared 5 October 2026. Proposal; the CBSE features below are not yet implemented.
+Revised 5 October 2026. Proposal for review; this revision changes the plan, not application behaviour.
 
-## Product direction
+## Main rule
 
-Make the existing SAT-prep product easy for CBSE students to enter through familiar school chapters. Start with Mathematics and English for Classes 10–12, then add Class 9 with its own verified syllabus mapping. A student should be able to open a chapter they recognise, learn a concept, answer a few questions and understand every mistake without taking a diagnostic.
+A completed school chapter routes its overlapping concepts directly to SAT applications, calculator demonstrations and efficient methods. Repeated introductory theory is collapsed, with a “Review the basics” option available anytime. A chapter's completion never removes SAT practice or marks a skill mastered.
 
-This plan assumes OpenPrep remains SAT preparation adapted for CBSE learners. Full CBSE board-exam preparation would need an additional assessment system, content bank and marking rubrics. Keep board marks and SAT estimates separate so neither is presented as the other.
+Use class, academic year, textbook edition, subjects and completed chapters to choose the starting path. Infer previous-year foundations as covered, with an editable “I need a refresher” option. For the current class, ask which chapters are completed: being in Class 11 does not mean the whole Class 11 textbook has already been taught. If the student skips this question, practice remains available and the plan uses an introductory bridge with optional theory.
 
-## Immediate repairs in this change
+The mapping examples below are proposed product decisions based on NCERT contents and relevant chapter sections. The production map must cite exact textbook sections and receive teacher review. This review is not a claim that every exercise in every textbook has been checked.
 
-- Onboarding has three slides: school details; optional English background; target SAT score, date and study schedule. The Maths/“what do you already know?” slide is removed. Back and Skip work on every relevant slide; answers remain when navigating back.
-- Completing setup goes straight to the dashboard. All skipped personal fields remain unset. Skipping study goals uses the displayed starting schedule of 45 minutes per day, 5 days per week.
-- The question bank, Smart Practice, custom practice, tests, course and daily plan no longer require a diagnostic. An optional starting-point check remains available.
-- Skill records are created during onboarding so the first practice answer can update mastery safely.
-- Optional diagnostic reminders no longer suppress due-review and test notifications. First-mock reminders can start from the first practice answer even without a diagnostic.
-- Fresh installations receive the missing practice rate-limit table through migration 0012. Previously, applying all migrations still left practice returning a temporary-unavailability error unless a separate SQL script had been run. Existing projects with the table are supported too.
-- The dashboard shows “Not measured yet” before any real answers instead of presenting a default model score as the student's current score. Predicted scores and suggested test timing also wait for evidence.
+## Onboarding: keep three slides
 
-## Build in this order
+1. **School details:** Class, CBSE/other curriculum, subjects and academic year. Once a class is selected, show an optional expandable checklist: “Which chapters have you finished at school?” Use chapter titles from the selected edition, with Done / In progress / Not started and Skip. For Class 11, show relevant Maths chapters; show Units and Measurements separately if Physics is selected. This is chapter coverage, not confidence ratings, and does not need a separate Maths slide.
+2. **English:** optional language background and preferred explanation language. Do not assume a student's SAT reading/writing ability from class or school English marks.
+3. **SAT goals:** target score, test date, study minutes and days. All remain skippable.
 
-| Order | Deliverable | What the student gets | Release check |
+Changing chapter completion later in Settings updates future lessons. Students can open the question bank, Smart Practice and tests immediately; no diagnostic is required.
+
+## Different routes by class
+
+| Current class | Starting coverage | Which theory gets collapsed | Main work offered |
 | --- | --- | --- | --- |
-| 1 | Reliable learning content | Worked explanations, correct diagrams and clear answer feedback | Every question offered in the pilot has a reviewed solution and usable assets |
-| 2 | A versioned CBSE chapter map | Browse by class, subject and familiar chapter instead of SAT domain names | Every published mapping cites its syllabus year and has teacher review |
-| 3 | School-to-SAT bridge lessons | Familiar method, then the SAT twist, then practice | Students can finish one complete chapter journey on a phone |
-| 4 | A chapter-first question bank | Chapter, concept, difficulty and question-type filters | No irrelevant questions silently enter a selected chapter |
-| 5 | Practice that fits school life | Short learning sessions, revision and optional timed SAT practice | A new student gets useful questions immediately; mistakes change recommendations |
-| 6 | A small CBSE student pilot | Feedback from the actual target audience | Students find a chapter, finish a set and explain the correction without help |
+| 9 | Prior-year foundations plus completed current-year chapters | Only the mapped basics already covered: coordinates, linear expressions, identities, number operations, measurement, probability or data as applicable | Bridge unfamiliar SAT notation and wording; visual examples; calculator basics; short untimed sets; teach remaining concepts |
+| 10 | Completed Class 9 foundations plus selected Class 10 chapters | Familiar algebra, systems, quadratic methods, coordinate distance, similarity, right-triangle trig, mensuration and probability, as applicable | SAT representations, efficient algebra, calculator intersections/roots, modelling, contextual interpretation and mixed practice |
+| 11 | Class 9–10 coverage plus explicitly completed Class 11 Maths/Physics chapters | Exact overlapping concepts within the selected chapters | Desmos demonstrations, reliable shortcuts, unfamiliar SAT applications, timing and targeted theory for gaps |
+| 12 / school completed | Earlier foundations plus confirmed Class 11 coverage | Mapped basics already studied; completion assumptions remain editable | Gap-first practice, timed mixed sets and full SAT preparation; no routine reteaching of familiar school material |
 
-Do not begin with another long survey, a larger question import or a compulsory level test. Learning quality and a familiar route into practice are the first priorities.
+Current-year unchecked chapters remain available to learn. Students may choose practice first for any topic. Errors offer a small concept refresher instead of restarting a whole school chapter.
 
-## 1. Fix the explanation gap first
+## Class 9: use the actual textbook edition
 
-The latest read-only OpenPrep audit found 13,486 active imported questions with blank explanations. A technically working demo still cannot teach a student why an answer is wrong. Do not fill this gap with unchecked generated text.
+The current NCERT Ganita Manjari has Part I and Part II. Its contents differ from the older Class 9 Mathematics book. Preserve separate mappings for students whose schools use different editions; use stable concept IDs rather than chapter numbers.
 
-Create a smaller reviewed pilot bank first. Each solution should include the concept, each algebraic or reasoning step, the correct answer, a common wrong turn, and when helpful a faster method. For MCQs, explain why each distractor fails. Tag whether the solution is missing, drafted or reviewed; show an honest missing-solution message until review is complete.
+| School coverage in the current book | Proposed SAT bridge |
+| --- | --- |
+| Coordinates; linear polynomials | Coordinates, linear expressions, tables and contextual linear relationships |
+| Numbers; algebraic identities | Exponents/radicals where covered, equivalent expressions and algebraic rewriting |
+| Perimeter/area; surface area/volume | Geometry formulas, scale factors and powered-unit conversion |
+| Probability; data | Probability and the specific data concepts actually covered; add SAT data tasks not covered there |
+| Two Variables, One Line | Linear equation graphs; add any SAT slope/parameter detail missing from the mapped sections |
+| Sequences/progressions | Recognising growth patterns and modelling; teach exponential-function details separately where needed |
+| Quadrilaterals; other geometry | Relevant shape/angle reasoning only; do not substitute school proofs for the SAT applications |
 
-Use original explanations and original bridge examples. Link to official resources for reference. Set a written reuse policy before copying textbook pages or question collections into the product.
+Propositions and algorithms do not automatically exempt SAT maths domains. Map individual relevant concepts where a reviewed connection exists.
 
-## 2. Make chapters the main navigation
+## Class 10: completed chapters unlock faster routes
 
-For a CBSE profile, show “My chapters” as the main learning entry. Use “Class” in this view and display the selected academic year. Keep SAT skill names available as secondary information.
+| Completed chapter/group | Collapse familiar theory | Add the SAT-specific work |
+| --- | --- | --- |
+| Polynomials; Quadratic Equations | Covered polynomial/zero/factorisation concepts and quadratic-solving methods | Roots as intercepts, graph features, parameters, equivalent forms and calculator checks |
+| Pair of Linear Equations | Covered substitution, elimination and graphical solution | Intersections, no/infinite solutions, unknown constants, choosing the quickest method |
+| Coordinate Geometry | Covered coordinate distance and division of segments | SAT coordinate problems; teach slope/line forms wherever these have not already been covered |
+| Triangles; Trigonometry | Covered similarity and right-triangle ratios | SAT diagram interpretation, special triangles, complementary-angle relationships and efficient setups |
+| Circles; Areas; Surface Areas and Volumes | Covered geometric properties and formulas | Contextual problems, scale factors and area/volume unit powers; circle equations need their own mapping |
+| Statistics; Probability | Covered school data methods and elementary probability | Sampling, inference, conditional probability and other SAT data skills where not already taught |
+| Arithmetic Progressions | Covered arithmetic-sequence work | Linear pattern modelling; exponential growth gets a separate bridge |
 
-Add versioned curriculum records and many-to-many mappings:
+This is concept coverage, not a claim that each school chapter fully covers an SAT skill. Class 10 Coordinate Geometry, for example, should not automatically mark Class 11 Straight Lines completed.
 
-- Curriculum: board, academic year, class, subject and subject variant.
-- Chapter: stable ID, title, order, prerequisite chapters and official source URL.
-- Mapping: chapter → concept → existing SAT skill, with overlap marked as direct, partial or SAT-only.
-- Question mapping: question → chapter/concept, task type and reviewed explanation status.
+## Class 11: chapter-aware acceleration
 
-Keep these separate from the existing SAT taxonomy. One school chapter can span several SAT skills, and one SAT skill can appear across multiple classes. Replace the coarse `BOARD_BY_GRADE` heuristic with reviewed mappings when this layer is ready. Class membership may suggest what to offer; it must not prove mastery.
+Offer these SAT-relevant chapter choices in the school-details slide: Relations and Functions, Straight Lines, Linear Inequalities, Conic Sections, Statistics, Probability, Trigonometric Functions, and other completed Maths chapters from the student's edition. Physics students also get Units and Measurements. Keep the full chapter list available, while labelling chapters with little direct SAT overlap.
 
-Example first bridge: Class 10 “Pair of Linear Equations in Two Variables” → simultaneous equations → the existing systems skill. Teach the familiar substitution/elimination method, then interpreting intersections and the number of solutions in SAT-style questions. This chapter is present in the official 2026–27 Class X Mathematics syllabus; the product mapping itself still needs review.
+| Marked completed | What OpenPrep collapses | What OpenPrep teaches next |
+| --- | --- | --- |
+| Straight Lines | Slope and the covered forms/properties of line equations | Calculator intersections, parameter sliders, equivalent forms, contextual slope/intercept, parallel/perpendicular shortcuts and timed applications |
+| Relations and Functions | Covered function notation, domain/range and standard graph definitions | SAT function interpretation, transformations, contextual restrictions and unfamiliar nonlinear/exponential tasks |
+| Both chapters above | Covered line foundations and covered general function foundations | A combined linear-functions fast route: demonstrations → efficient methods → mixed SAT questions |
+| Linear Inequalities | Covered inequality-solving and graphical basics | SAT inequalities in context, boundary/direction mistakes and parameter questions |
+| Conic Sections | Covered circles and parabolas relevant to SAT | Circle equations, completing-square connections, radius/centre traps and graph interpretation; omit extra conics from the default SAT route |
+| Statistics / Probability | Only the covered data/probability concepts | SAT data interpretation and remaining inference/sampling/conditional-probability gaps |
+| Trigonometric Functions | Covered angle/function foundations | Relevant SAT trig applications and efficient methods; leave advanced identities outside the core path |
+| Units and Measurements | Covered dimensions and base-unit theory | Powered conversions, cancellation, derived units and timed rate problems |
 
-Subject variants must remain explicit. CBSE's Class X sample-paper directory lists Mathematics Basic and Standard separately, as well as English Language & Literature and English Communicative. Do not silently merge their board-exam expectations.
+Straight Lines alone does not justify skipping all of functions. Relations and Functions is the separate coverage signal for general function foundations. Completing one chapter must not silently exempt another.
 
-## 3. Teach the bridge, not just the answer
+Sequences, binomial methods and other chapters may help with particular algebra tasks, but must not remove broad SAT domains. Calculus, advanced counting and 3-D geometry should not become required SAT lessons merely because they are in the Class 11 book.
 
-A chapter page should have four clear actions: Learn, Try examples, Practice, Review mistakes. For each concept:
+## Worked student journey: Straight Lines completed
 
-1. Explain it in simple English using familiar notation.
-2. Work through a school-style example step by step.
-3. Show how an SAT question tests the same concept differently.
-4. Give an untimed short set, then offer timed practice when useful.
+For a Class 11 student who selects Straight Lines as Done:
 
-Add an optional English/Hindi glossary for difficult terms, while keeping assessed English passages and answer wording intact. Have bilingual explanations reviewed. Let students turn extra language support on without changing their assumed ability.
+- The linear topic opens in application mode, with familiar theory collapsed.
+- Show a brief demonstration of solving two lines by finding their intersection.
+- Add a parameter slider to illustrate one, zero or infinitely many solutions.
+- Show a reliable shortcut, such as comparing coefficients or identifying equal slopes, and explain when it works.
+- Give a short set mixing interpretation, constants and contextual linear questions. Teach relevant new SAT notation inline.
+- A mistaken intercept answer offers only the intercept refresher; the student can open more theory if wanted.
 
-English should start with reading evidence, vocabulary in context, grammar, transitions and sentence structure. Offer short practice from observed mistakes. Explain where SAT tasks differ from school literature or extended writing; do not claim the current SAT English bank covers the whole CBSE English syllabus.
+If Relations and Functions is also Done, collapse the covered general function definitions. Otherwise provide the small function bridge still needed. For a student who has not finished Straight Lines, show the basic concept explanation before the same applications.
 
-## 4. Make practice approachable
+By “demos” this plan means demonstrations, including Desmos practice. The current OpenPrep calculator implementation uses GeoGebra; SAT-specific Desmos lessons must use the College Board Desmos version, with an external practice link initially and an appropriate supported integration later. Do not label GeoGebra-specific controls as SAT Desmos controls.
 
-Let a student select a familiar chapter in the question bank and start immediately. Explain the lesson connection after the answer. Start with short untimed sessions and adjust difficulty using real answers; leave the diagnostic optional.
+## Units and dimensions: add a dedicated method lesson
 
-Offer a study mode that balances school revision with SAT work. Put upcoming school exams and busy weeks in Settings, rather than adding more onboarding slides. Keep the actual SAT goal/date clearly labelled. Show completion, accuracy and recent improvement before showing speculative scores. Explain that SAT estimates are approximate and are not board-mark predictions.
+NCERT Class 11 Physics Units and Measurements discusses dimensions and treating units algebraically, with conversion tasks involving derived units and powers. Build an original lesson using that method, linked to SAT rates/unit-conversion skills.
 
-After a mistake, offer a short explanation, one easier prerequisite item if needed, then a similar question and a later review. A student should not need to understand labels such as “Problem Solving and Data Analysis” to find work on percentages or statistics.
+### Lesson sequence
 
-## 5. Pilot and measure
+1. Write the quantity with all units visible.
+2. Identify the powers: velocity has length/time; acceleration has length/time squared.
+3. Multiply by conversion ratios equal to one, oriented so the old units cancel.
+4. Apply each power to the entire conversion factor.
+5. Cancel units first, calculate second, then check the scale and final units.
 
-Choose a limited set of mapped maths concepts and English tasks with complete explanations. Test with CBSE students from different classes, subject variants and English comfort levels.
+For dimensions M^a L^b T^c, the numerical conversion follows the corresponding powers of the old-unit/new-unit size ratios. Negative powers handle denominators. The same rule applies to area, volume, density and compound rates. Temperature scales with an offset need their own formula.
 
-Measure time to first answer, chapter-search success, practice completion, explanation helpfulness, repeated errors and return visits. Compare learning on a small before/after concept set rather than promising a score increase. Collect teacher feedback on chapter alignment and solution quality.
+### Original examples
 
-Before widening the pilot, complete signed-in browser checks at narrow mobile widths, keyboard-only navigation, back/skip navigation, failed saves, calculator use, question assets, test submission and resume. Passing backend tests is useful evidence but does not establish visual or provider reliability.
+**Velocity:**
 
-## Optional later board-exam mode
+72 km/h × (1000 m / 1 km) × (1 h / 3600 s) = 20 m/s.
 
-A true board-prep mode needs short and extended responses, step/partial-credit rubrics, competency and case-based tasks, syllabus coverage and teacher-reviewed marking. Build that separately once the SAT bridge works. Do not repurpose 200–800 SAT section scores or label SAT MCQs as complete board preparation.
+**Acceleration:**
 
-## Official references checked for this plan
+2 m/s² × (1 km / 1000 m) × (3600 s / 1 h)² = 25,920 km/h².
 
-- [CBSE curriculum 2026–27](https://cbseacademic.nic.in/curriculum_2027.html): annual class and subject syllabus index.
-- [Class X Mathematics syllabus 2026–27](https://cbseacademic.nic.in/web_material/CurriculumMain27/SecPart1/Maths_SecP1X_2026-27.pdf): chapter and competency reference for the example mapping.
-- [Class X sample papers and marking schemes 2026–27](https://cbseacademic.nic.in/SQP_CLASSX_2026-27.html): subject variants and assessment references.
-- [Class XII sample papers and marking schemes 2026–27](https://cbseacademic.nic.in/SQP_CLASSXII_2026-27.html): senior-secondary assessment references.
-- [CBSE competency-based learning frameworks](https://cbseacademic.nic.in/cbe/learning-framework.html): progressive learning outcomes and suggested assessment objectives. Cross-check these against the selected current-year syllabus.
+The time factor is squared because time appears as s². Converting only one time factor gives a different unit: 2 m/s² = 7.2 (km/h)/s, not 7.2 km/h².
 
-Recheck official sources at each academic-year rollover. An older map must not silently become the new year's curriculum.
+**Other powers:**
+
+3 m² = 30,000 cm²; 5 cm³ = 0.000005 m³; 1 g/cm³ = 1000 kg/m³.
+
+Provide demonstrations with visible cancellation, followed by mixed drills. Wrong answers should trigger feedback such as “the time conversion factor needs to be squared”, rather than only “incorrect”. For Physics students who completed Units and Measurements, open straight in the demonstrations/drills; everyone else can learn the short method without taking a Physics course.
+
+## English route
+
+Use actual reading/writing practice to personalise English. Class 9/10 can receive more vocabulary, sentence-structure and passage scaffolding; Class 11/12 can start with compact SAT bridges and timed practice if comfortable. These are editable starting preferences, not exemptions. School literature coverage does not prove SAT inference, evidence, grammar or rhetoric mastery.
+
+## Content and implementation order
+
+1. Build reviewed, edition-specific chapter-to-concept mappings for Classes 9, 10 and 11. Class 9 must be a launch cohort, not postponed.
+2. Add optional chapter completion to the school-details slide and Settings. Record Done / In progress / Not started / Unknown independently of test mastery.
+3. Split each topic into school theory, SAT bridge, calculator demonstration, efficient method and practice. Completed chapters collapse only mapped school-theory blocks.
+4. Launch reviewed linear/systems/function and units-conversion pathways first, with worked explanations for every offered question.
+5. Use practice mistakes to offer precise refreshers. Keep the whole question bank and tests available.
+6. Pilot with Class 9/10 students and two Class 11 groups—chapters completed and not completed. Verify that they get different theory paths but both get useful SAT practice.
+
+Store curriculum year/edition, chapter ID, covered concept IDs, completion status and mapping review/source separately from theta/mastery. Do not use chapter completion as an invented score or as evidence that a student answered correctly.
+
+## Acceptance examples
+
+- Class 9, current linear chapter Done: familiar basics collapsed, new SAT details taught, SAT practice retained.
+- Class 9, current chapter Not started: short theory and bridge available.
+- Class 10, systems Done: applications/intersections route opens directly.
+- Class 11, Straight Lines Done and Relations and Functions Not started: line theory collapsed; general function bridge remains.
+- Class 11, both Done: combined calculator/shortcut route opens directly.
+- Class 11, Physics not selected: no assumed Units and Measurements coverage; conversion lesson remains accessible.
+- Units and Measurements Done: advanced powered-conversion drills open directly.
+- Chapter selection skipped: all practice still works; theory remains optional.
+- A later mistake offers a targeted refresher without undoing recorded school completion.
+
+## Primary references reviewed
+
+Checked current NCERT contents and relevant chapter sections for this plan. Links are references, not permission to reproduce textbook exercises.
+
+- Class 9 Ganita Manjari: [Part I contents](https://ncert.nic.in/textbook/pdf/iemh1ps.pdf), [Part II contents](https://ncert.nic.in/textbook/pdf/iemh2ps.pdf), [Linear Polynomials](https://ncert.nic.in/textbook/pdf/iemh102.pdf).
+- Class 10 Mathematics: [contents](https://ncert.nic.in/textbook/pdf/jemh1ps.pdf), [Pair of Linear Equations](https://ncert.nic.in/textbook/pdf/jemh103.pdf), [Coordinate Geometry](https://ncert.nic.in/textbook/pdf/jemh107.pdf).
+- Class 11 Mathematics: [contents, including Straight Lines scope](https://ncert.nic.in/textbook/pdf/kemh1ps.pdf), [Relations and Functions](https://ncert.nic.in/textbook/pdf/kemh102.pdf), [Conic Sections](https://ncert.nic.in/textbook/pdf/kemh110.pdf). The direct Straight Lines chapter PDF did not load in this review; its contents entries were checked.
+- Class 11 Physics: [Units and Measurements](https://ncert.nic.in/textbook/pdf/keph101.pdf).
+- College Board: [SAT maths skills](https://satsuite.collegeboard.org/practice/student-question-bank/math), [calculator policy](https://satsuite.collegeboard.org/in-school-assessments/calculator-policy), [College Board Desmos practice calculator](https://www.desmos.com/testing/collegeboard/graphing).
+
+Cross-check the textbook edition against the school's current CBSE syllabus before publishing a production chapter map.
