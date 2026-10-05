@@ -10,7 +10,7 @@ const reply = (error: string, status: number) => Response.json({ error }, { stat
 async function ownedFile(context: Context) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { response: reply("Sign in required", 401) };
+  if (!user || user.is_anonymous) return { response: reply("Sign in required", 401) };
   const { id } = await context.params;
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) return { response: reply("File not found", 404) };
   const [file] = await db.select().from(r2Files).where(and(eq(r2Files.id, id), eq(r2Files.ownerId, user.id), eq(r2Files.status, "ready")));

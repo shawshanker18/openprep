@@ -1,3 +1,5 @@
+import {DeliveryBlockedView} from "@/components/delivery-blocked";
+import { DeliveryBlocked } from "@/server/delivery-policy";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { and, eq } from "drizzle-orm";
@@ -31,7 +33,7 @@ function SkillList({ title, skills }: { title: string; skills: SkillSummary[] })
 }
 
 // Diagnostic → starting-profile view (spec 04 §2); every other kind → test results (spec 04 §5.3).
-export default async function ResultsPage({ params }: PageProps<"/test/[sessionId]/results">) {
+async function loadPage({ params }: PageProps<"/test/[sessionId]/results">) {
   const { sessionId } = await params;
   const { userId, profile } = await requireUser();
   if (!/^[0-9a-f-]{36}$/i.test(sessionId)) notFound();
@@ -110,4 +112,11 @@ export default async function ResultsPage({ params }: PageProps<"/test/[sessionI
       <div><Button size="lg" render={<Link href="/dashboard" />}>See my plan</Button></div>
     </main>
   );
+}
+
+export default async function ResultsPage(props:PageProps<"/test/[sessionId]/results">) {
+  let content, message:string|undefined;
+  try { content=await loadPage(props); }
+  catch(e) { if(e instanceof DeliveryBlocked) message=e.message; else throw e; }
+  return message ? <DeliveryBlockedView message={message} /> : content;
 }

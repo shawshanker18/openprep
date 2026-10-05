@@ -10,6 +10,10 @@ import type { Difficulty } from "@/engine/constants";
 import { nextDiagnosticSpec, type DiagAnswered, type DiagSpec } from "@/engine/diagnostic";
 import { sectionEstimate, totalEstimate } from "@/engine/score";
 import { recordAttempt } from "./attempts";
+import { exposeQuestions } from "./delivery";
+import { deliveryContext } from "./delivery-context";
+import { DELIVERY_POLICY } from "./delivery-policy";
+import { questionExposures } from "@/db/schema";
 import { toPublic } from "./questions";
 
 const SKILLS_BY_DOMAIN = Object.fromEntries(Object.keys(DOMAINS).map((d) => [d, skillsIn(d).map((s) => s.id)]));
@@ -101,6 +105,7 @@ export async function startDiagnostic(userId: string): Promise<string> {
 }
 
 export async function getDiagnostic(userId: string, sessionId: string) {
+  const context=await deliveryContext();
   const [s] = await db.select().from(testSessions)
     .where(and(eq(testSessions.id, sessionId), eq(testSessions.userId, userId), eq(testSessions.kind, "diagnostic")));
   if (!s) return null;
@@ -109,13 +114,15 @@ export async function getDiagnostic(userId: string, sessionId: string) {
     const items = await sessionItems(tx, sessionId);
     const index = await answeredCount(tx, userId, sessionId);
     const cur = items[index];
-    return { status: s.status, current: cur ? toPublic(cur.q) : null, index };
+    if(cur) await exposeQuestions(tx,userId,[cur.q],context);
+    return { status: s.status, current: cur ? toPublic(cur.q, userId) : null, index };
   });
 }
 
 export async function answerDiagnostic(userId: string, input: {
   sessionId: string; questionId: string; response: string | null; timeMs: number; confidence?: 1 | 2 | 3 | null;
 }) {
+  const context=await deliveryContext();
   return db.transaction(async (tx) => {
     const now = new Date();
     const [s] = await tx.select().from(testSessions)
@@ -126,6 +133,9 @@ export async function answerDiagnostic(userId: string, input: {
     const index = await answeredCount(tx, userId, input.sessionId);
     const cur = items[index];
     if (!cur || cur.q.id !== input.questionId) return { ok: false as const, error: "That question was already answered. Reload to continue." };
+    const [exposure]=await tx.select().from(questionExposures).where(and(eq(questionExposures.userId,userId),eq(questionExposures.questionId,cur.q.id)));
+    if(!exposure || now.getTime()-Math.max(exposure.firstAt.getTime(),cur.servedAt?.getTime()??0)<DELIVERY_POLICY.minimumAnswerMs)
+      return {ok:false as const,error:"Take a moment to read the question before submitting."};
     const timeMs = serverCappedTime(input.timeMs, cur.servedAt, now);
 
     await tx.update(testItems).set({ response: input.response, timeMs })
@@ -139,6 +149,7 @@ export async function answerDiagnostic(userId: string, input: {
       await finish(tx, userId, input.sessionId, now);
       return { ok: true as const, data: { done: true as const } };
     }
-    return { ok: true as const, data: { done: false as const, question: toPublic(next), index: index + 1 } };
+    await exposeQuestions(tx,userId,[next],context);
+    return { ok: true as const, data: { done: false as const, question: toPublic(next, userId), index: index + 1 } };
   });
 }

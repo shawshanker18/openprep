@@ -1,35 +1,44 @@
-import { notFound } from "next/navigation";
+import {DeliveryBlockedView} from "@/components/delivery-blocked";
+import { DeliveryBlocked } from "@/server/delivery-policy";
+import { notFound, redirect } from "next/navigation";
 import { SKILL_BY_ID } from "@/content/taxonomy";
-import { DiagnosticGate } from "@/components/diagnostic-gate";
-import { diagnosticPending, requireUser } from "@/server/auth";
 import { getTodayBlock } from "@/server/daily";
-import { createPaper } from "@/server/papers";
+import { requireUser } from "@/server/auth";
+import { createPracticeSession, getPracticeSession } from "@/server/practice-sessions";
+import { z } from "zod";
 import { PracticeRunner } from "./practice-runner";
 
 export const metadata = { title: "Practice" };
 
 const list = (v: string | string[] | undefined) => [v ?? []].flat().flatMap((x) => x.split(",")).filter(Boolean);
 
-export default async function PracticePage({ searchParams }: PageProps<"/practice">) {
+async function loadPage({ searchParams }: PageProps<"/practice">) {
   const sp = await searchParams;
+  const { userId, profile } = await requireUser();
+  const bi=Number(sp.block);
+  const block=Number.isInteger(bi) && bi>=0 ? await getTodayBlock(userId,profile,bi) : null;
+  const blockQuery=block?`&block=${block.index}`:"";
+  if (sp.session !== undefined) {
+    const parsed = z.uuid().safeParse(sp.session);
+    if (!parsed.success) notFound();
+    const session = await getPracticeSession(userId, parsed.data);
+    if (!session) notFound();
+    return <PracticeRunner key={session.id} userId={userId} sessionId={session.id} mode={session.config.mode}
+      title={session.title} block={block} set={{count:session.config.count??100}} back={session.back??undefined} />;
+  }
   const skillId = typeof sp.skill === "string" ? sp.skill : undefined;
   const d = sp.difficulty === "mixed" ? "mixed" : Number(sp.difficulty);
   const difficulty = d === 1 || d === 2 || d === 3 || d === "mixed" ? d : undefined;
   if (skillId && !SKILL_BY_ID[skillId]) notFound();
   const mode = sp.mode === "review" ? "review" : sp.mode === "set" ? "set" : sp.mode === "list" ? "list" : skillId ? "skill" : "smart";
-  const { userId, profile } = await requireUser();
-  if (diagnosticPending(profile)) return <DiagnosticGate />;
-  const bi = Number(sp.block);
-  const block = Number.isInteger(bi) && bi >= 0 ? await getTodayBlock(userId, profile, bi) : null;
 
   // Where to go when the set is finished: the course or the question bank (only these paths are accepted).
   const back = typeof sp.from === "string" && /^\/(course(\/[a-z-]+)?|question-bank(\?[\w=&%.,-]*)?|bookmarks(\?page=\d+)?)$/.test(sp.from) ? sp.from : undefined;
 
   if (mode === "list") {
     const ids = list(sp.ids).filter((id) => /^[\w-]{22}$/.test(id)).slice(0, 50);
-    const set = { skillIds: [] as string[], tags: [] as string[], count: ids.length, timing: "off" as const };
-    const paperId=createPaper(userId, {mode:"list",ids});
-    return <PracticeRunner key={paperId} userId={userId} paperId={paperId} mode="list" title={back?.startsWith('/bookmarks')?'Saved question':'Question bank'} block={null} set={{count:set.count}} back={back} />;
+    const sessionId=await createPracticeSession(userId, {mode:"list",ids,count:Math.max(1,ids.length)},back?.startsWith('/bookmarks')?'Saved questions':'Question bank',back);
+    redirect(`/practice?session=${sessionId}${blockQuery}`);
   }
 
   if (mode === "set") {
@@ -40,12 +49,19 @@ export default async function PracticePage({ searchParams }: PageProps<"/practic
     const timing = sp.timing === "on" || sp.timing === "off" ? sp.timing : "auto";
     const title = skillIds.length === 1 ? SKILL_BY_ID[skillIds[0]!]!.name : skillIds.length ? "Custom practice" : "Custom practice (focus skills)";
     const set = { skillIds, tags, count, timing } as const;
-    const paperId=createPaper(userId, {mode:"set", difficulty, ...set});
-    return <PracticeRunner key={paperId} userId={userId} paperId={paperId} mode="set" title={title} block={block} set={{count:set.count}} back={back} />;
+    const sessionId=await createPracticeSession(userId, {mode:"set", difficulty, ...set},title,back);
+    redirect(`/practice?session=${sessionId}${blockQuery}`);
   }
 
   const plain = difficulty === "mixed" ? undefined : difficulty;
   const title = mode === "review" ? (skillId ? `Review · ${SKILL_BY_ID[skillId]!.name}` : "Review") : skillId ? SKILL_BY_ID[skillId]!.name : "Smart practice";
-  const paperId=createPaper(userId, {mode,skillId,difficulty:plain});
-  return <PracticeRunner key={paperId} userId={userId} paperId={paperId} mode={mode} title={title} block={block} />;
+  const sessionId=await createPracticeSession(userId, {mode,skillId,difficulty:plain},title);
+  redirect(`/practice?session=${sessionId}${blockQuery}`);
+}
+
+export default async function PracticePage(props:PageProps<"/practice">) {
+  let content, message:string|undefined;
+  try { content=await loadPage(props); }
+  catch(e) { if(e instanceof DeliveryBlocked) message=e.message; else throw e; }
+  return message ? <DeliveryBlockedView message={message} /> : content;
 }

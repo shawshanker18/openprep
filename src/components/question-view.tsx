@@ -19,6 +19,7 @@ export function QuestionView({ question: q, value, onChange, disabled, correct }
       {q.passageMd && <Markdown className="rounded-lg bg-muted/50 p-4 text-[15px]">{q.passageMd}</Markdown>}
       <div className="flex flex-col gap-4">
         <Markdown className="text-[15px]">{q.stemMd}</Markdown>
+        <span className="text-xs text-muted-foreground" title="Your personal question copy reference">Copy ref: {q.copyRef}</span>
         {q.choices?.length ? (
           <div role="radiogroup" aria-label="Answer choices" className="flex flex-col gap-2">
             {q.choices!.map((c, index) => {
