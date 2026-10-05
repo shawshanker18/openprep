@@ -8,6 +8,7 @@ import { and, asc, eq, sql } from "drizzle-orm";
 import * as schema from "@/db/schema";
 import { SKILLS } from "@/content/taxonomy";
 
+vi.mock("@/server/delivery-context",()=>({deliveryContext:async()=>({ip:null,device:null})}));
 const pg = new PGlite();
 const queries: string[] = [];
 const db = drizzle(pg, { schema, logger: { logQuery(query) { queries.push(query); } } });
@@ -36,6 +37,7 @@ beforeAll(async () => {
 
 // Each case starts its own tests: age earlier ones so the start speed limit (4 per 5 minutes) applies per case.
 beforeEach(async () => {
+  await db.delete(schema.deliveryWindows).where(sql`id like 'test-start:%'`);
   await db.update(schema.testSessions).set({ startedAt: sql`${schema.testSessions.startedAt} - interval '10 minutes'` });
 });
 
@@ -60,7 +62,9 @@ it("section test: routes to the hard module, submits idempotently, scores, and u
   // Another user can't touch this module.
   expect((await T.saveResponse(OTHER, { moduleId: m1!.id, position: 0, response: "B", flagged: false, timeMsDelta: 1 })).ok).toBe(false);
 
+  await db.update(schema.testModules).set({startedAt:new Date(Date.now()-10*60_000)});
   await T.submitModule(USER, m1!.id);
+  await db.update(schema.testModules).set({startedAt:new Date(Date.now()-10*60_000)});
   await T.submitModule(USER, m1!.id); // double submit: no-op
   const mods = await modules(r.id);
   expect(mods).toHaveLength(2);
@@ -73,6 +77,7 @@ it("section test: routes to the hard module, submits idempotently, scores, and u
   expect(pre).toHaveLength(0);
 
   await T.startModule(USER, mods[1]!.id);
+  await db.update(schema.testModules).set({startedAt:new Date(Date.now()-10*60_000)});
   await T.submitModule(USER, mods[1]!.id); // all blank in module 2
   const [s] = await db.select().from(schema.testSessions).where(eq(schema.testSessions.id, r.id));
   expect(s!.status).toBe("completed");
@@ -124,6 +129,7 @@ it("full test on a thin bank: an empty routed R&W module is skipped and Math sti
   expect(rw1).toMatchObject({ section: "rw", route: "base" });
   expect(await items(rw1!.id)).toHaveLength(5); // the whole R&W bank
   await T.startModule(USER, rw1!.id);
+  await db.update(schema.testModules).set({startedAt:new Date(Date.now()-10*60_000)});
   await T.submitModule(USER, rw1!.id);
   const mods = await modules(r.id);
   expect(mods).toHaveLength(2);
@@ -161,6 +167,7 @@ it("a question in a live test can't be answered (and revealed) through practice"
   const [m] = await modules(r.id);
   const [first] = await items(m!.id);
   expect(await T.inRunningTest(USER, first!.questionId)).toBe(true);
+  await db.update(schema.questionServes).set({servedAt:new Date(Date.now()-6000)});
   expect(await P.submitAnswer(USER, { questionId: first!.questionId, response: "A", timeMs: 5000, confidence: 3 })).toBeNull();
   // ...and practice doesn't serve it at all (it would be stuck on a question it can't grade).
   expect(await P.nextQuestion(USER, {} as schema.Profile, { mode: "list", ids: [first!.questionId], exclude: [] })).toBeNull();
@@ -172,6 +179,7 @@ it("a question in a live test can't be answered (and revealed) through practice"
   await T.abandonTest(USER, r.id);
   // Once the test is over, practice can serve and reveal it as usual.
   await P.nextQuestion(USER, {} as schema.Profile, { mode: "list", ids: [first!.questionId], exclude: [] });
+  await db.update(schema.questionServes).set({servedAt:new Date(Date.now()-6000)});
   expect(await P.submitAnswer(USER, { questionId: first!.questionId, response: "A", timeMs: 5000, confidence: 3 })).not.toBeNull();
 });
 
@@ -229,6 +237,7 @@ it("test starts have a speed limit, not a quota", async () => {
   for (let i = 0; i < 4; i++) expect((await start()).ok).toBe(true);
   expect(await start()).toMatchObject({ ok: false, error: "rate" }); // a 5th within 5 minutes
   await db.update(schema.testSessions).set({ startedAt: sql`${schema.testSessions.startedAt} - interval '6 minutes'` }).where(eq(schema.testSessions.userId, U));
+  await db.delete(schema.deliveryWindows).where(eq(schema.deliveryWindows.id,`test-start:user:${U}`)); // age the independent rolling bucket along with the session fixture
   expect((await start()).ok).toBe(true); // a few minutes later: fine, however many they did before
 });
 

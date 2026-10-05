@@ -4,6 +4,7 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import { cn } from "@/lib/utils";
+import { QuestionImage } from "./question-image";
 
 /** "Worked example 1 (easy)" → "worked-example-1-easy", so pages can link to a lesson section. */
 export const slugify = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -11,7 +12,7 @@ export const slugify = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/
 export function Markdown({ children, className }: { children: string; className?: string }) {
   return (
     <div className={cn("prose-op", className)}>
-      <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+      <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]} components={{img:({src,alt})=><QuestionImage key={typeof src==='string'?src:''} src={typeof src==='string'?src:undefined} alt={alt}/>}}>
         {children}
       </ReactMarkdown>
     </div>

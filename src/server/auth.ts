@@ -14,7 +14,7 @@ export const getAuthUser = cache(async (): Promise<AuthUser | null> => {
   if (process.env.NODE_ENV === "development" && process.env.DEV_USER_ID) return { id: process.env.DEV_USER_ID, email: null, name: null };
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser(); // getUser, NOT getSession: verifies the JWT
-  if (!user) return null;
+  if (!user || user.is_anonymous) return null;
   const meta = user.user_metadata as { full_name?: string; name?: string } | undefined;
   return { id: user.id, email: user.email ?? null, name: meta?.full_name ?? meta?.name ?? null };
 });

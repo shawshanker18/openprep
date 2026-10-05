@@ -1,3 +1,5 @@
+import {DeliveryBlockedView} from "@/components/delivery-blocked";
+import { DeliveryBlocked } from "@/server/delivery-policy";
 import { notFound, redirect } from "next/navigation";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
@@ -13,7 +15,7 @@ import { abandon, endDiagnostic } from "./actions";
 
 export const metadata = { title: "Test" };
 
-export default async function TestPage({ params }: PageProps<"/test/[sessionId]">) {
+async function loadPage({ params }: PageProps<"/test/[sessionId]">) {
   const { sessionId } = await params;
   const { userId } = await requireUser();
   if (!/^[0-9a-f-]{36}$/i.test(sessionId)) notFound();
@@ -54,4 +56,11 @@ export default async function TestPage({ params }: PageProps<"/test/[sessionId]"
         serverNow={st.serverNow} breakBefore={st.breakBefore} heading={st.session.title} />
     </main>
   );
+}
+
+export default async function TestPage(props:PageProps<"/test/[sessionId]">) {
+  let content, message:string|undefined;
+  try { content=await loadPage(props); }
+  catch(e) { if(e instanceof DeliveryBlocked) message=e.message; else throw e; }
+  return message ? <DeliveryBlockedView message={message} /> : content;
 }

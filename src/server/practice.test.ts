@@ -1,63 +1,70 @@
-// Question bank and list-mode practice against real Postgres (PGlite).
-import fs from "node:fs";
-import path from "node:path";
-import { beforeAll, expect, it, vi } from "vitest";
-import { PGlite } from "@electric-sql/pglite";
-import { drizzle } from "drizzle-orm/pglite";
-import * as schema from "@/db/schema";
-import { SKILLS } from "@/content/taxonomy";
-
-const pg = new PGlite();
-const db = drizzle(pg, { schema });
-vi.mock("@/db", () => ({ db }));
-const P = await import("./practice");
-const Q = await import("./questions");
-
-const USER = "00000000-0000-0000-0000-0000000000cc";
-const skill = SKILLS.find((k) => k.section === "math")!;
-const ids = ["qa", "qb", "qc"].map((x) => `${skill.id}-${x}`);
-
-beforeAll(async () => {
-  const dir = path.resolve(import.meta.dirname, "../../drizzle");
-  for (const file of fs.readdirSync(dir).filter((x) => x.endsWith(".sql") && !x.startsWith("0001")).sort())
-    for (const stmt of fs.readFileSync(path.join(dir, file), "utf8").split("--> statement-breakpoint")) await pg.exec(stmt);
-  await db.insert(schema.profiles).values({ id: USER });
-  await db.insert(schema.skillState).values(SKILLS.map((s) => ({ userId: USER, skillId: s.id })));
-  await db.insert(schema.questions).values(ids.map((id) => ({ id, skillId: skill.id, section: "math" as const, domain: skill.domain, difficulty: 2,
-    type: "mcq" as const, passageMd: null, stemMd: "s", choices: [], answer: { choice: "A" }, explanationMd: "e", choiceRationales: null,
-    fastMethodMd: null, desmos: null, tags: [], status: "active" as const, version: 1 })));
+import fs from 'node:fs';
+import path from 'node:path';
+import {beforeAll,expect,it,vi} from 'vitest';
+import {PGlite} from '@electric-sql/pglite';
+import {drizzle} from 'drizzle-orm/pglite';
+import {and,eq} from 'drizzle-orm';
+import * as schema from '@/db/schema';
+import {SKILLS} from '@/content/taxonomy';
+vi.mock('./delivery-context',()=>({deliveryContext:async()=>({ip:null,device:null})}));
+const pg=new PGlite(),db=drizzle(pg,{schema});
+vi.mock('@/db',()=>({db}));
+const P=await import('./practice'),Q=await import('./questions');
+const USER='00000000-0000-0000-0000-0000000000cc',OTHER='00000000-0000-0000-0000-0000000000dd';
+const skill=SKILLS.find(s=>s.section==='math')!;
+const ids=['qa','qb','qc','qd'].map(x=>`${skill.id}-${x}`);
+beforeAll(async()=>{
+ const dir=path.resolve(import.meta.dirname,'../../drizzle');
+ for(const file of fs.readdirSync(dir).filter(x=>x.endsWith('.sql')&&!x.startsWith('0001')).sort())
+  for(const stmt of fs.readFileSync(path.join(dir,file),'utf8').split('--> statement-breakpoint')) await pg.exec(stmt);
+ await db.insert(schema.profiles).values([{id:USER},{id:OTHER}]);
+ await db.insert(schema.skillState).values([USER,OTHER].flatMap(userId=>SKILLS.map(s=>({userId,skillId:s.id}))));
+ await db.insert(schema.questions).values(ids.map(id=>({id,skillId:skill.id,section:skill.section,domain:skill.domain,difficulty:2,type:'mcq' as const,stemMd:'stem',choices:[{id:'A',md:'1'}],answer:{choice:'A'},explanationMd:'explanation'})));
 });
-
-it("list mode walks the given ids in order, and the bank shows last result and saved flag", async () => {
-  const profile = {} as schema.Profile; // list mode never reads the profile
-  const order = [ids[1]!, ids[0]!];
-  const first = await P.nextQuestion(USER, profile, { mode: "list", ids: order, exclude: [] });
-  expect(first?.question.id).toBe(Q.publicId(ids[1]!));
-  await P.submitAnswer(USER, { questionId: ids[1]!, response: "A", timeMs: 5000, confidence: 2 });
-  expect((await P.nextQuestion(USER, profile, { mode: "list", ids: order, exclude: [ids[1]!] }))?.question.id).toBe(Q.publicId(ids[0]!));
-  expect(await P.nextQuestion(USER, profile, { mode: "list", ids: order, exclude: order })).toBeNull();
-
-  await db.insert(schema.bookmarks).values({ userId: USER, questionId: ids[2]! });
-  const bank = Object.fromEntries((await P.questionBank(USER)).rows.map((q) => [q.id, q]));
-  expect(bank[ids[1]!]).toMatchObject({ status: "correct", saved: false });
-  expect(bank[ids[0]!]).toMatchObject({ status: "new", saved: false });
-  expect(bank[ids[2]!]).toMatchObject({ status: "new", saved: true });
+const serve=(user:string,id:string)=>P.nextQuestion(user,{} as schema.Profile,{mode:'list',ids:[id],exclude:[]});
+const age=()=>db.update(schema.questionServes).set({servedAt:new Date(Date.now()-6000)});
+it('IDs differ between accounts and resolve only delivered content',async()=>{
+ const pub=Q.publicId(ids[0]!,USER);
+ expect(pub).not.toBe(Q.publicId(ids[0]!,OTHER));
+ expect(await Q.internalId(pub,USER)).toBeNull();
+ const r=await serve(USER,ids[0]!);
+ expect(r!.question.id).toBe(pub);
+ expect(await Q.internalId(pub,USER)).toBe(ids[0]);
+ expect(await Q.internalId(pub,OTHER)).toBeNull();
+ expect(await Q.internalId(ids[0]!,USER)).toBeNull();
+ expect(JSON.stringify(r!.question)).not.toMatch(/explanation|difficulty|skillId|choiceRationales/);
 });
-
-it("stops handing out questions once an account pulls too many too fast", async () => {
-  const U2 = "00000000-0000-0000-0000-0000000000dd";
-  await db.insert(schema.profiles).values({ id: U2 });
-  const many = Array.from({ length: P.SPEED_LIMIT.max }, (_, i) => `${skill.id}-bulk${i}`);
-  await db.insert(schema.questions).values(many.map((id) => ({ id, skillId: skill.id, section: "math" as const, domain: skill.domain, difficulty: 2,
-    type: "mcq" as const, passageMd: null, stemMd: "s", choices: [], answer: { choice: "A" }, explanationMd: "e", choiceRationales: null,
-    fastMethodMd: null, desmos: null, tags: [], status: "active" as const, version: 1 })));
-  const now = new Date();
-  await db.insert(schema.questionServes).values(many.slice(0, -1).map((questionId) => ({ userId: U2, questionId, servedAt: now })));
-  expect(await P.tooFast(U2, now)).toBe(false);
-  await db.insert(schema.questionServes).values({ userId: U2, questionId: many.at(-1)!, servedAt: now });
-  expect(await P.tooFast(U2, now)).toBe(true);
-  // A minute later they can carry on: it's a speed limit, not a quota.
-  expect(await P.tooFast(U2, new Date(now.getTime() + 60_001))).toBe(false);
+it('an immediate wrong answer cannot reveal the solution; identical retries are idempotent',async()=>{
+ const input={questionId:ids[0]!,response:'B',timeMs:5000,confidence:2 as const};
+ await expect(P.submitAnswer(USER,input)).rejects.toThrow(/read the question/);
+ await age();
+ const first=await P.submitAnswer(USER,input),retry=await P.submitAnswer(USER,input);
+ expect(first!.revealed.answer).toEqual({choice:'A'});
+ expect(retry!.attemptId).toBe(first!.attemptId);
+ expect(await P.submitAnswer(USER,{...input,response:'A'})).toBeNull();
+ expect(await P.submitAnswer(OTHER,input)).toBeNull();
+});
+it('parallel pulls cannot exceed two unanswered deliveries',async()=>{
+ const results=await Promise.allSettled(ids.map(id=>serve(OTHER,id)));
+ expect(results.filter(r=>r.status==='fulfilled')).toHaveLength(2);
+ expect(results.filter(r=>r.status==='rejected')).toHaveLength(2);
+ expect(await db.select().from(schema.questionServes).where(eq(schema.questionServes.userId,OTHER))).toHaveLength(2);
+});
+it('resuming preserves the server clock and consumes no new exposure',async()=>{
+ const [served]=await db.select().from(schema.questionServes).where(eq(schema.questionServes.userId,OTHER));
+ const old=served!.servedAt;
+ const r=await P.resumeQuestion(OTHER,served!.questionId,'off');
+ expect(r!.question.id).toBe(Q.publicId(served!.questionId,OTHER));
+ const [after]=await db.select().from(schema.questionServes).where(and(eq(schema.questionServes.userId,OTHER),eq(schema.questionServes.questionId,served!.questionId)));
+ expect(after!.servedAt).toEqual(old);
+});
+it('bank history has no unseen catalogue, totals or saved-before-serve preview',async()=>{
+ await db.insert(schema.bookmarks).values({userId:USER,questionId:ids[3]!});
+ const bank=await P.questionBank(USER);
+ expect(bank.rows.map(r=>r.id)).toEqual([ids[0]]);
+ expect(bank.counts).toEqual({attempted:1,correct:0,incorrect:1});
+ expect(bank.counts).not.toHaveProperty('total');
+ expect((await P.questionBank(USER,{status:'new',page:100})).rows).toEqual([]);
 });
 
 it("plan blocks are done only from real work today (a click can't tick them)", async () => {
@@ -79,8 +86,8 @@ it("plan blocks are done only from real work today (a click can't tick them)", a
   expect(before.map((b) => b.done)).toEqual([false, false, false, false, false]);
   expect(before[0]!.progress).toEqual({ n: 0, target: 3 }); // 5 minutes of math ≈ 3 questions
 
-  const four = [...ids, `${skill.id}-bulk0`];
-  await db.insert(schema.questionServes).values(four.map((questionId) => ({ userId: U3, questionId, servedAt: new Date() })));
+  const four = [...ids];
+  await db.insert(schema.questionServes).values(four.map((questionId) => ({ userId: U3, questionId, servedAt: new Date(Date.now()-6000) })));
   for (const q of four) await P.submitAnswer(U3, { questionId: q, response: "A", timeMs: 30_000, confidence: 2 });
   await db.insert(schema.lessonProgress).values([
     { userId: U3, skillId: skill.id },                                                                   // read today
@@ -91,86 +98,3 @@ it("plan blocks are done only from real work today (a click can't tick them)", a
   expect(after[1]!.progress).toEqual({ n: 1, target: 3 }); // 4 answers: 3 finish the first block, 1 left for the check-in
 });
 
-it("answers are only revealed for questions this student was given (no reading the bank by id)", async () => {
-  const U4 = "00000000-0000-0000-0000-0000000000ff";
-  await db.insert(schema.profiles).values({ id: U4 });
-  await db.insert(schema.skillState).values(SKILLS.map((s) => ({ userId: U4, skillId: s.id })));
-  const never = `${skill.id}-bulk7`;
-  expect(await P.wasGiven(U4, never)).toBe(false);
-  expect(await P.submitAnswer(U4, { questionId: never, response: "A", timeMs: 5000, confidence: 2 })).toBeNull();
-
-  const served = await P.nextQuestion(U4, {} as schema.Profile, { mode: "list", ids: [never], exclude: [] });
-  expect(served?.question.id).toBe(Q.publicId(never));
-  expect(await P.wasGiven(U4, never)).toBe(true);
-  const r = await P.submitAnswer(U4, { questionId: never, response: "A", timeMs: 5000, confidence: 2 });
-  expect(r?.revealed.answer).toEqual({ choice: "A" });
-
-  // One answer per serve: trying again (B, C, ...) is refused until the question is served again.
-  expect(await P.submitAnswer(U4, { questionId: never, response: "B", timeMs: 5000, confidence: 2 })).toBeNull();
-  await new Promise((r) => setTimeout(r, 5));
-  await P.nextQuestion(U4, {} as schema.Profile, { mode: "list", ids: [never], exclude: [] });
-  expect(await P.submitAnswer(U4, { questionId: never, response: "B", timeMs: 5000, confidence: 2 })).not.toBeNull();
-});
-
-it("question ids sent to the browser are opaque and map back only through the server", async () => {
-  const Q2 = await import("./questions");
-  const pub = Q2.publicId(ids[0]!);
-  expect(pub).toMatch(/^[\w-]{22}$/);
-  expect(pub).not.toContain(skill.id); // nothing about the skill or numbering leaks
-  expect(await Q2.internalId(pub)).toBe(ids[0]);
-  expect(await Q2.internalId(ids[0]!)).toBeNull(); // the internal id itself is not accepted from the browser
-  expect(await Q2.internalId("A".repeat(22))).toBeNull(); // a guess maps to nothing
-  const q = (await P.nextQuestion(USER, {} as schema.Profile, { mode: "list", ids: [ids[2]!], exclude: [] }))!.question;
-  expect(JSON.stringify(q)).not.toMatch(/answer|explanation|difficulty|choiceRationales/);
-});
-
-it('retrying the same submitted answer returns its result without recording another attempt',async()=>{
-  await P.nextQuestion(USER,{} as schema.Profile,{mode:'list',ids:[ids[2]!],exclude:[]});
-  const input={questionId:ids[2]!,response:'A',timeMs:5000,confidence:2 as const};
-  const first=await P.submitAnswer(USER,input),retry=await P.submitAnswer(USER,input);
-  expect(first).not.toBeNull();expect(retry?.attemptId).toBe(first?.attemptId);
-});
-
-
-it("paginates ten rows after filtering and keeps global counters and student results", async () => {
-  const target = SKILLS.find((s) => s.section === "rw")!;
-  const other = "00000000-0000-0000-0000-000000000011";
-  await db.insert(schema.profiles).values({ id: other });
-  const batch = Array.from({ length: 23 }, (_, i) => `pagination-${String(i).padStart(2, "0")}`);
-  await db.insert(schema.questions).values(batch.map((id, i) => ({
-    id, skillId: target.id, section: target.section, domain: target.domain, difficulty: i < 12 ? 1 : 3,
-    type: "mcq", stemMd: `Preview ${id}`, answer: { choice: "A" }, explanationMd: "Explanation",
-  })));
-  // The latest answer wins, and another student's answer must not change this student's status.
-  await db.insert(schema.attempts).values([
-    { userId: USER, questionId: batch[0]!, skillId: target.id, context: "practice", correct: true, timeMs: 1000,
-      thetaBefore: 0, thetaAfter: 0, createdAt: new Date("2026-01-01") },
-    { userId: USER, questionId: batch[0]!, skillId: target.id, context: "practice", correct: false, timeMs: 1000,
-      thetaBefore: 0, thetaAfter: 0, createdAt: new Date("2026-01-02") },
-    { userId: other, questionId: batch[1]!, skillId: target.id, context: "practice", correct: true, timeMs: 1000,
-      thetaBefore: 0, thetaAfter: 0 },
-  ]);
-  await db.insert(schema.bookmarks).values({ userId: USER, questionId: batch[2]! });
-  const filter = { skillId: target.id };
-  const first = await P.questionBank(USER, filter);
-  const second = await P.questionBank(USER, { ...filter, page: 2 });
-  const third = await P.questionBank(USER, { ...filter, page: 3 });
-  expect(first.rows.map((q) => q.id)).toEqual(batch.slice(0, 10));
-  expect(second.rows.map((q) => q.id)).toEqual(batch.slice(10, 20));
-  expect(third.rows.map((q) => q.id)).toEqual(batch.slice(20));
-  expect([first.hasMore, second.hasMore, third.hasMore]).toEqual([true, true, false]);
-  expect(first.counts.filtered).toBe(23);
-  expect(first.counts).toEqual(second.counts);
-  expect(first.rows[0]).toMatchObject({ status: "incorrect", stem: `Preview ${batch[0]}` });
-  expect(first.rows[1]).toMatchObject({ status: "new", stem: null });
-  expect(first.rows[2]).toMatchObject({ saved: true, stem: `Preview ${batch[2]}` });
-  expect((await P.questionBank(USER, { ...filter, status: "incorrect" })).rows.map((q) => q.id)).toEqual([batch[0]]);
-  expect((await P.questionBank(USER, { ...filter, status: "correct" })).rows).toEqual([]);
-  expect((await P.questionBank(USER, { ...filter, status: "saved" })).rows.map((q) => q.id)).toEqual([batch[2]]);
-  expect((await P.questionBank(USER, { ...filter, status: "new" })).counts.filtered).toBe(22);
-  expect((await P.questionBank(USER, { ...filter, difficulty: 3 })).counts.filtered).toBe(11);
-  expect((await P.questionBank(USER, { ...filter, section: "math" })).rows).toEqual([]);
-  expect((await P.questionBank(USER, { ...filter, page: Infinity })).page).toBe(1);
-  expect((await P.questionBank(USER, { ...filter, page: 1.5 })).page).toBe(1);
-  expect((await P.questionBank(USER, { ...filter, page: 999 })).page).toBe(3);
-});

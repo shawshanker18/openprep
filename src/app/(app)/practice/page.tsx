@@ -1,3 +1,5 @@
+import {DeliveryBlockedView} from "@/components/delivery-blocked";
+import { DeliveryBlocked } from "@/server/delivery-policy";
 import { notFound } from "next/navigation";
 import { SKILL_BY_ID } from "@/content/taxonomy";
 import { requireUser } from "@/server/auth";
@@ -9,7 +11,7 @@ export const metadata = { title: "Practice" };
 
 const list = (v: string | string[] | undefined) => [v ?? []].flat().flatMap((x) => x.split(",")).filter(Boolean);
 
-export default async function PracticePage({ searchParams }: PageProps<"/practice">) {
+async function loadPage({ searchParams }: PageProps<"/practice">) {
   const sp = await searchParams;
   const skillId = typeof sp.skill === "string" ? sp.skill : undefined;
   const d = sp.difficulty === "mixed" ? "mixed" : Number(sp.difficulty);
@@ -26,7 +28,7 @@ export default async function PracticePage({ searchParams }: PageProps<"/practic
   if (mode === "list") {
     const ids = list(sp.ids).filter((id) => /^[\w-]{22}$/.test(id)).slice(0, 50);
     const set = { skillIds: [] as string[], tags: [] as string[], count: ids.length, timing: "off" as const };
-    const paperId=createPaper(userId, {mode:"list",ids});
+    const paperId=await createPaper(userId, {mode:"list",ids,count:Math.max(1,ids.length)});
     return <PracticeRunner key={paperId} userId={userId} paperId={paperId} mode="list" title={back?.startsWith('/bookmarks')?'Saved question':'Question bank'} block={null} set={{count:set.count}} back={back} />;
   }
 
@@ -38,12 +40,19 @@ export default async function PracticePage({ searchParams }: PageProps<"/practic
     const timing = sp.timing === "on" || sp.timing === "off" ? sp.timing : "auto";
     const title = skillIds.length === 1 ? SKILL_BY_ID[skillIds[0]!]!.name : skillIds.length ? "Custom practice" : "Custom practice (focus skills)";
     const set = { skillIds, tags, count, timing } as const;
-    const paperId=createPaper(userId, {mode:"set", difficulty, ...set});
+    const paperId=await createPaper(userId, {mode:"set", difficulty, ...set});
     return <PracticeRunner key={paperId} userId={userId} paperId={paperId} mode="set" title={title} block={block} set={{count:set.count}} back={back} />;
   }
 
   const plain = difficulty === "mixed" ? undefined : difficulty;
   const title = mode === "review" ? (skillId ? `Review · ${SKILL_BY_ID[skillId]!.name}` : "Review") : skillId ? SKILL_BY_ID[skillId]!.name : "Smart practice";
-  const paperId=createPaper(userId, {mode,skillId,difficulty:plain});
+  const paperId=await createPaper(userId, {mode,skillId,difficulty:plain});
   return <PracticeRunner key={paperId} userId={userId} paperId={paperId} mode={mode} title={title} block={block} />;
+}
+
+export default async function PracticePage(props:PageProps<"/practice">) {
+  let content, message:string|undefined;
+  try { content=await loadPage(props); }
+  catch(e) { if(e instanceof DeliveryBlocked) message=e.message; else throw e; }
+  return message ? <DeliveryBlockedView message={message} /> : content;
 }

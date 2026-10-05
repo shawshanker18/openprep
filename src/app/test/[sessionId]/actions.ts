@@ -1,5 +1,7 @@
 "use server";
 
+import { DeliveryBlocked } from "@/server/delivery-policy";
+import { limitPractice } from "@/server/ratelimit";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -37,15 +39,18 @@ export async function answerDiagnostic(input: z.input<typeof Answer>) {
   const parsed = Answer.safeParse(input);
   if (!parsed.success) return { ok: false as const, error: "Invalid answer." };
   if (await lockedOut(userId, { sessionId: parsed.data.sessionId })) return { ok: false as const, error: LOCKED };
-  const questionId = await internalId(parsed.data.questionId);
+  const questionId = await internalId(parsed.data.questionId, userId);
   if (!questionId) return { ok: false as const, error: "That question was already answered. Reload to continue." };
-  return answer(userId, { ...parsed.data, questionId });
+  const limited=await limitPractice(userId,"answer",questionId);
+  if(limited) return {ok:false as const,error:limited};
+  try { return await answer(userId, { ...parsed.data, questionId }); } catch(e) { if(e instanceof DeliveryBlocked) return {ok:false as const,error:e.message}; throw e; }
 }
 
 export async function startModule(moduleId: string) {
   const { userId } = await requireUser();
   if (!z.uuid().safeParse(moduleId).success || (await lockedOut(userId, { moduleId }))) return false;
-  return start(userId, moduleId);
+  if(await limitPractice(userId,"request")) return false;
+  try { return await start(userId, moduleId); } catch(e) { if(e instanceof DeliveryBlocked) return false; throw e; }
 }
 
 const Save = z.object({
@@ -63,7 +68,8 @@ export async function saveResponse(input: z.input<typeof Save>) {
 export async function submitModule(moduleId: string) {
   const { userId } = await requireUser();
   if (!z.uuid().safeParse(moduleId).success || (await lockedOut(userId, { moduleId }))) return false;
-  return submit(userId, moduleId);
+  if(await limitPractice(userId,"request")) return false;
+  try { return await submit(userId, moduleId); } catch(e) { if(e instanceof DeliveryBlocked) return false; throw e; }
 }
 
 /** End a diagnostic early: answers so far are kept, the student carries on (as if skipped) and can retake it later. */
