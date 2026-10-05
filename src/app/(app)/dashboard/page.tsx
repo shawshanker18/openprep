@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { MasteryBar } from "@/components/mastery-bar";
-import { DiagnosticGate } from "@/components/diagnostic-gate";
+import { DiagnosticSuggestion } from "@/components/diagnostic-gate";
 import { diagnosticPending, getAuthUser, requireUser } from "@/server/auth";
 import { getDashboard } from "@/server/daily";
 import { getSkillSummary } from "@/server/analytics";
@@ -60,18 +60,19 @@ export default async function DashboardPage() {
   const [{ userId, profile }, user] = await Promise.all([requireUser(), getAuthUser()]);
   const first = user?.name?.split(" ")[0];
   const hello = <h1 className="text-2xl font-semibold">{greeting(profile.timezone)}{first ? `, ${first}` : ""}</h1>;
-  if (diagnosticPending(profile)) return <div className="flex flex-col gap-6">{hello}<DiagnosticGate /></div>;
   const [d, summary, home] = await Promise.all([getDashboard(userId, profile), getSkillSummary(userId), homeData(userId)]);
 
+  const hasEvidence = summary.skills.some((skill) => skill.n > 0);
+
   // The five numbers.
-  const ready = profile.targetScore ? readyBy({ estimate: d.estimate.total, target: profile.targetScore,
+  const ready = hasEvidence && profile.targetScore ? readyBy({ estimate: d.estimate.total, target: profile.targetScore,
     minutesPerDay: profile.minutesPerDay, daysPerWeek: profile.daysPerWeek, now: new Date() }) : null;
   const month = (dt: Date) => dt.toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: profile.timezone });
   const testDay = profile.testDate ? new Date(`${profile.testDate}T12:00:00Z`) : null;
-  const best = profile.targetScore ? bestTestDate(ready, new Date()) : null;
+  const best = hasEvidence && profile.targetScore ? bestTestDate(ready, new Date()) : null;
   const tooSoon = !!(best && !best.capped && testDay && testDay < best.date);
   const upcoming = testDay && d.daysLeft != null && d.daysLeft >= 0;
-  const predicted = upcoming ? predictedScore({ estimate: d.estimate.total, minutesPerDay: profile.minutesPerDay, daysPerWeek: profile.daysPerWeek, daysLeft: d.daysLeft! }) : null;
+  const predicted = hasEvidence && upcoming ? predictedScore({ estimate: d.estimate.total, minutesPerDay: profile.minutesPerDay, daysPerWeek: profile.daysPerWeek, daysLeft: d.daysLeft! }) : null;
 
   // Where you left off, most urgent first.
   const resume: { title: string; detail: string; href: string; action: string }[] = [];
@@ -100,13 +101,15 @@ export default async function DashboardPage() {
         <Button className="max-w-full whitespace-normal text-left" render={<Link href={primary.href} />}>{resume[0] ? `${primary.action}: ${resume[0].title}` : primary.action}</Button>
       </div>
 
+      {diagnosticPending(profile) && <DiagnosticSuggestion />}
+
       <div className="grid min-w-0 grid-cols-1 gap-3 min-[480px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5">
         <Stat label="Goal" value={profile.targetScore ?? "Set goal"} href={profile.targetScore ? undefined : "/settings#goal"} />
-        <Stat label="Current score" value={d.estimate.total} />
-        <Stat label="Predicted" value={predicted ?? "Add test date"} sub={predicted != null && "on test day"} href={predicted == null ? "/settings#goal" : undefined} />
-        <Stat label="Best time to take it" value={best ? month(best.date) : "Set goal"}
+        <Stat label="Estimated score" value={hasEvidence ? d.estimate.total : "Not measured yet"} />
+        <Stat label="Predicted" value={predicted ?? (hasEvidence ? "Add test date" : "Start practicing")} sub={predicted != null && "on test day"} href={predicted == null ? (hasEvidence ? "/settings#goal" : "/practice") : undefined} />
+        <Stat label="Best time to take it" value={best ? month(best.date) : hasEvidence ? "Set goal" : "Start practicing"}
           sub={best?.capped ? `add study time to reach ${profile.targetScore} by then` : tooSoon ? "after your test date" : undefined} warn={tooSoon || best?.capped}
-          href={!best || best.capped ? "/settings#goal" : undefined} />
+          href={!hasEvidence ? "/practice" : !best || best.capped ? "/settings#goal" : undefined} />
         <Stat label="Next SAT" value={upcoming ? formatDate(testDay!, "UTC") : "Add date"}
           sub={upcoming ? (d.daysLeft === 0 ? "today" : `in ${d.daysLeft} day${d.daysLeft === 1 ? "" : "s"}`) : testDay ? "your last date has passed" : undefined}
           href={upcoming ? undefined : "/settings#goal"} className="col-span-2 sm:col-span-1" />
@@ -136,7 +139,7 @@ export default async function DashboardPage() {
               const m = sectionMastery(sec);
               return (
                 <div key={sec} className="flex flex-col gap-1">
-                  <span className="flex justify-between"><span>{sec === "math" ? "Math" : "Reading and Writing"}</span><span className="tabular-nums text-muted-foreground">≈ {sec === "math" ? d.estimate.math : d.estimate.rw}</span></span>
+                  <span className="flex justify-between"><span>{sec === "math" ? "Math" : "Reading and Writing"}</span><span className="tabular-nums text-muted-foreground">{m == null ? "—" : `≈ ${sec === "math" ? d.estimate.math : d.estimate.rw}`}</span></span>
                   <MasteryBar pct={m ?? 0} measured={m != null} />
                   <span className="text-xs text-muted-foreground">{m == null ? "not measured yet" : `${m}% skill mastery`}</span>
                 </div>

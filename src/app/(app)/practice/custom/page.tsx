@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { DiagnosticGate } from "@/components/diagnostic-gate";
 import { SKILLS } from "@/content/taxonomy";
-import { diagnosticPending, requireUser } from "@/server/auth";
+import { requireUser } from "@/server/auth";
 import { skillsWithQuestions } from "@/server/plan";
 import { tagsBySkill } from "@/server/practice";
 import { SkillTagPicker } from "../skill-tag-picker";
@@ -13,8 +12,7 @@ const control = "h-9 rounded-md border bg-background px-2 text-sm";
 
 // A plain GET form: /practice?mode=set&… runs the set in PracticeRunner.
 export default async function CustomPracticePage() {
-  const { profile } = await requireUser();
-  if (diagnosticPending(profile)) return <DiagnosticGate />;
+  await requireUser();
   const [available, tags] = await Promise.all([skillsWithQuestions(), tagsBySkill()]);
   const skills = SKILLS.filter((s) => available.has(s.id));
 

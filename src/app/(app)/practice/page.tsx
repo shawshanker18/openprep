@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { SKILL_BY_ID } from "@/content/taxonomy";
-import { DiagnosticGate } from "@/components/diagnostic-gate";
-import { diagnosticPending, requireUser } from "@/server/auth";
+import { requireUser } from "@/server/auth";
 import { getTodayBlock } from "@/server/daily";
 import { createPaper } from "@/server/papers";
 import { PracticeRunner } from "./practice-runner";
@@ -18,7 +17,6 @@ export default async function PracticePage({ searchParams }: PageProps<"/practic
   if (skillId && !SKILL_BY_ID[skillId]) notFound();
   const mode = sp.mode === "review" ? "review" : sp.mode === "set" ? "set" : sp.mode === "list" ? "list" : skillId ? "skill" : "smart";
   const { userId, profile } = await requireUser();
-  if (diagnosticPending(profile)) return <DiagnosticGate />;
   const bi = Number(sp.block);
   const block = Number.isInteger(bi) && bi >= 0 ? await getTodayBlock(userId, profile, bi) : null;
 

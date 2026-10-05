@@ -2,9 +2,8 @@ import Link from "next/link";
 import { Bookmark, Check, Circle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Choice } from "@/components/ui/choice";
-import { DiagnosticGate } from "@/components/diagnostic-gate";
 import { DOMAINS, SKILLS, SKILL_BY_ID, type DomainId } from "@/content/taxonomy";
-import { diagnosticPending, requireUser } from "@/server/auth";
+import { requireUser } from "@/server/auth";
 import { questionBank, QUESTION_BANK_PAGE_SIZE, type BankFilters } from "@/server/practice";
 import { publicId } from "@/server/questions";
 import { cn } from "@/lib/utils";
@@ -25,8 +24,7 @@ function preview(md: string) {
 
 export default async function QuestionBankPage({ searchParams }: PageProps<"/question-bank">) {
   const sp = await searchParams;
-  const { userId, profile } = await requireUser();
-  if (diagnosticPending(profile)) return <DiagnosticGate />;
+  const { userId } = await requireUser();
 
   const section = one(sp.section) === "math" || one(sp.section) === "rw" ? one(sp.section) : "";
   const skill = SKILL_BY_ID[one(sp.skill)] ? one(sp.skill) : "";

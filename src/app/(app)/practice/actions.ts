@@ -6,7 +6,7 @@ import { text } from "@/lib/text";
 import { db } from "@/db";
 import { attempts, bookmarks, questionReports, questions } from "@/db/schema";
 import { MISTAKE_TYPES } from "@/engine/mistakes";
-import { diagnosticPending, requireUser } from "@/server/auth";
+import { requireUser } from "@/server/auth";
 import { nextQuestion as next, resumeQuestion, submitAnswer as submit, tooFast, wasGiven } from "@/server/practice";
 import { limitPractice, SLOW_DOWN } from "@/server/ratelimit";
 import { internalId, internalIds } from "@/server/questions";
@@ -17,7 +17,6 @@ const id = text().min(1).max(64);
 const Next = z.object({ paperId: z.string().max(12000), exclude: z.array(id).max(200), similarTo: id.optional(), resumeId:id.optional() });
 export async function nextQuestion(input: z.input<typeof Next>) {
   const { userId, profile } = await requireUser();
-  if (diagnosticPending(profile)) return { ok: false as const, error: "Take the diagnostic first." };
   const p = Next.safeParse(input);
   if (!p.success) return { ok: false as const, error: "Invalid request." };
   const limited = await limitPractice(userId, "request");
@@ -48,8 +47,7 @@ const Submit = z.object({
   confidence: z.union([z.literal(1), z.literal(2), z.literal(3)]),
 });
 export async function submitAnswer(input: z.input<typeof Submit>) {
-  const { userId, profile } = await requireUser();
-  if (diagnosticPending(profile)) return { ok: false as const, error: "Take the diagnostic first." };
+  const { userId } = await requireUser();
   const p = Submit.safeParse(input);
   if (!p.success) return { ok: false as const, error: "Invalid answer." };
   const questionId = await internalId(p.data.questionId);

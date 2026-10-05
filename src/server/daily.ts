@@ -4,7 +4,7 @@ import "server-only";
 import { cache } from "react";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { and, count, desc, eq, gte, inArray, like, lt, sql } from "drizzle-orm";
+import { and, count, desc, eq, gte, inArray, like, lt, min, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { attempts, dailyPlans, lessonProgress, scoreSnapshots, skillState, testSessions, type Profile } from "@/db/schema";
 import { SKILL_BY_ID } from "@/content/taxonomy";
@@ -36,17 +36,19 @@ export async function nextDesmosLesson(userId: string): Promise<string | null> {
   return slugs.find((s) => !opened.some((o) => o.skillId === `desmos:${s}`)) ?? null;
 }
 
-/** A full mock is due 14 days after the last one (7 inside the final 4 weeks), or a week after the diagnostic. */
+/** A full mock is due 14 days after the last one (7 near the test), or a week after the first practice/diagnostic. */
 export async function isMockDue(userId: string, daysLeft: number | null, now = new Date()) {
-  const [[lastMock], [diag]] = await Promise.all([
+  const [[lastMock], [diag], [practice]] = await Promise.all([
     db.select().from(testSessions).where(and(eq(testSessions.userId, userId), eq(testSessions.kind, "full"), eq(testSessions.status, "completed")))
       .orderBy(desc(testSessions.completedAt)).limit(1),
     db.select().from(testSessions).where(and(eq(testSessions.userId, userId), eq(testSessions.kind, "diagnostic"), eq(testSessions.status, "completed"))).limit(1),
+    db.select({ at: min(attempts.createdAt) }).from(attempts).where(and(eq(attempts.userId, userId), inArray(attempts.context, ["practice", "review"]))),
   ]);
   const mockGap = daysLeft != null && daysLeft <= 28 ? 7 : 14;
+  const firstStudy = [diag?.completedAt, practice?.at].filter((date) => date != null).map((date) => new Date(date!).getTime());
   const due = lastMock?.completedAt
     ? now.getTime() - lastMock.completedAt.getTime() >= mockGap * DAY
-    : !!diag?.completedAt && now.getTime() - diag.completedAt.getTime() >= 7 * DAY;
+    : firstStudy.length > 0 && now.getTime() - Math.min(...firstStudy) >= 7 * DAY;
   return { due, lastMock };
 }
 
