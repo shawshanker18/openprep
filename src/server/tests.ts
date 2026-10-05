@@ -352,8 +352,8 @@ export async function runningTestQuestionIds(userId: string) {
 }
 
 /** Is any of this question's test sessions still running for this user? (No AI help during tests.) */
-export async function inRunningTest(userId: string, questionId: string) {
-  const [r] = await db.select({ id: testSessions.id }).from(testItems)
+export async function inRunningTest(userId: string, questionId: string, database: typeof db | Tx = db) {
+  const [r] = await database.select({ id: testSessions.id }).from(testItems)
     .innerJoin(testModules, eq(testModules.id, testItems.moduleId))
     .innerJoin(testSessions, eq(testSessions.id, testModules.sessionId))
     .where(and(eq(testItems.questionId, questionId), eq(testSessions.userId, userId), eq(testSessions.status, "in_progress"))).limit(1);

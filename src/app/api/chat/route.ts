@@ -1,4 +1,6 @@
 // AI tutor endpoint (spec 04 §8.3). Plain-text streaming; the client reads it with fetch.
+import { readJsonBody, InvalidBody } from "@/server/request-body";
+import { limitPractice } from "@/server/ratelimit";
 import { after } from "next/server";
 import { streamText } from "ai";
 import { z } from "zod";
@@ -11,7 +13,7 @@ import { internalId } from "@/server/questions";
 import { profiles } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
-const Body = z.object({
+const Body = z.strictObject({
   questionId: safeText().min(1).max(64),
   mode: z.enum(MODES),
   choice: z.enum(["A", "B", "C", "D"]).optional(),
@@ -28,7 +30,12 @@ export function GET() {
 export async function POST(req: Request) {
   const userId = await getUserId();
   if (!userId) return text("Please sign in.", 401);
-  const p = Body.safeParse(await req.json().catch(() => null));
+  if(req.headers.get("origin")!==new URL(req.url).origin) return text("Invalid request.",403);
+  if(await limitPractice(userId,"request")) return text("Please try again shortly.",429);
+  let body:unknown;
+  try {body=await readJsonBody(req,128*1024);}
+  catch(e) {return text(e instanceof InvalidBody?e.message:"Invalid request.",e instanceof InvalidBody?e.status:400);}
+  const p = Body.safeParse(body);
   if (!p.success) return text("Invalid request.", 400);
   const { questionId, mode, choice, messages } = p.data;
   const lastUser = messages.findLast((m) => m.role === "user");

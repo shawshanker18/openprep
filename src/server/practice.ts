@@ -2,7 +2,7 @@
 import "server-only";
 import { memo } from "@/lib/memo";
 import { and, asc, count, desc, eq, gte, inArray, isNotNull, lte, sql } from "drizzle-orm";
-import { db } from "@/db";
+import { db, type Tx } from "@/db";
 import { attempts, bookmarks, questionExposures, questionServes, questions, reviewItems, skillState, type Profile, type Question } from "@/db/schema";
 import { SKILL_BY_ID } from "@/content/taxonomy";
 import { TARGET_SECONDS, type Difficulty } from "@/engine/constants";
@@ -69,21 +69,22 @@ async function pickInSkill(userId: string, skillId: string, exclude: string[], n
 }
 
 /** Per-question countdown for a set: SAT pace when on; when auto, only for skills that are strong but slow. */
-async function timeLimitFor(userId: string, q: Question, timing: Timing | undefined): Promise<number | null> {
+export async function timeLimitFor(userId: string, q: Question, timing: Timing | undefined, database: typeof db | Tx = db): Promise<number | null> {
   const sec = q.section as "rw" | "math";
   if (timing === "on") return TARGET_SECONDS[sec];
   if (timing !== "auto") return null;
-  const [st] = await db.select().from(skillState).where(and(eq(skillState.userId, userId), eq(skillState.skillId, q.skillId)));
+  const [st] = await database.select().from(skillState).where(and(eq(skillState.userId, userId), eq(skillState.skillId, q.skillId)));
   if (!st?.n) return null;
   const strong = ["strong", "mastered"].includes(status(st.theta, true));
   return strong && pace(st.totalTimeMs / st.n, sec) === "slow" ? TARGET_SECONDS[sec] : null;
 }
 
-export async function nextQuestion(userId: string, profile: Profile, input: {
+export type PracticeSelection = {
   mode: PracticeMode; skillId?: string; exclude: string[]; difficulty?: SetDifficulty; ids?: string[];
   skillIds?: string[]; tags?: string[]; timing?: Timing;
   context?: DeliveryContext; exploratory?: boolean; paper?: { nonce: string; count: number };
-}) {
+};
+export async function selectPracticeQuestion(userId: string, profile: Profile, input: PracticeSelection) {
   const now = new Date();
   // Never serve a question from one of the student's unfinished tests: it couldn't be answered here (that would
   // reveal a live test question's answer), so practice would be stuck on it.
@@ -132,6 +133,11 @@ export async function nextQuestion(userId: string, profile: Profile, input: {
       }
     }
   }
+  return q;
+}
+export async function nextQuestion(userId: string, profile: Profile, input: PracticeSelection) {
+  const now=new Date();
+  const q=await selectPracticeQuestion(userId,profile,input);
   if (!q) return null;
   await servePractice(userId, q, input.context ?? await deliveryContext(), input.paper);
   const timeLimitS = input.mode === "set" ? await timeLimitFor(userId, q, input.timing) : null;
@@ -173,21 +179,23 @@ export async function resumeQuestion(userId:string,questionId:string,timing:Timi
 
 export async function submitAnswer(userId: string, input: {
   questionId: string; response: string | null; timeMs: number; confidence: 1 | 2 | 3;
-}) {
+}, transaction?: Tx, session?: { id: string; servedAt: Date }) {
+  const database=transaction??db;
   const [[q], live, [served]] = await Promise.all([
-    db.select().from(questions).where(eq(questions.id, input.questionId)),
-    inRunningTest(userId, input.questionId), // practice would reveal the answer to a question in a live test
-    db.select({ at: questionServes.servedAt }).from(questionServes)
+    database.select().from(questions).where(eq(questions.id, input.questionId)),
+    inRunningTest(userId, input.questionId, database), // practice would reveal the answer to a question in a live test
+    database.select({ at: questionServes.servedAt }).from(questionServes)
       .where(and(eq(questionServes.userId, userId), eq(questionServes.questionId, input.questionId))),
   ]);
   // One answer per serve: the question must have been handed to this student and not answered since. No answering
   // questions you weren't given, and no trying A, then B, then C on the same serve.
   if (!q || live || !served || q.status !== "active") return null;
   const timeMs = serverCappedTime(input.timeMs, served?.at ?? null, new Date());
-  return db.transaction(async (tx) => {
+  const run = async (tx: Tx) => {
     const [currentServe]=await tx.select().from(questionServes)
       .where(and(eq(questionServes.userId,userId),eq(questionServes.questionId,q.id))).for('update');
     const [last]=await tx.select().from(attempts).where(and(eq(attempts.userId,userId),eq(attempts.questionId,q.id))).orderBy(desc(attempts.createdAt)).limit(1);
+    if (session && currentServe?.servedAt.getTime() !== session.servedAt.getTime()) return null;
     if(!currentServe || last && last.createdAt>=currentServe.servedAt) {
       if(last && last.response===input.response) return {correct:last.correct,attemptId:last.id,revealed:toRevealed(q, userId),masteryBefore:masteryPct(last.thetaBefore),masteryAfter:masteryPct(last.thetaAfter),mistakeGuess:last.mistakeType,skillName:SKILL_BY_ID[q.skillId]?.name??q.skillId};
       return null;
@@ -199,14 +207,15 @@ export async function submitAnswer(userId: string, input: {
       .where(and(eq(reviewItems.userId, userId), eq(reviewItems.questionId, q.id)));
     const r = await recordAttempt(tx, userId, q, {
       response: input.response, timeMs, confidence: input.confidence,
-      context: queued ? "review" : "practice", now: new Date(),
+      context: queued ? "review" : "practice", sessionId: session?.id, now: new Date(),
     });
     return {
       correct: r.correct, attemptId: r.attemptId, revealed: toRevealed(q, userId),
       masteryBefore: masteryPct(r.thetaBefore), masteryAfter: masteryPct(r.thetaAfter),
       mistakeGuess: r.mistakeType, skillName: SKILL_BY_ID[q.skillId]?.name ?? q.skillId,
     };
-  });
+  };
+  return transaction ? run(transaction) : db.transaction(run);
 }
 
 /** Active question tags per skill (the sub-skills), for pickers and the skill page. */

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useReducer, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Bookmark } from "lucide-react";
@@ -13,9 +14,11 @@ import { FocusToggle } from "@/components/focus-toggle";
 import { MISTAKE_LABEL, MISTAKE_TYPES, type MistakeType } from "@/engine/mistakes";
 import { cn, isTyping } from "@/lib/utils";
 import type { PublicQuestion, RevealedQuestion } from "@/server/questions";
-import { nextQuestion, setMistakeType, submitAnswer, toggleBookmark } from "./actions";
+import { setMistakeType, toggleBookmark } from "./actions";
 import { ReportQuestion } from "./report-question";
-import { readDraft, writeDraft, readPracticeProgress, writePracticeProgress } from "@/lib/answer-drafts";
+import { readDraft, writeDraft } from "@/lib/answer-drafts";
+
+import { loadSavedPractice, saveSavedPractice, answerSavedPractice } from "./session-actions";
 
 type Mode = "skill" | "smart" | "review" | "set" | "list";
 type SetConfig = { count: number };
@@ -33,6 +36,7 @@ type State =
   | ({ phase: "answering"; q: PublicQuestion; value: string | null; limitS: number | null } & Base)
   | ({ phase: "revealed"; q: PublicQuestion; value: string | null; limitS: number | null; r: Result; mistake: string | null } & Base);
 type Action =
+  | { type: "hydrate"; state:State }
   | { type: "restore"; progress:Base }
   | { type: "loaded"; q: PublicQuestion; limitS: number | null; value?:string|null } | { type: "done" } | { type: "select"; value: string | null }
   | { type: "revealed"; r: Result; timeMs: number } | { type: "mistake"; m: string } | { type: "next" } | { type: "failed"; error: string };
@@ -40,6 +44,7 @@ type Action =
 const base = (s: State): Base => ({ seen: s.seen, answered: s.answered, correct: s.correct, ms: s.ms });
 function reducer(s: State, a: Action): State {
   switch (a.type) {
+    case "hydrate": return a.state;
     case "restore": return { ...a.progress, phase:"loading" };
     case "loaded": return { ...base(s), phase: "answering", seen: s.seen.includes(a.q.id)?s.seen:[...s.seen, a.q.id], q: a.q, value: a.value??null, limitS: a.limitS };
     case "done": return { ...base(s), phase: "done" };
@@ -54,23 +59,26 @@ function reducer(s: State, a: Action): State {
   }
 }
 
-const elapsedMs = (since: number, hidden: number) => Math.round(performance.now() - since - hidden);
+const elapsedMs = (since: number, hidden: number, pausedAt:number|null=null) => {
+  const now=performance.now();
+  return Math.round(now-since-hidden-(pausedAt===null?0:now-pausedAt));
+};
 const CONFIDENCE = [{ v: 1, label: "Guessed" }, { v: 2, label: "Unsure" }, { v: 3, label: "Sure" }] as const;
 const clock = (sec: number) => `${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, "0")}`;
 
 /** Per-question countdown at SAT pace. Runs into overtime rather than cutting the student off. */
-function Countdown({ limitS }: { limitS: number }) {
-  const [left, setLeft] = useState(limitS);
+function Countdown({ limitS, elapsedS = 0 }: { limitS: number; elapsedS?:number }) {
+  const [left, setLeft] = useState(limitS-elapsedS);
   useEffect(() => {
     const t0 = performance.now();
-    const id = setInterval(() => setLeft(limitS - (performance.now() - t0) / 1000), 1000);
+    const id = setInterval(() => setLeft(limitS - elapsedS - (performance.now() - t0) / 1000), 1000);
     return () => clearInterval(id);
-  }, [limitS]);
+  }, [limitS,elapsedS]);
   return <span className={cn("tabular-nums", left <= 0 && "text-red-700")}>{left > 0 ? clock(left) : `Time's up +${clock(-left)}`}</span>;
 }
 
-export function PracticeRunner({ paperId, userId, mode, title, block, set, back }: {
-  paperId: string; userId: string; mode: Mode; title: string; block?: { index: number; target: number } | null;
+export function PracticeRunner({ sessionId, userId, mode, title, block, set, back }: {
+  sessionId: string; userId: string; mode: Mode; title: string; block?: { index: number; target: number } | null;
   set?: SetConfig; back?: string;
 }) {
   const [s, dispatch] = useReducer(reducer, { phase: "restoring", seen: [], answered: 0, correct: 0, ms: 0 });
@@ -87,45 +95,62 @@ export function PracticeRunner({ paperId, userId, mode, title, block, set, back 
   const hiddenSince = useRef<number | null>(null);
   const similarTo = useRef<string | null>(null); // skill of a just-missed question → next pick is a similar one
   const [bookmarked, setBookmarked] = useState(false); // the current question's, from the server
-  const restored = useRef<{id:string;response:string|null}|null>(null);
-  const draftKey = useRef('');
-  useEffect(()=>{
-    draftKey.current=`openprep:practice:${userId}:${window.location.pathname}${window.location.search}`;
-    restored.current=readDraft(draftKey.current)[0]??null;
-    dispatch({type:"restore",progress:readPracticeProgress(draftKey.current)});
-  },[userId]);
+  const router = useRouter();
+  const [position,setPosition] = useState(0);
+  const [positions,setPositions] = useState<{position:number;attempted:boolean}[]>([]);
+  const [saveStatus,setSaveStatus] = useState("Saved to your account");
+  const carriedMs = useRef(0);
+  const [savedTimeMs,setSavedTimeMs] = useState(0);
+  const draftKey = `openprep:practice:${userId}:${sessionId}`;
+  const load = useCallback(async (kind:"resume"|"next"|"jump"="resume",at?:number) => {
+    const sim=similarTo.current;similarTo.current=null;
+    const res=await loadSavedPractice({sessionId,kind,position:at,similar:!!sim})
+      .catch(()=>({ok:false as const,error:"Couldn't load your session. Check your connection and try again."}));
+    if(!res.ok) {dispatch({type:"failed",error:res.error});return;}
+    const data=res.data;
+    setPosition(data.position);setPositions(data.items);
+    const progress={seen:[],answered:data.answered,correct:data.correct,ms:data.ms};
+    if(data.done) {dispatch({type:"hydrate",state:{phase:"done",...progress}});return;}
+    const local=readDraft(draftKey).find(d=>d.id===data.question.id);
+    const value=data.result?data.response:local?.response??data.response;
+    setSaveStatus(data.result || value===data.response?"Saved to your account":"Saving…");
+    const common={...progress,q:data.question,value,limitS:data.timeLimitS};
+    dispatch({type:"hydrate",state:data.result?{...common,phase:"revealed",r:data.result,mistake:data.result.mistakeGuess}:{...common,phase:"answering"}});
+    setBookmarked(data.bookmarked);carriedMs.current=data.timeMs;setSavedTimeMs(data.timeMs);
+    shownAt.current=performance.now();hiddenMs.current=0;hiddenSince.current=null;
+  },[sessionId,draftKey]);
+  useEffect(()=>{start(async()=>{await load();});},[load]);
 
-  const load = useCallback((exclude: string[]) => start(async () => {
-    const sim = similarTo.current;
-    similarTo.current = null;
-    const draft=restored.current;restored.current=null;
-    const res = await nextQuestion({ paperId, exclude, similarTo: sim ?? undefined, resumeId:draft?.id })
-      .catch(() => ({ ok: false as const, error: "Couldn't load the next question. Check your connection and try again." }));
-    if (!res.ok) { restored.current=draft; dispatch({ type: "failed", error: res.error }); return; }
-    if ("done" in res.data) dispatch({ type: "done" });
-    else {
-      dispatch({ type: "loaded", q: res.data.question, limitS: res.data.timeLimitS, value:res.data.question.id===draft?.id?draft.response:null });
-      setBookmarked(res.data.bookmarked);
-      shownAt.current = performance.now(); hiddenMs.current = 0;
+  const save = useCallback(async () => {
+    if(s.phase!=="answering") return true;
+    setSaveStatus("Saving…");
+    const res=await saveSavedPractice({sessionId,position,response:s.value,timeMs:Math.min(86400_000,carriedMs.current+elapsedMs(shownAt.current,hiddenMs.current,hiddenSince.current))})
+      .catch(()=>({ok:false as const,error:"Couldn't save. Your answer is kept on this device; try again."}));
+    if(res.ok) {
+      const local=readDraft(draftKey)[0];
+      if(local?.id===s.q.id && local.response===s.value) writeDraft(draftKey,[]);
     }
-  }), [paperId]);
-  // A set stops after `count` answers.
-  const next = useCallback(() => dispatch({ type: set && s.answered >= set.count ? "done" : "next" }), [set, s.answered]);
-
-  // Only the most recent 200 (the server's limit): a very long session keeps going instead of failing at question 201.
-  useEffect(() => { if (s.phase === "loading") { if(set && s.answered>=set.count) dispatch({type:"done"}); else load(s.seen.slice(-200)); } }, [s.phase, s.seen, s.answered, set, load]);
+    setSaveStatus(res.ok?"Saved to your account":"Not saved online — retry before leaving");
+    return res.ok;
+  },[sessionId,position,s,draftKey]);
   useEffect(()=>{
-    if(!draftKey.current) return;
-    if(s.phase==='answering') writeDraft(draftKey.current,[{id:s.q.id,position:0,response:s.value,flagged:false,timeMs:0}]);
-    if(s.phase==='revealed' || s.phase==='done') writeDraft(draftKey.current,[]);
-    if(s.phase==='answering' || s.phase==='revealed') writePracticeProgress(draftKey.current,base(s));
-    if(s.phase==='done') writePracticeProgress(draftKey.current,null);
-  },[s]);
+    if(s.phase!=="answering") return;
+    writeDraft(draftKey,[{id:s.q.id,position,response:s.value,flagged:false,timeMs:0}]);
+    const timer=setTimeout(()=>{void save();},800);
+    const interval=setInterval(()=>{if(!document.hidden) void save();},10000);
+    return ()=>{clearTimeout(timer);clearInterval(interval);};
+  },[s,position,draftKey,save]);
+  useEffect(()=>{if(s.phase==="revealed") writeDraft(draftKey,[]);},[s.phase,draftKey]);
+  const navigate = useCallback((kind:"next"|"jump",at:number) => start(async()=>{
+    if(!(await save())) {toast.error("Save failed. Check your connection and try again.");return;}
+    await load(kind,at);
+  }),[save,load]);
+  const next = useCallback(()=>navigate("next",position),[navigate,position]);
   useEffect(()=>{
-    const leave=(event:BeforeUnloadEvent)=>{if(s.phase==='answering' && s.value!==null){event.preventDefault();event.returnValue='';}};
-    window.addEventListener('beforeunload',leave);
-    return ()=>window.removeEventListener('beforeunload',leave);
-  },[s]);
+    const leave=(event:BeforeUnloadEvent)=>{if(s.phase==="answering" && saveStatus!=="Saved to your account"){event.preventDefault();event.returnValue="";}};
+    window.addEventListener("beforeunload",leave);
+    return ()=>window.removeEventListener("beforeunload",leave);
+  },[s.phase,saveStatus]);
 
   // Today's plan block is done once enough questions are answered (the server counts them; this just says so).
   useEffect(() => {
@@ -144,12 +169,12 @@ export function PracticeRunner({ paperId, userId, mode, title, block, set, back 
 
   const submit = (confidence: 1 | 2 | 3) => {
     if (pending || s.phase !== "answering" || s.value === null) return;
-    const timeMs = elapsedMs(shownAt.current, hiddenMs.current);
+    const timeMs = Math.min(86400_000,carriedMs.current + elapsedMs(shownAt.current, hiddenMs.current,hiddenSince.current));
     start(async () => {
-      const res = await submitAnswer({ questionId: s.q.id, response: s.value, timeMs, confidence })
+      const res = await answerSavedPractice({ sessionId, position, response: s.value, timeMs, confidence })
         .catch(() => ({ ok: false as const, error: "Couldn't submit your answer. Your selection is still here. Check your connection and try again." }));
       if (!res.ok) toast.error(res.error);
-      else dispatch({ type: "revealed", r: res.data, timeMs });
+      else { writeDraft(draftKey,[]); await load(); }
     });
   };
 
@@ -159,7 +184,7 @@ export function PracticeRunner({ paperId, userId, mode, title, block, set, back 
       if (pending || isTyping(e) || e.metaKey || e.ctrlKey) return;
       if (s.phase === "answering" && !!s.q.choices?.length) {
         const i = "1234".indexOf(e.key) >= 0 ? "1234".indexOf(e.key) : "abcd".indexOf(e.key.toLowerCase());
-        if (i >= 0) dispatch({ type: "select", value: "ABCD"[i]! });
+        if (i >= 0) {setSaveStatus("Saving…");dispatch({ type: "select", value: "ABCD"[i]! });}
       }
       if (s.phase === "revealed" && e.key === "Enter") next();
     };
@@ -172,7 +197,8 @@ export function PracticeRunner({ paperId, userId, mode, title, block, set, back 
     return (
       <div className="flex flex-col items-start gap-3">
         <p role="alert" className="text-sm">{s.error}</p>
-        <Button variant="outline" onClick={() => dispatch({ type: "next" })}>Try again</Button>
+        <Button variant="outline" onClick={() => start(async()=>{await load();})}>Try again</Button>
+        <Link href="/practice/sessions" className="text-sm underline">Saved sessions</Link>
       </div>
     );
   }
@@ -183,7 +209,10 @@ export function PracticeRunner({ paperId, userId, mode, title, block, set, back 
         <p className="text-muted-foreground tabular-nums">
           {s.answered > 0 ? `${s.correct}/${s.answered} correct · average ${Math.round(s.ms / s.answered / 1000)}s per question.` : "Try other skills or sub-topics."}
         </p>
+        <QuestionPositions positions={positions} current={position} pending={pending} onJump={at=>navigate("jump",at)} />
+        <p className="text-sm text-muted-foreground">{positions.filter(p=>!p.attempted).length} reached questions are still unattempted. You can return to them above.</p>
         <div className="flex flex-wrap gap-2">
+          <Button variant="outline" render={<Link href="/practice/sessions" />}>Saved sessions</Button>
           {back ? <Button render={<Link href={back} />}>{back.startsWith("/question-bank") ? "Back to the question bank" : back.startsWith('/bookmarks')?'Back to saved questions':"Back to the course"}</Button> : <Button render={<Link href="/practice/custom" />}>New custom set</Button>}
           <Button variant="outline" render={<Link href="/dashboard" />}>Back to dashboard</Button>
         </div>
@@ -211,6 +240,11 @@ export function PracticeRunner({ paperId, userId, mode, title, block, set, back 
 
   return (
     <div className="flex flex-col gap-6">
+      <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
+        <span role="status">{saveStatus}</span>
+        <Button variant="outline" disabled={pending} onClick={()=>start(async()=>{if(await save()) router.push("/practice/sessions");else toast.error("Couldn't save. Please try again.");})}>Save and leave</Button>
+      </div>
+      <QuestionPositions positions={positions} current={position} pending={pending} onJump={at=>navigate("jump",at)} />
       <div className="flex items-center justify-between gap-2 text-sm text-muted-foreground">
         <span>
           {title} · {set ? `${s.answered}/${set.count}` : s.answered} answered{block && s.answered < block.target && ` · ${block.target - s.answered} to finish this block`}
@@ -218,7 +252,7 @@ export function PracticeRunner({ paperId, userId, mode, title, block, set, back 
         </span>
         <div className="flex items-center gap-1">
           <FocusToggle />
-          {s.phase === "answering" && s.limitS && <Countdown key={s.q.id} limitS={s.limitS} />}
+          {s.phase === "answering" && s.limitS && <Countdown key={s.q.id} limitS={s.limitS} elapsedS={savedTimeMs/1000} />}
           <Button variant="ghost" size="sm" aria-label="Bookmark" aria-pressed={bookmarked} onClick={async () => {
             const res = await toggleBookmark({ questionId: s.q.id })
               .catch(() => ({ ok: false as const, error: "Couldn't save the bookmark. Check your connection and try again." }));
@@ -231,7 +265,7 @@ export function PracticeRunner({ paperId, userId, mode, title, block, set, back 
       </div>
 
       <QuestionView key={s.q.id} question={s.q} value={s.value} disabled={s.phase === "revealed" || pending}
-        onChange={(v) => dispatch({ type: "select", value: v })} correct={correctChoice} />
+        onChange={(v) => {setSaveStatus("Saving…");dispatch({ type: "select", value: v });}} correct={correctChoice} />
 
       {s.phase === "answering" && (
         <div ref={confidenceRef} className="flex flex-col gap-2">
@@ -239,6 +273,7 @@ export function PracticeRunner({ paperId, userId, mode, title, block, set, back 
             <TutorPanel key={s.q.id} questionId={s.q.id} answered={false} />
             {true && <DesmosToggle className="h-64" />}
           </div>
+          <Button variant="outline" className="self-start" disabled={pending} onClick={next}>Skip for now</Button>
           <span className="text-sm text-muted-foreground">How sure are you? (this submits your answer)</span>
           <div className="flex flex-wrap gap-2">
             {CONFIDENCE.map((c) => (
@@ -310,4 +345,14 @@ function Explanation({ q }: { q: RevealedQuestion }) {
       {cur.id === "desmos" && q.desmos && <DesmosCalculator expressions={q.desmos.expressions} className="h-72" />}
     </div>
   );
+}
+
+function QuestionPositions({positions,current,pending,onJump}:{positions:{position:number;attempted:boolean}[];current:number;pending:boolean;onJump:(at:number)=>void}) {
+  return <nav aria-label="Session questions" className="flex flex-wrap gap-2">
+    {positions.map(p=><button key={p.position} type="button" disabled={pending} aria-current={p.position===current?"step":undefined}
+      onClick={()=>onJump(p.position)} className={cn("rounded-md border px-2 py-1 text-sm",p.position===current&&"bg-muted font-semibold")}
+      aria-label={`Question ${p.position+1}, ${p.attempted?"attempted":"unattempted"}`}>
+      {p.position+1} {p.attempted?"✓":"○"}
+    </button>)}
+  </nav>;
 }
