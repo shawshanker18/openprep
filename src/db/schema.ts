@@ -283,6 +283,24 @@ export const aiCache = pgTable("ai_cache", {
 });
 
 export type Question = typeof questions.$inferSelect;
+/** Private first-exposure ledger; also supplies cross-account monitoring. Never exposed through the Data API. */
+export const questionExposures = pgTable("question_exposures", {
+  userId: userRef(),
+  questionId: text("question_id").notNull().references(() => questions.id),
+  skillId: text("skill_id").notNull(),
+  ipHash: text("ip_hash"), deviceHash: text("device_hash"),
+  firstAt: ts("first_at").notNull().defaultNow(),
+}, (t) => [primaryKey({ columns: [t.userId, t.questionId] }),
+  index("exposure_user_time").on(t.userId, t.firstAt), index("exposure_skill_time").on(t.userId, t.skillId, t.firstAt),
+  index("exposure_ip_time").on(t.ipHash, t.firstAt), index("exposure_device_time").on(t.deviceHash, t.firstAt),
+  index("exposure_question_time").on(t.questionId, t.firstAt)]);
+
+export const deliveryGuards = pgTable("delivery_guards", { id: text("id").primaryKey(), expiresAt: ts("expires_at").notNull().defaultNow() });
+/** Bounded rolling request/event windows, shared across all app instances and Redis outages. */
+export const deliveryWindows = pgTable("delivery_windows", {
+  id: text("id").primaryKey(), times: jsonb("times").$type<number[]>().notNull().default([]),
+  expiresAt: ts("expires_at").notNull(),
+});
 export type Profile = typeof profiles.$inferSelect;
 export type SkillStateRow = typeof skillState.$inferSelect;
 export { r2Files } from "./storage-schema";

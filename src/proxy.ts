@@ -3,8 +3,12 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { SESSION_COOKIE_OPTIONS } from "@/lib/supabase/cookies";
 import { anonymousLimited } from "@/server/ratelimit";
+import { DEVICE_COOKIE, issueDevice, verifyDevice, trustedIp } from "@/server/delivery-identity";
 
 export async function proxy(request: NextRequest) {
+  let device = request.cookies.get(DEVICE_COOKIE)?.value;
+  const newDevice = !verifyDevice(device);
+  if (newDevice) { device = issueDevice(); request.cookies.set(DEVICE_COOKIE, device); }
   let response = NextResponse.next({ request });
   const supabase = createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
     cookieOptions: SESSION_COOKIE_OPTIONS,
@@ -18,8 +22,9 @@ export async function proxy(request: NextRequest) {
     },
   });
   const { data: { user } } = await supabase.auth.getUser(); // verifies the session and refreshes it if needed
+  if (newDevice) response.cookies.set(DEVICE_COOKIE, device!, { httpOnly:true, secure:process.env.NODE_ENV === "production", sameSite:"lax", path:"/", maxAge:365*86_400 });
   // Signed-out writes (server actions, forms) are capped per IP before any of our code runs.
-  const ip = (request.headers.get("x-forwarded-for")?.split(",")[0] ?? "").trim() || "unknown";
+  const ip = trustedIp(request.headers) ?? "unknown-network";
   if (!user && request.method === "POST" && (await anonymousLimited(ip)))
     return new NextResponse("Too many requests.", { status: 429, headers: { "Retry-After": "60" } });
   // Only the landing and sign-in pages may appear in search results; nothing inside the app or its API.

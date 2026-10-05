@@ -1,9 +1,9 @@
 // Practice: which question next, and submitting an answer (spec 04 §3).
 import "server-only";
 import { memo } from "@/lib/memo";
-import { and, asc, count, desc, eq, gte, inArray, isNotNull, isNull, lte, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, gte, inArray, isNotNull, lte, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { attempts, bookmarks, questionServes, questions, reviewItems, skillState, type Profile, type Question } from "@/db/schema";
+import { attempts, bookmarks, questionExposures, questionServes, questions, reviewItems, skillState, type Profile, type Question } from "@/db/schema";
 import { SKILL_BY_ID } from "@/content/taxonomy";
 import { TARGET_SECONDS, type Difficulty } from "@/engine/constants";
 import { masteryPct, pace, status } from "@/engine/mastery";
@@ -11,6 +11,9 @@ import { pickQuestion, targetDifficulty } from "@/engine/select";
 import { recordAttempt } from "./attempts";
 import { ensureWeeklyFocus, skillsByPriority } from "./plan";
 import { toPublic, toRevealed } from "./questions";
+import { servePractice } from "./delivery";
+import { deliveryContext, type DeliveryContext } from "./delivery-context";
+import { DELIVERY_POLICY, DeliveryBlocked } from "./delivery-policy";
 import { inRunningTest, runningTestQuestionIds, serverCappedTime } from "./tests";
 
 export type PracticeMode = "skill" | "smart" | "review" | "set" | "list";
@@ -32,7 +35,7 @@ export async function countDueReviews(userId: string, now = new Date()) {
 }
 
 /** Pick a question in one skill: similar-question after a miss, else adaptive difficulty. `tags` (if any) is a strict filter. */
-async function pickInSkill(userId: string, skillId: string, exclude: string[], now: Date, forced?: Difficulty, tags: string[] = []): Promise<Question | null> {
+async function pickInSkill(userId: string, skillId: string, exclude: string[], now: Date, forced?: Difficulty, tags: string[] = [], exploratory = false): Promise<Question | null> {
   // Only the fields selection needs; the full text is fetched for the one question picked.
   const slim = { id: questions.id, difficulty: questions.difficulty, tags: questions.tags };
   const [pool, seen, queued, [state], [last]] = await Promise.all([
@@ -57,7 +60,9 @@ async function pickInSkill(userId: string, skillId: string, exclude: string[], n
   // Missed the previous question in this session → one similar question (same difficulty, shared tag).
   const missedJustNow = last && !last.correct && exclude.includes(last.q.id);
   const want = forced ?? (missedJustNow ? (last.q.difficulty as Difficulty) : targetDifficulty(state?.theta ?? 0, Math.random));
-  const pick = pickQuestion(candidates, want, now, Math.random, missedJustNow ? last.q.tags : []);
+  const nearest=candidates.filter(c=>c.difficulty===want);
+  const broad=nearest.length>=8 ? nearest : candidates;
+  const pick = exploratory ? broad[Math.floor(Math.random()*broad.length)] : pickQuestion(candidates, want, now, Math.random, missedJustNow ? last.q.tags : []);
   if (!pick) return null;
   const [q] = await db.select().from(questions).where(eq(questions.id, pick.id));
   return q ?? null;
@@ -74,21 +79,10 @@ async function timeLimitFor(userId: string, q: Question, timing: Timing | undefi
   return strong && pace(st.totalTimeMs / st.n, sec) === "slow" ? TARGET_SECONDS[sec] : null;
 }
 
-/**
- * Anti-scraping speed limit, not a quota: students can do as many questions as they like, but no more than this
- * many new ones in any minute (2 seconds each, faster than anyone can read and answer). A script pulling the bank
- * hits it at once. (questionServes keeps one row per question, so this counts distinct questions.)
- */
-export const SPEED_LIMIT = { ms: 60_000, max: 30 };
-export async function tooFast(userId: string, now = new Date()) {
-  const [{ n }] = (await db.select({ n: count() }).from(questionServes)
-    .where(and(eq(questionServes.userId, userId), gte(questionServes.servedAt, new Date(now.getTime() - SPEED_LIMIT.ms))))) as [{ n: number }];
-  return n >= SPEED_LIMIT.max;
-}
-
 export async function nextQuestion(userId: string, profile: Profile, input: {
   mode: PracticeMode; skillId?: string; exclude: string[]; difficulty?: SetDifficulty; ids?: string[];
   skillIds?: string[]; tags?: string[]; timing?: Timing;
+  context?: DeliveryContext; exploratory?: boolean; paper?: { nonce: string; count: number };
 }) {
   const now = new Date();
   // Never serve a question from one of the student's unfinished tests: it couldn't be answered here (that would
@@ -120,7 +114,7 @@ export async function nextQuestion(userId: string, profile: Profile, input: {
     }
   } else if (input.mode === "skill") {
     if (!input.skillId || !SKILL_BY_ID[input.skillId]) return null;
-    q = await pickInSkill(userId, input.skillId, exclude, now, forced);
+    q = await pickInSkill(userId, input.skillId, exclude, now, forced, [], input.exploratory);
   } else {
     // Smart: weekly focus, switching skill every 5 answers today; every 6th question is a due review.
     // ponytail: "today" = last 24h, not the local calendar day; switch to localDate() if rotation feels off.
@@ -139,15 +133,13 @@ export async function nextQuestion(userId: string, profile: Profile, input: {
     }
   }
   if (!q) return null;
-  // Server-side clock: remember when this question was handed out (submitAnswer caps the reported time by it).
-  await db.insert(questionServes).values({ userId, questionId: q.id, servedAt: now })
-    .onConflictDoUpdate({ target: [questionServes.userId, questionServes.questionId], set: { servedAt: now } });
+  await servePractice(userId, q, input.context ?? await deliveryContext(), input.paper);
   const timeLimitS = input.mode === "set" ? await timeLimitFor(userId, q, input.timing) : null;
   const [reviewsDue, [saved]] = await Promise.all([
     countDueReviews(userId, now),
     db.select({ id: bookmarks.questionId }).from(bookmarks).where(and(eq(bookmarks.userId, userId), eq(bookmarks.questionId, q.id))),
   ]);
-  return { question: toPublic(q), reviewsDue, timeLimitS, bookmarked: !!saved };
+  return { question: toPublic(q, userId), reviewsDue, timeLimitS, bookmarked: !!saved };
 }
 
 /**
@@ -156,13 +148,14 @@ export async function nextQuestion(userId: string, profile: Profile, input: {
  * and skipping the serve limits.
  */
 export async function wasGiven(userId: string, questionId: string) {
-  const [served, answered] = await Promise.all([
+  const [served, answered, exposed] = await Promise.all([
     db.select({ id: questionServes.questionId }).from(questionServes)
       .where(and(eq(questionServes.userId, userId), eq(questionServes.questionId, questionId))).limit(1),
     db.select({ id: attempts.id }).from(attempts)
       .where(and(eq(attempts.userId, userId), eq(attempts.questionId, questionId))).limit(1),
+    db.select({id:questionExposures.questionId}).from(questionExposures).where(and(eq(questionExposures.userId,userId),eq(questionExposures.questionId,questionId))).limit(1),
   ]);
-  return served.length > 0 || answered.length > 0;
+  return served.length > 0 || answered.length > 0 || exposed.length > 0;
 }
 
 /** Reload an already-served, still-unanswered question without advancing or restarting its serve clock. */
@@ -174,8 +167,8 @@ export async function resumeQuestion(userId:string,questionId:string,timing:Timi
     inRunningTest(userId,questionId),
     db.select().from(bookmarks).where(and(eq(bookmarks.userId,userId),eq(bookmarks.questionId,questionId))),
   ]);
-  if(!q || !served || live || last && last.at>=served.servedAt) return null;
-  return {question:toPublic(q),reviewsDue:await countDueReviews(userId),timeLimitS:await timeLimitFor(userId,q,timing),bookmarked:!!saved};
+  if(!q || !served || served.servedAt.getTime() < Date.now()-DELIVERY_POLICY.pendingMs || live || last && last.at>=served.servedAt) return null;
+  return {question:toPublic(q, userId),reviewsDue:await countDueReviews(userId),timeLimitS:await timeLimitFor(userId,q,timing),bookmarked:!!saved};
 }
 
 export async function submitAnswer(userId: string, input: {
@@ -189,16 +182,18 @@ export async function submitAnswer(userId: string, input: {
   ]);
   // One answer per serve: the question must have been handed to this student and not answered since. No answering
   // questions you weren't given, and no trying A, then B, then C on the same serve.
-  if (!q || live || !served) return null;
+  if (!q || live || !served || q.status !== "active") return null;
   const timeMs = serverCappedTime(input.timeMs, served?.at ?? null, new Date());
   return db.transaction(async (tx) => {
     const [currentServe]=await tx.select().from(questionServes)
       .where(and(eq(questionServes.userId,userId),eq(questionServes.questionId,q.id))).for('update');
     const [last]=await tx.select().from(attempts).where(and(eq(attempts.userId,userId),eq(attempts.questionId,q.id))).orderBy(desc(attempts.createdAt)).limit(1);
     if(!currentServe || last && last.createdAt>=currentServe.servedAt) {
-      if(last && last.response===input.response) return {correct:last.correct,attemptId:last.id,revealed:toRevealed(q),masteryBefore:masteryPct(last.thetaBefore),masteryAfter:masteryPct(last.thetaAfter),mistakeGuess:last.mistakeType,skillName:SKILL_BY_ID[q.skillId]?.name??q.skillId};
+      if(last && last.response===input.response) return {correct:last.correct,attemptId:last.id,revealed:toRevealed(q, userId),masteryBefore:masteryPct(last.thetaBefore),masteryAfter:masteryPct(last.thetaAfter),mistakeGuess:last.mistakeType,skillName:SKILL_BY_ID[q.skillId]?.name??q.skillId};
       return null;
     }
+    if (Date.now() - currentServe.servedAt.getTime() < DELIVERY_POLICY.minimumAnswerMs)
+      throw new DeliveryBlocked("Take a moment to read the question before submitting.");
     // A question in the user's review queue is always recorded as a review, whatever the client says.
     const [queued] = await tx.select().from(reviewItems)
       .where(and(eq(reviewItems.userId, userId), eq(reviewItems.questionId, q.id)));
@@ -207,7 +202,7 @@ export async function submitAnswer(userId: string, input: {
       context: queued ? "review" : "practice", now: new Date(),
     });
     return {
-      correct: r.correct, attemptId: r.attemptId, revealed: toRevealed(q),
+      correct: r.correct, attemptId: r.attemptId, revealed: toRevealed(q, userId),
       masteryBefore: masteryPct(r.thetaBefore), masteryAfter: masteryPct(r.thetaAfter),
       mistakeGuess: r.mistakeType, skillName: SKILL_BY_ID[q.skillId]?.name ?? q.skillId,
     };
@@ -252,47 +247,20 @@ export type BankFilters = {
   status?: BankStatus | "saved"; page?: number;
 };
 
-/** Aggregate counters separately; only fetch question rows for the displayed page. */
+/** Personal history only. Fresh questions are generated sets, never an enumerable catalogue. */
 export async function questionBank(userId: string, filters: BankFilters = {}) {
-  const latest = db.selectDistinctOn([attempts.questionId], {
-    questionId: attempts.questionId, correct: attempts.correct,
-  }).from(attempts).where(eq(attempts.userId, userId))
-    .orderBy(attempts.questionId, desc(attempts.createdAt), desc(attempts.id)).as("bank_latest");
-  const saved = sql<boolean>`exists(select 1 from bookmarks b where b.user_id = ${userId} and b.question_id = ${questions.id})`;
-  const matches = and(
-    filters.section ? eq(questions.section, filters.section) : undefined,
-    filters.skillId ? eq(questions.skillId, filters.skillId) : undefined,
-    filters.difficulty ? eq(questions.difficulty, filters.difficulty) : undefined,
-    filters.status === "saved" ? saved : filters.status === "new" ? isNull(latest.questionId)
-      : filters.status === "correct" ? eq(latest.correct, true)
-      : filters.status === "incorrect" ? eq(latest.correct, false) : undefined,
-  ) ?? sql`true`;
-
-  const [counts] = await db.select({
-    total: sql<number>`count(*)::int`,
-    attempted: sql<number>`count(${latest.questionId})::int`,
-    correct: sql<number>`count(*) filter (where ${latest.correct} = true)::int`,
-    incorrect: sql<number>`count(*) filter (where ${latest.correct} = false)::int`,
-    math: sql<number>`count(*) filter (where ${questions.section} = 'math')::int`,
-    rw: sql<number>`count(*) filter (where ${questions.section} = 'rw')::int`,
-    filtered: sql<number>`count(*) filter (where ${matches})::int`,
-  }).from(questions).leftJoin(latest, eq(latest.questionId, questions.id))
-    .where(eq(questions.status, "active"));
-  const requested = Number.isSafeInteger(filters.page) && filters.page! > 0 ? filters.page! : 1;
-  const page = Math.min(requested, Math.max(1, Math.ceil(counts!.filtered / QUESTION_BANK_PAGE_SIZE)));
-  const visibleText = sql`${latest.questionId} is not null or ${saved}`;
-  const rows = await db.select({
-    id: questions.id, skillId: questions.skillId, section: questions.section, difficulty: questions.difficulty,
-    type: questions.type,
-    passage: sql<string | null>`case when ${visibleText} then ${questions.passageMd} else null end`,
-    stem: sql<string | null>`case when ${visibleText} then ${questions.stemMd} else null end`,
-    last: latest.correct, saved,
-  }).from(questions).leftJoin(latest, eq(latest.questionId, questions.id))
-    .where(and(eq(questions.status, "active"), matches))
-    .orderBy(asc(questions.skillId), asc(questions.difficulty), asc(questions.id))
-    .limit(QUESTION_BANK_PAGE_SIZE).offset((page - 1) * QUESTION_BANK_PAGE_SIZE);
-  return {
-    rows: rows.map((r) => ({ ...r, status: (r.last == null ? "new" : r.last ? "correct" : "incorrect") as BankStatus })),
-    counts: counts!, page, hasMore: counts!.filtered > page * QUESTION_BANK_PAGE_SIZE,
-  };
+  const latest = db.selectDistinctOn([attempts.questionId], { questionId: attempts.questionId, correct: attempts.correct })
+    .from(attempts).where(eq(attempts.userId,userId)).orderBy(attempts.questionId,desc(attempts.createdAt)).as("latest");
+  const matches = and(filters.section ? eq(questions.section,filters.section) : undefined,
+    filters.skillId ? eq(questions.skillId,filters.skillId) : undefined,
+    filters.difficulty ? eq(questions.difficulty,filters.difficulty) : undefined,
+    filters.status === "correct" ? eq(latest.correct,true) : filters.status === "incorrect" ? eq(latest.correct,false) : undefined,
+    filters.status === "saved" ? sql`exists(select 1 from bookmarks b where b.user_id=${userId} and b.question_id=${questions.id})` : undefined,
+    filters.status === "new" ? sql`false` : undefined);
+  const rows = await db.select({id:questions.id,skillId:questions.skillId,section:questions.section,difficulty:questions.difficulty,
+    stem:questions.stemMd,passage:questions.passageMd,last:latest.correct,
+    saved:sql<boolean>`exists(select 1 from bookmarks b where b.user_id=${userId} and b.question_id=${questions.id})`})
+    .from(latest).innerJoin(questions,eq(questions.id,latest.questionId)).where(matches).limit(10);
+  const [counts] = await db.select({attempted:count(),correct:sql<number>`count(*) filter(where ${latest.correct})::int`,incorrect:sql<number>`count(*) filter(where not ${latest.correct})::int`}).from(latest);
+  return {rows: rows.map(r=>({...r,status:r.last?"correct":"incorrect"})),counts:counts!};
 }

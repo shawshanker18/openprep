@@ -3,8 +3,12 @@
 // and counts accounts against the ticket's IP. Existing users never need one: the hook only runs for new accounts.
 import "server-only";
 import { headers } from "next/headers";
-import { and, count, eq, gte, lt } from "drizzle-orm";
+import { lt } from "drizzle-orm";
 import { db } from "@/db";
+import { consumeWindow } from "./delivery";
+import { deliveryContext } from "./delivery-context";
+import { digest, trustedIp } from "./delivery-identity";
+import { DeliveryBlocked } from "./delivery-policy";
 import { signupTickets } from "@/db/schema";
 
 const MAX_TICKETS_PER_HOUR = 30; // per IP: sign-in attempts, so the table can't be flooded
@@ -12,16 +16,21 @@ const MAX_TICKETS_PER_HOUR = 30; // per IP: sign-in attempts, so the table can't
 /** The requester's IP as Vercel saw it (Vercel overwrites X-Forwarded-For, so a client can't fake it). */
 export async function clientIp() {
   const h = await headers();
-  return (h.get("x-forwarded-for")?.split(",")[0] ?? h.get("x-real-ip") ?? "").trim() || "unknown";
+  return trustedIp(h) ?? digest("unknown-network");
 }
 
 /** Lets Supabase create an account for this email in the next 30 minutes, if it turns out to be new. */
 export async function issueSignupTicket(email: string, ip: string, now = new Date()) {
-  const [{ n }] = (await db.select({ n: count() }).from(signupTickets)
-    .where(and(eq(signupTickets.ip, ip), gte(signupTickets.createdAt, new Date(now.getTime() - 3_600_000))))) as [{ n: number }];
-  if (n >= MAX_TICKETS_PER_HOUR) return false;
-  await db.insert(signupTickets).values({ email: email.toLowerCase(), ip, createdAt: now });
-  return true;
+  const context=await deliveryContext();
+  try {
+    await db.transaction(async tx=>{
+      await consumeWindow(tx,`signup:ip:${digest(ip)}`,MAX_TICKETS_PER_HOUR,3_600_000,1,now.getTime());
+      if(context.device) await consumeWindow(tx,`signup:device:${context.device}`,6,86_400_000,1,now.getTime());
+      await tx.insert(signupTickets).values({email:email.toLowerCase(),ip,createdAt:now});
+    });
+    return true;
+  } catch(e) { if(e instanceof DeliveryBlocked) return false; throw e; }
+
 }
 
 /** Run by the cron tick: tickets only matter for a day. */

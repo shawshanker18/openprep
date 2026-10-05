@@ -36,7 +36,7 @@ export async function POST(req: Request) {
   if (lastUser && lastUser.content.length > AI_INPUT_MAX_CHARS) return text(`Please keep questions under ${AI_INPUT_MAX_CHARS} characters.`, 400);
   if (mode === "why_wrong" && !choice) return text("Which choice did you pick?", 400);
 
-  const internal = await internalId(questionId);
+  const internal = await internalId(questionId, userId);
   const q = internal ? await loadQuestion(internal) : null;
   if (!q) return text("Question not found.", 404);
   if (mode === "vocab" && q.section !== "rw") return text("Vocabulary help is for Reading & Writing questions.", 400);

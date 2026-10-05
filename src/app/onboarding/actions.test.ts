@@ -7,6 +7,7 @@ import { eq } from "drizzle-orm";
 import * as schema from "@/db/schema";
 import { SKILLS } from "@/content/taxonomy";
 
+vi.mock("@/server/delivery-context",()=>({deliveryContext:async()=>({ip:null,device:null})}));
 const pg = new PGlite();
 const db = drizzle(pg, { schema });
 const userId = "00000000-0000-0000-0000-000000000001";
@@ -55,10 +56,11 @@ it("opens bank, Smart Practice, daily plan, reviews and mini tests without any d
     type: "mcq" as const, stemMd: "Solve 2x = 4.", choices: [{ id: "A", md: "2" }, { id: "B", md: "4" }], answer: { choice: "A" }, explanationMd: "Divide both sides by 2 to get x = 2.",
   })));
   const profile = (await db.query.profiles.findFirst({ where: eq(schema.profiles.id, userId) }))!;
-  expect((await P.questionBank(userId)).counts.total).toBe(12);
-  const served = await A.nextQuestion({ paperId: createPaper(userId, { mode: "smart" }), exclude: [] });
+  expect((await P.questionBank(userId)).rows).toHaveLength(0);
+  const served = await A.nextQuestion({ paperId: await createPaper(userId, { mode: "smart" }), exclude: [] });
   expect(served).toMatchObject({ ok: true });
   if (!served.ok || "done" in served.data) throw new Error("Smart Practice did not serve a question");
+  await db.update(schema.questionServes).set({servedAt:new Date(Date.now()-6000)});
   const answered = await A.submitAnswer({ questionId: served.data.question.id, response: "B", timeMs: 5000, confidence: 3 });
   expect(answered.ok).toBe(true);
   const state = await db.query.skillState.findFirst({ where: eq(schema.skillState.skillId, skill.id) });

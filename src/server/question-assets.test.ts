@@ -4,15 +4,17 @@ import {beforeAll,expect,it,vi} from 'vitest';
 import {PGlite} from '@electric-sql/pglite';
 import {drizzle} from 'drizzle-orm/pglite';
 import * as schema from '@/db/schema';
+vi.mock("@/server/delivery-context",()=>({deliveryContext:async()=>({ip:null,device:null})}));
 const pg=new PGlite(),db=drizzle(pg,{schema});
 const state=vi.hoisted(()=>({user:null as string|null}));
 vi.mock('@/db',()=>({db}));
 vi.mock('@/server/auth',()=>({getUserId:async()=>state.user}));
 const {GET}=await import('@/app/api/question-assets/[questionId]/[index]/route');
-const {publicId,toPublic}=await import('./questions');
+const {toPublic}=await import('./questions');
 const USER='00000000-0000-0000-0000-0000000000dd',OTHER='00000000-0000-0000-0000-0000000000ee';
 const ID='image-fixture',ASSET='00000000-0000-0000-0000-000000000001';
-const request=(index='0')=>GET(new Request('https://example.com'),{params:Promise.resolve({questionId:publicId(ID),index})});
+const {createAssetToken}=await import('./question-asset-token');
+const request=(index='0')=>GET(new Request('https://example.com'),{params:Promise.resolve({questionId:createAssetToken(USER,ID,ASSET),index})});
 beforeAll(async()=>{
   const dir=path.resolve(import.meta.dirname,'../../drizzle');
   for(const file of fs.readdirSync(dir).filter(x=>x.endsWith('.sql')&&!x.startsWith('0001')).sort())
@@ -33,8 +35,9 @@ it('serves referenced image bytes privately and hides storage identifiers',async
   expect(response.headers.get('cache-control')).toContain('private');
   expect(new Uint8Array(await response.arrayBuffer())).toHaveLength(8);
   const [q]=await db.select().from(schema.questions);
-  const pub=toPublic(q!);
-  expect(pub.stemMd).toContain(`/api/question-assets/${publicId(ID)}/0`);
+  const pub=toPublic(q!,USER);
+  expect(pub.stemMd).toContain(`/api/question-assets/`);
+  expect(pub.stemMd).not.toContain(ID);
   expect(JSON.stringify(pub)).not.toContain(ASSET);
 });
 it('does not let a caller enumerate unrelated assets',async()=>{
