@@ -73,3 +73,17 @@ describe("private file routes", () => {
     expect(uploadObject).not.toHaveBeenCalled();
   });
 });
+it("rejects unsupported file types and oversized streams before sending bytes to storage",async()=>{
+ const input=(body:BodyInit,type:string)=>new Request("https://example.com/api/files",{method:"POST",headers:{Origin:"https://example.com","Content-Type":type},body});
+ expect((await POST(input("<svg/>","image/svg+xml"))).status).toBe(415);
+ expect((await POST(input("MZ executable","application/octet-stream"))).status).toBe(415);
+ expect((await POST(input(new Uint8Array(3*1024*1024+1),"image/png"))).status).toBe(413);
+ expect(uploadObject).not.toHaveBeenCalled();
+});
+it("rejects anonymous Supabase accounts as file owners",async()=>{
+ state.user={id:owner,is_anonymous:true} as typeof state.user;
+ expect((await list(request())).status).toBe(401);
+ expect((await GET(request(),context)).status).toBe(401);
+ expect((await POST(new Request("https://example.com/api/files",{method:"POST",headers:{Origin:"https://example.com"}}))).status).toBe(401);
+ expect(uploadObject).not.toHaveBeenCalled();
+});

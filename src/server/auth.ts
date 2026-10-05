@@ -14,7 +14,7 @@ export const getAuthUser = cache(async (): Promise<AuthUser | null> => {
   if (process.env.NODE_ENV === "development" && process.env.DEV_USER_ID) return { id: process.env.DEV_USER_ID, email: null, name: null };
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser(); // getUser, NOT getSession: verifies the JWT
-  if (!user) return null;
+  if (!user || user.is_anonymous) return null;
   const meta = user.user_metadata as { full_name?: string; name?: string } | undefined;
   return { id: user.id, email: user.email ?? null, name: meta?.full_name ?? meta?.name ?? null };
 });
@@ -33,7 +33,7 @@ export const requireUser = cache(async () => {
   return { userId, profile: profile! };
 });
 
-/** True while the student has skipped the diagnostic: practice, tests and the plan stay locked. */
-export const diagnosticPending = (p: { onboardingStep: string }) => p.onboardingStep === "diagnostic_skipped";
+/** Whether to offer the optional starting-point diagnostic. Never an access restriction. */
+export const diagnosticPending = (p: { onboardingStep: string }) => p.onboardingStep === "diagnostic_skipped" || p.onboardingStep === "diagnostic";
 
 export type ActionResult<T = undefined> = { ok: true; data: T } | { ok: false; error: string };

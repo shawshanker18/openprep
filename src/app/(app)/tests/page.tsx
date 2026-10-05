@@ -3,8 +3,7 @@ import { formatDate } from "@/lib/dates";
 import { Button } from "@/components/ui/button";
 import { SKILLS } from "@/content/taxonomy";
 import type { TestResult } from "@/engine/score";
-import { DiagnosticGate } from "@/components/diagnostic-gate";
-import { diagnosticPending, requireUser } from "@/server/auth";
+import { requireUser } from "@/server/auth";
 import { skillsWithQuestions } from "@/server/plan";
 import { tagsBySkill } from "@/server/practice";
 import { freshFullMock, listTests, openTests, TESTS_PER_PAGE } from "@/server/tests";
@@ -34,7 +33,6 @@ function StartCard({ title, time, children, fields }: { title: string; time: str
 export default async function TestsPage({ searchParams }: PageProps<"/tests">) {
   const sp = await searchParams;
   const { userId, profile } = await requireUser();
-  if (diagnosticPending(profile)) return <DiagnosticGate />;
   const page = Math.max(1, Math.min(1000, Number(sp.page) || 1));
   const [found, running, available, tags, fresh] = await Promise.all([listTests(userId, page), openTests(userId), skillsWithQuestions(), tagsBySkill(), freshFullMock(userId)]);
   const history = found.slice(0, TESTS_PER_PAGE);

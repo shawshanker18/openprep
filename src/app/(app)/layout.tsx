@@ -13,7 +13,7 @@ import { isAdmin } from "@/server/admin";
 
 export default async function AppLayout({ children }: LayoutProps<"/">) {
   const { userId, profile } = await requireUser();
-  if (profile.onboardingStep !== "done" && profile.onboardingStep !== "diagnostic_skipped") redirect("/onboarding");
+  if (profile.onboardingStep !== "done" && profile.onboardingStep !== "diagnostic_skipped" && profile.onboardingStep !== "diagnostic") redirect("/onboarding");
   const [notifications, checklist, user, summary, admin] = await Promise.all([
     getNotifications(userId, profile), getChecklist(userId, profile), getAuthUser(), getSkillSummary(userId),
     isAdmin(userId),

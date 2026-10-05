@@ -1,7 +1,7 @@
 // Complete database schema (spec 01 §4). Text columns instead of enums; values validated by zod at the edge.
 import { sql } from "drizzle-orm";
 import {
-  pgTable, uuid, text, integer, smallint, real, boolean, timestamp, date, jsonb, primaryKey, index,
+  pgTable, check, uuid, text, integer, smallint, real, boolean, timestamp, date, jsonb, primaryKey, index,
 } from "drizzle-orm/pg-core";
 
 const ts = (name: string) => timestamp(name, { withTimezone: true });
@@ -11,7 +11,7 @@ const userRef = () => uuid("user_id").notNull().references(() => profiles.id, { 
 export const profiles = pgTable("profiles", {
   id: uuid("id").primaryKey(), // = auth.users.id
   createdAt: ts("created_at").notNull().defaultNow(),
-  onboardingStep: text("onboarding_step").notNull().default("survey"), // survey | self | diagnostic | done
+  onboardingStep: text("onboarding_step").notNull().default("survey"), // survey | self (legacy) | diagnostic | diagnostic_skipped | done
   timezone: text("timezone").notNull().default("Asia/Kolkata"),
   grade: smallint("grade"),
   curriculum: text("curriculum"),
@@ -28,6 +28,13 @@ export const profiles = pgTable("profiles", {
   dashboardLayout: jsonb("dashboard_layout").$type<{ id: string; visible: boolean }[] | null>(), // null = automatic default
   weeklyFocus: jsonb("weekly_focus").$type<{ weekOf: string; skillIds: string[] } | null>(),
 });
+
+// One bounded row per student; the practice API updates this atomically.
+export const practiceRateWindows = pgTable("practice_rate_windows", {
+  userId: userRef().primaryKey(),
+  windowStart: ts("window_start").notNull(),
+  requests: integer("requests").notNull(),
+}, (table) => [check("practice_rate_windows_requests_check", sql`${table.requests} >= 0`)]).enableRLS();
 
 export const satAttempts = pgTable("sat_attempts", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -276,6 +283,53 @@ export const aiCache = pgTable("ai_cache", {
 });
 
 export type Question = typeof questions.$inferSelect;
+/** Private first-exposure ledger; also supplies cross-account monitoring. Never exposed through the Data API. */
+export const questionExposures = pgTable("question_exposures", {
+  userId: userRef(),
+  questionId: text("question_id").notNull().references(() => questions.id),
+  skillId: text("skill_id").notNull(),
+  ipHash: text("ip_hash"), deviceHash: text("device_hash"),
+  firstAt: ts("first_at").notNull().defaultNow(),
+}, (t) => [primaryKey({ columns: [t.userId, t.questionId] }),
+  index("exposure_user_time").on(t.userId, t.firstAt), index("exposure_skill_time").on(t.userId, t.skillId, t.firstAt),
+  index("exposure_ip_time").on(t.ipHash, t.firstAt), index("exposure_device_time").on(t.deviceHash, t.firstAt),
+  index("exposure_question_time").on(t.questionId, t.firstAt)]);
+
+export const deliveryGuards = pgTable("delivery_guards", { id: text("id").primaryKey(), expiresAt: ts("expires_at").notNull().defaultNow() });
+/** Bounded rolling request/event windows, shared across all app instances and Redis outages. */
+export const deliveryWindows = pgTable("delivery_windows", {
+  id: text("id").primaryKey(), times: jsonb("times").$type<number[]>().notNull().default([]),
+  expiresAt: ts("expires_at").notNull(),
+});
 export type Profile = typeof profiles.$inferSelect;
 export type SkillStateRow = typeof skillState.$inferSelect;
 export { r2Files } from "./storage-schema";
+
+
+/** Saved practice state is server-only; future questions are selected only when reached. */
+export const practiceSessions = pgTable("practice_sessions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: userRef(),
+  config: jsonb("config").$type<import("@/server/papers").PaperConfig>().notNull(),
+  title: text("title").notNull(),
+  back: text("back"),
+  cursor: integer("cursor").notNull().default(0),
+  status: text("status").notNull().default("active"),
+  createdAt: ts("created_at").notNull().defaultNow(),
+  updatedAt: ts("updated_at").notNull().defaultNow(),
+}, (t) => [index("practice_sessions_user_time").on(t.userId, t.updatedAt),
+  check("practice_sessions_cursor_check", sql`${t.cursor} >= 0 and ${t.cursor} <= 100`),
+  check("practice_sessions_status_check", sql`${t.status} in ('active', 'completed')`)]).enableRLS();
+
+export const practiceSessionItems = pgTable("practice_session_items", {
+  sessionId: uuid("session_id").notNull().references(() => practiceSessions.id, {onDelete: "cascade"}),
+  position: integer("position").notNull(),
+  questionId: text("question_id").notNull().references(() => questions.id),
+  response: text("response"),
+  timeMs: integer("time_ms").notNull().default(0),
+  attemptId: uuid("attempt_id").references(() => attempts.id),
+  servedAt: ts("served_at").notNull(),
+}, (t) => [primaryKey({columns: [t.sessionId, t.position]}),
+  check("practice_session_items_position_check", sql`${t.position} >= 0 and ${t.position} < 100`),
+  check("practice_session_items_time_check", sql`${t.timeMs} >= 0 and ${t.timeMs} <= 86400000`),
+  check("practice_session_items_response_check", sql`${t.response} is null or length(${t.response}) <= 8`)]).enableRLS();

@@ -6,6 +6,7 @@ import { PGlite } from "@electric-sql/pglite";
 import { drizzle } from "drizzle-orm/pglite";
 import * as schema from "@/db/schema";
 
+vi.mock('./delivery-context',()=>({deliveryContext:async()=>({ip:null,device:null})}));
 const pg = new PGlite();
 const db = drizzle(pg, { schema });
 vi.mock("@/db", () => ({ db }));

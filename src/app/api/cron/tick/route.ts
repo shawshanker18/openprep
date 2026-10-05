@@ -1,3 +1,4 @@
+import { cleanDeliveryWindows } from "@/server/delivery-maintenance";
 import { timingSafeEqual } from "node:crypto";
 import { sendDueReminders } from "@/server/push";
 import { sweepTests } from "@/server/tests";
@@ -20,5 +21,6 @@ export async function POST(req: Request) {
   const tests = await sweepTests();
   const reminders = await sendDueReminders();
   await deleteOldSignupTickets();
+  await cleanDeliveryWindows();
   return Response.json({ tests, reminders });
 }

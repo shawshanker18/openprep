@@ -1,7 +1,7 @@
 // Tests: assembly, module lifecycle, server-authoritative timing, scoring at completion (spec 03 §7–8, 04 §5).
 // Mastery is only updated when the whole session completes; abandoned sessions change nothing.
 import "server-only";
-import { and, asc, count, desc, eq, gte, inArray, isNull, lt, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull, lt, sql } from "drizzle-orm";
 import { db, type Tx } from "@/db";
 import { attempts, questions, scoreSnapshots, skillState, testItems, testModules, testSessions } from "@/db/schema";
 import { SKILL_BY_ID } from "@/content/taxonomy";
@@ -12,6 +12,9 @@ import { buildTestResult, type ResultItem } from "@/engine/score";
 import { targetDifficulty } from "@/engine/select";
 import { recordAttempt } from "./attempts";
 import { timingStats } from "@/engine/score";
+import { consumeWindow, exposeQuestions, lockDelivery } from "./delivery";
+import { deliveryContext } from "./delivery-context";
+import { DELIVERY_POLICY, DeliveryBlocked } from "./delivery-policy";
 import { toPublic, toRevealed } from "./questions";
 
 export type TestKind = "full" | "section" | "module" | "mini" | "weakness" | "custom";
@@ -84,24 +87,24 @@ async function skillSetModule(tx: Tx, userId: string, sessionId: string, idx: nu
   return insertModule(tx, sessionId, idx, sections.size === 1 ? [...sections][0]! : "mixed", "base", timeLimitS, picked);
 }
 
-// Every new test hands out questions, so starting them has a speed limit (anti-scraping). It's not a quota: no one
-// starts tests this fast by hand, even ending each one straight away.
+// Atomic creation limit. Content exposure additionally uses the shared daily/weekly ledger.
 const START_LIMIT = { ms: 5 * 60_000, max: 4 };
 
 export async function startTest(userId: string, input: {
   kind: TestKind; section?: Section; skillId?: string; skillIds?: string[]; count?: number; timed?: boolean; focus?: string[];
   tags?: string[]; difficulty?: Difficulty | "mixed"; title?: string;
 }): Promise<{ ok: true; id: string } | { ok: false; error: string; resumeId?: string }> {
-  const [{ n }] = (await db.select({ n: count() }).from(testSessions)
-    .where(and(eq(testSessions.userId, userId), gte(testSessions.startedAt, new Date(Date.now() - START_LIMIT.ms))))) as [{ n: number }];
-  if (n >= START_LIMIT.max) return { ok: false, error: "rate" };
-  if (input.kind === "full" || input.kind === "section") {
-    const [open] = await db.select({ id: testSessions.id }).from(testSessions)
-      .where(and(eq(testSessions.userId, userId), eq(testSessions.status, "in_progress"), inArray(testSessions.kind, ["full", "section"]))).limit(1);
-    if (open) return { ok: false, error: "You already have a test in progress.", resumeId: open.id };
-  }
+  const context=await deliveryContext();
   const timed = input.timed ?? (input.kind !== "weakness");
   return db.transaction(async (tx) => {
+    await lockDelivery(tx,userId,context);
+    if(input.kind==="full" || input.kind==="section") {
+      const [open]=await tx.select({id:testSessions.id}).from(testSessions).where(and(eq(testSessions.userId,userId),eq(testSessions.status,"in_progress"),inArray(testSessions.kind,["full","section"]))).limit(1);
+      if(open) return {ok:false as const,error:"You already have a test in progress.",resumeId:open.id};
+    }
+    await consumeWindow(tx,`test-start:user:${userId}`,START_LIMIT.max,START_LIMIT.ms);
+    if(context.device) await consumeWindow(tx,`test-start:device:${context.device}`,8,START_LIMIT.ms);
+    if(context.ip) await consumeWindow(tx,`test-start:ip:${context.ip}`,40,START_LIMIT.ms);
     const sections: Section[] = input.kind === "full" ? ["rw", "math"] : input.section ? [input.section] : [];
     const config: Config = { sections, adaptive: input.kind === "full" || input.kind === "section", timed };
     if (input.kind === "custom") Object.assign(config, { skillIds: input.skillIds, count: input.count, tags: input.tags ?? [], difficulty: input.difficulty ?? "mixed", ...(input.title ? { title: input.title } : {}) });
@@ -138,6 +141,7 @@ export async function startTest(userId: string, input: {
     if (n === 0) throw new NoQuestions();
     return { ok: true as const, id };
   }).catch((e) => {
+    if (e instanceof DeliveryBlocked) return {ok:false as const,error:"rate"};
     if (e instanceof NoQuestions) return { ok: false as const, error: "There aren't any questions for this test yet." };
     throw e;
   });
@@ -210,6 +214,7 @@ async function finishSession(tx: Tx, userId: string, s: typeof testSessions.$inf
 
 /** Current state for the runner page. Auto-submits a module whose deadline has passed (tab was closed). */
 export async function getTestState(userId: string, sessionId: string) {
+  const context=await deliveryContext();
   for (let i = 0; i < 6; i++) {
     const now = new Date();
     const state = await db.transaction(async (tx) => {
@@ -225,12 +230,13 @@ export async function getTestState(userId: string, sessionId: string) {
       }
       const prev = mods[mods.indexOf(cur) - 1];
       const items = await moduleItems(tx, cur.id);
+      await exposeQuestions(tx,userId,items.map(i=>i.q),context);
       return {
         kind: "module" as const, session: { id: s.id, kind: s.kind, title: (s.config as Config).title ?? null },
         module: { id: cur.id, idx: cur.idx, section: cur.section, route: cur.route, timeLimitS: cur.timeLimitS,
           startedAt: cur.startedAt?.toISOString() ?? null, deadlineAt: cur.deadlineAt?.toISOString() ?? null, adaptive: (s.config as Config).adaptive },
         breakBefore: s.kind === "full" && !cur.startedAt && prev?.section === "rw" && cur.section === "math",
-        items: items.map(({ item, q }) => ({ position: item.position, question: toPublic(q), response: item.response, flagged: item.flagged })),
+        items: items.map(({ item, q }) => ({ position: item.position, question: toPublic(q, userId), response: item.response, flagged: item.flagged })),
         serverNow: now.toISOString(),
       };
     });
@@ -247,9 +253,11 @@ async function ownedModule(tx: Tx, userId: string, moduleId: string) {
 }
 
 export async function startModule(userId: string, moduleId: string) {
+  const context=await deliveryContext();
   return db.transaction(async (tx) => {
     const r = await ownedModule(tx, userId, moduleId);
     if (!r || r.s.status !== "in_progress" || r.m.submittedAt) return false;
+    await exposeQuestions(tx,userId,(await moduleItems(tx,moduleId)).map(i=>i.q),context);
     if (r.m.startedAt) return true; // idempotent
     const now = new Date();
     await tx.update(testModules).set({
@@ -283,6 +291,11 @@ export async function submitModule(userId: string, moduleId: string) {
   return db.transaction(async (tx) => {
     const r = await ownedModule(tx, userId, moduleId);
     if (!r) return false;
+    if (!r.m.submittedAt) {
+      const items=await moduleItems(tx,moduleId);
+      if (!r.m.startedAt || Date.now()-r.m.startedAt.getTime()<items.length*DELIVERY_POLICY.minimumAnswerMs) return false;
+      await exposeQuestions(tx,userId,items.map(i=>i.q),await deliveryContext());
+    }
     await submitModuleTx(tx, userId, r.s.id, moduleId, new Date());
     const [after] = await tx.select({ status: testSessions.status }).from(testSessions).where(eq(testSessions.id, r.s.id));
     return { finished: after?.status !== "in_progress" }; // the runner goes straight to results when the test is over
@@ -296,11 +309,13 @@ export async function abandonTest(userId: string, sessionId: string) {
 
 /** Completed session with every question revealed (answers are only shown after the whole test). */
 export async function getTestResult(userId: string, sessionId: string) {
+  const awaitContext=await deliveryContext();
   const [s] = await db.select().from(testSessions).where(and(eq(testSessions.id, sessionId), eq(testSessions.userId, userId)));
   if (!s || s.status !== "completed") return s ? { session: s, items: [], timing: timingStats([]) } : null;
   const rows = await db.select({ item: testItems, q: questions, m: testModules }).from(testItems)
     .innerJoin(testModules, eq(testModules.id, testItems.moduleId)).innerJoin(questions, eq(questions.id, testItems.questionId))
     .where(eq(testModules.sessionId, s.id)).orderBy(asc(testModules.idx), asc(testItems.position));
+  await db.transaction(tx=>exposeQuestions(tx,userId,rows.map(r=>r.q),awaitContext));
   const att = await db.select({ id: attempts.id, questionId: attempts.questionId, correct: attempts.correct, mistakeType: attempts.mistakeType })
     .from(attempts).where(and(eq(attempts.userId, userId), eq(attempts.sessionId, s.id)));
   return {
@@ -309,7 +324,7 @@ export async function getTestResult(userId: string, sessionId: string) {
     items: rows.map(({ item, q, m }) => {
       const a = att.find((x) => x.questionId === q.id);
       return { moduleIdx: m.idx, section: m.section, position: item.position, response: item.response, timeMs: item.timeMs,
-        correct: a?.correct ?? false, attemptId: a?.id ?? null, mistakeType: a?.mistakeType ?? null, question: toRevealed(q) };
+        correct: a?.correct ?? false, attemptId: a?.id ?? null, mistakeType: a?.mistakeType ?? null, question: toRevealed(q, userId) };
     }),
   };
 }
@@ -337,8 +352,8 @@ export async function runningTestQuestionIds(userId: string) {
 }
 
 /** Is any of this question's test sessions still running for this user? (No AI help during tests.) */
-export async function inRunningTest(userId: string, questionId: string) {
-  const [r] = await db.select({ id: testSessions.id }).from(testItems)
+export async function inRunningTest(userId: string, questionId: string, database: typeof db | Tx = db) {
+  const [r] = await database.select({ id: testSessions.id }).from(testItems)
     .innerJoin(testModules, eq(testModules.id, testItems.moduleId))
     .innerJoin(testSessions, eq(testSessions.id, testModules.sessionId))
     .where(and(eq(testItems.questionId, questionId), eq(testSessions.userId, userId), eq(testSessions.status, "in_progress"))).limit(1);

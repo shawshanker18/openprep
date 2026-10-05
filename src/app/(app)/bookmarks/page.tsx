@@ -15,7 +15,7 @@ export const metadata = { title: "Saved questions" };
 async function removeBookmark(pub: string) {
   "use server";
   const { userId } = await requireUser();
-  const questionId = await internalId(pub);
+  const questionId = await internalId(pub, userId);
   if (questionId) await db.delete(bookmarks).where(and(eq(bookmarks.userId, userId), eq(bookmarks.questionId, questionId)));
   revalidatePath("/bookmarks");
 }
@@ -30,11 +30,11 @@ export default async function BookmarksPage({searchParams}:PageProps<"/bookmarks
     // Answers are shown only for questions this student has already answered (never leak unseen answers).
     answered: sql<boolean>`exists(select 1 from ${attempts} a where a.user_id = ${userId} and a.question_id = ${questions.id})`,
   }).from(bookmarks).innerJoin(questions, eq(questions.id, bookmarks.questionId))
-    .where(eq(bookmarks.userId, userId)).orderBy(desc(bookmarks.createdAt),bookmarks.questionId).limit(11).offset((page-1)*10);
+    .where(and(eq(bookmarks.userId, userId), sql`(exists(select 1 from question_exposures e where e.user_id=${userId} and e.question_id=${questions.id}) or exists(select 1 from attempts a where a.user_id=${userId} and a.question_id=${questions.id}) or exists(select 1 from question_serves s where s.user_id=${userId} and s.question_id=${questions.id}))`)).orderBy(desc(bookmarks.createdAt),bookmarks.questionId).limit(11).offset((page-1)*10);
   const more=rows.length>10;
   const shown=rows.slice(0,10).map(r=>{
     const q={id:r.id,stemMd:r.stem,passageMd:r.passage,choices:r.choices};
-    return {...r,stem:questionMarkdown(q,r.stem),passage:r.passage?questionMarkdown(q,r.passage):null};
+    return {...r,stem:questionMarkdown(q,r.stem,userId),passage:r.passage?questionMarkdown(q,r.passage,userId):null};
   });
 
   return (
@@ -45,7 +45,7 @@ export default async function BookmarksPage({searchParams}:PageProps<"/bookmarks
       ) : (
         <ul className="flex flex-col gap-3">
           {shown.map((r) => (
-            <li key={publicId(r.id)} className="flex flex-col gap-2 rounded-lg border p-4 text-sm">
+            <li key={publicId(r.id, userId)} className="flex flex-col gap-2 rounded-lg border p-4 text-sm">
               {r.passage && <Markdown className="line-clamp-3 text-muted-foreground">{r.passage}</Markdown>}
               <Markdown>{r.stem}</Markdown>
               {r.answered && (
@@ -61,8 +61,8 @@ export default async function BookmarksPage({searchParams}:PageProps<"/bookmarks
                 <span className="text-xs text-muted-foreground">saved {formatDate(r.at, profile.timezone)}</span>
                 <span className="flex-1" />
                 <Button size="sm" variant="outline" render={<Link href={`/practice?skill=${r.skillId}`} />}>Practice this skill</Button>
-                <Button size="sm" render={<Link href={`/practice?mode=list&ids=${publicId(r.id)}&from=${encodeURIComponent(`/bookmarks?page=${page}`)}`} />}>Practice this question</Button>
-                <form action={removeBookmark.bind(null, publicId(r.id))}><Button size="sm" variant="ghost" type="submit">Remove</Button></form>
+                <Button size="sm" render={<Link href={`/practice?mode=list&ids=${publicId(r.id, userId)}&from=${encodeURIComponent(`/bookmarks?page=${page}`)}`} />}>Practice this question</Button>
+                <form action={removeBookmark.bind(null, publicId(r.id, userId))}><Button size="sm" variant="ghost" type="submit">Remove</Button></form>
               </div>
             </li>
           ))}

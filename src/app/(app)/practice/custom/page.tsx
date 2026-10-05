@@ -1,7 +1,7 @@
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { DiagnosticGate } from "@/components/diagnostic-gate";
 import { SKILLS } from "@/content/taxonomy";
-import { diagnosticPending, requireUser } from "@/server/auth";
+import { requireUser } from "@/server/auth";
 import { skillsWithQuestions } from "@/server/plan";
 import { tagsBySkill } from "@/server/practice";
 import { SkillTagPicker } from "../skill-tag-picker";
@@ -13,14 +13,14 @@ const control = "h-9 rounded-md border bg-background px-2 text-sm";
 
 // A plain GET form: /practice?mode=set&… runs the set in PracticeRunner.
 export default async function CustomPracticePage() {
-  const { profile } = await requireUser();
-  if (diagnosticPending(profile)) return <DiagnosticGate />;
+  await requireUser();
   const [available, tags] = await Promise.all([skillsWithQuestions(), tagsBySkill()]);
   const skills = SKILLS.filter((s) => available.has(s.id));
 
   return (
     <div className="flex flex-col gap-8">
       <h1 className="text-2xl font-semibold">Custom practice</h1>
+      <Link href="/practice/sessions" className="text-sm underline">Resume a saved session</Link>
       <form action="/practice" method="get" className="flex flex-col gap-3 rounded-xl border p-5">
         <input type="hidden" name="mode" value="set" />
         <div><h2 className="font-medium">Skills</h2><p className="text-sm text-muted-foreground">Leave all unticked for Auto: your focus skills this week.</p></div>
