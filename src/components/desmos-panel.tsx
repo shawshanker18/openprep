@@ -31,6 +31,7 @@ function loadGeoGebra(): Promise<void> {
 /** Inline GeoGebra graphing calculator with a Desmos-like surrounding layout and controls. */
 export function DesmosCalculator({ expressions = EMPTY_EXPRESSIONS, className = "h-96" }: { expressions?: string[]; className?: string }) {
   const el = useRef<HTMLDivElement>(null);
+  const viewport = useRef<HTMLDivElement>(null);
   const shell = useRef<HTMLDivElement>(null);
   const sizing = useRef<ReturnType<typeof watchCalculatorSize>|null>(null);
   const id = useId().replace(/:/g, "");
@@ -40,21 +41,28 @@ export function DesmosCalculator({ expressions = EMPTY_EXPRESSIONS, className = 
   useEffect(() => {
     let cancelled=false, scriptReady=false, injected=false, timedOut=false;
     const target=el.current;
-    if(!target) return;
+    const host=viewport.current;
+    if(!target || !host) return;
     let apiInstance:GeoGebraApi|null=null;
+    let parameters:Record<string,unknown>|null=null;
     let timeout:number|null=null;
     const fail=()=>{if(!cancelled){timedOut=true;setState("error");}};
     // The host is observed before injection, so hidden panels never initialize at an invented size.
-    const watcher=watchCalculatorSize(target,(width,height)=>{
+    // GeoGebra writes inline dimensions to its injection target. Measure a separate
+    // layout-owned viewport so its previous size cannot freeze the next measurement.
+    const watcher=watchCalculatorSize(host,(width,height)=>{
       if(cancelled || timedOut) return;
+      if(parameters) {parameters.width=width;parameters.height=height;}
       if(apiInstance) {
         apiInstance.setSize(width,height);
         setState("ready");
       } else if(scriptReady && !injected && window.GGBApplet) {
         injected=true;
         timeout=window.setTimeout(fail,20_000);
-        const applet=new window.GGBApplet({
+        parameters={
           id, appName:"graphing", width, height, showToolBar:false, showAlgebraInput:true, showMenuBar:false,
+          // Resize the actual views rather than scaling an old canvas to fit the page.
+          disableAutoScale:true, autoHeight:false, preventFocus:true,
           showResetIcon:true, showZoomButtons:true, enableLabelDrags:false, enableShiftDragZoom:true,
           appletOnLoad:(api:GeoGebraApi)=>{
             if(cancelled || timedOut){api.remove();return;}
@@ -64,7 +72,8 @@ export function DesmosCalculator({ expressions = EMPTY_EXPRESSIONS, className = 
             // GeoGebra's callback can run before its canvas layout is painted. Re-measure over two frames.
             watcher.refresh();
           },
-        },true);
+        };
+        const applet=new window.GGBApplet(parameters,true);
         applet.inject(id);
       }
     });
@@ -119,7 +128,9 @@ export function DesmosCalculator({ expressions = EMPTY_EXPRESSIONS, className = 
       {fullscreen ? <Minimize className="size-4" /> : <Expand className="size-4" />}
     </button>
     {state === "loading" && <div className="absolute inset-0 z-10 flex items-center justify-center gap-2 bg-background text-sm text-muted-foreground"><LoaderCircle className="size-4 animate-spin" /> Loading calculator…</div>}
-    <div ref={el} id={id} className="min-h-0 min-w-0 w-full flex-1 overflow-hidden" />
+    <div ref={viewport} className="relative min-h-0 min-w-0 w-full flex-1 overflow-hidden">
+      <div ref={el} id={id} className="absolute inset-0" />
+    </div>
   </div>;
 }
 
