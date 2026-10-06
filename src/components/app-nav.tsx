@@ -5,20 +5,49 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import {
-  BarChart3, Check, ClipboardList, Home, Library, Menu, Settings, ShieldCheck,
+  BarChart3, Bookmark, BookOpen, Calculator, Check, ClipboardList, GraduationCap, Home, Library, Menu, Settings, ShieldCheck, Sparkles, XCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import type { ChecklistItem } from "@/server/notifications";
 
-export const NAV_GROUPS = [{ label: null, items: [
+export const NAV_GROUPS = [
+  {
+    label: null,
+    items: [
+      { href: "/dashboard", label: "Dashboard", icon: Home },
+      { href: "/progress", label: "Progress", icon: BarChart3 },
+      { href: "/mistakes", label: "Mistakes", icon: XCircle },
+      { href: "/bookmarks", label: "Saved questions", icon: Bookmark },
+    ],
+  },
+  {
+    label: "Learn",
+    items: [
+      { href: "/start", label: "Start from scratch", icon: GraduationCap },
+      { href: "/skills", label: "Your skills", icon: BookOpen },
+      { href: "/desmos", label: "Desmos", icon: Calculator },
+    ],
+  },
+  {
+    label: "Practice",
+    items: [
+      { href: "/practice", label: "Recommended Practice", icon: Sparkles },
+      { href: "/question-bank", label: "Question bank", icon: Library },
+      { href: "/tests", label: "Practice tests", icon: ClipboardList },
+    ],
+  },
+] as const;
+
+/** Bottom bar on phones: the five most used destinations. */
+export const MOBILE_TABS = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
-  { href: "/question-bank", label: "Question Bank", icon: Library },
+  { href: "/practice", label: "Practice", icon: Sparkles },
+  { href: "/start", label: "Learn", icon: GraduationCap },
   { href: "/tests", label: "Tests", icon: ClipboardList },
   { href: "/progress", label: "Progress", icon: BarChart3 },
-]}] as const;
-export const MOBILE_TABS = NAV_GROUPS[0].items;
+] as const;
 
 export function CurrentSection() {
   const path = usePathname();
