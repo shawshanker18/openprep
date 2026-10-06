@@ -1,10 +1,12 @@
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import {DeliveryBlockedView} from "@/components/delivery-blocked";
 import { DeliveryBlocked } from "@/server/delivery-policy";
 import { notFound, redirect } from "next/navigation";
 import { SKILL_BY_ID } from "@/content/taxonomy";
 import { getTodayBlock } from "@/server/daily";
 import { requireUser } from "@/server/auth";
-import { createPracticeSession, getPracticeSession } from "@/server/practice-sessions";
+import { createPracticeSession, getPracticeSession, listPracticeSessions } from "@/server/practice-sessions";
 import { z } from "zod";
 import { PracticeRunner } from "./practice-runner";
 
@@ -15,6 +17,15 @@ const list = (v: string | string[] | undefined) => [v ?? []].flat().flatMap((x) 
 async function loadPage({ searchParams }: PageProps<"/practice">) {
   const sp = await searchParams;
   const { userId, profile } = await requireUser();
+  if (Object.keys(sp).length === 0) {
+    const saved = (await listPracticeSessions(userId)).find(s => s.status === 'active');
+    return <div className="flex flex-col gap-6"><h1 className="text-2xl font-semibold">Practice</h1>
+      {saved && <section className="rounded-xl border p-5"><h2 className="font-medium">Continue practicing</h2><p className="mb-3 text-sm">{saved.title}</p><Button render={<Link href={`/practice?session=${saved.id}`} />}>Resume session</Button></section>}
+      <section className="rounded-xl border p-5"><h2 className="font-medium">Recommended Practice</h2><p className="my-3 text-sm text-muted-foreground">Questions chosen from your recent answers and skills that need work.</p><Button render={<Link prefetch={false} href="/practice?recommended=1" />}>Start recommended practice</Button></section>
+      <section><h2 className="font-medium">Choose your own practice</h2><p className="my-2 text-sm text-muted-foreground">Select skills, difficulty and length in the Question Bank.</p><Link className="underline" href="/question-bank">Open Question Bank</Link></section>
+      <div className="flex gap-4 text-sm"><Link className="underline" href="/practice/sessions">Saved sessions</Link><Link className="underline" href="/start">Start from scratch</Link><Link className="underline" href="/desmos">Desmos</Link></div>
+    </div>;
+  }
   const bi=Number(sp.block);
   const block=Number.isInteger(bi) && bi>=0 ? await getTodayBlock(userId,profile,bi) : null;
   const blockQuery=block?`&block=${block.index}`:"";
@@ -43,14 +54,14 @@ async function loadPage({ searchParams }: PageProps<"/practice">) {
 
   if (mode === "set") {
     const skillIds = list(sp.skills).filter((s) => SKILL_BY_ID[s]).slice(0, 29);
-    if (skillIds.length > 1 || list(sp.skills).length !== skillIds.length) notFound();
+    if (list(sp.skills).length !== skillIds.length) notFound();
     const tags = list(sp.tags);
     if (tags.length > 1 || tags.some(tag => tag !== "desmos")) notFound();
     const n = Number(sp.count);
     const count = sp.count === undefined ? 10 : n;
     if (![5, 10, 20, 30].includes(count)) notFound();
     const timing = sp.timing === "on" || sp.timing === "off" ? sp.timing : "auto";
-    if (!back && skillIds.length !== 1) notFound();
+    if (!back && !skillIds.length) notFound();
     const title = skillIds.length === 1 ? SKILL_BY_ID[skillIds[0]!]!.name : "Question bank";
     const set = { skillIds, tags, count, timing } as const;
     const sessionId=await createPracticeSession(userId, {mode:"set", difficulty, ...set},title,back);
@@ -58,7 +69,7 @@ async function loadPage({ searchParams }: PageProps<"/practice">) {
   }
 
   const plain = difficulty === "mixed" ? undefined : difficulty;
-  const title = mode === "review" ? (skillId ? `Review · ${SKILL_BY_ID[skillId]!.name}` : "Review") : skillId ? SKILL_BY_ID[skillId]!.name : "Adaptive practice";
+  const title = mode === "review" ? (skillId ? `Review · ${SKILL_BY_ID[skillId]!.name}` : "Review") : skillId ? SKILL_BY_ID[skillId]!.name : "Recommended practice";
   const sessionId=await createPracticeSession(userId, {mode,skillId,difficulty:plain},title);
   redirect(`/practice?session=${sessionId}${blockQuery}`);
 }

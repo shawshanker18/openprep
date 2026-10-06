@@ -1,3 +1,4 @@
+import { availableQuestion } from "./question-availability";
 // Tests: assembly, module lifecycle, server-authoritative timing, scoring at completion (spec 03 §7–8, 04 §5).
 // Mastery is only updated when the whole session completes; abandoned sessions change nothing.
 import "server-only";
@@ -39,7 +40,7 @@ async function pool(tx: Tx, userId: string, where: ReturnType<typeof and>) {
     difficulty: questions.difficulty, type: questions.type, tags: questions.tags,
   }, seen: sql<Date | null>`max(${attempts.createdAt})` }).from(questions)
     .leftJoin(attempts, and(eq(attempts.questionId, questions.id), eq(attempts.userId, userId)))
-    .where(and(eq(questions.status, "active"), where)).groupBy(questions.id);
+    .where(and(eq(questions.status, "active"), availableQuestion(userId), where)).groupBy(questions.id);
   return rows.map((r) => ({ ...r.q, difficulty: r.q.difficulty as Difficulty, type: r.q.type as "mcq" | "spr", lastSeenAt: r.seen ? new Date(r.seen) : null }));
 }
 
@@ -218,6 +219,7 @@ export async function getTestState(userId: string, sessionId: string) {
   for (let i = 0; i < 6; i++) {
     const now = new Date();
     const state = await db.transaction(async (tx) => {
+      await lockDelivery(tx,userId,context);
       const s = await loadSession(tx, userId, sessionId);
       if (!s) return { kind: "missing" as const };
       if (s.status !== "in_progress") return { kind: "finished" as const, status: s.status };
@@ -288,7 +290,9 @@ export async function saveResponse(userId: string, input: {
 }
 
 export async function submitModule(userId: string, moduleId: string) {
+  const context=await deliveryContext();
   return db.transaction(async (tx) => {
+    await lockDelivery(tx,userId,context);
     const r = await ownedModule(tx, userId, moduleId);
     if (!r) return false;
     if (!r.m.submittedAt) {

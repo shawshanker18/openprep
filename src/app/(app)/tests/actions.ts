@@ -1,35 +1,17 @@
 "use server";
-
-import { redirect } from "next/navigation";
-import { z } from "zod";
-import { text } from "@/lib/text";
-import { SKILL_BY_ID } from "@/content/taxonomy";
-import { requireUser } from "@/server/auth";
-import { ensureWeeklyFocus } from "@/server/plan";
-import { startTest } from "@/server/tests";
-
-const skill = z.string().refine((s) => !!SKILL_BY_ID[s]);
-const Start = z.discriminatedUnion("kind", [
-  z.object({ kind: z.literal("full") }),
-  z.object({ kind: z.literal("section"), section: z.enum(["rw", "math"]) }),
-  z.object({ kind: z.literal("module"), section: z.enum(["rw", "math"]) }),
-  z.object({ kind: z.literal("mini"), skillId: skill }),
-  z.object({ kind: z.literal("weakness") }),
-  z.object({
-    kind: z.literal("custom"), skillIds: z.array(skill).min(1).max(29), count: z.coerce.number().int().min(5).max(30), timed: z.boolean(),
-    tags: z.array(text().min(1).max(64)).max(50),
-    difficulty: z.enum(["mixed", "1", "2", "3"]).default("mixed").transform((d) => (d === "mixed" ? d : (Number(d) as 1 | 2 | 3))),
-    title: text().trim().max(80).optional(), // course quizzes, unit tests and challenges
-  }),
+import { redirect } from 'next/navigation';
+import { z } from 'zod';
+import { requireUser } from '@/server/auth';
+import { startTest } from '@/server/tests';
+const Start = z.discriminatedUnion('kind', [
+  z.object({kind:z.literal('full')}),
+  z.object({kind:z.literal('module'),section:z.enum(['math','rw'])}),
 ]);
-
 export async function startTestAction(form: FormData) {
-  const { userId, profile } = await requireUser();
-  const raw = Object.fromEntries(form);
-  const p = Start.safeParse({ ...raw, skillIds: form.getAll("skillIds"), tags: form.getAll("tags"), timed: form.get("timed") === "on" });
-  if (!p.success) redirect("/tests?error=invalid");
-  const focus = p.data.kind === "weakness" ? await ensureWeeklyFocus(userId, profile) : undefined;
-  const r = await startTest(userId, { ...p.data, focus });
-  if (!r.ok) redirect(r.resumeId ? `/tests?resume=${r.resumeId}` : r.error === "rate" ? "/tests?error=rate" : "/tests?error=empty");
-  redirect(`/test/${r.id}`);
+  const {userId} = await requireUser();
+  const parsed = Start.safeParse(Object.fromEntries(form));
+  if (!parsed.success) redirect('/tests?error=invalid');
+  const result = await startTest(userId, parsed.data);
+  if (!result.ok) redirect(result.resumeId ? `/tests?resume=${result.resumeId}` : result.error==='rate' ? '/tests?error=rate' : '/tests?error=empty');
+  redirect(`/test/${result.id}`);
 }

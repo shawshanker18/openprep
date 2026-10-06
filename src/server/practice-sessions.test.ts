@@ -101,15 +101,25 @@ it("new questions use cumulative session positions; completing then reviewing ke
  expect(await database.select().from(schema.questionExposures)).toHaveLength(5);
 });
 
-it("rejects removed custom configurations before creating or resuming a session", async () => {
-  const before = await database.select().from(schema.practiceSessions);
-  await expect(S.createPracticeSession(user, {mode:"set",skillIds:[skill.id,"m-alg-lin2"],count:5}, "Removed custom builder")).rejects.toThrow();
-  expect(await database.select().from(schema.practiceSessions)).toHaveLength(before.length);
+it("supports multi-skill bank sessions and preserves legacy saved sessions", async () => {
+  const bank = await S.createPracticeSession(user, {mode:"set",skillIds:[skill.id,"m-alg-lin2"],count:5}, "Question Bank");
+  expect((await S.getPracticeSession(user,bank))?.config.skillIds).toHaveLength(2);
+  expect((await S.listPracticeSessions(user)).map(s=>s.id)).toContain(bank);
   const [legacy] = await database.insert(schema.practiceSessions).values({userId:user, title:"Custom practice", config:{mode:"set",skillIds:[skill.id],count:5}}).returning();
-  expect(await S.getPracticeSession(user,legacy!.id)).toBeNull();
-  expect((await S.listPracticeSessions(user)).map(s=>s.id)).not.toContain(legacy!.id);
-  await expect(S.loadPracticeSession(user,profile,legacy!.id)).rejects.toThrow(/not found/);
-  await expect(S.savePracticeDraft(user,legacy!.id,0,"A",5000)).rejects.toThrow(/not found/);
-  await expect(S.answerPracticeSession(user,legacy!.id,0,{response:"A",timeMs:5000,confidence:2})).rejects.toThrow(/not found/);
-  expect(await database.select().from(schema.practiceSessions).where(eq(schema.practiceSessions.id,legacy!.id))).toHaveLength(1);
+  expect(await S.getPracticeSession(user,legacy!.id)).not.toBeNull();
+});
+it("excludes active session and test questions from preview queries and restores availability after completion", async () => {
+  const {availableQuestion} = await import("./question-availability");
+  const sid=await S.createPracticeSession(other,{mode:"set",skillIds:[skill.id],count:5},"Question Bank");
+  await database.insert(schema.practiceSessionItems).values({sessionId:sid,position:0,questionId:ids[0]!,servedAt:new Date()});
+  const [test]=await database.insert(schema.testSessions).values({userId:other,kind:"module"}).returning();
+  const [module]=await database.insert(schema.testModules).values({sessionId:test!.id,idx:0,section:"math"}).returning();
+  await database.insert(schema.testItems).values({moduleId:module!.id,position:0,questionId:ids[1]!});
+  const available=()=>database.select({id:schema.questions.id}).from(schema.questions).where(availableQuestion(other));
+  expect((await available()).map(q=>q.id)).not.toContain(ids[0]);
+  expect((await available()).map(q=>q.id)).not.toContain(ids[1]);
+  expect((await database.select({id:schema.questions.id}).from(schema.questions).where(availableQuestion(user))).map(q=>q.id)).toContain(ids[1]);
+  await database.update(schema.practiceSessions).set({status:"completed"}).where(eq(schema.practiceSessions.id,sid));
+  await database.update(schema.testSessions).set({status:"completed"}).where(eq(schema.testSessions.id,test!.id));
+  expect((await available()).map(q=>q.id)).toEqual(expect.arrayContaining([ids[0],ids[1]]));
 });

@@ -32,7 +32,7 @@ it("does not fetch or reveal answers when the diagnostic finishes", async () => 
   expect(html).not.toContain("<details");
   expect(html).not.toContain("Estimated");
 });
-it("opens a saved review only on request and keeps mistakes collapsed", async () => {
+it("opens a saved review only on request and shows mistake details together", async () => {
   state.getTestResult.mockResolvedValue({ items: [
     { moduleIdx: 0, position: 0, correct: true },
     { moduleIdx: 0, position: 1, correct: false },
@@ -41,7 +41,7 @@ it("opens a saved review only on request and keeps mistakes collapsed", async ()
   expect(state.getTestResult).toHaveBeenCalledWith("student", sessionId);
   expect(html).toContain("Question 2");
   expect(html).not.toContain("Question 1");
-  expect(html).not.toContain('open=""');
+  expect(html).toContain('open=""');
 });
 it("does not reveal an unavailable session", async () => {
   state.sessions = [];

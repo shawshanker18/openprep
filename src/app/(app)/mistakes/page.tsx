@@ -24,7 +24,7 @@ export default async function MistakesPage({ searchParams }: PageProps<"/mistake
   // Latest wrong attempt per question, joined to its review-queue state; newest first, a page at a time.
   const latest = db.selectDistinctOn([attempts.questionId], {
     id: attempts.questionId, skillId: attempts.skillId, section: questions.section, stem: sql<string>`concat_ws(chr(10) || chr(10), ${questions.passageMd}, ${questions.stemMd})`.as("stem"),
-    response: attempts.response, answer: questions.answer, choices: questions.choices, rationale: questions.choiceRationales, at: attempts.createdAt, dueAt: reviewItems.dueAt,
+    explanation: questions.explanationMd, response: attempts.response, answer: questions.answer, choices: questions.choices, rationale: questions.choiceRationales, at: attempts.createdAt, dueAt: reviewItems.dueAt,
   }).from(attempts)
     .innerJoin(questions, eq(questions.id, attempts.questionId))
     .leftJoin(reviewItems, and(eq(reviewItems.userId, userId), eq(reviewItems.questionId, attempts.questionId)))
@@ -69,10 +69,11 @@ export default async function MistakesPage({ searchParams }: PageProps<"/mistake
         <ul className="flex flex-col gap-2">
           {rows.map((m) => (
             <li key={publicId(m.id,userId)} className="flex flex-col gap-1 rounded-md border p-3 text-sm">
-              <Markdown className="line-clamp-3">{m.stem}</Markdown>
+              <Markdown>{m.stem}</Markdown>
               <p>Your answer: <b>{m.response ?? "Not answered"}</b> · Correct answer: <b>{"choice" in m.answer ? m.answer.choice : m.answer.accepted.join(" or ")}</b></p>
               {"choice" in m.answer && Array.isArray(m.choices) && <Markdown>{m.choices.find(c => "choice" in m.answer && c.id === m.answer.choice)?.md ?? ""}</Markdown>}
               {m.response && m.rationale?.[m.response] && <Markdown>{m.rationale[m.response]!}</Markdown>}
+              {m.explanation && <Markdown>{`**Why:** ${m.explanation}`}</Markdown>}
               <span className="text-xs text-muted-foreground">
                 <Link className="underline" href={`/skills/${m.skillId}?tab=mistakes`}>{SKILL_BY_ID[m.skillId]?.name}</Link>
                 {" · "}missed {formatDate(m.at, profile.timezone)}

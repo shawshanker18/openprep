@@ -12,6 +12,10 @@ describe("imported question formatting", () => {
     expect(normalizeMarkdown("$x^{18}$ and `x^2` ![x^2](asset://example)")).toBe("$x^{18}$ and `x^2` ![x^2](asset://example)");
     expect(normalizeMarkdown("$\\begin{aligned}\nx^2 &= 4\\\\\ny &= 2\\end{aligned}$")).toBe("$\\begin{aligned}\nx^2 &= 4\\\\\ny &= 2\\end{aligned}$");
   });
+  it("handles Unicode, negative and grouped exponents without changing code or fractions", () => {
+    expect(normalizeMarkdown("x², 2^(3x+1), x^-2, 10⁻³")).toBe("$x^{2}$, $2^{3x+1}$, $x^{-2}$, $10^{-3}$");
+    expect(normalizeMarkdown(String.raw`$\frac{x^2}{2}$ and ` + "`x²`" )).toBe(String.raw`$\frac{x^2}{2}$ and ` + "`x²`");
+  });
   it("normalizes alternative math delimiters and corrupted JSON escapes", () => {
     expect(normalizeMarkdown(String.raw`\(x^2\)`)).toBe("$x^2$");
     expect(normalizeMarkdown("$\frac{1}{2}$")).toBe("$\\frac{1}{2}$");

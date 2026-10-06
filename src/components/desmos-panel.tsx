@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Calculator, Expand, ExternalLink, LoaderCircle, Minimize } from "lucide-react";
 import { watchCalculatorSize } from "@/lib/calculator-size";
+import { Markdown } from "@/components/markdown";
 import { Button } from "@/components/ui/button";
 
 type DesmosApi = {
@@ -118,7 +119,7 @@ export function DesmosCalculator({ expressions = EMPTY_EXPRESSIONS, className = 
         <>
           <iframe title="Desmos graphing calculator" src={FALLBACK} className="min-h-0 w-full flex-1 border-0" allowFullScreen />
           {expressions.length > 0 && <div className="shrink-0 border-t border-neutral-200 bg-neutral-50 px-3 py-2 text-xs text-neutral-600">
-            Enter: {expressions.map((expression) => <code key={expression} className="mx-1 inline-block rounded bg-white px-1 py-0.5 text-neutral-900">{expression}</code>)}
+            Equations {expressions.map((expression) => <Markdown key={expression} className="mx-1 inline-block rounded bg-white px-2 py-1 text-neutral-900">{`$${expression}$`}</Markdown>)}
           </div>}
         </>
       ) : (
