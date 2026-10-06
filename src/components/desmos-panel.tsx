@@ -18,7 +18,7 @@ declare global {
 }
 
 const EMPTY_EXPRESSIONS: string[] = [];
-const FALLBACK = "https://www.desmos.com/calculator";
+const FALLBACK = "https://www.desmos.com/testing/collegeboard/graphing";
 const API_KEY = process.env.NEXT_PUBLIC_DESMOS_API_KEY;
 let loading: Promise<void> | null = null;
 
@@ -57,7 +57,7 @@ export function DesmosCalculator({ expressions = EMPTY_EXPRESSIONS, className = 
       if (cancelled || timedOut || !scriptReady || !window.Desmos) return;
       try {
         if (!calculator) {
-          calculator = window.Desmos.GraphingCalculator(target, { autosize: false });
+          calculator = window.Desmos.GraphingCalculator(target, { autosize: false, expressions: true, settingsMenu: false });
           (JSON.parse(expressionKey) as string[]).forEach((latex, index) =>
             calculator!.setExpression({ id: `lesson-${index}`, latex }));
         }

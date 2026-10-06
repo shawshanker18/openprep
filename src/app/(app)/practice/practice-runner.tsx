@@ -208,7 +208,7 @@ export function PracticeRunner({ sessionId, userId, mode, title, block, set, bac
         <p className="text-muted-foreground tabular-nums">
           {s.answered > 0 ? `${s.correct}/${s.answered} correct · average ${Math.round(s.ms / s.answered / 1000)}s per question.` : "Try other skills or sub-topics."}
         </p>
-        <QuestionPositions positions={positions} current={position} pending={pending} onJump={at=>navigate("jump",at)} />
+        <QuestionPositions positions={positions} current={position} target={set?.count??100} pending={pending} onJump={at=>navigate("jump",at)} />
         <p className="text-sm text-muted-foreground">{positions.filter(p=>!p.attempted).length} reached questions are still unattempted. You can return to them above.</p>
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" render={<Link href="/practice/sessions" />}>Saved sessions</Button>
@@ -242,11 +242,11 @@ export function PracticeRunner({ sessionId, userId, mode, title, block, set, bac
         <span role="status">{saveStatus}</span>
         <Button variant="outline" disabled={pending} onClick={()=>start(async()=>{if(await save()) router.push("/practice/sessions");else toast.error("Couldn't save. Please try again.");})}>Save and leave</Button>
       </div>
-      <QuestionPositions positions={positions} current={position} pending={pending} onJump={at=>navigate("jump",at)} />
+      <QuestionPositions positions={positions} current={position} target={set?.count??100} pending={pending} onJump={at=>navigate("jump",at)} />
       <div className="flex items-center justify-between gap-2 text-sm text-muted-foreground">
         <span>
           {title} · {s.q.section === "rw" ? "Reading and Writing" : "Math"} · {set ? `${s.answered}/${set.count}` : s.answered} answered{block && s.answered < block.target && ` · ${block.target - s.answered} to finish this block`}
-          {mode === "smart" && <> · <Link href="/practice/custom" className="underline">Customize practice</Link></>}
+          {mode === "smart" && <> · <Link href="/question-bank" className="underline">Choose questions</Link></>}
         </span>
         <div className="flex items-center gap-1">
           <FocusToggle />
@@ -271,7 +271,7 @@ export function PracticeRunner({ sessionId, userId, mode, title, block, set, bac
             <TutorPanel key={s.q.id} questionId={s.q.id} answered={false} />
             {s.q.section === "math" && <DesmosToggle />}
           </div>
-          <Button variant="outline" className="self-start" disabled={pending} onClick={next}>Skip for now</Button>
+          <Button variant="outline" className="self-start" disabled={pending} onClick={next}>Next question</Button>
           <span className="text-sm text-muted-foreground">How sure are you? (this submits your answer)</span>
           <div className="flex flex-wrap gap-2">
             {CONFIDENCE.map((c) => (
@@ -332,12 +332,12 @@ function Explanation({ q }: { q: RevealedQuestion }) {
   );
 }
 
-function QuestionPositions({positions,current,pending,onJump}:{positions:{position:number;attempted:boolean}[];current:number;pending:boolean;onJump:(at:number)=>void}) {
-  return <nav aria-label="Session questions" className="flex flex-wrap gap-2">
+function QuestionPositions({positions,current,target,pending,onJump}:{positions:{position:number;attempted:boolean}[];current:number;target:number;pending:boolean;onJump:(at:number)=>void}) {
+  return <details className="rounded-lg border p-3"><summary className="cursor-pointer text-sm font-medium">Question pane · Question {Math.min(current+1,target)} of {target}</summary><p className="my-2 text-xs text-muted-foreground">Select any opened question to return to it. ✓ Answered · ○ Unanswered</p><nav aria-label="Session questions" className="flex flex-wrap gap-2">
     {positions.map(p=><button key={p.position} type="button" disabled={pending} aria-current={p.position===current?"step":undefined}
       onClick={()=>onJump(p.position)} className={cn("rounded-md border px-2 py-1 text-sm",p.position===current&&"bg-muted font-semibold")}
       aria-label={`Question ${p.position+1}, ${p.attempted?"attempted":"unattempted"}`}>
       {p.position+1} {p.attempted?"✓":"○"}
     </button>)}
-  </nav>;
+  </nav></details>;
 }

@@ -1,3 +1,4 @@
+import { likelyCoveredSkills } from "@/lib/curriculum-coverage";
 import Link from "next/link";
 import { DOMAINS, SKILLS, type DomainId } from "@/content/taxonomy";
 import { MasteryBar } from "@/components/mastery-bar";
@@ -24,6 +25,7 @@ export default async function SkillsPage({ searchParams }: PageProps<"/skills">)
       .where(and(eq(lessonProgress.userId, userId), inArray(lessonProgress.skillId, SKILLS.map((k) => k.id)))).then((r) => r as [{ lessons: number }]),
     byPriority ? skillsByPriority(userId, profile) : Promise.resolve([]),
   ]);
+  const covered=likelyCoveredSkills(profile);
   const measured = skills.filter((s) => s.status !== "unknown").length;
   const strong = skills.filter((s) => s.status === "strong" || s.status === "mastered").length;
   const tab = (on: boolean) => cn("-mb-px border-b-2 px-3 py-2", on ? "border-primary font-medium" : "border-transparent text-muted-foreground");
@@ -47,7 +49,7 @@ export default async function SkillsPage({ searchParams }: PageProps<"/skills">)
               <li key={s.id}>
                 <Link href={`/skills/${s.id}`} className="flex flex-col gap-1 rounded-md border p-3 hover:bg-muted">
                   <div className="flex items-baseline justify-between gap-2 text-sm">
-                    <span>{i + 1}. {s.name}</span>
+                    <span>{i + 1}. {s.name}{covered.has(s.id) && <span className="ml-2 inline-block text-xs text-emerald-700 dark:text-emerald-300">Likely covered in school</span>}</span>
                     <span className="shrink-0 text-xs text-muted-foreground tabular-nums">{s.status === "unknown" ? STATUS_LABEL.unknown : `${s.mastery}% · ${STATUS_LABEL[s.status]}`}</span>
                   </div>
                   <MasteryBar pct={s.mastery} measured={s.status !== "unknown"} selfRating={s.selfRating} />
@@ -68,7 +70,7 @@ export default async function SkillsPage({ searchParams }: PageProps<"/skills">)
                 {skills.filter((s) => s.domain === d).map((s) => (
                   <Link key={s.id} href={`/skills/${s.id}`} className="flex flex-col gap-1 rounded-md p-1 hover:bg-muted">
                     <div className="flex items-baseline justify-between gap-2 text-sm">
-                      <span>{s.name}</span>
+                      <span>{s.name}{covered.has(s.id) && <span className="ml-2 inline-block text-xs text-emerald-700 dark:text-emerald-300">Likely covered in school</span>}</span>
                       <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
                         {s.status === "unknown" ? STATUS_LABEL.unknown : `${s.mastery}% · ${STATUS_LABEL[s.status]}`}
                         {s.pace === "slow" && " · slow"}

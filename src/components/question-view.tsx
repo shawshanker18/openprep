@@ -8,21 +8,23 @@ import type { PublicQuestion } from "@/server/questions";
 import { DOMAINS, SKILL_BY_ID, type DomainId } from "@/content/taxonomy";
 
 /** One question: passage, stem, and a choice radio group or SPR input. `correct` marks the answer after reveal. */
-export function QuestionView({ question: q, value, onChange, disabled, correct }: {
+export function QuestionView({ question: q, value, onChange, disabled, correct, showMetadata = true, compact = false }: {
   question: PublicQuestion;
   value: string | null;
   onChange: (v: string | null) => void;
   disabled?: boolean;
+  showMetadata?: boolean;
+  compact?: boolean;
   correct?: string | null; // choice letter, once revealed (MCQ only)
 }) {
   return (
-    <div className="question-content grid w-full min-w-0 gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-10">
-      <section aria-label="Question" className="flex min-w-0 flex-col gap-4 md:border-r md:pr-8">
-        <div aria-label="Question details" className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+    <div className={cn("question-content grid w-full min-w-0 gap-6", !compact && "md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-10")}>
+      <section aria-label="Question" className={cn("flex min-w-0 flex-col gap-4", !compact && "md:border-r md:pr-8")}>
+        {showMetadata && <div aria-label="Question details" className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
           <span>Domain: {DOMAINS[q.domain as DomainId]?.name ?? q.domain}</span>
           <span>Skill: {SKILL_BY_ID[q.skillId]?.name ?? q.skillId}</span>
           <span>SAT difficulty: {q.difficulty === 1 ? "Easy" : q.difficulty === 2 ? "Medium" : q.difficulty === 3 ? "Hard" : "Unrated"}</span>
-        </div>
+        </div>}
         {q.passageMd && <Markdown className="text-base">{q.passageMd}</Markdown>}
         <Markdown className="text-[15px]">{q.stemMd}</Markdown>
       </section>

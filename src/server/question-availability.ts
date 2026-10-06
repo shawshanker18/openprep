@@ -2,9 +2,14 @@ import 'server-only';
 import { sql } from 'drizzle-orm';
 import { questions } from '@/db/schema';
 
+/** Stable one-in-five partition keeps fresh test content out of practice without changing stored questions. */
+export function reservedForTests() {
+  return sql`mod(abs(hashtext(${questions.id})::bigint),5)=0`;
+}
+
 /** Account-scoped exclusion, used by previews, practice selection and test assembly. */
-export function availableQuestion(userId: string, exceptSession?: string) {
-  return sql`not exists (
+export function availableQuestion(userId: string, exceptSession?: string, includeReserved = false) {
+  return sql`(${includeReserved} or not (${reservedForTests()}) or exists (select 1 from attempts a where a.user_id=${userId} and a.question_id=${questions.id})) and not exists (
     select 1 from practice_session_items pi join practice_sessions ps on ps.id=pi.session_id
     where ps.user_id=${userId} and ps.status='active' and pi.question_id=${questions.id}
       and (${exceptSession ?? null}::uuid is null or ps.id<>${exceptSession ?? null}::uuid)

@@ -19,7 +19,10 @@ export function normalizeMarkdown(source: string): string {
     .map((part, index) => index % 2 ? part : part.replace(/\b([a-zA-Z]|\d+(?:\.\d+)?)\^(-?\d+|\{[^{}\n]+\}|\([^()\n]+\))/g, (_, base, power) => `$${base}^{${power.replace(/^[{(]|[})]$/g, "")}}$`))
     .join("")
     .split(/(\$\$[\s\S]*?\$\$|(?<!\\)\$[^$]*?(?<!\\)\$|`[^`]*`|!\[[^\]]*\]\([^)]*\))/g)
-    .map((part, index) => index % 2 ? part : part.replace(/([a-zA-Z]|\d+(?:\.\d+)?)([⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺ⁿ]+)/g, (_, base: string, exponent: string) => {
+    .map((part, index) => index % 2 ? (part.startsWith('$') ? part.replace(/\^\(([^()\n]+)\)/g, '^{$1}').replace(/([a-zA-Z0-9)}\]])([⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺ⁿ]+)/g, (_, base: string, exponent: string) => {
+      const symbols="⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺ⁿ", plain="0123456789-+n";
+      return `${base}^{${[...exponent].map(c=>plain[symbols.indexOf(c)]).join('')}}`;
+    }) : part) : part.replace(/([a-zA-Z]|\d+(?:\.\d+)?)([⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺ⁿ]+)/g, (_, base: string, exponent: string) => {
       const symbols = "⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺ⁿ", plain = "0123456789-+n";
       return `$${base}^{${[...exponent].map(c => plain[symbols.indexOf(c)]).join("")}}$`;
     }))

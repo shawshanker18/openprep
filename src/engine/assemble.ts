@@ -40,7 +40,7 @@ export function largestRemainder(total: number, weights: number[]): number[] {
 }
 
 export type PoolQ = {
-  id: string; skillId: string; domain: string; difficulty: Difficulty; type: "mcq" | "spr"; lastSeenAt: Date | null;
+  id: string; skillId: string; domain: string; difficulty: Difficulty; type: "mcq" | "spr"; lastSeenAt: Date | null; reserved?: boolean;
 };
 
 /**
@@ -62,10 +62,11 @@ export function assembleModule<T extends PoolQ>(
   // Round-robin across skills, unseen tier before seen tier.
   const take = (n: number, pred: (q: T) => boolean): T[] => {
     const out: T[] = [];
-    for (const tier of [true, false]) {
+    for (const tier of [0,1,2]) {
       const bySkill = new Map<string, T[]>();
       for (const q of ordered) {
-        if (used.has(q.id) || (q.lastSeenAt === null) !== tier || !pred(q)) continue;
+        const priority = q.lastSeenAt !== null ? 2 : q.reserved ? 0 : 1;
+        if (used.has(q.id) || priority !== tier || !pred(q)) continue;
         const group = bySkill.get(q.skillId);
         if (group) group.push(q);
         else bySkill.set(q.skillId, [q]);

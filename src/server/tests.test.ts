@@ -274,3 +274,20 @@ it("custom test selects multiple skills with one narrow metadata query", async (
   for (const skill of skills) expect(selected.filter((item) => item.questionId.startsWith(skill))).toHaveLength(4);
   await T.abandonTest(OTHER, result.id);
 });
+it('submits an early module and saves final drafts atomically, with safe retries and ownership checks',async()=>{
+  const started=await T.startTest(USER,{kind:'module',section:'math'});
+  if(!started.ok) throw new Error(started.error);
+  const [module]=await modules(started.id);
+  expect(await T.submitModule(USER,module!.id)).toBe(false);
+  await T.startModule(USER,module!.id);
+  const drafts=[{position:0,response:'A',flagged:true,timeMsDelta:200},{position:1,response:'B',flagged:false,timeMsDelta:200}];
+  expect(await T.submitModule(OTHER,module!.id,drafts)).toBe(false);
+  expect(await T.submitModule(USER,module!.id,[{...drafts[0]!,position:99}])).toBe(false);
+  expect((await items(module!.id))[0]!.response).toBeNull();
+  expect(await T.submitModule(USER,module!.id,drafts)).toEqual({finished:true});
+  const saved=await items(module!.id);
+  expect(saved[0]).toMatchObject({response:'A',flagged:true});
+  expect(saved[1]).toMatchObject({response:'B'});
+  expect(await T.submitModule(USER,module!.id,[{...drafts[0]!,response:'B'}])).toEqual({finished:true});
+  expect((await items(module!.id))[0]!.response).toBe('A');
+});

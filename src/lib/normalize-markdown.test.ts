@@ -33,3 +33,6 @@ describe("official SAT dates", () => {
     expect(upcomingSatDates("2027-06-06")).toEqual([]);
   });
 });
+it('normalizes exponent notation inside math, preserving code and correctly grouping the entire power',()=>{
+  expect(normalizeMarkdown('$2^(3x+1)+x²+10⁻³$ and `x²`')).toBe('$2^{3x+1}+x^{2}+10^{-3}$ and `x²`');
+});

@@ -1,4 +1,4 @@
-import { availableQuestion } from "./question-availability";
+import { availableQuestion, reservedForTests } from "./question-availability";
 // Tests: assembly, module lifecycle, server-authoritative timing, scoring at completion (spec 03 §7–8, 04 §5).
 // Mastery is only updated when the whole session completes; abandoned sessions change nothing.
 import "server-only";
@@ -15,7 +15,7 @@ import { recordAttempt } from "./attempts";
 import { timingStats } from "@/engine/score";
 import { consumeWindow, exposeQuestions, lockDelivery } from "./delivery";
 import { deliveryContext } from "./delivery-context";
-import { DELIVERY_POLICY, DeliveryBlocked } from "./delivery-policy";
+import { DeliveryBlocked } from "./delivery-policy";
 import { toPublic, toRevealed } from "./questions";
 
 export type TestKind = "full" | "section" | "module" | "mini" | "weakness" | "custom";
@@ -38,10 +38,10 @@ async function pool(tx: Tx, userId: string, where: ReturnType<typeof and>) {
   const rows = await tx.select({ q: {
     id: questions.id, skillId: questions.skillId, domain: questions.domain,
     difficulty: questions.difficulty, type: questions.type, tags: questions.tags,
-  }, seen: sql<Date | null>`max(${attempts.createdAt})` }).from(questions)
+  }, reserved: reservedForTests().mapWith(Boolean), seen: sql<Date | null>`max(${attempts.createdAt})` }).from(questions)
     .leftJoin(attempts, and(eq(attempts.questionId, questions.id), eq(attempts.userId, userId)))
-    .where(and(eq(questions.status, "active"), availableQuestion(userId), where)).groupBy(questions.id);
-  return rows.map((r) => ({ ...r.q, difficulty: r.q.difficulty as Difficulty, type: r.q.type as "mcq" | "spr", lastSeenAt: r.seen ? new Date(r.seen) : null }));
+    .where(and(eq(questions.status, "active"), availableQuestion(userId,undefined,true), where)).groupBy(questions.id);
+  return rows.map((r) => ({ ...r.q, reserved:r.reserved, difficulty: r.q.difficulty as Difficulty, type: r.q.type as "mcq" | "spr", lastSeenAt: r.seen ? new Date(r.seen) : null }));
 }
 
 async function usedIds(tx: Tx, sessionId: string) {
@@ -272,7 +272,9 @@ export async function startModule(userId: string, moduleId: string) {
 export async function saveResponse(userId: string, input: {
   moduleId: string; position: number; response: string | null; flagged: boolean; timeMsDelta: number;
 }) {
+  const context=await deliveryContext();
   return db.transaction(async (tx) => {
+    await lockDelivery(tx,userId,context);
     const r = await ownedModule(tx, userId, input.moduleId);
     if (!r || r.s.status !== "in_progress" || r.m.submittedAt || !r.m.startedAt) return { ok: false as const, error: "This module is closed." };
     if (r.m.deadlineAt && Date.now() > r.m.deadlineAt.getTime() + GRACE_MS) return { ok: false as const, error: "Time is up for this module." };
@@ -289,7 +291,7 @@ export async function saveResponse(userId: string, input: {
   });
 }
 
-export async function submitModule(userId: string, moduleId: string) {
+export async function submitModule(userId: string, moduleId: string, drafts: {position:number;response:string|null;flagged:boolean;timeMsDelta:number}[] = []) {
   const context=await deliveryContext();
   return db.transaction(async (tx) => {
     await lockDelivery(tx,userId,context);
@@ -297,7 +299,18 @@ export async function submitModule(userId: string, moduleId: string) {
     if (!r) return false;
     if (!r.m.submittedAt) {
       const items=await moduleItems(tx,moduleId);
-      if (!r.m.startedAt || Date.now()-r.m.startedAt.getTime()<items.length*DELIVERY_POLICY.minimumAnswerMs) return false;
+      if (!r.m.startedAt || r.s.status!=="in_progress") return false;
+      const positions=new Set(items.map(i=>i.item.position));
+      if(drafts.some(d=>!positions.has(d.position)) || new Set(drafts.map(d=>d.position)).size!==drafts.length) return false;
+      // Save final answers and close the module in one transaction, without a per-question duration gate.
+      if(!r.m.deadlineAt || Date.now()<=r.m.deadlineAt.getTime()+GRACE_MS) {
+        let room=Math.max(0,Date.now()-r.m.startedAt.getTime()+2000-items.reduce((sum,i)=>sum+i.item.timeMs,0));
+        for(const draft of drafts) {
+          const delta=Math.max(0,Math.min(draft.timeMsDelta,3_600_000,room));room-=delta;
+          await tx.update(testItems).set({response:draft.response,flagged:draft.flagged,timeMs:sql`least(${testItems.timeMs}+${delta},3600000)`})
+            .where(and(eq(testItems.moduleId,moduleId),eq(testItems.position,draft.position)));
+        }
+      }
       await exposeQuestions(tx,userId,items.map(i=>i.q),await deliveryContext());
     }
     await submitModuleTx(tx, userId, r.s.id, moduleId, new Date());
@@ -391,7 +404,7 @@ export async function sweepTests(now = new Date()) {
     .where(and(eq(testSessions.status, "in_progress"), isNull(testModules.submittedAt),
       lt(testModules.deadlineAt, new Date(now.getTime() - GRACE_MS))))
     .limit(200);
-  for (const e of expired) await db.transaction((tx) => submitModuleTx(tx, e.userId, e.sessionId, e.moduleId, now));
+  for (const e of expired) await db.transaction(async tx=>{await lockDelivery(tx,e.userId,{ip:null,device:null});await submitModuleTx(tx,e.userId,e.sessionId,e.moduleId,now);});
   const stale = await db.update(testSessions).set({ status: "abandoned", completedAt: now })
     .where(and(eq(testSessions.status, "in_progress"), sql`${testSessions.kind} <> 'diagnostic'`,
       lt(testSessions.startedAt, new Date(now.getTime() - 3 * 86_400_000))))

@@ -23,6 +23,8 @@ beforeAll(async()=>{
  await database.insert(schema.profiles).values([{id:user},{id:other}]);
  profile=(await database.select().from(schema.profiles).where(eq(schema.profiles.id,user)))[0]!;
  await database.insert(schema.skillState).values(SKILLS.map(s=>({userId:user,skillId:s.id})));
+ const candidates=await pg.query<{id:string}>("select 'practice-fixture-' || n as id from generate_series(1,100) n where mod(abs(hashtext('practice-fixture-' || n)::bigint),5)<>0 limit 5");
+ ids.splice(0,ids.length,...candidates.rows.map(r=>r.id));
  await database.insert(schema.questions).values(ids.map(id=>({id,skillId:skill.id,section:skill.section,domain:skill.domain,difficulty:2,type:"mcq" as const,stemMd:"stem",choices:[{id:"A",md:"one"}],answer:{choice:"A"},explanationMd:"solution"})));
  session=await S.createPracticeSession(user,{mode:"set",skillIds:[skill.id],count:5},"Lesson practice");
 });
@@ -166,4 +168,15 @@ it("steps adaptive difficulty up after correct answers and down after misses, in
       await S.answerPracticeSession(student,sid,position,{response:responses[position]!,timeMs:6000,confidence:2});
     }
   } finally {random.mockRestore();}
+});
+it("reserves fresh test questions from practice while allowing review after an attempt",async()=>{
+ const {availableQuestion}=await import("./question-availability");
+ const candidate=await pg.query<{id:string}>("select 'reserved-' || n as id from generate_series(1,100) n where mod(abs(hashtext('reserved-' || n)::bigint),5)=0 limit 1");
+ const id=candidate.rows[0]!.id;
+ await database.insert(schema.questions).values({id,skillId:skill.id,section:skill.section,domain:skill.domain,difficulty:2,type:"mcq",stemMd:"Reserved",choices:[{id:"A",md:"1"}],answer:{choice:"A"},explanationMd:""});
+ const lookup=(includeReserved=false)=>database.select().from(schema.questions).where(and(eq(schema.questions.id,id),availableQuestion(other,undefined,includeReserved)));
+ expect(await lookup()).toHaveLength(0);
+ expect(await lookup(true)).toHaveLength(1);
+ await database.insert(schema.attempts).values({userId:other,questionId:id,skillId:skill.id,response:"A",correct:true,timeMs:5000,context:"practice",thetaBefore:0,thetaAfter:0});
+ expect(await lookup()).toHaveLength(1);
 });
