@@ -20,7 +20,7 @@ const MODE_RULE: Record<Mode, string> = {
   explain: "explain: explain the solution a different way from the official explanation.",
   byhand: "byhand: every algebra step, one per line.",
   fast: "fast: the quickest legitimate test-day method.",
-  desmos: "geogebra: exact things to type into the GeoGebra calculator and what to click.",
+  desmos: "desmos: exact things to type into the Desmos calculator and what to click.",
   why_wrong: "why_wrong: explain the specific mistake that leads to the student's choice, then the fix.",
   vocab: "vocab: explain the key vocabulary or grammar rule this question tests (word in context, punctuation, agreement, transitions) in plain language, with 1-2 short original example sentences.",
   similar: "similar: write ONE new original practice question testing the same skill at the same difficulty in the same SAT format (a short passage if Reading & Writing; 4 choices A-D, or a student-produced response if the original is one). Start with the heading \"**AI-generated practice (not scored)**\", then the question, then a line \"Answer: X\", then a short worked solution. Do not reuse the original's wording or numbers. Up to 300 words.",
@@ -50,7 +50,7 @@ export async function checkAccess(userId: string, q: Question, mode: Mode): Prom
 }
 
 export const cacheKey = (q: Question, mode: Mode, choice?: string) =>
-  `${q.id}:${mode}${mode === "why_wrong" ? `:${choice}` : ""}:v${q.version}`;
+  `${q.id}:${mode}${mode === "why_wrong" ? `:${choice}` : ""}:v${q.version}:plain-desmos-v1`;
 
 export async function getCached(key: string) {
   const [r] = await db.select().from(aiCache).where(eq(aiCache.key, key));
@@ -96,6 +96,7 @@ RULES:
 - Mode = ${mode}. ${MODE_RULE[mode]}
 - Match depth to mastery when known: below 45% define terms and go slower; above 70% be brief.
 - Sound like a patient human tutor talking to one student: plain, warm sentences that say WHY each step works and what to notice first.
+  Use direct explanations. Avoid slogans, motivational filler, canned introductions, and exaggerated claims.
   No dashes used as punctuation (no "—" or " - "), no filler, no praise padding, no headings for short answers.
 - Use $...$ for all math. Keep answers under 180 words unless asked for more steps or the mode allows more.
 - Stay on this question, its skill, and SAT preparation. Politely decline anything else.

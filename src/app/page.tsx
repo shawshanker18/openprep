@@ -3,9 +3,9 @@ import { Button } from "@/components/ui/button";
 import { SKILLS } from "@/content/taxonomy";
 
 const STEPS = [
-  { title: "Diagnose", body: `A short adaptive diagnostic finds your real starting point in all ${SKILLS.length} SAT skills.` },
-  { title: "Practice what matters", body: "Every question is chosen for you: the skills with the most points left to gain, at the right difficulty." },
-  { title: "Test and track", body: "Full adaptive mocks, mistake review, and an honest score estimate that tightens as you go." },
+  { title: "Diagnose", body: `An optional diagnostic estimates your level across ${SKILLS.length} SAT skills.` },
+  { title: "Practice", body: "Practice questions selected from your recent answers, or choose a skill in the question bank." },
+  { title: "Test and track", body: "Take timed practice tests, review mistakes, and track estimated scores." },
 ];
 
 // Static: signed-in visitors are sent to /dashboard by the proxy before this is served.
@@ -13,10 +13,10 @@ export default function Landing() {
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-12 px-4 py-16">
       <section className="flex flex-col gap-4">
-        <h1 className="text-4xl font-semibold tracking-tight">SAT prep that starts where you are.</h1>
+        <h1 className="text-4xl font-semibold tracking-tight">Free SAT practice.</h1>
         <p className="max-w-xl text-lg text-muted-foreground">
-          Tell us your target and how much time you have. OpenPrep works out what you know, then gives you the next best
-          thing to study. Free and open source.
+          Practice Math and Reading and Writing, take tests, and review your answers. Set a target score and study schedule
+          to get a daily plan.
         </p>
         <div><Button size="lg" render={<Link href="/login" />}>Get started</Button></div>
       </section>

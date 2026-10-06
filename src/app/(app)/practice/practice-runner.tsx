@@ -311,7 +311,7 @@ export function PracticeRunner({ sessionId, userId, mode, title, block, set, bac
 function Explanation({ q }: { q: RevealedQuestion }) {
   const tabs = [
     { id: "hand", label: "By hand", md: q.explanationMd },
-    q.desmos && { id: "desmos", label: "GeoGebra", md: q.desmos.stepsMd },
+    q.desmos && { id: "desmos", label: "Desmos", md: q.desmos.stepsMd },
     q.fastMethodMd && { id: "fast", label: "Fastest", md: q.fastMethodMd },
   ].filter(Boolean) as { id: string; label: string; md: string }[];
   const [tab, setTab] = useReducer((_: string, t: string) => t, "hand");

@@ -11,7 +11,7 @@ type Msg = { role: "user" | "assistant"; content: string };
 
 const LABEL: Record<Exclude<Mode, "chat">, string> = {
   hint: "Give me a hint", explain: "Explain it differently", byhand: "Show every step", fast: "Fastest SAT method",
-  desmos: "Solve it with GeoGebra", why_wrong: "Why is my answer wrong?",
+  desmos: "Solve it with Desmos", why_wrong: "Why is my answer wrong?",
   vocab: "Explain the vocabulary/grammar", similar: "Give me a similar question",
 };
 
