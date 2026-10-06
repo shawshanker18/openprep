@@ -69,12 +69,12 @@ it("parallel Next retries advance once, skipped questions remain unattempted, an
  expect(resumed).toMatchObject({position:1,response:"B",timeMs:17000,result:null});
  await expect(S.loadPracticeSession(user,profile,session,{kind:"jump",position:4})).rejects.toThrow(/not found/);
 });
-it("enforces unanswered and minimum-time quotas even through saved-session navigation",async()=>{
+it("allows continuing with skipped questions while enforcing minimum answer time",async()=>{
  await expect(S.answerPracticeSession(user,session,1,{response:"B",timeMs:0,confidence:1})).rejects.toThrow(/read the question/);
  await expect(S.loadPracticeSession(user,profile,session,{kind:"next",position:1})).resolves.toMatchObject({position:2}); // already reached
- await expect(S.loadPracticeSession(user,profile,session,{kind:"next",position:2})).rejects.toThrow(/open questions/);
- expect((await S.getPracticeSession(user,session))?.cursor).toBe(2); // rejected pull rolls back cursor
- expect(await database.select().from(schema.practiceSessionItems)).toHaveLength(3);
+ await expect(S.loadPracticeSession(user,profile,session,{kind:"next",position:2})).resolves.toMatchObject({position:3});
+ expect((await S.getPracticeSession(user,session))?.cursor).toBe(3); // skipped questions do not block the next question
+ expect(await database.select().from(schema.practiceSessionItems)).toHaveLength(4);
 });
 it("rejects cross-account reads, saves, answers, and random session IDs",async()=>{
  expect(await S.getPracticeSession(other,session)).toBeNull();

@@ -4,7 +4,7 @@ export const DELIVERY_POLICY = {
   skill: { day: 60, week: 180 },
   device: { day: 360, week: 1200 },
   ip: { day: 1800, week: 6000 },
-  minute: 12, unanswered: 2, pendingMs: 30 * 60_000, minimumAnswerMs: 5000,
+  minute: 12, pendingMs: 30 * 60_000, minimumAnswerMs: 5000,
   paperHours: 2, setsPerDay: 60, similarPerDay: 30,
 } as const;
 

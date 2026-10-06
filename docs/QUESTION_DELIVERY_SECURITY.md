@@ -29,7 +29,7 @@ The limits live in src/server/delivery-policy.ts. Shared-network limits are high
 
 Additional controls:
 
-- Practice: at most 12 deliveries per rolling minute and two unanswered questions. Pending deliveries stop occupying slots after 30 minutes. Resume preserves the original clock and consumes no new exposure.
+- Practice: at most 12 deliveries per rolling minute. Unanswered questions and unfinished sessions do not block new practice. Resume preserves the original clock and consumes no new exposure.
 - A practice/diagnostic answer needs five seconds of server-measured elapsed time. Supplying a larger client time does not satisfy this requirement. Wrong or blank answers still reveal explanations after acceptance, for learning.
 - Test creation is atomically capped at four starts per account, eight per device and forty per IP in five minutes; concurrent requests cannot create extra sessions.
 - Test modules cannot be submitted until at least five seconds per item have elapsed since starting. Normal SAT deadlines and server-side expiry still apply. Starting and viewing modules charge exposure; tests cannot bypass daily/weekly allowances.
