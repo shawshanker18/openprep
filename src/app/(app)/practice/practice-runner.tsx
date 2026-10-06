@@ -212,7 +212,7 @@ export function PracticeRunner({ sessionId, userId, mode, title, block, set, bac
         <p className="text-sm text-muted-foreground">{positions.filter(p=>!p.attempted).length} reached questions are still unattempted. You can return to them above.</p>
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" render={<Link href="/practice/sessions" />}>Saved sessions</Button>
-          {back ? <Button render={<Link href={back} />}>{back.startsWith("/question-bank") ? "Back to the question bank" : back.startsWith('/bookmarks')?'Back to saved questions':"Back to the course"}</Button> : <Button render={<Link href="/practice/custom" />}>New custom set</Button>}
+          {back ? <Button render={<Link href={back} />}>{back.startsWith("/question-bank") ? "Back to the question bank" : back.startsWith('/bookmarks')?'Back to saved questions':"Back to the course"}</Button> : <Button render={<Link href="/practice" />}>Adaptive practice</Button>}
           <Button variant="outline" render={<Link href="/dashboard" />}>Back to dashboard</Button>
         </div>
       </div>

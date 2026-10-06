@@ -85,6 +85,9 @@ export type PracticeSelection = {
   context?: DeliveryContext; exploratory?: boolean; paper?: { nonce: string; count: number };
 };
 export async function selectPracticeQuestion(userId: string, profile: Profile, input: PracticeSelection) {
+  if (input.mode === "set" && ((input.skillIds?.length ?? 0) > 1 || (input.tags?.length ?? 0) > 1 || input.tags?.some(tag => tag !== "desmos"))) {
+    throw new DeliveryBlocked("Custom practice is no longer available.");
+  }
   const now = new Date();
   // Never serve a question from one of the student's unfinished tests: it couldn't be answered here (that would
   // reveal a live test question's answer), so practice would be stuck on it.

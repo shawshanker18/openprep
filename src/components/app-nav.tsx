@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import {
-  BarChart3, Bookmark, BookOpen, Calculator, Check, ClipboardList, GraduationCap, Home, Library, Menu, Settings, ShieldCheck, SlidersHorizontal, Sparkles, XCircle,
+  BarChart3, Bookmark, BookOpen, Calculator, Check, ClipboardList, GraduationCap, Home, Library, Menu, Settings, ShieldCheck, Sparkles, XCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -35,7 +35,6 @@ export const NAV_GROUPS = [
     items: [
       { href: "/practice", label: "Adaptive practice", icon: Sparkles },
       { href: "/question-bank", label: "Question bank", icon: Library },
-      { href: "/practice/custom", label: "Custom practice", icon: SlidersHorizontal },
       { href: "/tests", label: "Practice tests", icon: ClipboardList },
     ],
   },
@@ -56,7 +55,6 @@ export function CurrentSection() {
   return <span className="mr-auto text-sm font-medium" aria-label="Current section">{item?.label ?? (path.startsWith("/settings") ? "Settings" : "OpenPrep")}</span>;
 }
 
-/** Exact match, or a sub-page — except /practice, whose sub-page /practice/custom has its own entry. */
 /**
  * Exact match, or a sub-page. Links with a query (practice presets) match on the query too, and plain
  * /practice stays inactive while a preset or a question-bank list is running there.

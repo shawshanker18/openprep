@@ -9,7 +9,7 @@ Practice now creates an account-owned database session and redirects to `/practi
 - Each reached question's position, internal ID, delivery time, unfinished response and saved working time.
 - The accepted attempt ID. Answers, correctness, explanations and summary totals are rebuilt from that attempt, rather than trusting browser totals.
 
-Future questions are selected on demand; the client receives no future question IDs or text. The remaining set size is a requested session size, not the size of the question bank. Practice sessions use the existing generated-set creation quotas and a maximum of 100 reached questions per session (custom sets remain 5–50). Resuming has no two-hour paper-token expiry and does not restart that cumulative count.
+Future questions are selected on demand; the client receives no future question IDs or text. The remaining set size is a requested session size, not the size of the question bank. Practice sessions use the existing generated-set creation quotas and a maximum of 100 reached questions per session (question-bank and lesson presets use fixed sizes). Resuming has no two-hour paper-token expiry and does not restart that cumulative count.
 
 Drafts save after a short pause in input and periodically while the tab is visible. A local input-only backup covers unsynced work on the same device. "Save and leave" waits for the server save; failed saves are shown explicitly. Sudden closure while offline cannot promise cross-device sync, and periodic timing checkpoints can lose the final few seconds. Previously expired browser-only session history is not reconstructed.
 
@@ -43,3 +43,5 @@ Apply Drizzle migration 0014 (after the pending 0013) and deploy the application
 ## Graphing calculator first-load sizing
 
 The GeoGebra wrapper previously initialized a fixed 900 × 500 applet, then resized synchronously during its load callback. It now measures the actual flex host before injection, waits for a visible host, and applies a post-load size after two animation frames. It observes the host rather than the outer border/padding, refreshes on fullscreen/minimize, and cancels pending frame callbacks on cleanup. Failed script loads can be retried by a later mount. Tests cover first-open dimensions, hidden/reopened panels, fullscreen sizes and cleanup. This is a code-level fix; the hosted GeoGebra canvas has not been visually tested in a signed-in browser.
+
+Custom Practice has been removed. Its builder route and navigation links no longer exist; server selection rejects multi-skill custom configurations. Historical custom sessions remain stored but cannot be resumed or changed. Adaptive practice, question-bank presets, lesson exercises and saved-question lists remain available.
