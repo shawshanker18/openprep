@@ -9,6 +9,8 @@ import { prepareEmailSignIn } from "@/app/auth/actions";
 
 export function LoginForm({ google: showGoogle, inApp = false }: { google: boolean; inApp?: boolean }) {
   const [age, setAge] = useState(false);
+  const [privacyAccepted,setPrivacyAccepted]=useState(false);
+  const canContinue=age && privacyAccepted;
   const [email, setEmail] = useState("");
   const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [refused, setRefused] = useState<string | null>(null);
@@ -17,10 +19,12 @@ export function LoginForm({ google: showGoogle, inApp = false }: { google: boole
 
   const magic = async (e: React.FormEvent) => {
     e.preventDefault();
+    if(!canContinue){setRefused("Please accept the Privacy Policy and confirm you are 13 or older before continuing.");setState("error");return;}
     setState("sending");
     setRefused(null);
     try {
-      await prepareEmailSignIn(email);
+      const prepared=await prepareEmailSignIn(email,privacyAccepted);
+      if(!prepared.ok){setRefused(prepared.error);setState("error");return;}
     const { error } = await createClient().auth.signInWithOtp({ email, options: { emailRedirectTo: redirectTo() } });
     // The sign-up cap explains itself; anything else gets the general message.
     if (error && /Too many new accounts|create your account on the OpenPrep/.test(error.message)) setRefused(error.message);
@@ -52,12 +56,16 @@ export function LoginForm({ google: showGoogle, inApp = false }: { google: boole
       <label className="flex items-start gap-2.5 text-sm text-muted-foreground">
         <input type="checkbox" className="mt-0.5 size-4 accent-foreground" checked={age} onChange={(e) => setAge(e.target.checked)} />
         <span>
-          I am 13 or older and agree to the <Link className="text-foreground underline" href="/terms">Terms</Link> and{" "}
-          <Link className="text-foreground underline" href="/privacy">Privacy policy</Link>.
+          I am 13 or older and agree to the <Link className="text-foreground underline" href="/terms">Terms</Link>.
         </span>
       </label>
 
-      {showGoogle && (inApp ? <AppGoogleButton enabled={age}>{or}</AppGoogleButton> : <><GoogleButton enabled={age} />{or}</>)}
+      <label className="flex items-start gap-2.5 text-sm text-muted-foreground">
+        <input id="accept-privacy" type="checkbox" required className="mt-0.5 size-4 accent-foreground" checked={privacyAccepted} onChange={e=>setPrivacyAccepted(e.target.checked)}/>
+        <span>I accept the <Link className="text-foreground underline" href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</Link>.</span>
+      </label>
+
+      {showGoogle && (inApp ? <AppGoogleButton enabled={canContinue}>{or}</AppGoogleButton> : <><GoogleButton enabled={canContinue} privacyAccepted={privacyAccepted}/>{or}</>)}
 
       <form onSubmit={magic} className="flex flex-col gap-5">
         <label className="flex flex-col gap-2 text-sm font-medium">
@@ -66,7 +74,7 @@ export function LoginForm({ google: showGoogle, inApp = false }: { google: boole
             autoComplete="email"
             className="h-12 rounded-xl bg-muted px-4 text-base font-normal outline-none ring-ring placeholder:text-muted-foreground focus:ring-2" />
         </label>
-        <button type="submit" disabled={!age || state === "sending"}
+        <button type="submit" disabled={!canContinue || state === "sending"}
           className="h-14 rounded-2xl bg-foreground text-base font-medium text-background transition-opacity disabled:opacity-40">
           {state === "sending" ? "Sending…" : "Continue with email"}
         </button>

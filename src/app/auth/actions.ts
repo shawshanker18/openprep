@@ -11,15 +11,18 @@ export async function signOut() {
 }
 
 /** Before an email link is requested: lets a new account be created for this email (3 per IP per day). */
-export async function prepareEmailSignIn(email: string) {
+export async function prepareEmailSignIn(email: string, privacyAccepted: boolean) {
+  if(privacyAccepted!==true)return {ok:false as const,error:"Please accept the Privacy Policy before continuing."};
   const p = z.email().max(254).safeParse(email);
-  if (p.success) await issueSignupTicket(p.data, await clientIp());
+  if(!p.success)return {ok:false as const,error:"Enter a valid email address."};
+  await issueSignupTicket(p.data, await clientIp());
+  return {ok:true as const};
 }
 
 /** The sign-up cap's own message when that's why sign-in failed, so the student knows what happened. */
 const refusal = (message?: string) => SIGNUP_REFUSALS.find((r) => message?.includes(r)) ? message : undefined;
 
-const Google = z.object({ credential: z.string().regex(/^[\w-]+\.[\w-]+\.[\w-]+$/).max(8192), nonce: z.uuid() });
+const Google = z.object({ credential: z.string().regex(/^[\w-]+\.[\w-]+\.[\w-]+$/).max(8192), nonce: z.uuid(), privacyAccepted:z.literal(true) });
 
 /**
  * Finish Google sign-in on the server: Supabase checks Google's ID token (and our nonce) and the session cookies

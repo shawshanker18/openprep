@@ -19,6 +19,7 @@ export function AppGoogleButton({ enabled, children }: { enabled: boolean; child
   if (!supported) return null;
 
   const start = async () => {
+    if(!enabled)return;
     try {
       const url = `${window.location.origin}/auth/google?n=${await newNonce()}`;
       if (window.openprepDesktop) window.open(url); // the desktop app opens it in the normal browser
