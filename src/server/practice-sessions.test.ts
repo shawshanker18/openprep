@@ -123,3 +123,22 @@ it("excludes active session and test questions from preview queries and restores
   await database.update(schema.testSessions).set({status:"completed"}).where(eq(schema.testSessions.id,test!.id));
   expect((await available()).map(q=>q.id)).toEqual(expect.arrayContaining([ids[0],ids[1]]));
 });
+it("applies selected difficulties to question previews and every question in a multi-skill bank session", async () => {
+  const student=randomUUID();
+  await database.insert(schema.profiles).values({id:student});
+  const studentProfile=(await database.select().from(schema.profiles).where(eq(schema.profiles.id,student)))[0]!;
+  await database.insert(schema.questions).values([1,2,3].map(d=>({id:`difficulty-${d}`,skillId:skill.id,section:skill.section,domain:skill.domain,difficulty:d,type:"mcq" as const,stemMd:"Sample question",choices:[{id:"A",md:"Answer"}],answer:{choice:"A"},explanationMd:"Stored explanation"})));
+  const {previewQuestions}=await import("./bank-preview");
+  const previews=await previewQuestions(student,[skill.id],[3]);
+  expect(previews).toHaveLength(1);
+  expect(previews[0]!.difficulty).toBe(3);
+  expect(JSON.stringify(previews)).not.toContain('Stored explanation');
+  expect(previews[0]).not.toHaveProperty('answer');
+  const sid=await S.createPracticeSession(student,{mode:"set",skillIds:[skill.id,"m-alg-lin2"],difficulties:[2,3],count:5},"Question Bank");
+  for(let position=0;position<5;position++) {
+    const question=await S.loadPracticeSession(student,studentProfile,sid,position===0?{kind:"resume"}:{kind:"next",position:position-1});
+    expect(question.done).toBe(false);
+    if(question.done) throw new Error("No question selected");
+    expect([2,3]).toContain(question.question.difficulty);
+  }
+});

@@ -8,6 +8,7 @@ import { eventQuota } from './delivery';
 export const PaperConfigSchema = z.object({
   mode: z.enum(['skill','smart','review','set','list']), skillId:z.string().min(1).max(64).optional(),
   difficulty:z.union([z.literal(1),z.literal(2),z.literal(3),z.literal('mixed')]).optional(),
+  difficulties:z.array(z.union([z.literal(1),z.literal(2),z.literal(3)])).min(1).max(3).optional(),
   // Bounded multi-skill selections from the question bank.
   skillIds:z.array(z.string().min(1).max(64)).max(29).optional(), tags:z.array(z.string().refine(tag => tag === 'desmos')).max(1).optional(),
   timing:z.enum(['auto','off','on']).optional(), ids:z.array(z.string().regex(/^[\w-]{22}$/)).max(50).optional(),

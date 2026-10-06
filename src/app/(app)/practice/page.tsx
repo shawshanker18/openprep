@@ -53,6 +53,9 @@ async function loadPage({ searchParams }: PageProps<"/practice">) {
   }
 
   if (mode === "set") {
+    const difficultyValues = list(sp.difficulties);
+    if (difficultyValues.some(v=>!['1','2','3'].includes(v)) || difficultyValues.length>3) notFound();
+    const difficulties = difficultyValues.length ? [...new Set(difficultyValues.map(Number))] as (1|2|3)[] : undefined;
     const skillIds = list(sp.skills).filter((s) => SKILL_BY_ID[s]).slice(0, 29);
     if (list(sp.skills).length !== skillIds.length) notFound();
     const tags = list(sp.tags);
@@ -64,7 +67,7 @@ async function loadPage({ searchParams }: PageProps<"/practice">) {
     if (!back && !skillIds.length) notFound();
     const title = skillIds.length === 1 ? SKILL_BY_ID[skillIds[0]!]!.name : "Question bank";
     const set = { skillIds, tags, count, timing } as const;
-    const sessionId=await createPracticeSession(userId, {mode:"set", difficulty, ...set},title,back);
+    const sessionId=await createPracticeSession(userId, {mode:"set", difficulty, difficulties, ...set},title,back);
     redirect(`/practice?session=${sessionId}${blockQuery}`);
   }
 
