@@ -7,34 +7,13 @@ import { Button } from "@/components/ui/button";
 import { db } from "@/db";
 import { testSessions } from "@/db/schema";
 import { requireUser } from "@/server/auth";
-import { getSkillSummary, type SkillSummary } from "@/server/analytics";
 import { getTestResult } from "@/server/tests";
 import { TestResults } from "./test-results";
-import { skillsByPriority } from "@/server/plan";
-import { SKILL_BY_ID } from "@/content/taxonomy";
 import { ReviewItem } from "./review-item";
 
 export const metadata = { title: "Results" };
 
-const SELF = ["Don't know", "A little", "Know it", "Very confident"];
-
-function SkillList({ title, skills }: { title: string; skills: SkillSummary[] }) {
-  return (
-    <div className="flex flex-col gap-2">
-      <h3 className="text-sm font-medium">{title}</h3>
-      {skills.length ? (
-        <ul className="flex flex-col gap-1 text-sm">
-          {skills.map((s) => (
-            <li key={s.id} className="flex justify-between gap-2"><span>{s.name}</span><span className="tabular-nums text-muted-foreground">{s.mastery}%</span></li>
-          ))}
-        </ul>
-      ) : <p className="text-sm text-muted-foreground">None yet</p>}
-    </div>
-  );
-}
-
-// Diagnostic → starting-profile view (spec 04 §2); every other kind → test results (spec 04 §5.3).
-async function loadPage({ params }: PageProps<"/test/[sessionId]/results">) {
+async function loadPage({ params, searchParams }: PageProps<"/test/[sessionId]/results">) {
   const { sessionId } = await params;
   const { userId, profile } = await requireUser();
   if (!/^[0-9a-f-]{36}$/i.test(sessionId)) notFound();
@@ -43,79 +22,29 @@ async function loadPage({ params }: PageProps<"/test/[sessionId]/results">) {
   if (s.status === "in_progress") redirect(`/test/${sessionId}`);
   if (s.kind !== "diagnostic") return <TestResults data={(await getTestResult(userId, sessionId))!} timeZone={profile.timezone} />;
 
-  const [{ skills, estimate }, ranked, review] = await Promise.all([getSkillSummary(userId), skillsByPriority(userId, profile), getTestResult(userId, sessionId)]);
-  // Personalized starting curriculum (plan §24.6): biggest gains first; skip what's already strong.
-  const path = ranked.slice(0, 5).map((r) => skills.find((k) => k.id === r.skillId)!).filter(Boolean);
-  const skip = skills.filter((k) => k.status === "strong" || k.status === "mastered");
-  const measured = skills.filter((k) => k.status !== "unknown").sort((a, b) => b.mastery - a.mastery);
-  const strong = measured.filter((k) => k.status === "strong" || k.status === "mastered");
-  const developing = measured.filter((k) => k.status === "developing");
-  const weak = measured.filter((k) => k.status === "weak");
-  const unmeasured = skills.filter((k) => k.status === "unknown");
-  const callouts = skills.filter((k) => k.selfRating != null && k.status !== "unknown" &&
-    ((k.selfRating >= 2 && k.mastery < 45) || (k.selfRating <= 1 && k.mastery >= 70)));
+  const sp = await searchParams;
+  const showMistakes = sp.review === "mistakes" && s.status === "completed";
+  // Fetch and reveal saved answers only after the student explicitly opens the review.
+  const review = showMistakes ? await getTestResult(userId, sessionId) : null;
+  const mistakes = review?.items.map((item, index) => ({ item, number: index + 1 })).filter(({ item }) => !item.correct) ?? [];
 
   return (
-    <main className="flex w-full flex-col gap-8 px-4 py-10 md:px-8">
-      <div>
-        <p className="text-sm text-muted-foreground">Your starting profile</p>
-        <h1 className="text-3xl font-semibold tabular-nums">Estimated {estimate.total.lo} to {estimate.total.hi}</h1>
-        <p className="text-muted-foreground">
-          Reading &amp; Writing ≈ {estimate.rw.score} · Math ≈ {estimate.math.score}. This is an estimate from a short diagnostic;
-          it narrows as you practice.
-        </p>
-      </div>
-
-      <div className="grid gap-6 sm:grid-cols-3">
-        <SkillList title="Strong" skills={strong} />
-        <SkillList title="Developing" skills={developing} />
-        <SkillList title="Needs work" skills={weak} />
-      </div>
-
-      {callouts.length > 0 && (
-        <div className="flex flex-col gap-2 rounded-lg border p-4 text-sm">
-          <h3 className="font-medium">You vs. the diagnostic</h3>
-          {callouts.map((k) => (
-            <p key={k.id}>
-              You rated <b>{k.name}</b> “{SELF[k.selfRating!]}”; the diagnostic suggests
-              {k.mastery < 45 ? " it needs work." : " you're stronger than you think."}
-            </p>
-          ))}
-        </div>
+    <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10">
+      <h1 className="text-2xl font-semibold">{showMistakes ? "Diagnostic mistakes" : s.status === "completed" ? "Diagnostic complete" : "Diagnostic ended"}</h1>
+      {!showMistakes && <p className="text-muted-foreground">Your saved answers are available in Tests → History. You can review mistakes now or come back later.</p>}
+      {showMistakes && (
+        <section className="flex flex-col gap-3" aria-label="Saved diagnostic mistakes">
+          <p className="text-sm text-muted-foreground">{mistakes.length ? "Open a question to see your answer and the correct answer." : "No mistakes in this diagnostic."}</p>
+          {mistakes.map(({ item, number }) => <ReviewItem key={`${item.moduleIdx}-${item.position}`} n={number}
+            q={item.question} response={item.response} correct={item.correct} timeMs={item.timeMs}
+            attemptId={item.attemptId} mistakeType={item.mistakeType} initiallyOpen={false} />)}
+        </section>
       )}
-
-      <section className="flex flex-col gap-3 rounded-lg border p-4">
-        <h3 className="font-medium">Your starting path</h3>
-        <p className="text-sm text-muted-foreground">Ordered by how many points each skill can add toward your target. Your daily plan follows this order.</p>
-        <ol className="flex flex-col gap-2 text-sm">
-          {path.map((k, i) => (
-            <li key={k.id} className="flex flex-wrap items-center justify-between gap-2">
-              <span>{i + 1}. {k.name} <span className="text-muted-foreground">· {k.status === "unknown" ? "not measured" : `${k.mastery}%`}</span></span>
-              <span className="flex gap-3">
-                <Link className="underline" href={`/start/${k.id}`}>Learn</Link>
-                <Link className="underline" href={`/practice?skill=${k.id}`}>Practice</Link>
-              </span>
-            </li>
-          ))}
-        </ol>
-        {skip.length > 0 && (
-          <p className="text-sm text-muted-foreground">
-            You can skip for now: {skip.map((k) => SKILL_BY_ID[k.id]?.name).join(", ")}.
-          </p>
-        )}
-      </section>
-
-      {unmeasured.length > 0 && (
-        <p className="text-sm text-muted-foreground">
-          {unmeasured.length} skills weren&apos;t measured yet. Practice will fill them in.
-        </p>
-      )}
-      {review && review.items.length > 0 && <section className="flex flex-col gap-3">
-        <h2 className="text-xl font-semibold">Review your diagnostic</h2>
-        <p className="text-sm text-muted-foreground">{review.items.filter(it => it.correct).length} of {review.items.length} correct. Open a question to compare your answer with the correct answer and explanation.</p>
-        {review.items.map((it, i) => <ReviewItem key={`${it.moduleIdx}-${it.position}`} n={i + 1} q={it.question} response={it.response} correct={it.correct} timeMs={it.timeMs} attemptId={it.attemptId} mistakeType={it.mistakeType} />)}
-      </section>}
-      <div><Button size="lg" render={<Link href="/dashboard" />}>See my plan</Button></div>
+      <div className="flex flex-wrap gap-2">
+        {!showMistakes && s.status === "completed" && <Button render={<Link href={`/test/${sessionId}/results?review=mistakes`} />}>Review mistakes</Button>}
+        <Button variant={showMistakes ? "default" : "outline"} render={<Link href="/dashboard" />}>Continue to dashboard</Button>
+        <Button variant="outline" render={<Link href="/tests#history" />}>Test history</Button>
+      </div>
     </main>
   );
 }
