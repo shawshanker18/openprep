@@ -12,6 +12,7 @@ import { getTestResult } from "@/server/tests";
 import { TestResults } from "./test-results";
 import { skillsByPriority } from "@/server/plan";
 import { SKILL_BY_ID } from "@/content/taxonomy";
+import { ReviewItem } from "./review-item";
 
 export const metadata = { title: "Results" };
 
@@ -42,7 +43,7 @@ async function loadPage({ params }: PageProps<"/test/[sessionId]/results">) {
   if (s.status === "in_progress") redirect(`/test/${sessionId}`);
   if (s.kind !== "diagnostic") return <TestResults data={(await getTestResult(userId, sessionId))!} timeZone={profile.timezone} />;
 
-  const [{ skills, estimate }, ranked] = await Promise.all([getSkillSummary(userId), skillsByPriority(userId, profile)]);
+  const [{ skills, estimate }, ranked, review] = await Promise.all([getSkillSummary(userId), skillsByPriority(userId, profile), getTestResult(userId, sessionId)]);
   // Personalized starting curriculum (plan §24.6): biggest gains first; skip what's already strong.
   const path = ranked.slice(0, 5).map((r) => skills.find((k) => k.id === r.skillId)!).filter(Boolean);
   const skip = skills.filter((k) => k.status === "strong" || k.status === "mastered");
@@ -55,7 +56,7 @@ async function loadPage({ params }: PageProps<"/test/[sessionId]/results">) {
     ((k.selfRating >= 2 && k.mastery < 45) || (k.selfRating <= 1 && k.mastery >= 70)));
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col gap-8 px-4 py-10">
+    <main className="flex w-full flex-col gap-8 px-4 py-10 md:px-8">
       <div>
         <p className="text-sm text-muted-foreground">Your starting profile</p>
         <h1 className="text-3xl font-semibold tabular-nums">Estimated {estimate.total.lo} to {estimate.total.hi}</h1>
@@ -109,6 +110,11 @@ async function loadPage({ params }: PageProps<"/test/[sessionId]/results">) {
           {unmeasured.length} skills weren&apos;t measured yet. Practice will fill them in.
         </p>
       )}
+      {review && review.items.length > 0 && <section className="flex flex-col gap-3">
+        <h2 className="text-xl font-semibold">Review your diagnostic</h2>
+        <p className="text-sm text-muted-foreground">{review.items.filter(it => it.correct).length} of {review.items.length} correct. Open a question to compare your answer with the correct answer and explanation.</p>
+        {review.items.map((it, i) => <ReviewItem key={`${it.moduleIdx}-${it.position}`} n={i + 1} q={it.question} response={it.response} correct={it.correct} timeMs={it.timeMs} attemptId={it.attemptId} mistakeType={it.mistakeType} />)}
+      </section>}
       <div><Button size="lg" render={<Link href="/dashboard" />}>See my plan</Button></div>
     </main>
   );

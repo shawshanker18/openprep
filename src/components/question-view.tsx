@@ -5,6 +5,7 @@ import { Markdown } from "@/components/markdown";
 import { isValidSprInput } from "@/engine/grade";
 import { cn } from "@/lib/utils";
 import type { PublicQuestion } from "@/server/questions";
+import { DOMAINS, SKILL_BY_ID, type DomainId } from "@/content/taxonomy";
 
 /** One question: passage, stem, and a choice radio group or SPR input. `correct` marks the answer after reveal. */
 export function QuestionView({ question: q, value, onChange, disabled, correct }: {
@@ -15,11 +16,18 @@ export function QuestionView({ question: q, value, onChange, disabled, correct }
   correct?: string | null; // choice letter, once revealed (MCQ only)
 }) {
   return (
-    <div className={cn("question-content grid gap-6", q.passageMd && "md:grid-cols-2")}>
-      {q.passageMd && <Markdown className="rounded-lg bg-muted/50 p-4 text-[15px]">{q.passageMd}</Markdown>}
-      <div className="flex flex-col gap-4">
+    <div className="question-content grid w-full min-w-0 gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-10">
+      <section aria-label="Question" className="flex min-w-0 flex-col gap-4 md:border-r md:pr-8">
+        <div aria-label="Question details" className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+          <span>Domain: {DOMAINS[q.domain as DomainId]?.name ?? q.domain}</span>
+          <span>Skill: {SKILL_BY_ID[q.skillId]?.name ?? q.skillId}</span>
+          <span>Difficulty: {q.difficulty === 1 ? "Easy" : q.difficulty === 2 ? "Medium" : q.difficulty === 3 ? "Hard" : "Unrated"}</span>
+        </div>
+        {q.passageMd && <Markdown className="text-base">{q.passageMd}</Markdown>}
         <Markdown className="text-[15px]">{q.stemMd}</Markdown>
-        <span className="text-xs text-muted-foreground" title="Your personal question copy reference">Copy ref: {q.copyRef}</span>
+      </section>
+      <section aria-label="Your answer" className="flex min-w-0 flex-col gap-4">
+        <h2 className="text-sm font-medium">{q.choices?.length ? "Choose an answer" : "Enter your answer"}</h2>
         {q.choices?.length ? (
           <div role="radiogroup" aria-label="Answer choices" className="flex flex-col gap-2">
             {q.choices!.map((c, index) => {
@@ -47,7 +55,7 @@ export function QuestionView({ question: q, value, onChange, disabled, correct }
                   )}>
                   <span className={cn("flex size-7 shrink-0 items-center justify-center rounded-full border text-sm font-medium",
                     chosen && "bg-primary text-primary-foreground")}>{c.id}</span>
-                  <Markdown className="flex-1">{c.md}</Markdown>
+                  <Markdown className="min-w-0 flex-1">{c.md}</Markdown>
                   {isRight && <Check className="size-5 text-emerald-700" aria-label="Correct answer" />}
                   {isWrong && <X className="size-5 text-red-700" aria-label="Your answer" />}
                 </button>
@@ -64,7 +72,7 @@ export function QuestionView({ question: q, value, onChange, disabled, correct }
             <span className="text-xs text-muted-foreground">Fractions or decimals. Enter 3 1/2 as 7/2 or 3.5.</span>
           </label>
         )}
-      </div>
+      </section>
     </div>
   );
 }

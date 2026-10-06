@@ -10,6 +10,9 @@ import { homeData } from "@/server/home";
 import { SKILL_BY_ID } from "@/content/taxonomy";
 import { bestTestDate, predictedScore, readyBy } from "@/engine/plan";
 import { formatDate } from "@/lib/dates";
+import { db } from "@/db";
+import { attempts } from "@/db/schema";
+import { sql } from "drizzle-orm";
 
 export const metadata = { title: "Home" };
 
@@ -62,6 +65,7 @@ export default async function DashboardPage() {
   const first = user?.name?.split(" ")[0];
   const hello = <h1 className="text-2xl font-semibold">{greeting(profile.timezone)}{first ? `, ${first}` : ""}</h1>;
   const [d, summary, home] = await Promise.all([getDashboard(userId, profile), getSkillSummary(userId), homeData(userId)]);
+  const [community] = await db.select({ count: sql<number>`count(distinct ${attempts.userId})::int` }).from(attempts);
 
   const hasEvidence = summary.skills.some((skill) => skill.n > 0);
 
@@ -107,6 +111,17 @@ export default async function DashboardPage() {
 
       {diagnosticPending(profile) && <DiagnosticSuggestion />}
 
+      <section className="rounded-xl border p-5">
+        <h2 className="font-semibold">Your SAT preparation, in one place</h2>
+        <p className="mt-1 text-sm text-muted-foreground">Learn a topic, practise questions, then review what you missed. Your plan adapts as you answer.</p>
+        <div className="mt-4 grid gap-4 sm:grid-cols-3 text-sm">
+          <Link href="/start" className="rounded-lg border p-3 hover:bg-muted"><b>Learn</b><p className="mt-1 text-muted-foreground">Start from scratch with lessons and worked examples.</p></Link>
+          <Link href="/practice" className="rounded-lg border p-3 hover:bg-muted"><b>Adaptive practice</b><p className="mt-1 text-muted-foreground">Get questions matched to the skills you need next.</p></Link>
+          <Link href="/tests" className="rounded-lg border p-3 hover:bg-muted"><b>Practice tests</b><p className="mt-1 text-muted-foreground">Try a full SAT or one section, then review your answers.</p></Link>
+        </div>
+        <p className="mt-3 text-xs text-muted-foreground">{(community?.count ?? 0).toLocaleString("en-US")} learner{community?.count === 1 ? " has" : "s have"} practised on this site.</p>
+      </section>
+
       <div className="grid min-w-0 grid-cols-1 gap-3 min-[480px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5">
         <Stat label="Goal" value={profile.targetScore ?? "Set goal"} href={profile.targetScore ? undefined : "/settings#goal"} />
         <Stat label="Estimated score" value={hasEvidence ? d.estimate.total : "Not measured yet"} />
@@ -122,7 +137,7 @@ export default async function DashboardPage() {
       <div className="grid items-start gap-4 lg:grid-cols-2">
         <Card title="Where you left off">
           {resume.length ? resume.map((r) => <Resume key={r.href} {...r} />) : (
-            <p className="text-sm text-muted-foreground">Nothing yet. <Link className="underline" href="/start">Start from scratch</Link> or try <Link className="underline" href="/practice">smart practice</Link>.</p>
+            <p className="text-sm text-muted-foreground">Nothing yet. <Link className="underline" href="/start">Start from scratch</Link> or try <Link className="underline" href="/practice">adaptive practice</Link>.</p>
           )}
         </Card>
 

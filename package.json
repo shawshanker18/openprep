@@ -14,7 +14,7 @@
     "content:validate": "tsx scripts/content-validate.ts",
     "content:seed": "tsx scripts/content-seed.mts",
     "admin": "tsx --env-file=.env.local scripts/admin.mts",
-    "vercel-build": "if [ -n \"$MIGRATE_DATABASE_URL\" ]; then npm run db:migrate; fi && npm run content:seed && next build"
+    "vercel-build": "if [ -n \"$MIGRATE_DATABASE_URL\" ]; then npm run db:migrate; fi && npm run content:validate && next build"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.71",

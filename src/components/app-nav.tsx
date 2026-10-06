@@ -19,7 +19,7 @@ export const NAV_GROUPS = [
       { href: "/dashboard", label: "Home", icon: Home },
       { href: "/progress", label: "Progress", icon: BarChart3 },
       { href: "/mistakes", label: "Mistakes", icon: XCircle },
-      { href: "/bookmarks", label: "Saved", icon: Bookmark },
+      { href: "/bookmarks", label: "Saved questions", icon: Bookmark },
     ],
   },
   {
@@ -27,13 +27,13 @@ export const NAV_GROUPS = [
     items: [
       { href: "/start", label: "Start from scratch", icon: GraduationCap },
       { href: "/skills", label: "Your skills", icon: BookOpen },
-      { href: "/desmos", label: "Desmos", icon: Calculator },
+      { href: "/desmos", label: "Graphing calculator", icon: Calculator },
     ],
   },
   {
     label: "Practice",
     items: [
-      { href: "/practice", label: "Smart practice", icon: Sparkles },
+      { href: "/practice", label: "Adaptive practice", icon: Sparkles },
       { href: "/question-bank", label: "Question bank", icon: Library },
       { href: "/practice/custom", label: "Custom practice", icon: SlidersHorizontal },
       { href: "/tests", label: "Practice tests", icon: ClipboardList },
@@ -49,6 +49,12 @@ export const MOBILE_TABS = [
   { href: "/tests", label: "Tests", icon: ClipboardList },
   { href: "/progress", label: "Progress", icon: BarChart3 },
 ] as const;
+
+export function CurrentSection() {
+  const path = usePathname();
+  const item = NAV_GROUPS.flatMap(group => [...group.items]).sort((a, b) => b.href.length - a.href.length).find(item => path === item.href || path.startsWith(`${item.href}/`));
+  return <span className="mr-auto text-sm font-medium" aria-label="Current section">{item?.label ?? (path.startsWith("/settings") ? "Settings" : "OpenPrep")}</span>;
+}
 
 /** Exact match, or a sub-page — except /practice, whose sub-page /practice/custom has its own entry. */
 /**

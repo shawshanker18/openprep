@@ -13,6 +13,7 @@ import {
 } from "./actions";
 import { Choice } from "@/components/ui/choice";
 import { DateField } from "@/components/ui/date-field";
+import { SatDateField } from "@/components/sat-date-field";
 
 export const metadata = { title: "Settings" };
 
@@ -50,7 +51,7 @@ export default async function SettingsPage({ searchParams }: PageProps<"/setting
           <label className="flex flex-col gap-1 text-sm">Target score
             <input name="targetScore" type="number" min={400} max={1600} step={10} defaultValue={profile.targetScore ?? 1400} className={control} /></label>
           <label className="flex flex-col gap-1 text-sm">Test date
-            <DateField name="testDate" defaultValue={profile.testDate} min={localDate(new Date(), profile.timezone)} /></label>
+            <SatDateField name="testDate" defaultValue={profile.testDate} today={localDate(new Date(), profile.timezone)} /></label>
           <label className="flex flex-col gap-1 text-sm">Minutes per day
             <Choice name="minutesPerDay" defaultValue={String(profile.minutesPerDay)} options={[15, 30, 45, 60, 90, 120].map((m) => ({ value: String(m), label: `${m} minutes` }))} /></label>
           <label className="flex flex-col gap-1 text-sm">Days per week

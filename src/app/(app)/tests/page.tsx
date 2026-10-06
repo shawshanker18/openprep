@@ -68,17 +68,12 @@ export default async function TestsPage({ searchParams }: PageProps<"/tests">) {
         <StartCard title="Section test" time="64 to 70 min · two adaptive modules" fields={<><input type="hidden" name="kind" value="section" />{sectionPick}</>}>
           One full section with routing to an easier or harder second module.
         </StartCard>
+      </div>
+      <details className="rounded-xl border p-5">
+        <summary className="cursor-pointer font-medium">More test options</summary>
+        <div className="mt-4 grid gap-4 lg:grid-cols-2">
         <StartCard title="Single module" time="32 to 35 min" fields={<><input type="hidden" name="kind" value="module" />{sectionPick}</>}>
           One timed module at mixed difficulty. Raw score only.
-        </StartCard>
-        <StartCard title="Mini test" time="12 to 15 min · up to 10 questions" fields={<>
-          <input type="hidden" name="kind" value="mini" />
-          <Choice name="skillId" required aria-label="Skill" defaultValue={skills[0]?.id} className="max-w-full" options={skills.map((s) => ({ value: s.id, label: s.name }))} />
-        </>}>
-          A quick check on one skill.
-        </StartCard>
-        <StartCard title="Weakness test" time="Untimed · 5 questions per focus skill" fields={<input type="hidden" name="kind" value="weakness" />}>
-          Targets this week&apos;s focus skills at the right difficulty for you.
         </StartCard>
         <StartCard title="Custom test" time="You choose" fields={<>
           <input type="hidden" name="kind" value="custom" />
@@ -92,7 +87,8 @@ export default async function TestsPage({ searchParams }: PageProps<"/tests">) {
         </>}>
           Pick skills, sub-topics, difficulty, length, and timing.
         </StartCard>
-      </div>
+        </div>
+      </details>
 
       <section className="flex flex-col gap-2">
         <h2 className="font-medium">History</h2>

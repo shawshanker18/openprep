@@ -32,7 +32,8 @@ it('IDs differ between accounts and resolve only delivered content',async()=>{
  expect(await Q.internalId(pub,USER)).toBe(ids[0]);
  expect(await Q.internalId(pub,OTHER)).toBeNull();
  expect(await Q.internalId(ids[0]!,USER)).toBeNull();
- expect(JSON.stringify(r!.question)).not.toMatch(/explanation|difficulty|skillId|choiceRationales/);
+ expect(JSON.stringify(r!.question)).not.toMatch(/explanation|choiceRationales/);
+ expect(r!.question).toMatchObject({skillId:"m-alg-lin1",domain:"m-alg",difficulty:2});
 });
 it('an immediate wrong answer cannot reveal the solution; identical retries are idempotent',async()=>{
  const input={questionId:ids[0]!,response:'B',timeMs:5000,confidence:2 as const};
@@ -97,4 +98,3 @@ it("plan blocks are done only from real work today (a click can't tick them)", a
   expect(after.map((b) => b.done)).toEqual([true, false, false, true, false]);
   expect(after[1]!.progress).toEqual({ n: 1, target: 3 }); // 4 answers: 3 finish the first block, 1 left for the check-in
 });
-

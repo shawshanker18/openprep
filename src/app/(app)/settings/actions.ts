@@ -12,6 +12,7 @@ import { requireUser, type ActionResult } from "@/server/auth";
 import { PushSubscriptionInput, removeSubscription, saveSubscription, sendTest } from "@/server/push";
 import { startDiagnostic } from "@/server/diagnostic";
 import { localDate } from "@/engine/plan";
+import { isSatDate } from "@/lib/sat-dates";
 
 const Settings = z.object({
   targetScore: z.coerce.number().int().min(400).max(1600).multipleOf(10),
@@ -28,7 +29,7 @@ export async function updateSettings(form: FormData) {
   if (p.data.testDate) {
     const today = localDate(new Date(), profile.timezone);
     const latest = `${Number(today.slice(0, 4)) + 3}${today.slice(4)}`;
-    if (p.data.testDate < today || p.data.testDate > latest) redirect("/settings?error=testdate");
+    if (!isSatDate(p.data.testDate) || p.data.testDate < today || p.data.testDate > latest) redirect("/settings?error=testdate");
   }
   await db.update(profiles).set({ ...p.data, testDate: p.data.testDate || null }).where(eq(profiles.id, userId));
   revalidatePath("/", "layout");

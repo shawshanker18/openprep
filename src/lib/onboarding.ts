@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { SKILLS, SUBJECTS, TOPICS } from "@/content/taxonomy";
+import { isSatDate } from "./sat-dates";
 
 const sectionScore = z.number().int().min(200).max(800).multipleOf(10);
 export const Survey = z.object({
@@ -10,7 +11,7 @@ export const Survey = z.object({
   englishBackground: z.enum(["first_language", "fluent", "learning"]).nullable(),
   prior: z.object({ math: sectionScore, rw: sectionScore, takenOn: z.iso.date() }).nullable(),
   targetScore: z.number().int().min(400).max(1600).multipleOf(10).nullable(),
-  testDate: z.iso.date().nullable(),
+  testDate: z.iso.date().refine(isSatDate, "Choose an official SAT date").nullable(),
   minutesPerDay: z.number().refine((n) => [15, 30, 45, 60, 90, 120].includes(n)),
   daysPerWeek: z.number().int().min(3).max(7),
   timezone: z.string().refine((tz) => { try { new Intl.DateTimeFormat("en", { timeZone: tz }); return true; } catch { return false; } }),

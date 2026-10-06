@@ -146,7 +146,7 @@ body.lesson-focus-mode .app-mobile-header,
 body.lesson-focus-mode .bottom-nav { display: none; }
 body.lesson-focus-mode main { max-width: none; padding-top: 1rem; }
 /* Content typography for <Markdown> (questions, lessons, AI output). */
-.prose-op { line-height: 1.65; }
+.prose-op { line-height: 1.65; overflow-wrap: anywhere; }
 .prose-op > * + * { margin-top: 0.75em; }
 .prose-op h2 { font-size: 1.15rem; font-weight: 600; margin-top: 1.25em; }
 .prose-op h3 { font-weight: 600; margin-top: 1em; }

@@ -52,7 +52,7 @@ export default async function StepPage({ params }: PageProps<"/start/[step]">) {
           {lesson.minutes && <p className="text-sm text-muted-foreground">About {lesson.minutes} minutes</p>}
           {lesson.sections.map((sec) => (
             <section key={sec.heading} className="flex flex-col gap-2">
-              <h2 className="text-lg font-semibold">{sec.heading}</h2>
+              <h2 className="text-lg font-semibold">{sec.heading.replace(/\(easy\)/i, "(medium)")}</h2>
               <Markdown className="text-[15px]">{sec.md}</Markdown>
             </section>
           ))}

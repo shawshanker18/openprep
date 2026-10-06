@@ -4,7 +4,7 @@ import { Award } from "lucide-react";
 import { getAuthUser, requireUser } from "@/server/auth";
 import { signOut } from "@/app/auth/actions";
 import { NotificationBell } from "@/components/notification-bell";
-import { MobileMenu, MobileTabs, NavLinks } from "@/components/app-nav";
+import { CurrentSection, MobileMenu, MobileTabs, NavLinks } from "@/components/app-nav";
 import { AppBridge } from "@/components/app-bridge";
 import { getChecklist, getNotifications } from "@/server/notifications";
 import { getSkillSummary } from "@/server/analytics";
@@ -43,11 +43,12 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
       </header>
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="app-topbar sticky top-0 z-10 hidden items-center justify-end gap-2 border-b bg-background px-8 py-2 md:flex">
+          <CurrentSection />
           {chips}
           <NotificationBell items={notifications} align="right" />
         </div>
-        <main className="mx-auto w-full min-w-0 max-w-5xl flex-1 overflow-x-hidden px-4 pb-8 pt-6 md:px-8">
-          <div className="mb-4 flex flex-wrap gap-2 md:hidden">{chips}</div>
+        <main className="mx-auto w-full min-w-0 max-w-5xl flex-1 overflow-x-hidden px-4 pb-8 pt-6 md:px-8 has-[.question-content]:max-w-none">
+          <div className="mb-4 flex flex-wrap items-center gap-2 md:hidden"><CurrentSection />{chips}</div>
           {children}
         </main>
       </div>
