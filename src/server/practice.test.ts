@@ -19,6 +19,8 @@ beforeAll(async()=>{
   for(const stmt of fs.readFileSync(path.join(dir,file),'utf8').split('--> statement-breakpoint')) await pg.exec(stmt);
  await db.insert(schema.profiles).values([{id:USER},{id:OTHER}]);
  await db.insert(schema.skillState).values([USER,OTHER].flatMap(userId=>SKILLS.map(s=>({userId,skillId:s.id}))));
+ const candidates=await pg.query<{id:string}>("select 'practice-fixture-' || n as id from generate_series(1,100) n where mod(abs(hashtext('practice-fixture-' || n)::bigint),5)<>0 limit 4");
+ ids.splice(0,ids.length,...candidates.rows.map(r=>r.id));
  await db.insert(schema.questions).values(ids.map(id=>({id,skillId:skill.id,section:skill.section,domain:skill.domain,difficulty:2,type:'mcq' as const,stemMd:'stem',choices:[{id:'A',md:'1'}],answer:{choice:'A'},explanationMd:'explanation'})));
 });
 const serve=(user:string,id:string)=>P.nextQuestion(user,{} as schema.Profile,{mode:'list',ids:[id],exclude:[]});

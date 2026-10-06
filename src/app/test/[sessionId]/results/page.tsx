@@ -29,12 +29,12 @@ async function loadPage({ params, searchParams }: PageProps<"/test/[sessionId]/r
   const mistakes = review?.items.map((item, index) => ({ item, number: index + 1 })).filter(({ item }) => !item.correct) ?? [];
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10">
+    <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10">
       <h1 className="text-2xl font-semibold">{showMistakes ? "Diagnostic mistakes" : s.status === "completed" ? "Diagnostic complete" : "Diagnostic ended"}</h1>
       {!showMistakes && <p className="text-muted-foreground">Your saved answers are available in Tests → History. You can review mistakes now or come back later.</p>}
       {showMistakes && (
         <section className="flex flex-col gap-3" aria-label="Saved diagnostic mistakes">
-          <p className="text-sm text-muted-foreground">{mistakes.length ? "Open a question to see your answer and the correct answer." : "No mistakes in this diagnostic."}</p>
+          <p className="text-sm text-muted-foreground">{mistakes.length ? "Your wrong answers are below. Each question shows your selection, the correct answer, and any explanation included in its source." : "No mistakes in this diagnostic."}</p>
           {mistakes.map(({ item, number }) => <ReviewItem key={`${item.moduleIdx}-${item.position}`} n={number}
             q={item.question} response={item.response} correct={item.correct} timeMs={item.timeMs}
             attemptId={item.attemptId} mistakeType={item.mistakeType} initiallyOpen={true} />)}

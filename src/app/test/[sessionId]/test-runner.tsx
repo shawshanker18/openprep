@@ -12,6 +12,7 @@ import { cn, isTyping } from "@/lib/utils";
 import type { PublicQuestion } from "@/server/questions";
 import { abandon, reportFocusLoss, saveResponse, startModule, submitModule } from "./actions";
 import { EndTest, useTestLockdown } from "./lockdown";
+import { withinSubmissionTimeout } from "@/lib/test-submit";
 import { readDraft, writeDraft } from "@/lib/answer-drafts";
 
 type Item = { position: number; question: PublicQuestion; response: string | null; flagged: boolean };
@@ -34,6 +35,7 @@ export function TestRunner({ userId, sessionId, module: m, items: initial, serve
   // Explicit flags, not a transition: a slow page refresh must never block answering.
   const [starting, setStarting] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [submitError,setSubmitError] = useState<string|null>(null);
 
   // Server-authoritative clock: remaining = deadline − (server time at load + elapsed since load).
   const loadedAt = useRef(0);
@@ -154,15 +156,23 @@ export function TestRunner({ userId, sessionId, module: m, items: initial, serve
       if (!unsaved.current.has(pos)) unsaved.current.set(pos, items[pos]!);
     }
     if (debounce.current) { clearTimeout(debounce.current); debounce.current = null; }
-    await saveAll();
-    const fail = (msg: string) => { submitted.current = false; setSubmitting(false); if (auto) {autoRetryAt.current=Date.now()+10_000;setSaving('error');} else toast.error(msg); };
-    if (!auto && unsaved.current.size) return fail("Some answers aren't saved yet. Check your connection, then submit again.");
-    const r = await submitModule(m.id).catch(() => null);
-    if (r === null) return fail("Couldn't submit. Check your connection and try again.");
-    if (r && typeof r === "object" && r.finished) router.replace(`/test/${sessionId}/results`);
-    else router.refresh(); // next module
-    writeDraft(draftKey,[]);
-  }, [m.id, router, sessionId, saveAll, screen, accrue, pos, items,draftKey]);
+    const fail = (msg: string) => {
+      submitted.current=false;setSubmitting(false);setSubmitError(msg);
+      if(auto){autoRetryAt.current=Date.now()+10_000;setSaving('error');} else toast.error(msg);
+    };
+    setSubmitError(null);
+    const drafts=[...unsaved.current].map(([position,it])=>({position,response:it.response,flagged:it.flagged,timeMsDelta:Math.round(acc.current[position]??0)}));
+    persist();
+    try {
+      const result=await withinSubmissionTimeout(submitModule({moduleId:m.id,drafts}));
+      if(!result.ok) return fail(result.error);
+      unsaved.current.clear();writeDraft(draftKey,[]);setSaving('saved');
+      setSubmitting(false);submitted.current=false;
+      if(result.finished) router.replace(`/test/${sessionId}/results`);
+      else router.refresh();
+    } catch {fail("Submission didn't finish. Your answers are kept on this device. Retry, or reload to check the saved module.");}
+
+  }, [m.id, router, sessionId, screen, accrue, pos, items,draftKey,persist]);
 
   // Countdown; auto-submit at zero.
   useEffect(() => {
@@ -246,13 +256,14 @@ export function TestRunner({ userId, sessionId, module: m, items: initial, serve
               </Button>
             </div>
             {(m.section === "math" || m.section === "mixed") && <DesmosToggle />}
-            <QuestionView key={it.question.id} question={it.question} value={it.response} onChange={(v) => update({ response: v })} disabled={submitting} />
+            <QuestionView key={it.question.id} question={it.question} value={it.response} onChange={(v) => update({ response: v })} disabled={submitting} showMetadata={false} />
           </div>
         ) : (
           <div className="mx-auto flex max-w-xl flex-col gap-4">
             <h2 className="text-xl font-semibold">Check your work</h2>
             <p className="text-sm text-muted-foreground">{answered} of {items.length} answered. Select a question to go back to it.</p>
             <Navigator items={items} current={-1} onPick={go} />
+            {submitError && <p role="alert" className="text-sm text-destructive">{submitError}</p>}
             <Button size="lg" className="self-start" disabled={submitting} onClick={() => void submit()}>
               {submitting ? "Submitting…" : "Submit module"}
             </Button>

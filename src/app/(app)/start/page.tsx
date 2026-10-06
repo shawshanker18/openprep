@@ -1,3 +1,4 @@
+import { likelyCoveredSkills } from "@/lib/curriculum-coverage";
 import Link from "next/link";
 import { ChevronRight, Circle, CircleCheck, SkipForward } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,7 +8,8 @@ import { scratchProgress } from "@/server/scratch";
 export const metadata = { title: "Start from scratch" };
 
 export default async function StartPage() {
-  const { userId } = await requireUser();
+  const { userId, profile } = await requireUser();
+  const covered=likelyCoveredSkills(profile);
   const { steps, next } = await scratchProgress(userId);
   const done = steps.filter((s) => s.status === "done").length;
   const skipped = steps.filter((s) => s.status === "skipped").length;
@@ -21,6 +23,7 @@ export default async function StartPage() {
           SAT format, calculator basics, and Math and Reading and Writing lessons. Work through the topics in order,
           or skip topics you already know.
         </p>
+        <p className="text-xs text-muted-foreground">“Likely covered in school” is a guide based on your grade and curriculum. Every topic stays available to learn.</p>
       </div>
 
       <section className="flex flex-col gap-3 rounded-xl border p-5">
@@ -58,7 +61,7 @@ export default async function StartPage() {
                   {s.status === "done" ? <CircleCheck className="size-4 shrink-0 text-primary" aria-label="Done" />
                     : s.status === "skipped" ? <SkipForward className="size-4 shrink-0 text-muted-foreground" aria-label="Skipped" />
                     : <Circle className="size-4 shrink-0 text-muted-foreground" aria-label="Not done" />}
-                  <span className={`flex-1 ${s.status === "skipped" ? "text-muted-foreground" : ""}`}>{s.title}</span>
+                  <span className={`flex-1 ${s.status === "skipped" ? "text-muted-foreground" : ""}`}>{s.title}{covered.has(s.ref) && <span className="ml-2 inline-block rounded bg-emerald-50 px-2 py-0.5 text-xs text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200">Likely covered in school</span>}</span>
                   {s.status === "skipped" && <span className="text-xs text-muted-foreground">Skipped</span>}
                   <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
                 </Link>

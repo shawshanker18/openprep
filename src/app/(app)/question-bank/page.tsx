@@ -17,7 +17,7 @@ export default async function QuestionBankPage({searchParams}: PageProps<'/quest
     try {previews=await previewQuestions(userId,skills,difficulties);}
     catch(e) {if(e instanceof DeliveryBlocked) message=e.message;else throw e;}
   }
-  return <div className="flex flex-col gap-6"><header><h1 className="text-2xl font-semibold">Question Bank</h1><p className="mt-2 text-muted-foreground">Choose what you want to practice. Preview a question or start a set.</p></header>
+  return <div className="flex flex-col gap-6"><header><h1 className="text-2xl font-semibold">Question Bank</h1><p className="mt-2 text-muted-foreground">Choose topics and SAT difficulties, preview questions, then start practice. Fresh test questions are reserved for Tests.</p></header>
     {message && <p role="alert">{message}</p>}
     <QuestionBankPicker key={`${skills.join(',')}:${difficulties.join(',')}:${count}`} initialSkills={skills} initialDifficulties={difficulties} initialCount={count} previews={previews} />
     {sp.preview==='1' && !previews.length && !message && <p>No available questions match these filters. Try other skills or a mixed difficulty.</p>}

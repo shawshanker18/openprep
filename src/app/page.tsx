@@ -1,44 +1,27 @@
-import { publicStats } from "@/server/public-stats";
-export const dynamic = "force-dynamic";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-
-
-const STEPS = [
-  { title: "Optional diagnostic", body: "Answer a short set of Math and Reading and Writing questions to find skills to work on. Open your mistakes when you are ready, and revisit them later." },
-  { title: "Practice", body: "Use recommended questions based on your answers, or build a practice set in the Question Bank. Choose skills, SAT difficulty, and length; preview questions before starting." },
-  { title: "Tests", body: "Take a full SAT-style test with timed, adaptive modules, or a short practice test in one subject. Review your answers after finishing." },
-  { title: "Track progress", body: "Your saved answers update your skill progress and score estimate. Resume sessions, revisit mistakes, and see your practice and test history." },
+import Link from 'next/link';
+import { ArrowRight, BookOpen, ChartNoAxesCombined, Check, ClipboardCheck, Compass } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Markdown } from '@/components/markdown';
+import { publicStats } from '@/server/public-stats';
+export const dynamic='force-dynamic';
+const features=[
+  {icon:Compass,title:'Find your starting point',body:'An optional diagnostic samples Math and Reading and Writing skills. Review your wrong answers when you are ready, with your selection and the correct answer side by side.'},
+  {icon:BookOpen,title:'Practice what you need',body:'Recommended Practice adjusts difficulty after each answer. Or choose multiple topics and difficulties in the Question Bank, preview questions, and start your own set.'},
+  {icon:ClipboardCheck,title:'Get used to test day',body:'Take a full SAT-style test with timed, adaptive modules, or a short test in one subject. Use the SAT Desmos calculator and review answers after the test.'},
+  {icon:ChartNoAxesCombined,title:'See your progress',body:'Follow a daily plan, track skills and score estimates, revisit mistakes, and resume saved sessions. Start from scratch lessons stay available for every topic.'},
 ];
-
-// Static: signed-in visitors are sent to /dashboard by the proxy before this is served.
-export default async function Landing() {
-  const stats = await publicStats().catch(() => null);
-  return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col gap-12 px-4 py-16">
-      <section className="flex flex-col gap-4">
-        <h1 className="text-4xl font-semibold tracking-tight">Prepare for the SAT with OpenPrep.</h1>
-        <p className="max-w-xl text-lg text-muted-foreground">
-          Free practice for students preparing for SAT Math and Reading and Writing.
-          Set your target score and study schedule, then follow a daily plan.
-        </p>
-        <div><Button size="lg" render={<Link href="/login" />}>Get started</Button></div>
+export default async function Landing(){
+  const stats=await publicStats().catch(()=>null);
+  return <main className="min-h-screen bg-[radial-gradient(ellipse_at_top_right,#d1fae5_0%,transparent_50%)] dark:bg-none">
+    <div className="mx-auto max-w-6xl px-5">
+      <header className="flex items-center justify-between border-b py-6"><Link href="/" className="text-xl font-semibold tracking-tight">OpenPrep<span className="text-emerald-600">.</span></Link><div className="flex items-center gap-5 text-sm"><a href="#features" className="hidden hover:underline sm:inline">How it works</a><Link href="/login" className="font-medium hover:underline">Sign in</Link></div></header>
+      <section className="grid items-center gap-12 py-16 md:grid-cols-2 md:py-24">
+        <div><p className="mb-5 text-sm font-semibold tracking-wide text-emerald-700 dark:text-emerald-400">FREE SAT PREPARATION</p><h1 className="text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">Know what to practice.<br/><span className="text-emerald-700 dark:text-emerald-400">See yourself improve.</span></h1><p className="mt-6 max-w-lg text-lg leading-relaxed text-muted-foreground">OpenPrep helps students prepare for SAT Math and Reading and Writing with questions, lessons, timed tests, and a study plan built around their goals.</p><Button size="lg" className="mt-7 h-12 rounded-xl bg-emerald-700 px-6 text-white hover:bg-emerald-800" render={<Link href="/login"/>}>Get started free <ArrowRight/></Button><p className="mt-3 text-sm text-muted-foreground">Set a target score. Choose your schedule. Start at your level.</p></div>
+        <div aria-label="Sample practice question" className="rounded-2xl border bg-background p-6 shadow-xl shadow-emerald-900/5 sm:p-8"><div className="mb-6 flex items-center justify-between text-sm"><span className="font-medium">A little practice, every day</span><span className="rounded-full bg-emerald-50 px-3 py-1 text-xs text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200">Sample question</span></div><Markdown>{String.raw`Which values of $x$ satisfy $x^2-5x+6=0$?`}</Markdown><div className="mt-5 flex flex-col gap-3">{['1 and 2','2 and 3','3 and 4'].map((answer,i)=><div key={answer} className={`flex items-center gap-3 rounded-xl border p-3 ${i===1?'border-emerald-600 bg-emerald-50 dark:bg-emerald-950':''}`}><span className="flex size-7 items-center justify-center rounded-full border text-sm">{'ABC'[i]}</span><span className="text-sm">{answer}</span>{i===1&&<Check className="ml-auto size-4 text-emerald-700"/>}</div>)}</div><div className="mt-5 border-t pt-4 text-sm"><p className="mb-2 font-medium text-emerald-700 dark:text-emerald-400">Understand the answer</p><Markdown>{String.raw`Factor into $(x-2)(x-3)=0$. Either factor can be zero, so $x=2$ or $x=3$.`}</Markdown></div></div>
       </section>
-      <section className="grid gap-6 sm:grid-cols-2">
-        {STEPS.map((s, i) => (
-          <div key={s.title}>
-            <div className="text-sm text-muted-foreground">{i + 1}</div>
-            <h2 className="font-medium">{s.title}</h2>
-            {stats && <section aria-label="OpenPrep usage" className="grid grid-cols-2 gap-4 sm:grid-cols-4">{[[stats.users,'All-time users'],[stats.active,'Active users · 30 days'],[stats.answered,'Questions answered'],[stats.tests,'Tests completed']].map(([n,label])=><div key={label}><strong className="text-xl tabular-nums">{Number(n).toLocaleString()}</strong><p className="text-sm text-muted-foreground">{label}</p></div>)}</section>}
-      <p className="text-sm text-muted-foreground">{s.body}</p>
-          </div>
-        ))}
-      </section>
-      {stats && <section aria-label="OpenPrep usage" className="grid grid-cols-2 gap-4 sm:grid-cols-4">{[[stats.users,'All-time users'],[stats.active,'Active users · 30 days'],[stats.answered,'Questions answered'],[stats.tests,'Tests completed']].map(([n,label])=><div key={label}><strong className="text-xl tabular-nums">{Number(n).toLocaleString()}</strong><p className="text-sm text-muted-foreground">{label}</p></div>)}</section>}
-      <p className="text-sm text-muted-foreground">
-        <Link className="underline" href="/about">How estimates work</Link> · <Link className="underline" href="/privacy">Privacy</Link> ·{" "}
-        <Link className="underline" href="/terms">Terms</Link>
-      </p>
-    </main>
-  );
+      <section id="features" className="scroll-mt-6 border-t py-12"><h2 className="mb-8 text-2xl font-semibold tracking-tight">A clear path from your first question to test day.</h2><div className="grid gap-5 sm:grid-cols-2">{features.map(({icon:Icon,title,body})=><article key={title} className="rounded-xl border bg-background p-6"><Icon className="mb-4 size-6 text-emerald-700 dark:text-emerald-400"/><h3 className="font-semibold">{title}</h3><p className="mt-2 text-sm leading-relaxed text-muted-foreground">{body}</p></article>)}</div></section>
+      {stats&&<section aria-label="OpenPrep usage" className="grid grid-cols-2 gap-6 border-t py-8 sm:grid-cols-4">{[[stats.users,'All-time users'],[stats.active,'Active in the last 30 days'],[stats.answered,'Questions answered'],[stats.tests,'Tests completed']].map(([n,label])=><div key={label}><strong className="text-2xl tabular-nums">{Number(n).toLocaleString()}</strong><p className="mt-1 text-sm text-muted-foreground">{label}</p></div>)}</section>}
+      <footer className="flex flex-wrap gap-5 border-t py-8 text-sm text-muted-foreground"><Link className="hover:underline" href="/about">How score estimates work</Link><Link className="hover:underline" href="/privacy">Privacy</Link><Link className="hover:underline" href="/terms">Terms</Link></footer>
+    </div>
+  </main>;
 }

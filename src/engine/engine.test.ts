@@ -409,3 +409,10 @@ describe("timing stats", () => {
     expect(t.slowest.map((x) => x.n)).toEqual([1, 3, 4]);
   });
 });
+it("uses fresh reserved questions first and fills a thin reserve from the bank",()=>{
+ const bp={section:"math" as const,count:2,timeLimitS:null,domainCounts:{"m-alg":2},difficultyCounts:{1:0,2:2,3:0}};
+ const base={skillId:"m-alg-lin1",domain:"m-alg",difficulty:2 as const,type:"mcq" as const,lastSeenAt:null};
+ const pool=[{...base,id:"bank"},{...base,id:"reserved",reserved:true},{...base,id:"seen-reserved",reserved:true,lastSeenAt:new Date()}];
+ expect(assembleModule(bp,pool,new Set(),()=>0.5).map(q=>q.id).sort()).toEqual(["bank","reserved"]);
+ expect(assembleModule({...bp,count:1,domainCounts:{"m-alg":1},difficultyCounts:{1:0,2:1,3:0}},pool,new Set(),()=>0.5)[0]!.id).toBe("reserved");
+});

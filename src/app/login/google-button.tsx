@@ -42,9 +42,11 @@ export function GoogleButton({ enabled, nonceHash, onToken }: { enabled: boolean
         nonce: nonceHash ?? (await sha256Hex(raw)), // Google embeds the hash; Supabase checks it against the raw nonce
         use_fedcm_for_prompt: true,
         callback: async ({ credential }: { credential: string }) => {
+          if (cancelled) return;
           setError(null);
           if (onToken) return onToken(credential);
           const r = await signInWithGoogle({ credential, nonce: raw }).catch(() => ({ ok: false, error: undefined }));
+          if (cancelled) return;
           if (!r.ok) { setError(("error" in r && r.error) || "Google sign-in didn't work. Please try again or use the email link."); return; }
           router.replace("/dashboard");
           router.refresh();

@@ -159,6 +159,10 @@ body.lesson-focus-mode main { max-width: none; padding-top: 1rem; }
 .prose-op img { max-width: 100%; }
 .prose-op .katex-display { overflow-x: auto; overflow-y: hidden; }
 
+/* Give scripts a little breathing room while keeping KaTeX vertical metrics intact. */
+.prose-op .katex .msupsub { margin-left: 0.08em; }
+.prose-op sup { font-size: 0.7em; vertical-align: super; margin-left: 0.08em; }
+
 /* Pages are not printable (no saving questions to PDF). */
 @media print {
   body { display: none; }

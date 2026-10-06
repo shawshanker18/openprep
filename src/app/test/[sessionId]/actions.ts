@@ -65,11 +65,19 @@ export async function saveResponse(input: z.input<typeof Save>) {
   return save(userId, p.data);
 }
 
-export async function submitModule(moduleId: string) {
-  const { userId } = await requireUser();
-  if (!z.uuid().safeParse(moduleId).success || (await lockedOut(userId, { moduleId }))) return false;
-  if(await limitPractice(userId,"request")) return false;
-  try { return await submit(userId, moduleId); } catch(e) { if(e instanceof DeliveryBlocked) return false; throw e; }
+const Submit = z.object({moduleId:z.uuid(),drafts:z.array(Save.omit({moduleId:true})).max(100).default([])});
+export async function submitModule(input: z.input<typeof Submit>) {
+  const {userId}=await requireUser();
+  const parsed=Submit.safeParse(input);
+  if(!parsed.success) return {ok:false as const,error:"Invalid module submission."};
+  const {moduleId,drafts}=parsed.data;
+  if(await lockedOut(userId,{moduleId})) return {ok:false as const,error:LOCKED};
+  const limited=await limitPractice(userId,"request");
+  if(limited) return {ok:false as const,error:limited};
+  try {
+    const result=await submit(userId,moduleId,drafts);
+    return result ? {ok:true as const,...result} : {ok:false as const,error:"This module could not be submitted. Reload to check its saved status and try again."};
+  } catch(e) {if(e instanceof DeliveryBlocked)return {ok:false as const,error:e.message};throw e;}
 }
 
 /** End a diagnostic early: answers so far are kept, the student carries on (as if skipped) and can retake it later. */
