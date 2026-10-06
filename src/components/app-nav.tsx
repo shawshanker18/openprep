@@ -167,10 +167,10 @@ export function MobileTabs() {
   const path = usePathname();
   const search = useSearchParams();
   return (
-    <nav className="bottom-nav fixed inset-x-0 bottom-0 z-10 flex justify-around border-t bg-background pb-[env(safe-area-inset-bottom)] md:hidden">
+    <nav className="bottom-nav fixed inset-x-0 bottom-0 z-10 flex justify-around border-t bg-background pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] md:hidden">
       {MOBILE_TABS.map(({ href, label, icon: Icon }) => (
         <Link key={href} href={href} aria-current={isActive(path, search, href) ? "page" : undefined}
-          className="flex flex-1 flex-col items-center gap-0.5 py-2 text-xs text-muted-foreground aria-[current=page]:text-foreground">
+          className="flex min-w-0 flex-1 flex-col items-center gap-0.5 py-2 text-xs text-muted-foreground aria-[current=page]:text-foreground">
           <Icon className="size-5" />{label}
         </Link>
       ))}

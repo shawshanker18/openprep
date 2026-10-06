@@ -10,7 +10,8 @@ import type { Tx } from "@/db";
 import { recordAttempt } from "./attempts";
 
 const pg = new PGlite();
-const db = drizzle(pg, { schema });
+const queries:string[]=[];
+const db = drizzle(pg, { schema,logger:{logQuery(query){queries.push(query);}} });
 const USER = "00000000-0000-0000-0000-000000000001";
 const now = new Date("2026-10-01T10:00:00Z");
 
@@ -93,4 +94,19 @@ it("guessed-right is queued for review in 3 days, and a guessed-right review sta
   expect((await review(Q3.id))!.stage).toBe(0);
   await record(Q3, { response: "D", timeMs: 30_000, confidence: 3, context: "review", now });
   expect((await review(Q3.id))!.stage).toBe(1); // a sure answer walks the ladder as before
+});
+
+it("batches sibling updates, clamps theta, and preserves established skills and other accounts",async()=>{
+ const other="00000000-0000-0000-0000-000000000002";
+ await db.insert(schema.profiles).values({id:other});
+ await db.insert(schema.skillState).values({userId:other,skillId:"m-adv-equiv",theta:1});
+ await db.update(schema.skillState).set({theta:2.99,n:0}).where(and(eq(schema.skillState.userId,USER),eq(schema.skillState.skillId,"m-adv-equiv")));
+ await db.update(schema.skillState).set({theta:1,n:3}).where(and(eq(schema.skillState.userId,USER),eq(schema.skillState.skillId,"m-adv-nonlin-func")));
+ queries.length=0;
+ await record(Q1,{response:"B",timeMs:5000,confidence:3,context:"practice",now});
+ expect(queries.filter(q=>q.startsWith('update "skill_state"'))).toHaveLength(2);
+ expect((await state("m-adv-equiv")).theta).toBe(3);
+ expect((await state("m-adv-nonlin-func")).theta).toBe(1);
+ const [otherState]=await db.select().from(schema.skillState).where(eq(schema.skillState.userId,other));
+ expect(otherState!.theta).toBe(1);
 });

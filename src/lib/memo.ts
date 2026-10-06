@@ -6,7 +6,7 @@ export function memo<T>(ttlMs: number, load: () => Promise<T>): (() => Promise<T
   let hit: { at: number; value: Promise<T> } | null = null;
   const fresh = () => {
     const value = load();
-    value.catch(() => { hit = null; });
+    value.catch(() => { if (hit?.value === value) hit = null; });
     hit = { at: Date.now(), value };
     return value;
   };

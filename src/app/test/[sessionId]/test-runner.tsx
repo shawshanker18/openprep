@@ -231,7 +231,7 @@ export function TestRunner({ userId, sessionId, module: m, items: initial, serve
   const it = items[pos]!;
   const answered = items.filter((x) => x.response !== null).length;
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] flex-col">
+    <div className="flex min-h-[calc(100dvh-4rem)] flex-col">
       <header className="sticky top-0 z-10 grid grid-cols-[minmax(0,1fr)_auto] sm:grid-cols-[minmax(0,1fr)_7rem_auto] items-center gap-2 border-b bg-background px-4 py-2 text-sm">
         <span className="min-w-0 truncate font-medium">{title}</span>
         {left != null && (

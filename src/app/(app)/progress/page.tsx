@@ -44,7 +44,7 @@ function Bars({ rows }: { rows: { label: string; value: number; suffix?: string 
   return (
     <ul className="flex flex-col gap-1.5 text-sm">
       {rows.map((r) => (
-        <li key={r.label} className="grid grid-cols-[minmax(8rem,max-content)_1fr_3rem] items-center gap-2">
+        <li key={r.label} className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_3rem] items-center gap-2">
           <span>{r.label}</span>
           <span className="h-2 rounded-full bg-primary" style={{ width: `${(100 * r.value) / max}%` }} />
           <span className="text-right tabular-nums text-muted-foreground">{r.value}{r.suffix}</span>
@@ -88,7 +88,7 @@ export default async function ProgressPage() {
           const ks = skills.filter((s) => s.domain === d && s.status !== "unknown");
           const avg = ks.length ? Math.round(ks.reduce((a, s) => a + s.mastery, 0) / ks.length) : 0;
           return (
-            <div key={d} className="grid grid-cols-[minmax(8rem,14rem)_1fr_4rem] items-center gap-3 text-sm">
+            <div key={d} className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_4rem] items-center gap-3 text-sm">
               <span>{DOMAINS[d].name}</span><MasteryBar pct={avg} measured={ks.length > 0} />
               <span className="text-right tabular-nums text-muted-foreground">{ks.length ? `${avg}%` : "Not yet"}</span>
             </div>

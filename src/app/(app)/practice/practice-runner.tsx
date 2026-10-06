@@ -327,7 +327,7 @@ function Explanation({ q }: { q: RevealedQuestion }) {
         </div>
       )}
       {cur.md ? <Markdown className="text-sm">{cur.md}</Markdown> : <p className="text-sm text-muted-foreground">A worked explanation is not included in this question&apos;s source. You can review the correct answer above or ask the tutor.</p>}
-      {cur.id === "desmos" && q.desmos && <DesmosCalculator expressions={q.desmos.expressions} className="h-[65vh]" />}
+      {cur.id === "desmos" && q.desmos && <DesmosCalculator expressions={q.desmos.expressions} className="h-[65dvh]" />}
     </div>
   );
 }

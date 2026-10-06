@@ -146,9 +146,10 @@ export async function withProgress(userId: string, profile: Profile, day: string
 }
 
 export async function getDashboard(userId: string, profile: Profile, now = new Date()) {
-  const daily = await ensureDaily(userId, profile, now);
+  const dailyRequest = ensureDaily(userId, profile, now);
   const daysLeft = daysToTest(profile, now);
-  const [states, dueReviews, { due: mockDue, lastMock }, week] = await Promise.all([
+  const [daily, states, dueReviews, { due: mockDue, lastMock }, week] = await Promise.all([
+    dailyRequest,
     skillStatesOf(userId),
     dueReviewsNow(userId),
     mockDueNow(userId, daysLeft),
