@@ -25,7 +25,7 @@ export async function sha256Hex(s: string) {
  * `nonceHash` + `onToken`: the browser half of signing in from the desktop/Android app (see /auth/google). The app
  * keeps the nonce; Google embeds its hash in the token, which is handed back to the app instead of signing in here.
  */
-export function GoogleButton({ enabled, nonceHash, onToken }: { enabled: boolean; nonceHash?: string; onToken?: (credential: string) => void }) {
+export function GoogleButton({ enabled, privacyAccepted=false, nonceHash, onToken }: { enabled: boolean; privacyAccepted?:boolean; nonceHash?: string; onToken?: (credential: string) => void }) {
   const router = useRouter();
   const el = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
@@ -45,7 +45,8 @@ export function GoogleButton({ enabled, nonceHash, onToken }: { enabled: boolean
           if (cancelled) return;
           setError(null);
           if (onToken) return onToken(credential);
-          const r = await signInWithGoogle({ credential, nonce: raw }).catch(() => ({ ok: false, error: undefined }));
+          if(!privacyAccepted){setError("Please accept the Privacy Policy before continuing.");return;}
+          const r = await signInWithGoogle({ credential, nonce: raw, privacyAccepted }).catch(() => ({ ok: false, error: undefined }));
           if (cancelled) return;
           if (!r.ok) { setError(("error" in r && r.error) || "Google sign-in didn't work. Please try again or use the email link."); return; }
           router.replace("/dashboard");
@@ -63,7 +64,7 @@ export function GoogleButton({ enabled, nonceHash, onToken }: { enabled: boolean
       document.head.appendChild(s);
     }
     return () => { cancelled = true; };
-  }, [enabled, router, nonceHash, onToken]);
+  }, [enabled, router, nonceHash, onToken,privacyAccepted]);
 
   if (!CLIENT_ID) return null;
   return (

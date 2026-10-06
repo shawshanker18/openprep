@@ -22,7 +22,7 @@ export default function FinishGoogleInApp() {
     window.history.replaceState(null, "", window.location.pathname); // the token doesn't stay in the address
     const nonce = takeNonce();
     const expired = { ok: false as const, error: "This sign-in has expired or was started somewhere else. Tap Continue with Google in this app again." };
-    (credential && nonce ? signInWithGoogle({ credential, nonce }) : Promise.resolve(expired))
+    (credential && nonce ? signInWithGoogle({ credential, nonce, privacyAccepted:true }) : Promise.resolve(expired))
       .then((r) => {
         if (!r.ok) { setError(("error" in r && r.error) || "Google sign-in didn't work. Please try again or use the email link."); return; }
         router.replace("/dashboard");

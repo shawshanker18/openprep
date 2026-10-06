@@ -68,7 +68,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
           </Link>
           <div className="flex flex-col gap-1 text-center">
             <h1 className="text-2xl font-medium">Sign in or create your free account</h1>
-            <p className="text-sm text-muted-foreground">Adaptive SAT prep. Free forever.</p>
+            <p className="text-sm text-muted-foreground">SAT questions, lessons, and practice. Free to use.</p>
           </div>
           {error && <p role="alert" className="rounded-xl border border-destructive p-3 text-sm text-destructive">That sign-in link didn&apos;t work or has expired. Request a new one below.</p>}
           <LoginForm google={p.google} inApp={inApp} />

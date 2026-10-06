@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { eq } from "drizzle-orm";
 import { localDate } from "@/engine/plan";
 import { Button } from "@/components/ui/button";
@@ -125,6 +126,7 @@ export default async function SettingsPage({ searchParams }: PageProps<"/setting
 
       <section className="flex flex-col gap-2">
         <h2 className="font-medium">Account</h2>
+        <Link href="/privacy" className="self-start text-sm underline">Privacy Policy</Link>
         <form action={signOut}><Button type="submit" variant="outline">Sign out</Button></form>
         <form action={deleteAccount} className="mt-4 flex flex-col gap-2 rounded-lg border border-destructive/40 p-4">
           <h3 className="text-sm font-medium">Delete my account</h3>
