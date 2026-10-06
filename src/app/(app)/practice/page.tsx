@@ -33,7 +33,7 @@ async function loadPage({ searchParams }: PageProps<"/practice">) {
   const mode = sp.mode === "review" ? "review" : sp.mode === "set" ? "set" : sp.mode === "list" ? "list" : skillId ? "skill" : "smart";
 
   // Where to go when the set is finished: the course or the question bank (only these paths are accepted).
-  const back = typeof sp.from === "string" && /^\/(course(\/[a-z-]+)?|question-bank(\?[\w=&%.,-]*)?|bookmarks(\?page=\d+)?)$/.test(sp.from) ? sp.from : undefined;
+  const back = typeof sp.from === "string" && /^\/(start(\/[a-z-]+)?|course(\/[a-z-]+)?|question-bank(\?[\w=&%.,-]*)?|bookmarks(\?page=\d+)?)$/.test(sp.from) ? sp.from : undefined;
 
   if (mode === "list") {
     const ids = list(sp.ids).filter((id) => /^[\w-]{22}$/.test(id)).slice(0, 50);
@@ -54,7 +54,7 @@ async function loadPage({ searchParams }: PageProps<"/practice">) {
   }
 
   const plain = difficulty === "mixed" ? undefined : difficulty;
-  const title = mode === "review" ? (skillId ? `Review · ${SKILL_BY_ID[skillId]!.name}` : "Review") : skillId ? SKILL_BY_ID[skillId]!.name : "Smart practice";
+  const title = mode === "review" ? (skillId ? `Review · ${SKILL_BY_ID[skillId]!.name}` : "Review") : skillId ? SKILL_BY_ID[skillId]!.name : "Adaptive practice";
   const sessionId=await createPracticeSession(userId, {mode,skillId,difficulty:plain},title);
   redirect(`/practice?session=${sessionId}${blockQuery}`);
 }

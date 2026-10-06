@@ -42,7 +42,7 @@ async function loadPage({ params }: PageProps<"/test/[sessionId]">) {
     const d = await getDiagnostic(userId, sessionId);
     if (!d || d.status !== "in_progress" || !d.current) redirect(`/test/${sessionId}/results`);
     return (
-      <main className="mx-auto w-full max-w-5xl px-4 py-8">
+      <main className="w-full px-4 py-8 md:px-8">
         <DiagnosticRunner key={d.current.id} sessionId={sessionId} initial={d.current} initialIndex={d.index} />
       </main>
     );

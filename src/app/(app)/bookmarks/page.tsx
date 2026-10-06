@@ -9,6 +9,7 @@ import { attempts, bookmarks, questions } from "@/db/schema";
 import { SKILL_BY_ID } from "@/content/taxonomy";
 import { requireUser } from "@/server/auth";
 import { internalId, publicId,questionMarkdown } from "@/server/questions";
+import { BookmarkNote } from "./bookmark-note";
 
 export const metadata = { title: "Saved questions" };
 
@@ -26,7 +27,7 @@ export default async function BookmarksPage({searchParams}:PageProps<"/bookmarks
   const { userId, profile } = await requireUser();
   const rows = await db.select({
     id: questions.id, skillId: questions.skillId, stem: questions.stemMd, passage: questions.passageMd,choices:questions.choices,
-    explanation: questions.explanationMd, answer: questions.answer, at: bookmarks.createdAt,
+    explanation: questions.explanationMd, answer: questions.answer, at: bookmarks.createdAt, note: bookmarks.note,
     // Answers are shown only for questions this student has already answered (never leak unseen answers).
     answered: sql<boolean>`exists(select 1 from ${attempts} a where a.user_id = ${userId} and a.question_id = ${questions.id})`,
   }).from(bookmarks).innerJoin(questions, eq(questions.id, bookmarks.questionId))
@@ -48,6 +49,7 @@ export default async function BookmarksPage({searchParams}:PageProps<"/bookmarks
             <li key={publicId(r.id, userId)} className="flex flex-col gap-2 rounded-lg border p-4 text-sm">
               {r.passage && <Markdown className="line-clamp-3 text-muted-foreground">{r.passage}</Markdown>}
               <Markdown>{r.stem}</Markdown>
+              <BookmarkNote questionId={publicId(r.id, userId)} note={r.note} />
               {r.answered && (
                 <details>
                   <summary className="cursor-pointer text-muted-foreground">

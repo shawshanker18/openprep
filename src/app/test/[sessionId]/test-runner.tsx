@@ -238,14 +238,14 @@ export function TestRunner({ userId, sessionId, module: m, items: initial, serve
 
       <div className="flex-1 px-4 py-6">
         {screen === "question" ? (
-          <div className="mx-auto flex max-w-5xl flex-col gap-4">
+          <div className="flex w-full min-w-0 flex-col gap-4 md:px-4">
             <div className="flex items-center justify-between">
               <span className="rounded bg-foreground px-2 py-0.5 text-sm text-background tabular-nums">{pos + 1}</span>
               <Button variant={it.flagged ? "secondary" : "ghost"} size="sm" onClick={() => update({ flagged: !it.flagged })} aria-pressed={it.flagged}>
                 <Flag className={cn(it.flagged && "fill-current")} /> {it.flagged ? "Flagged" : "Flag for review"}
               </Button>
             </div>
-            {true && <DesmosToggle className="h-64" />}
+            {(m.section === "math" || m.section === "mixed") && <DesmosToggle />}
             <QuestionView key={it.question.id} question={it.question} value={it.response} onChange={(v) => update({ response: v })} disabled={submitting} />
           </div>
         ) : (

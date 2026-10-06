@@ -244,6 +244,7 @@ export const dailyPlans = pgTable("daily_plans", {
 export const bookmarks = pgTable("bookmarks", {
   userId: userRef(),
   questionId: text("question_id").notNull().references(() => questions.id),
+  note: text("note").notNull().default(""),
   createdAt: ts("created_at").notNull().defaultNow(),
 }, (t) => [primaryKey({ columns: [t.userId, t.questionId] })]);
 

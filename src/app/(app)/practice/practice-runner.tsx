@@ -11,10 +11,9 @@ import { QuestionView } from "@/components/question-view";
 import { DesmosCalculator, DesmosToggle } from "@/components/desmos-panel";
 import { TutorPanel } from "@/components/tutor-panel";
 import { FocusToggle } from "@/components/focus-toggle";
-import { MISTAKE_LABEL, MISTAKE_TYPES, type MistakeType } from "@/engine/mistakes";
 import { cn, isTyping } from "@/lib/utils";
 import type { PublicQuestion, RevealedQuestion } from "@/server/questions";
-import { setMistakeType, toggleBookmark } from "./actions";
+import { toggleBookmark } from "./actions";
 import { ReportQuestion } from "./report-question";
 import { readDraft, writeDraft } from "@/lib/answer-drafts";
 
@@ -234,7 +233,6 @@ export function PracticeRunner({ sessionId, userId, mode, title, block, set, bac
   }
 
   const r = s.phase === "revealed" ? s.r : null;
-  const mistake = s.phase === "revealed" ? s.mistake : null;
   const correctChoice = r && "choice" in r.revealed.answer ? r.revealed.answer.choice : null;
   const rationale = r && !r.correct && s.value ? r.revealed.choiceRationales?.[s.value] : null;
 
@@ -247,7 +245,7 @@ export function PracticeRunner({ sessionId, userId, mode, title, block, set, bac
       <QuestionPositions positions={positions} current={position} pending={pending} onJump={at=>navigate("jump",at)} />
       <div className="flex items-center justify-between gap-2 text-sm text-muted-foreground">
         <span>
-          {title} · {set ? `${s.answered}/${set.count}` : s.answered} answered{block && s.answered < block.target && ` · ${block.target - s.answered} to finish this block`}
+          {title} · {s.q.section === "rw" ? "Reading and Writing" : "Math"} · {set ? `${s.answered}/${set.count}` : s.answered} answered{block && s.answered < block.target && ` · ${block.target - s.answered} to finish this block`}
           {mode === "smart" && <> · <Link href="/practice/custom" className="underline">Customize practice</Link></>}
         </span>
         <div className="flex items-center gap-1">
@@ -271,7 +269,7 @@ export function PracticeRunner({ sessionId, userId, mode, title, block, set, bac
         <div ref={confidenceRef} className="flex flex-col gap-2">
           <div className="flex flex-wrap items-start gap-2">
             <TutorPanel key={s.q.id} questionId={s.q.id} answered={false} />
-            {true && <DesmosToggle className="h-64" />}
+            {s.q.section === "math" && <DesmosToggle />}
           </div>
           <Button variant="outline" className="self-start" disabled={pending} onClick={next}>Skip for now</Button>
           <span className="text-sm text-muted-foreground">How sure are you? (this submits your answer)</span>
@@ -294,22 +292,9 @@ export function PracticeRunner({ sessionId, userId, mode, title, block, set, bac
               {r.skillName}: {r.masteryBefore}% → {r.masteryAfter}%
             </span>
           </div>
-          {rationale && <p className="text-sm"><b>Why {s.value} is wrong:</b> {rationale}</p>}
+          <p className="text-sm">Your answer: <b>{s.value ?? "Not answered"}</b> · Correct answer: <b>{"choice" in r.revealed.answer ? r.revealed.answer.choice : r.revealed.answer.accepted.join(" or ")}</b></p>
+          {rationale && <Markdown className="text-sm">{`**Why ${s.value} is wrong:** ${rationale}`}</Markdown>}
           <Explanation q={r.revealed} />
-          {!r.correct && (
-            <div className="flex flex-col gap-2">
-              <span className="text-sm">What went wrong?</span>
-              <div className="flex flex-wrap gap-1.5">
-                {MISTAKE_TYPES.map((m) => (
-                  <button key={m} type="button" aria-pressed={mistake === m}
-                    onClick={async () => { dispatch({ type: "mistake", m }); await setMistakeType({ attemptId: r.attemptId, type: m }); }}
-                    className={cn("rounded-full border px-3 py-1 text-xs", mistake === m ? "bg-primary text-primary-foreground" : "hover:bg-muted")}>
-                    {MISTAKE_LABEL[m as MistakeType]}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
           <div className="flex flex-wrap gap-2">
             <Button size="lg" onClick={next}>{set && s.answered >= set.count ? "See summary" : "Next"}</Button>
             {!r.correct && !(set && s.answered >= set.count) && (
@@ -342,7 +327,7 @@ function Explanation({ q }: { q: RevealedQuestion }) {
         </div>
       )}
       {cur.md ? <Markdown className="text-sm">{cur.md}</Markdown> : <p className="text-sm text-muted-foreground">A worked explanation is not included in this question&apos;s source. You can review the correct answer above or ask the tutor.</p>}
-      {cur.id === "desmos" && q.desmos && <DesmosCalculator expressions={q.desmos.expressions} className="h-72" />}
+      {cur.id === "desmos" && q.desmos && <DesmosCalculator expressions={q.desmos.expressions} className="h-[65vh]" />}
     </div>
   );
 }

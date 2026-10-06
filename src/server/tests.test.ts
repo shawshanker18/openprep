@@ -46,6 +46,23 @@ const modules = (sessionId: string) =>
 const items = (moduleId: string) =>
   db.select().from(schema.testItems).where(eq(schema.testItems.moduleId, moduleId)).orderBy(asc(schema.testItems.position));
 
+it("diagnostic review reveals answered questions only after completion and only to their owner", async () => {
+  const diagUser = "00000000-0000-0000-0000-0000000000dc";
+  await db.insert(schema.profiles).values({ id: diagUser });
+  const [q] = await db.select().from(schema.questions).limit(1);
+  const [session] = await db.insert(schema.testSessions).values({ userId: diagUser, kind: "diagnostic" }).returning();
+  const [module] = await db.insert(schema.testModules).values({ sessionId: session!.id, idx: 0, section: "math", route: "base" }).returning();
+  await db.insert(schema.testItems).values({ moduleId: module!.id, position: 0, questionId: q!.id, response: "B", timeMs: 30000 });
+  await db.insert(schema.attempts).values({ userId: diagUser, questionId: q!.id, skillId: q!.skillId, context: "diagnostic", sessionId: session!.id, response: "B", correct: false, timeMs: 30000, thetaBefore: 0, thetaAfter: 0 });
+  expect((await T.getTestResult(diagUser, session!.id))!.items).toEqual([]);
+  expect(await T.getTestResult(OTHER, session!.id)).toBeNull();
+  await db.update(schema.testSessions).set({ status: "completed", completedAt: new Date() }).where(eq(schema.testSessions.id, session!.id));
+  const review = await T.getTestResult(diagUser, session!.id);
+  expect(review!.items).toHaveLength(1);
+  expect(review!.items[0]).toMatchObject({ response: "B", correct: false, question: { answer: { choice: "A" }, explanationMd: "e" } });
+  expect(await T.getTestResult(OTHER, session!.id)).toBeNull();
+});
+
 it("section test: routes to the hard module, submits idempotently, scores, and updates mastery once", async () => {
   const r = await T.startTest(USER, { kind: "section", section: "math" });
   if (!r.ok) throw new Error(r.error);

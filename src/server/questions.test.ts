@@ -10,6 +10,8 @@ it("toPublic never leaks the answer or its hints", () => {
     tags: ["t"], status: "active", version: 1,
   };
   const pub = toPublic(q,"alice");
-  for (const k of ["answer", "explanationMd", "choiceRationales", "fastMethodMd", "desmos", "difficulty", "tags", "skillId", "section", "domain", "type"])
+  expect(pub.section).toBe("math"); // Safe label for the section currently being answered.
+  expect(pub).toMatchObject({ skillId: "m-alg-lin1", domain: "m-alg", difficulty: 3 });
+  for (const k of ["answer", "explanationMd", "choiceRationales", "fastMethodMd", "desmos", "tags", "type"])
     expect(pub).not.toHaveProperty(k);
 });

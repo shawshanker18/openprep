@@ -1,12 +1,11 @@
 import Link from "next/link";
 import { formatDate } from "@/lib/dates";
-import { and, desc, eq, lte, sql } from "drizzle-orm";
+import { and, desc, eq, lte, notExists, sql } from "drizzle-orm";
 import { Button } from "@/components/ui/button";
 import { Markdown } from "@/components/markdown";
 import { db } from "@/db";
-import { attempts, questions, reviewItems } from "@/db/schema";
+import { attempts, questions, reviewItems, testItems, testModules, testSessions } from "@/db/schema";
 import { SKILL_BY_ID } from "@/content/taxonomy";
-import { MISTAKE_LABEL, MISTAKE_TYPES, type MistakeType } from "@/engine/mistakes";
 import { cn } from "@/lib/utils";
 import { requireUser } from "@/server/auth";
 import { publicId } from "@/server/questions";
@@ -16,24 +15,26 @@ const PER_PAGE = 30;
 
 export default async function MistakesPage({ searchParams }: PageProps<"/mistakes">) {
   const sp = await searchParams;
-  const view = sp.view === "all" ? "all" : "due";
+  const view = sp.view === "due" ? "due" : "all";
   const section = sp.section === "rw" || sp.section === "math" ? sp.section : null;
-  const type = MISTAKE_TYPES.includes(sp.type as MistakeType) ? (sp.type as MistakeType) : null;
   const page = Math.max(1, Math.min(1000, Number(sp.page) || 1));
   const { userId, profile } = await requireUser();
   const now = new Date();
 
   // Latest wrong attempt per question, joined to its review-queue state; newest first, a page at a time.
   const latest = db.selectDistinctOn([attempts.questionId], {
-    id: attempts.questionId, skillId: attempts.skillId, section: questions.section, stem: sql<string>`coalesce(${questions.passageMd}, ${questions.stemMd})`.as("stem"),
-    mistakeType: attempts.mistakeType, at: attempts.createdAt, dueAt: reviewItems.dueAt,
+    id: attempts.questionId, skillId: attempts.skillId, section: questions.section, stem: sql<string>`concat_ws(chr(10) || chr(10), ${questions.passageMd}, ${questions.stemMd})`.as("stem"),
+    response: attempts.response, answer: questions.answer, choices: questions.choices, rationale: questions.choiceRationales, at: attempts.createdAt, dueAt: reviewItems.dueAt,
   }).from(attempts)
     .innerJoin(questions, eq(questions.id, attempts.questionId))
     .leftJoin(reviewItems, and(eq(reviewItems.userId, userId), eq(reviewItems.questionId, attempts.questionId)))
     .where(and(
       eq(attempts.userId, userId), eq(attempts.correct, false),
+      notExists(db.select({ id: testItems.questionId }).from(testItems)
+        .innerJoin(testModules, eq(testModules.id, testItems.moduleId))
+        .innerJoin(testSessions, eq(testSessions.id, testModules.sessionId))
+        .where(and(eq(testItems.questionId, attempts.questionId), eq(testSessions.userId, userId), eq(testSessions.status, "in_progress")))),
       section ? eq(questions.section, section) : undefined,
-      type ? eq(attempts.mistakeType, type) : undefined,
       view === "due" ? lte(reviewItems.dueAt, now) : undefined,
     ))
     .orderBy(attempts.questionId, desc(attempts.createdAt)).as("m");
@@ -44,7 +45,7 @@ export default async function MistakesPage({ searchParams }: PageProps<"/mistake
     .where(and(eq(reviewItems.userId, userId), lte(reviewItems.dueAt, now)))) as [{ due: number }];
 
   const href = (o: Record<string, string | null>) => {
-    const q = new URLSearchParams(Object.entries({ view, section, type, page: null, ...o }).filter(([, v]) => v) as [string, string][]);
+    const q = new URLSearchParams(Object.entries({ view, section, page: null, ...o }).filter(([, v]) => v) as [string, string][]);
     return `/mistakes?${q}`;
   };
   const chip = (active: boolean) => cn("rounded-full border px-3 py-1 text-xs", active ? "bg-primary text-primary-foreground" : "hover:bg-muted");
@@ -60,8 +61,7 @@ export default async function MistakesPage({ searchParams }: PageProps<"/mistake
         <Link className={chip(view === "all")} href={href({ view: "all" })}>All</Link>
         <span className="mx-1 border-l" />
         {(["rw", "math"] as const).map((s) => <Link key={s} className={chip(section === s)} href={href({ section: section === s ? null : s })}>{s === "rw" ? "R&W" : "Math"}</Link>)}
-        <span className="mx-1 border-l" />
-        {MISTAKE_TYPES.map((t) => <Link key={t} className={chip(type === t)} href={href({ type: type === t ? null : t })}>{MISTAKE_LABEL[t]}</Link>)}
+
       </div>
       {rows.length === 0 ? (
         <p className="text-muted-foreground">{view === "due" ? "Nothing due right now." : "No mistakes match these filters."}</p>
@@ -69,10 +69,13 @@ export default async function MistakesPage({ searchParams }: PageProps<"/mistake
         <ul className="flex flex-col gap-2">
           {rows.map((m) => (
             <li key={publicId(m.id,userId)} className="flex flex-col gap-1 rounded-md border p-3 text-sm">
-              <Markdown className="line-clamp-2">{m.stem}</Markdown>
+              <Markdown className="line-clamp-3">{m.stem}</Markdown>
+              <p>Your answer: <b>{m.response ?? "Not answered"}</b> · Correct answer: <b>{"choice" in m.answer ? m.answer.choice : m.answer.accepted.join(" or ")}</b></p>
+              {"choice" in m.answer && Array.isArray(m.choices) && <Markdown>{m.choices.find(c => "choice" in m.answer && c.id === m.answer.choice)?.md ?? ""}</Markdown>}
+              {m.response && m.rationale?.[m.response] && <Markdown>{m.rationale[m.response]!}</Markdown>}
               <span className="text-xs text-muted-foreground">
                 <Link className="underline" href={`/skills/${m.skillId}?tab=mistakes`}>{SKILL_BY_ID[m.skillId]?.name}</Link>
-                {m.mistakeType && ` · ${MISTAKE_LABEL[m.mistakeType as MistakeType]}`} · missed {formatDate(m.at, profile.timezone)}
+                {" · "}missed {formatDate(m.at, profile.timezone)}
                 {" · "}{m.dueAt ? (m.dueAt <= now ? "due now" : `review ${formatDate(m.dueAt, profile.timezone)}`) : "cleared"}
               </span>
             </li>

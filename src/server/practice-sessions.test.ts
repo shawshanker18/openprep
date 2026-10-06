@@ -30,7 +30,8 @@ it("saves only reached questions and restores an unattempted answer across reque
  const first=await S.loadPracticeSession(user,profile,session);
  expect(first.done).toBe(false);
  if(first.done) throw Error("missing question");
- expect(JSON.stringify(first)).not.toMatch(/solution|difficulty|skillId|saved-/);
+ expect(JSON.stringify(first)).not.toMatch(/solution|saved-/);
+ expect(first.question).toMatchObject({skillId:"m-alg-lin1",domain:"m-alg",difficulty:2});
  await S.savePracticeDraft(user,session,0,"A",23000);
  const restored=await S.loadPracticeSession(user,profile,session);
  expect(restored).toMatchObject({position:0,question:{id:first.question.id},response:"A",timeMs:23000,result:null,answered:0});

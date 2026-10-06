@@ -8,6 +8,7 @@ import { SUBJECTS } from "@/content/taxonomy";
 import { submitSurvey } from "./actions";
 import { Choice } from "@/components/ui/choice";
 import { DateField } from "@/components/ui/date-field";
+import { SatDateField } from "@/components/sat-date-field";
 import { Survey } from "@/lib/onboarding";
 
 const field = "flex flex-col gap-1.5 text-sm";
@@ -124,7 +125,7 @@ export function SurveyForm() {
 
       <div className="flex flex-col gap-2 text-sm">
         <label className={field}>Test date
-          <DateField name="testDate" disabled={unsureDate || step !== 2} required={!unsureDate && step === 2} min={new Date().toISOString().slice(0, 10)} />
+          <SatDateField name="testDate" disabled={unsureDate || step !== 2} required={!unsureDate && step === 2} />
         </label>
         <label className="flex items-center gap-2">
           <input type="checkbox" checked={unsureDate} onChange={(e) => setUnsureDate(e.target.checked)} /> Not sure yet
