@@ -6,12 +6,10 @@ import { Markdown } from "@/components/markdown";
 import { MasteryBar } from "@/components/mastery-bar";
 import { DOMAINS, SKILL_BY_ID } from "@/content/taxonomy";
 import { certaintyLabel, certaintyPct } from "@/engine/mastery";
-import { MISTAKE_LABEL, type MistakeType } from "@/engine/mistakes";
 import { cn } from "@/lib/utils";
 import { requireUser } from "@/server/auth";
 import { getSkillDetail, getSkillSummary } from "@/server/analytics";
 import { skillStats, tagsBySkill } from "@/server/practice";
-import { startTestAction } from "../../tests/actions";
 
 // Lessons live in Start from scratch; this page is only the student's standing on the skill.
 const TABS = ["performance", "practice", "mistakes"] as const;
@@ -72,7 +70,7 @@ export default async function SkillPage({ params, searchParams }: PageProps<"/sk
 
       {tab === "practice" && (
         <div className="flex flex-col gap-3">
-          <Button size="lg" className="self-start" render={<Link href={`/practice?skill=${skillId}`} />}>Practice (adaptive)</Button>
+          <Button size="lg" className="self-start" render={<Link href={`/practice?skill=${skillId}`} />}>Practice this skill</Button>
           <div className="flex flex-wrap gap-2">
             {[1, 2, 3].map((d) => (
               <Button key={d} variant="outline" render={<Link href={`/practice?skill=${skillId}&difficulty=${d}`} />}>{DIFF[d]}</Button>
@@ -82,10 +80,7 @@ export default async function SkillPage({ params, searchParams }: PageProps<"/sk
               <Button variant="outline" render={<Link href={`/practice?mode=set&skills=${skillId}&tags=desmos`} />}>Desmos-based</Button>
             )}
             <Button variant="outline" render={<Link href={`/practice?mode=review&skill=${skillId}`} />}>Review mistakes</Button>
-            <form action={startTestAction}>
-              <input type="hidden" name="kind" value="mini" /><input type="hidden" name="skillId" value={skillId} />
-              <Button type="submit" variant="outline">Take a mini test</Button>
-            </form>
+
           </div>
           <p className="text-sm text-muted-foreground">SAT-level mixes difficulties with a countdown at real test pace.</p>
         </div>
@@ -141,8 +136,7 @@ export default async function SkillPage({ params, searchParams }: PageProps<"/sk
             <div className="grid gap-6 sm:grid-cols-2">
               <div><h3 className="mb-2 text-sm font-medium">By topic</h3>
                 <ul className="text-sm">{detail.mistakesByTag.map((t) => <li key={t.tag} className="flex justify-between"><span>{t.tag.replace(/-/g, " ")}</span><span>{t.n}</span></li>)}</ul></div>
-              <div><h3 className="mb-2 text-sm font-medium">By type</h3>
-                <ul className="text-sm">{detail.mistakesByType.map((t) => <li key={t.type} className="flex justify-between"><span>{MISTAKE_LABEL[t.type as MistakeType] ?? t.type}</span><span>{t.n}</span></li>)}</ul></div>
+
             </div>
             <ul className="flex flex-col gap-2">
               {detail.missed.map((m) => (

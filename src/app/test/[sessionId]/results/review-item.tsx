@@ -25,7 +25,7 @@ export function ReviewItem({ n, q, response, correct, timeMs, initiallyOpen }: {
         <QuestionView question={q} value={response} onChange={() => {}} disabled correct={choice} />
         {!choice && "accepted" in q.answer && <p className="text-sm">Accepted answer: <b>{q.answer.accepted.join(" or ")}</b></p>}
         {rationale && <Markdown className="text-sm">{`**Why ${response} is wrong:** ${rationale}`}</Markdown>}
-        <Markdown className="text-sm">{q.explanationMd}</Markdown>
+        {q.explanationMd ? <Markdown className="text-sm">{`**Why:** ${q.explanationMd}`}</Markdown> : !rationale && <p className="text-sm text-muted-foreground">A written explanation is not available for this question yet.</p>}
         {q.fastMethodMd && <Markdown className="text-sm text-muted-foreground">{`**Fastest:** ${q.fastMethodMd}`}</Markdown>}
         <div><TutorPanel questionId={q.id} answered wrongChoice={!correct && !!q.choices?.length ? response : null} /></div>
 

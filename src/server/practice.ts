@@ -1,7 +1,8 @@
 // Practice: which question next, and submitting an answer (spec 04 §3).
 import "server-only";
+import { availableQuestion } from "./question-availability";
 import { memo } from "@/lib/memo";
-import { and, asc, count, desc, eq, gte, inArray, isNotNull, lte, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, gte, inArray, isNotNull, lte, notInArray, sql } from "drizzle-orm";
 import { db, type Tx } from "@/db";
 import { attempts, bookmarks, questionExposures, questionServes, questions, reviewItems, skillState, type Profile, type Question } from "@/db/schema";
 import { SKILL_BY_ID } from "@/content/taxonomy";
@@ -23,7 +24,7 @@ export type Timing = "auto" | "off" | "on";
 async function dueReview(userId: string, now: Date, exclude: string[], skillId?: string) {
   const rows = await db.select({ q: questions }).from(reviewItems)
     .innerJoin(questions, eq(questions.id, reviewItems.questionId))
-    .where(and(eq(reviewItems.userId, userId), lte(reviewItems.dueAt, now), skillId ? eq(questions.skillId, skillId) : undefined))
+    .where(and(eq(reviewItems.userId, userId), lte(reviewItems.dueAt, now), availableQuestion(userId), skillId ? eq(questions.skillId, skillId) : undefined))
     .orderBy(asc(reviewItems.dueAt)).limit(exclude.length + 1);
   return rows.map((r) => r.q).find((q) => !exclude.includes(q.id)) ?? null;
 }
@@ -39,7 +40,7 @@ async function pickInSkill(userId: string, skillId: string, exclude: string[], n
   // Only the fields selection needs; the full text is fetched for the one question picked.
   const slim = { id: questions.id, difficulty: questions.difficulty, tags: questions.tags };
   const [pool, seen, queued, [state], [last]] = await Promise.all([
-    db.select(slim).from(questions).where(and(eq(questions.skillId, skillId), eq(questions.status, "active"))),
+    db.select(slim).from(questions).where(and(eq(questions.skillId, skillId), eq(questions.status, "active"), availableQuestion(userId), exclude.length ? notInArray(questions.id, exclude) : undefined, forced ? eq(questions.difficulty, forced) : undefined)),
     db.select({ id: attempts.questionId, at: sql<Date>`max(${attempts.createdAt})` }).from(attempts)
       .where(and(eq(attempts.userId, userId), eq(attempts.skillId, skillId))).groupBy(attempts.questionId),
     db.select({ id: reviewItems.questionId }).from(reviewItems).where(eq(reviewItems.userId, userId)),
@@ -85,7 +86,7 @@ export type PracticeSelection = {
   context?: DeliveryContext; exploratory?: boolean; paper?: { nonce: string; count: number };
 };
 export async function selectPracticeQuestion(userId: string, profile: Profile, input: PracticeSelection) {
-  if (input.mode === "set" && ((input.skillIds?.length ?? 0) > 1 || (input.tags?.length ?? 0) > 1 || input.tags?.some(tag => tag !== "desmos"))) {
+  if (input.mode === "set" && ((input.tags?.length ?? 0) > 1 || input.tags?.some(tag => tag !== "desmos"))) {
     throw new DeliveryBlocked("Custom practice is no longer available.");
   }
   const now = new Date();
@@ -98,7 +99,7 @@ export async function selectPracticeQuestion(userId: string, profile: Profile, i
   if (input.mode === "list") {
     // A hand-picked list (question bank): the first one not answered yet in this session, in the given order.
     const nextId = (input.ids ?? []).find((id) => !exclude.includes(id));
-    if (nextId) q = (await db.select().from(questions).where(and(eq(questions.id, nextId), eq(questions.status, "active"))))[0] ?? null;
+    if (nextId) q = (await db.select().from(questions).where(and(eq(questions.id, nextId), eq(questions.status, "active"), availableQuestion(userId))))[0] ?? null;
   } else if (input.mode === "review") {
     q = await dueReview(userId, now, exclude, input.skillId);
   } else if (input.mode === "set") {

@@ -1,7 +1,8 @@
+import { availableQuestion } from "./question-availability";
 import "server-only";
-import { and, asc, desc, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq } from "drizzle-orm";
 import { db, type Tx } from "@/db";
-import { attempts, bookmarks, practiceSessions as sessions, practiceSessionItems as items, questionServes, questions, type Profile } from "@/db/schema";
+import { attempts, bookmarks, practiceSessions as sessions, practiceSessionItems as items, questionServes, questions, type Profile, type Question } from "@/db/schema";
 import { SKILL_BY_ID } from "@/content/taxonomy";
 import { masteryPct } from "@/engine/mastery";
 import { PaperConfigSchema, type PaperConfig } from "./papers";
@@ -13,7 +14,6 @@ import { inRunningTest } from "./tests";
 import { selectPracticeQuestion, submitAnswer, timeLimitFor } from "./practice";
 
 export async function createPracticeSession(userId: string, config: PaperConfig, title: string, back?: string) {
-  if (title.startsWith("Custom practice")) throw new DeliveryBlocked("Custom practice is no longer available.");
   const parsed = PaperConfigSchema.parse(config);
   await eventQuota(userId, await deliveryContext(), "set");
   const [session] = await db.insert(sessions).values({userId, config: parsed, title, back}).returning({id: sessions.id});
@@ -21,16 +21,16 @@ export async function createPracticeSession(userId: string, config: PaperConfig,
 }
 export async function getPracticeSession(userId: string, id: string) {
   const session = (await db.select().from(sessions).where(and(eq(sessions.id, id), eq(sessions.userId, userId))))[0];
-  return session && PaperConfigSchema.safeParse(session.config).success && !session.title.startsWith("Custom practice") ? session : null;
+  return session && PaperConfigSchema.safeParse(session.config).success ? session : null;
 }
 export async function listPracticeSessions(userId: string, page = 1) {
   // No question catalogue or text is returned by the history list.
   return db.select({id:sessions.id, title:sessions.title, status:sessions.status, cursor:sessions.cursor, updatedAt:sessions.updatedAt})
-    .from(sessions).where(and(eq(sessions.userId,userId), sql`(${sessions.config}->'skillIds' is null or jsonb_array_length(${sessions.config}->'skillIds') <= 1)`, sql`${sessions.title} not like 'Custom practice%'`)).orderBy(desc(sessions.updatedAt),desc(sessions.id)).limit(50).offset((page-1)*50);
+    .from(sessions).where(and(eq(sessions.userId,userId))).orderBy(desc(sessions.updatedAt),desc(sessions.id)).limit(50).offset((page-1)*50);
 }
 async function owned(tx: Tx, userId: string, id: string) {
   const [session] = await tx.select().from(sessions).where(and(eq(sessions.id,id),eq(sessions.userId,userId))).for("update");
-  if (!session || !PaperConfigSchema.safeParse(session.config).success || session.title.startsWith("Custom practice")) throw new DeliveryBlocked("Practice session not found.");
+  if (!session || !PaperConfigSchema.safeParse(session.config).success) throw new DeliveryBlocked("Practice session not found.");
   return session;
 }
 const itemKey = (id: string, position: number) => and(eq(items.sessionId,id),eq(items.position,position));
@@ -53,7 +53,7 @@ export async function loadPracticeSession(userId: string, profile: Profile, id: 
   if(config.ids && ids?.length!==config.ids.length) throw new DeliveryBlocked("Question not found.");
   const selectingSimilar = similar && navigation.kind==="next" && navigation.position===before.cursor;
   const wanted = navigation.kind==="next" && navigation.position===before.cursor ? before.cursor+1 : navigation.kind==="jump"?navigation.position:before.cursor;
-  let candidate = null;
+  let candidate: Question | null = null;
   if(wanted!==undefined && wanted<config.count && !beforeItems.some(i=>i.position===wanted)) {
     const source=beforeItems.find(i=>i.position===before.cursor);
     if(selectingSimilar && !source?.attemptId) throw new DeliveryBlocked("Answer your question first.");
@@ -81,7 +81,13 @@ export async function loadPracticeSession(userId: string, profile: Profile, id: 
           await consumeWindow(tx,scope.id,scope.max,86_400_000);
       }
       if(candidate) {
-        if(rows.some(r=>r.questionId===candidate.id)) throw new DeliveryBlocked("Your session changed in another tab. Reload to continue.");
+        const candidateId = candidate.id;
+        if(rows.some(r=>r.questionId===candidateId)) throw new DeliveryBlocked("Your session changed in another tab. Reload to continue.");
+        const [available] = await tx.select({id:questions.id}).from(questions).where(and(eq(questions.id,candidate.id),availableQuestion(userId,id)));
+        if (!available) {
+          candidate = await selectPracticeQuestion(userId,profile,{...config,ids,exclude:rows.map(r=>r.questionId)});
+          if (!candidate) throw new DeliveryBlocked("No questions are available with these filters. Resume an active session or choose other skills.");
+        }
         await servePractice(userId,candidate,context,undefined,tx);
         const [serve] = await tx.select().from(questionServes).where(and(eq(questionServes.userId,userId),eq(questionServes.questionId,candidate.id)));
         [item] = await tx.insert(items).values({sessionId:id,position,questionId:candidate.id,servedAt:serve!.servedAt}).returning();

@@ -37,7 +37,7 @@ async function loadPage({ params, searchParams }: PageProps<"/test/[sessionId]/r
           <p className="text-sm text-muted-foreground">{mistakes.length ? "Open a question to see your answer and the correct answer." : "No mistakes in this diagnostic."}</p>
           {mistakes.map(({ item, number }) => <ReviewItem key={`${item.moduleIdx}-${item.position}`} n={number}
             q={item.question} response={item.response} correct={item.correct} timeMs={item.timeMs}
-            attemptId={item.attemptId} mistakeType={item.mistakeType} initiallyOpen={false} />)}
+            attemptId={item.attemptId} mistakeType={item.mistakeType} initiallyOpen={true} />)}
         </section>
       )}
       <div className="flex flex-wrap gap-2">

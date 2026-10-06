@@ -16,6 +16,12 @@ export function normalizeMarkdown(source: string): string {
     .replace(/\\\(([\s\S]*?)\\\)/g, (_, math) => `$${math}$`)
     .replace(/\\\[([\s\S]*?)\\\]/g, (_, math) => `\n\n$$\n${math}\n$$\n\n`)
     .split(/(\$\$[\s\S]*?\$\$|(?<!\\)\$[^$]*?(?<!\\)\$|`[^`]*`|!\[[^\]]*\]\([^)]*\))/g)
-    .map((part, index) => index % 2 ? part : part.replace(/\b([a-zA-Z]|\d+(?:\.\d+)?)\^(-?\d+|\{[^{}\n]+\})/g, (_, base, power) => `$${base}^{${power.replace(/[{}]/g, "")}}$`))
+    .map((part, index) => index % 2 ? part : part.replace(/\b([a-zA-Z]|\d+(?:\.\d+)?)\^(-?\d+|\{[^{}\n]+\}|\([^()\n]+\))/g, (_, base, power) => `$${base}^{${power.replace(/^[{(]|[})]$/g, "")}}$`))
+    .join("")
+    .split(/(\$\$[\s\S]*?\$\$|(?<!\\)\$[^$]*?(?<!\\)\$|`[^`]*`|!\[[^\]]*\]\([^)]*\))/g)
+    .map((part, index) => index % 2 ? part : part.replace(/([a-zA-Z]|\d+(?:\.\d+)?)([⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺ⁿ]+)/g, (_, base: string, exponent: string) => {
+      const symbols = "⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺ⁿ", plain = "0123456789-+n";
+      return `$${base}^{${[...exponent].map(c => plain[symbols.indexOf(c)]).join("")}}$`;
+    }))
     .join("");
 }

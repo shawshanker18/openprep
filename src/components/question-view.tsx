@@ -21,7 +21,7 @@ export function QuestionView({ question: q, value, onChange, disabled, correct }
         <div aria-label="Question details" className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
           <span>Domain: {DOMAINS[q.domain as DomainId]?.name ?? q.domain}</span>
           <span>Skill: {SKILL_BY_ID[q.skillId]?.name ?? q.skillId}</span>
-          <span>Difficulty: {q.difficulty === 1 ? "Easy" : q.difficulty === 2 ? "Medium" : q.difficulty === 3 ? "Hard" : "Unrated"}</span>
+          <span>SAT difficulty: {q.difficulty === 1 ? "Easy" : q.difficulty === 2 ? "Medium" : q.difficulty === 3 ? "Hard" : "Unrated"}</span>
         </div>
         {q.passageMd && <Markdown className="text-base">{q.passageMd}</Markdown>}
         <Markdown className="text-[15px]">{q.stemMd}</Markdown>

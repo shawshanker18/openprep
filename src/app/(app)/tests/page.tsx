@@ -1,13 +1,9 @@
 import Link from "next/link";
 import { formatDate } from "@/lib/dates";
 import { Button } from "@/components/ui/button";
-import { SKILLS } from "@/content/taxonomy";
 import type { TestResult } from "@/engine/score";
 import { requireUser } from "@/server/auth";
-import { skillsWithQuestions } from "@/server/plan";
-import { tagsBySkill } from "@/server/practice";
 import { freshFullMock, listTests, openTests, TESTS_PER_PAGE } from "@/server/tests";
-import { SkillTagPicker } from "../practice/skill-tag-picker";
 import { abandon } from "@/app/test/[sessionId]/actions";
 import { startTestAction } from "./actions";
 import { Choice } from "@/components/ui/choice";
@@ -17,7 +13,6 @@ export const metadata = { title: "Practice tests" };
 
 const KIND = { full: "Full practice test", section: "Section test", module: "Single module", mini: "Mini test", weakness: "Weakness test", custom: "Custom test", diagnostic: "Diagnostic" } as Record<string, string>;
 const ERR: Record<string, string> = { empty: "There aren't enough questions for that test yet.", invalid: "Please check the test options.", rate: "Too many tests started in a few minutes. Please wait a moment and try again." };
-const control = "h-9 rounded-md border bg-background px-2 text-sm";
 
 function StartCard({ title, time, children, fields }: { title: string; time: string; children: React.ReactNode; fields: React.ReactNode }) {
   return (
@@ -34,13 +29,12 @@ export default async function TestsPage({ searchParams }: PageProps<"/tests">) {
   const sp = await searchParams;
   const { userId, profile } = await requireUser();
   const page = Math.max(1, Math.min(1000, Number(sp.page) || 1));
-  const [found, running, available, tags, fresh] = await Promise.all([listTests(userId, page), openTests(userId), skillsWithQuestions(), tagsBySkill(), freshFullMock(userId)]);
+  const [found, running, fresh] = await Promise.all([listTests(userId, page), openTests(userId), freshFullMock(userId)]);
   const history = found.slice(0, TESTS_PER_PAGE);
   const more = found.length > TESTS_PER_PAGE;
   const open = running.filter((t) => t.kind !== "diagnostic");
-  const skills = SKILLS.filter((s) => available.has(s.id));
   const sectionPick = (
-    <Choice name="section" defaultValue="rw" aria-label="Section" className="sm:w-56" options={[{ value: "rw", label: "Reading and Writing" }, { value: "math", label: "Math" }]} />
+    <Choice name="section" defaultValue="math" aria-label="Section" className="sm:w-56" options={[{ value: "rw", label: "Reading and Writing" }, { value: "math", label: "Math" }]} />
   );
 
   return (
@@ -65,30 +59,10 @@ export default async function TestsPage({ searchParams }: PageProps<"/tests">) {
         <StartCard title="Full practice test" time="2 h 14 min · 98 questions + 10-min break" fields={<input type="hidden" name="kind" value="full" />}>
           Both sections, adaptive like the real test: how you do in each first module sets the difficulty of the second.
         </StartCard>
-        <StartCard title="Section test" time="64 to 70 min · two adaptive modules" fields={<><input type="hidden" name="kind" value="section" />{sectionPick}</>}>
-          One full section with routing to an easier or harder second module.
+        <StartCard title="Short practice test" time="32 to 35 min · one timed module" fields={<><input type="hidden" name="kind" value="module" />{sectionPick}</>}>
+          Choose Math or Reading and Writing. Review your answers after finishing; this shorter test reports accuracy rather than an SAT score.
         </StartCard>
       </div>
-      <details className="rounded-xl border p-5">
-        <summary className="cursor-pointer font-medium">More test options</summary>
-        <div className="mt-4 grid gap-4 lg:grid-cols-2">
-        <StartCard title="Single module" time="32 to 35 min" fields={<><input type="hidden" name="kind" value="module" />{sectionPick}</>}>
-          One timed module at mixed difficulty. Raw score only.
-        </StartCard>
-        <StartCard title="Custom test" time="You choose" fields={<>
-          <input type="hidden" name="kind" value="custom" />
-          <SkillTagPicker skills={skills} tagsBySkill={tags} name="skillIds" />
-          <div className="flex flex-wrap items-center gap-3 text-sm">
-            <Choice name="difficulty" defaultValue="mixed" aria-label="Difficulty" className="w-32" options={[{ value: "mixed", label: "Mixed" }, { value: "1", label: "Easy" },
-              { value: "2", label: "Medium" }, { value: "3", label: "Hard" }]} />
-            <label className="flex items-center gap-2">Questions <input name="count" type="number" min={5} max={30} defaultValue={10} className={`${control} w-20`} /></label>
-            <label className="flex items-center gap-2"><input type="checkbox" name="timed" defaultChecked /> Timed</label>
-          </div>
-        </>}>
-          Pick skills, sub-topics, difficulty, length, and timing.
-        </StartCard>
-        </div>
-      </details>
 
       <section id="history" className="flex scroll-mt-4 flex-col gap-2">
         <h2 className="font-medium">History</h2>

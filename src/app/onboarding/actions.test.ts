@@ -42,7 +42,7 @@ it("allows skipped slides and initializes every skill before the diagnostic with
   expect(await db.select().from(schema.skillState)).toHaveLength(SKILLS.length);
 });
 
-it("opens bank, Smart Practice, daily plan, reviews and mini tests without any diagnostic", async () => {
+it("opens bank, Recommended Practice, daily plan, reviews and short tests without any diagnostic", async () => {
   const P = await import("@/server/practice");
   const A = await import("@/app/(app)/practice/actions");
   const { createPaper } = await import("@/server/papers");
@@ -73,7 +73,7 @@ it("opens bank, Smart Practice, daily plan, reviews and mini tests without any d
   expect((await getNotifications(userId, profile)).some((n) => n.id === "reviews")).toBe(true);
   expect((await isMockDue(userId, null)).due).toBe(false);
   expect((await isMockDue(userId, null, new Date(Date.now() + 8 * 86_400_000))).due).toBe(true);
-  const form = new FormData(); form.set("kind", "mini"); form.set("skillId", skill.id);
+  const form = new FormData(); form.set("kind", "module"); form.set("section", "math");
   await startTestAction(form);
   expect(redirect).toHaveBeenLastCalledWith(expect.stringMatching(/^\/test\//));
   expect((await db.select().from(schema.testSessions)).some((session) => session.kind === "diagnostic")).toBe(false);

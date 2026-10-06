@@ -1,7 +1,7 @@
+import Link from "next/link";
 import { DOMAINS, type DomainId } from "@/content/taxonomy";
 import { formatDate } from "@/lib/dates";
 import { MasteryBar } from "@/components/mastery-bar";
-import { MISTAKE_LABEL, type MistakeType } from "@/engine/mistakes";
 import { requireUser } from "@/server/auth";
 import { getProgress, getSkillSummary } from "@/server/analytics";
 
@@ -84,7 +84,7 @@ export default async function ProgressPage() {
 
       <section className="flex flex-col gap-3">
         <h2 className="font-medium">Mastery by domain</h2>
-        {(Object.keys(DOMAINS) as DomainId[]).map((d) => {
+        {(Object.keys(DOMAINS) as DomainId[]).sort((a,b)=>Number(DOMAINS[a].section!=="math")-Number(DOMAINS[b].section!=="math")).map((d) => {
           const ks = skills.filter((s) => s.domain === d && s.status !== "unknown");
           const avg = ks.length ? Math.round(ks.reduce((a, s) => a + s.mastery, 0) / ks.length) : 0;
           return (
@@ -97,11 +97,7 @@ export default async function ProgressPage() {
       </section>
 
       <div className="grid gap-10 lg:grid-cols-2">
-        <section className="flex flex-col gap-3">
-          <h2 className="font-medium">Mistake types · 30 days</h2>
-          {p.mistakesByType.length ? <Bars rows={p.mistakesByType.map((m) => ({ label: MISTAKE_LABEL[m.type as MistakeType] ?? m.type!, value: m.n }))} />
-            : <p className="text-sm text-muted-foreground">No mistakes logged yet.</p>}
-        </section>
+        <section className="flex flex-col gap-3"><h2 className="font-medium">Review your work</h2><Link className="underline" href="/mistakes">Recent mistakes</Link><Link className="underline" href="/skills">Skills</Link><Link className="underline" href="/tests#history">Test history</Link><Link className="underline" href="/practice/sessions">Practice history</Link><Link className="underline" href="/bookmarks">Saved questions</Link></section>
         <section className="flex flex-col gap-3">
           <h2 className="font-medium">How sure vs. how right · 30 days</h2>
           {p.calibration.length ? <Bars rows={p.calibration.sort((a, b) => a.confidence - b.confidence).map((c) => ({ label: `${CONF[c.confidence]} (${c.n})`, value: c.accuracy, suffix: "%" }))} />
