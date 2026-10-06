@@ -43,11 +43,15 @@ async function loadPage({ searchParams }: PageProps<"/practice">) {
 
   if (mode === "set") {
     const skillIds = list(sp.skills).filter((s) => SKILL_BY_ID[s]).slice(0, 29);
-    const tags = list(sp.tags).filter(t=>t.length<=64).slice(0, 50);
+    if (skillIds.length > 1 || list(sp.skills).length !== skillIds.length) notFound();
+    const tags = list(sp.tags);
+    if (tags.length > 1 || tags.some(tag => tag !== "desmos")) notFound();
     const n = Number(sp.count);
-    const count = Number.isInteger(n) ? Math.min(50, Math.max(5, n)) : 10;
+    const count = sp.count === undefined ? 10 : n;
+    if (![5, 10, 20, 30].includes(count)) notFound();
     const timing = sp.timing === "on" || sp.timing === "off" ? sp.timing : "auto";
-    const title = skillIds.length === 1 ? SKILL_BY_ID[skillIds[0]!]!.name : skillIds.length ? "Custom practice" : "Custom practice (focus skills)";
+    if (!back && skillIds.length !== 1) notFound();
+    const title = skillIds.length === 1 ? SKILL_BY_ID[skillIds[0]!]!.name : "Question bank";
     const set = { skillIds, tags, count, timing } as const;
     const sessionId=await createPracticeSession(userId, {mode:"set", difficulty, ...set},title,back);
     redirect(`/practice?session=${sessionId}${blockQuery}`);

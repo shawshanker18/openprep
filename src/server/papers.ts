@@ -8,10 +8,11 @@ import { eventQuota } from './delivery';
 export const PaperConfigSchema = z.object({
   mode: z.enum(['skill','smart','review','set','list']), skillId:z.string().min(1).max(64).optional(),
   difficulty:z.union([z.literal(1),z.literal(2),z.literal(3),z.literal('mixed')]).optional(),
-  skillIds:z.array(z.string().min(1).max(64)).max(29).optional(), tags:z.array(z.string().min(1).max(64)).max(50).optional(),
+  // Sets support the single-skill question bank and lesson presets only.
+  skillIds:z.array(z.string().min(1).max(64)).max(1).optional(), tags:z.array(z.string().refine(tag => tag === 'desmos')).max(1).optional(),
   timing:z.enum(['auto','off','on']).optional(), ids:z.array(z.string().regex(/^[\w-]{22}$/)).max(50).optional(),
   count:z.number().int().min(1).max(100).default(100),
-});
+}).refine(config => config.mode !== 'set' || [5,10,20,30].includes(config.count), 'Unsupported practice preset size');
 export type PaperConfig = z.input<typeof PaperConfigSchema>;
 function key() {
   const secret=process.env.QUESTION_ID_SECRET || process.env.CRON_SECRET;

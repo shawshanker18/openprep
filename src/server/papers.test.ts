@@ -18,3 +18,11 @@ it('rejects tampering, invalid lengths and expired papers',async()=>{
   vi.spyOn(Date,'now').mockReturnValue(Date.now()+2*3600_000+1);
   expect(readPaper('alice',token)).toBeNull();vi.restoreAllMocks();
 });
+
+it('rejects multi-skill custom builders but allows question-bank and lesson presets', async () => {
+  const { PaperConfigSchema } = await import('./papers');
+  expect(PaperConfigSchema.safeParse({mode:'set',skillIds:['m-alg-lin1','m-alg-lin2'],count:10}).success).toBe(false);
+  expect(PaperConfigSchema.safeParse({mode:'set',skillIds:['m-alg-lin1'],tags:['arbitrary-tag'],count:10}).success).toBe(false);
+  expect(PaperConfigSchema.safeParse({mode:'set',skillIds:['m-alg-lin1'],count:5}).success).toBe(true);
+  expect(PaperConfigSchema.safeParse({mode:'set',skillIds:[],count:10,timing:'off'}).success).toBe(true);
+});

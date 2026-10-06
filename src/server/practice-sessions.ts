@@ -1,5 +1,5 @@
 import "server-only";
-import { and, asc, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq, sql } from "drizzle-orm";
 import { db, type Tx } from "@/db";
 import { attempts, bookmarks, practiceSessions as sessions, practiceSessionItems as items, questionServes, questions, type Profile } from "@/db/schema";
 import { SKILL_BY_ID } from "@/content/taxonomy";
@@ -13,22 +13,24 @@ import { inRunningTest } from "./tests";
 import { selectPracticeQuestion, submitAnswer, timeLimitFor } from "./practice";
 
 export async function createPracticeSession(userId: string, config: PaperConfig, title: string, back?: string) {
+  if (title.startsWith("Custom practice")) throw new DeliveryBlocked("Custom practice is no longer available.");
   const parsed = PaperConfigSchema.parse(config);
   await eventQuota(userId, await deliveryContext(), "set");
   const [session] = await db.insert(sessions).values({userId, config: parsed, title, back}).returning({id: sessions.id});
   return session!.id;
 }
 export async function getPracticeSession(userId: string, id: string) {
-  return (await db.select().from(sessions).where(and(eq(sessions.id, id), eq(sessions.userId, userId))))[0] ?? null;
+  const session = (await db.select().from(sessions).where(and(eq(sessions.id, id), eq(sessions.userId, userId))))[0];
+  return session && PaperConfigSchema.safeParse(session.config).success && !session.title.startsWith("Custom practice") ? session : null;
 }
 export async function listPracticeSessions(userId: string, page = 1) {
   // No question catalogue or text is returned by the history list.
   return db.select({id:sessions.id, title:sessions.title, status:sessions.status, cursor:sessions.cursor, updatedAt:sessions.updatedAt})
-    .from(sessions).where(eq(sessions.userId,userId)).orderBy(desc(sessions.updatedAt),desc(sessions.id)).limit(50).offset((page-1)*50);
+    .from(sessions).where(and(eq(sessions.userId,userId), sql`(${sessions.config}->'skillIds' is null or jsonb_array_length(${sessions.config}->'skillIds') <= 1)`, sql`${sessions.title} not like 'Custom practice%'`)).orderBy(desc(sessions.updatedAt),desc(sessions.id)).limit(50).offset((page-1)*50);
 }
 async function owned(tx: Tx, userId: string, id: string) {
   const [session] = await tx.select().from(sessions).where(and(eq(sessions.id,id),eq(sessions.userId,userId))).for("update");
-  if (!session) throw new DeliveryBlocked("Practice session not found.");
+  if (!session || !PaperConfigSchema.safeParse(session.config).success || session.title.startsWith("Custom practice")) throw new DeliveryBlocked("Practice session not found.");
   return session;
 }
 const itemKey = (id: string, position: number) => and(eq(items.sessionId,id),eq(items.position,position));
