@@ -1,5 +1,5 @@
 import "server-only";
-import { and, count, eq, gte, inArray, sql } from "drizzle-orm";
+import { and, count, eq, gte, inArray } from "drizzle-orm";
 import { db, type Tx } from "@/db";
 import { attempts, deliveryGuards, deliveryWindows, questionExposures, questionServes, questions, type Question } from "@/db/schema";
 import type { DeliveryContext } from "./delivery-context";
@@ -72,15 +72,11 @@ export async function servePractice(userId: string, q: Question, context: Delive
   const run = async (tx: Tx) => {
     await lockDelivery(tx, userId, context);
     const now = new Date();
-    const [pending] = await tx.select({ n: count() }).from(questionServes).where(and(eq(questionServes.userId, userId),
-      gte(questionServes.servedAt, new Date(now.getTime() - P.pendingMs)),
-      sql`not exists(select 1 from attempts a where a.user_id=${userId} and a.question_id=${questionServes.questionId} and a.created_at>=${questionServes.servedAt})`));
-    if (pending!.n >= P.unanswered) throw new DeliveryBlocked("Answer your open questions before starting another one, or return later.");
     // Re-serving an unanswered question must not reset its clock.
     const [old] = await tx.select().from(questionServes).where(and(eq(questionServes.userId, userId), eq(questionServes.questionId, q.id)));
     if (old && old.servedAt > new Date(now.getTime() - P.pendingMs)) {
       const [result] = await tx.select({id:attempts.id}).from(attempts).where(and(eq(attempts.userId,userId),eq(attempts.questionId,q.id),gte(attempts.createdAt,old.servedAt))).limit(1);
-      if (!result) throw new DeliveryBlocked("Return to your open question to continue.");
+      if (!result) return; // Reuse the existing delivery instead of blocking another saved session.
     }
     await consumeWindow(tx, `delivery:user:${userId}`, P.minute, 60_000);
     if (paper) await consumeWindow(tx, `paper:${userId}:${paper.nonce}`, paper.count, P.paperHours * 3_600_000);

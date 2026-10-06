@@ -45,11 +45,19 @@ it('an immediate wrong answer cannot reveal the solution; identical retries are 
  expect(await P.submitAnswer(USER,{...input,response:'A'})).toBeNull();
  expect(await P.submitAnswer(OTHER,input)).toBeNull();
 });
-it('parallel pulls cannot exceed two unanswered deliveries',async()=>{
+it('unfinished questions do not block fresh practice deliveries',async()=>{
  const results=await Promise.allSettled(ids.map(id=>serve(OTHER,id)));
- expect(results.filter(r=>r.status==='fulfilled')).toHaveLength(2);
- expect(results.filter(r=>r.status==='rejected')).toHaveLength(2);
- expect(await db.select().from(schema.questionServes).where(eq(schema.questionServes.userId,OTHER))).toHaveLength(2);
+ expect(results.filter(r=>r.status==='fulfilled')).toHaveLength(4);
+ expect(results.filter(r=>r.status==='rejected')).toHaveLength(0);
+ expect(await db.select().from(schema.questionServes).where(eq(schema.questionServes.userId,OTHER))).toHaveLength(4);
+});
+it('reopening the same unfinished question reuses its delivery without resetting the answer clock',async()=>{
+ const [before]=await db.select().from(schema.questionServes).where(and(eq(schema.questionServes.userId,OTHER),eq(schema.questionServes.questionId,ids[0]!)));
+ const exposures=await db.select().from(schema.questionExposures).where(eq(schema.questionExposures.userId,OTHER));
+ expect((await serve(OTHER,ids[0]!))!.question.id).toBe(Q.publicId(ids[0]!,OTHER));
+ const [after]=await db.select().from(schema.questionServes).where(and(eq(schema.questionServes.userId,OTHER),eq(schema.questionServes.questionId,ids[0]!)));
+ expect(after!.servedAt).toEqual(before!.servedAt);
+ expect(await db.select().from(schema.questionExposures).where(eq(schema.questionExposures.userId,OTHER))).toHaveLength(exposures.length);
 });
 it('resuming preserves the server clock and consumes no new exposure',async()=>{
  const [served]=await db.select().from(schema.questionServes).where(eq(schema.questionServes.userId,OTHER));
