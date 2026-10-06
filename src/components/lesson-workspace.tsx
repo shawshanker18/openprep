@@ -47,18 +47,15 @@ export function LessonWorkspace({
         </div>
       </div>
 
-      <div className="grid min-h-0 min-w-0 flex-1 gap-6 overflow-hidden lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+      <div className="grid min-h-0 min-w-0 flex-1 gap-0 overflow-hidden rounded-lg border lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <section className={`min-w-0 ${calculatorSide === "left" ? "lg:order-2" : "lg:order-1"}`}>
-          <div className="rounded-xl border p-5">
+          <div className="p-5">
             <Link href="/desmos" className="mb-5 inline-block text-sm text-muted-foreground hover:underline">← Desmos lessons</Link>
             <div className="prose-op">{children}</div>
           </div>
         </section>
         <section className={`min-w-0 ${calculatorSide === "left" ? "lg:order-1" : "lg:order-2"}`}>
-          <div className="sticky top-4 rounded-xl border bg-background p-3">
-            <div className="mb-2 flex items-center justify-between px-1 text-sm font-medium">
-              <span>Desmos calculator</span>
-            </div>
+          <div className="sticky top-4">
             {calculator}
           </div>
         </section>
