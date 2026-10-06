@@ -27,7 +27,7 @@ export const NAV_GROUPS = [
     items: [
       { href: "/start", label: "Start from scratch", icon: GraduationCap },
       { href: "/skills", label: "Your skills", icon: BookOpen },
-      { href: "/desmos", label: "Graphing calculator", icon: Calculator },
+      { href: "/desmos", label: "Desmos", icon: Calculator },
     ],
   },
   {

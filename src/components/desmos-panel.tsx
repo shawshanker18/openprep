@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Calculator, Expand, LoaderCircle, Minimize } from "lucide-react";
+import { Calculator, Expand, ExternalLink, LoaderCircle, Minimize } from "lucide-react";
 import { watchCalculatorSize } from "@/lib/calculator-size";
 import { Button } from "@/components/ui/button";
 
@@ -99,27 +99,36 @@ export function DesmosCalculator({ expressions = EMPTY_EXPRESSIONS, className = 
     document.addEventListener("keydown", escape);
     return () => { document.body.style.overflow = original; document.removeEventListener("keydown", escape); inertSiblings.forEach(({element,before})=>{element.toggleAttribute('inert',before);});previousFocus?.focus(); };
   }, [fullscreen]);
-  if (!API_KEY || state === "error") {
-    return (
-      <div ref={shell} role={fullscreen ? "dialog" : undefined} aria-modal={fullscreen || undefined} aria-label="Graphing calculator" className={fullscreen ? "fixed inset-0 z-50 flex flex-col gap-2 bg-background p-4" : `relative flex min-h-[320px] min-w-[280px] max-w-full resize flex-col gap-2 overflow-auto ${className}`} title="Drag the bottom-right corner to resize">
-        <button type="button" className="absolute right-3 top-3 z-20 rounded-md border bg-background p-2 hover:bg-muted" onClick={() => setFullscreen((v) => !v)} aria-label={fullscreen ? "Exit full-screen calculator" : "Open full-screen calculator"}>
-          {fullscreen ? <Minimize className="size-4" /> : <Expand className="size-4" />}
-        </button>
-        <iframe title="Desmos graphing calculator" src={FALLBACK} className="min-h-0 flex-1 w-full rounded-md border" allowFullScreen />
-        <p className="text-xs text-muted-foreground">If the embedded calculator is blocked, <a className="underline" href={FALLBACK} target="_blank" rel="noopener noreferrer">open Desmos</a>.
-          {expressions.length > 0 && <> Enter: {expressions.map((e) => <code key={e} className="mx-1 rounded bg-muted px-1">{e}</code>)}</>}</p>
+  const hosted = !API_KEY || state === "error";
+  return (
+    <div ref={shell} role={fullscreen ? "dialog" : undefined} aria-modal={fullscreen || undefined}
+      aria-label="Desmos graphing calculator"
+      className={fullscreen ? "fixed inset-0 z-50 flex flex-col bg-white" : `relative flex min-h-[320px] min-w-0 max-w-full resize flex-col overflow-hidden border border-neutral-300 bg-white ${className}`}>
+      <div className="flex shrink-0 items-center justify-between gap-3 bg-[#2d2d2d] px-3 py-2 text-white">
+        <span className="text-base font-medium tracking-tight">Desmos</span>
+        <div className="flex items-center gap-1">
+          <a href={FALLBACK} target="_blank" rel="noopener noreferrer" className="rounded p-2 text-white/80 hover:bg-white/10 hover:text-white" aria-label="Open Desmos in a new tab"><ExternalLink className="size-4" /></a>
+          <button type="button" className="rounded p-2 text-white/80 hover:bg-white/10 hover:text-white"
+            onClick={() => setFullscreen((value) => !value)} aria-label={fullscreen ? "Exit full-screen calculator" : "Open full-screen calculator"}>
+            {fullscreen ? <Minimize className="size-4" /> : <Expand className="size-4" />}
+          </button>
+        </div>
       </div>
-    );
-  }
-  return <div ref={shell} role={fullscreen ? "dialog" : undefined} aria-modal={fullscreen || undefined} aria-label="Graphing calculator" className={fullscreen ? "fixed inset-0 z-50 flex flex-col bg-background p-4" : `relative flex min-h-[320px] min-w-[280px] max-w-full resize flex-col overflow-hidden rounded-md border ${className}`} title="Drag the bottom-right corner to resize">
-    <button type="button" className="absolute right-3 top-3 z-20 rounded-md border bg-background p-2 hover:bg-muted" onClick={() => setFullscreen((v) => !v)} aria-label={fullscreen ? "Exit full-screen calculator" : "Open full-screen calculator"}>
-      {fullscreen ? <Minimize className="size-4" /> : <Expand className="size-4" />}
-    </button>
-    {state === "loading" && <div className="absolute inset-0 z-10 flex items-center justify-center gap-2 bg-background text-sm text-muted-foreground"><LoaderCircle className="size-4 animate-spin" /> Loading calculator…</div>}
-    <div ref={viewport} className="relative min-h-0 min-w-0 w-full flex-1 overflow-hidden">
-      <div ref={el} className="absolute inset-0" />
+      {hosted ? (
+        <>
+          <iframe title="Desmos graphing calculator" src={FALLBACK} className="min-h-0 w-full flex-1 border-0" allowFullScreen />
+          {expressions.length > 0 && <div className="shrink-0 border-t border-neutral-200 bg-neutral-50 px-3 py-2 text-xs text-neutral-600">
+            Enter: {expressions.map((expression) => <code key={expression} className="mx-1 inline-block rounded bg-white px-1 py-0.5 text-neutral-900">{expression}</code>)}
+          </div>}
+        </>
+      ) : (
+        <div ref={viewport} className="relative min-h-0 min-w-0 w-full flex-1 overflow-hidden">
+          {state === "loading" && <div role="status" className="absolute inset-0 z-10 flex items-center justify-center gap-2 bg-white text-sm text-neutral-600"><LoaderCircle className="size-4 animate-spin" /> Loading Desmos…</div>}
+          <div ref={el} className="absolute inset-0" />
+        </div>
+      )}
     </div>
-  </div>;
+  );
 }
 
 /** Toggleable calculator for practice and test modules; starts empty so it doesn't give the method away. */
@@ -129,7 +138,7 @@ export function DesmosToggle({ className = "h-[65vh] min-h-[24rem]" }: { classNa
   return (
     <div className="flex w-full min-w-0 flex-col gap-2">
       <Button variant="outline" size="sm" className="self-start" onClick={() => { setMounted(true); setOpen((o) => !o); }} aria-expanded={open}>
-        <Calculator /> {open ? "Hide calculator" : "Calculator"}
+        <Calculator /> {open ? "Hide Desmos" : "Desmos"}
       </Button>
       {mounted && <div hidden={!open}><DesmosCalculator className={className} /></div>}
     </div>
