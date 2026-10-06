@@ -59,7 +59,7 @@ export default async function SkillsPage({ searchParams }: PageProps<"/skills">)
           <p className="text-xs text-muted-foreground">Skills at the top can add the most points toward your target, because they are tested often and you have room to grow. Skills you&apos;ve already mastered sit at the bottom.</p>
       </div>) : (
       <div className="grid gap-8 lg:grid-cols-2">
-        {(["rw", "math"] as const).map((section) => (
+        {(["math", "rw"] as const).map((section) => (
           <section key={section} className="flex flex-col gap-4">
             <h2 className="text-lg font-semibold">{section === "rw" ? "Reading and Writing" : "Math"}</h2>
             {(Object.keys(DOMAINS) as DomainId[]).filter((d) => DOMAINS[d].section === section).map((d) => (
