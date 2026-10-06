@@ -1,11 +1,11 @@
 // The ONE write path for attempts and skill_state.theta (spec 00 §4 rule 3, 03 §9).
 // Always called inside a transaction by the caller.
 import "server-only";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import type { Tx } from "@/db";
 import { attempts, reviewItems, skillState, type Question } from "@/db/schema";
 import { skillsIn } from "@/content/taxonomy";
-import { GUESSED_CORRECT_WEIGHT, MAX_ATTEMPT_MS, REVIEW_INTERVAL_DAYS, REVIEW_WEIGHT, SIBLING_MAX_N, SIBLING_SHARE, type Difficulty } from "@/engine/constants";
+import { GUESSED_CORRECT_WEIGHT, MAX_ATTEMPT_MS, REVIEW_INTERVAL_DAYS, REVIEW_WEIGHT, SIBLING_MAX_N, SIBLING_SHARE, THETA_MIN, THETA_MAX, type Difficulty } from "@/engine/constants";
 import { applyDelta, thetaDelta } from "@/engine/mastery";
 import { grade } from "@/engine/grade";
 import { guessMistakeType, type MistakeType } from "@/engine/mistakes";
@@ -37,11 +37,10 @@ export async function recordAttempt(tx: Tx, userId: string, q: Question, a: {
   }).where(and(eq(skillState.userId, userId), eq(skillState.skillId, q.skillId)));
 
   // Share evidence with same-domain skills that have little of their own.
-  for (const sib of rows) {
-    if (sib.skillId === q.skillId || sib.n >= SIBLING_MAX_N) continue;
-    await tx.update(skillState).set({ theta: applyDelta(sib.theta, SIBLING_SHARE * delta) })
-      .where(and(eq(skillState.userId, userId), eq(skillState.skillId, sib.skillId)));
-  }
+  const siblings=rows.filter(sib=>sib.skillId!==q.skillId && sib.n<SIBLING_MAX_N).map(sib=>sib.skillId);
+  if(siblings.length) await tx.update(skillState).set({
+    theta:sql`greatest(${THETA_MIN},least(${THETA_MAX},${skillState.theta}+${SIBLING_SHARE*delta}))`,
+  }).where(and(eq(skillState.userId,userId),inArray(skillState.skillId,siblings)));
 
   const mistakeType: MistakeType | null = correct ? null
     : a.response === null ? (a.context === "test" ? "timing" : "concept")

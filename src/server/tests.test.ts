@@ -182,7 +182,10 @@ it("a question in a live test can't be answered (and revealed) through practice"
   const r = await T.startTest(USER, { kind: "mini", skillId: SKILLS.find((s) => s.section === "math")!.id });
   if (!r.ok) throw new Error(r.error);
   const [m] = await modules(r.id);
-  const [first] = await items(m!.id);
+  // Use a non-reserved item so this checks active-test exclusion independently of the fresh test reserve.
+  const [first]=await db.select({questionId:schema.testItems.questionId}).from(schema.testItems)
+    .where(and(eq(schema.testItems.moduleId,m!.id),sql`mod(abs(hashtext(${schema.testItems.questionId})::bigint),5)<>0`)).limit(1);
+  expect(first).toBeDefined();
   expect(await T.inRunningTest(USER, first!.questionId)).toBe(true);
   await db.update(schema.questionServes).set({servedAt:new Date(Date.now()-6000)});
   expect(await P.submitAnswer(USER, { questionId: first!.questionId, response: "A", timeMs: 5000, confidence: 3 })).toBeNull();

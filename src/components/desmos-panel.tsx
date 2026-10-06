@@ -133,7 +133,7 @@ export function DesmosCalculator({ expressions = EMPTY_EXPRESSIONS, className = 
 }
 
 /** Toggleable calculator for practice and test modules; starts empty so it doesn't give the method away. */
-export function DesmosToggle({ className = "h-[65vh] min-h-[24rem]" }: { className?: string }) {
+export function DesmosToggle({ className = "h-[65dvh] min-h-[20rem]" }: { className?: string }) {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   return (

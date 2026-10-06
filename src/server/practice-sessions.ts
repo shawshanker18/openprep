@@ -28,6 +28,13 @@ export async function listPracticeSessions(userId: string, page = 1) {
   return db.select({id:sessions.id, title:sessions.title, status:sessions.status, cursor:sessions.cursor, updatedAt:sessions.updatedAt})
     .from(sessions).where(and(eq(sessions.userId,userId))).orderBy(desc(sessions.updatedAt),desc(sessions.id)).limit(50).offset((page-1)*50);
 }
+/** Dashboard resume query stays bounded even after hundreds of completed sessions. */
+export async function latestActivePracticeSession(userId:string) {
+  const [session]=await db.select({id:sessions.id,title:sessions.title}).from(sessions)
+    .where(and(eq(sessions.userId,userId),eq(sessions.status,"active")))
+    .orderBy(desc(sessions.updatedAt),desc(sessions.id)).limit(1);
+  return session??null;
+}
 async function owned(tx: Tx, userId: string, id: string) {
   const [session] = await tx.select().from(sessions).where(and(eq(sessions.id,id),eq(sessions.userId,userId))).for("update");
   if (!session || !PaperConfigSchema.safeParse(session.config).success) throw new DeliveryBlocked("Practice session not found.");

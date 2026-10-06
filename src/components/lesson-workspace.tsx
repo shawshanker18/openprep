@@ -32,7 +32,7 @@ export function LessonWorkspace({
   };
 
   return (
-    <div data-lesson={slug} className="lesson-workspace flex min-h-[calc(100vh-2rem)] flex-col gap-4">
+    <div data-lesson={slug} className="lesson-workspace flex min-h-[calc(100dvh-2rem)] flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-3">
         <div className="flex min-w-0 items-center gap-3">
           <Button variant="outline" size="sm" onClick={toggleNavigation} aria-pressed={navigation}>

@@ -180,3 +180,14 @@ it("reserves fresh test questions from practice while allowing review after an a
  await database.insert(schema.attempts).values({userId:other,questionId:id,skillId:skill.id,response:"A",correct:true,timeMs:5000,context:"practice",thetaBefore:0,thetaAfter:0});
  expect(await lookup()).toHaveLength(1);
 });
+it("finds the newest active session even when completed history would fill the first page",async()=>{
+ const student=randomUUID();await database.insert(schema.profiles).values({id:student});
+ const config={mode:"set",skillIds:[skill.id],count:5} as const;
+ await database.insert(schema.practiceSessions).values(Array.from({length:60},()=>({userId:student,title:"Completed",config:{...config,skillIds:[skill.id]},status:"completed",updatedAt:new Date()})));
+ await database.insert(schema.practiceSessions).values([
+  {userId:student,title:"Older active",config:{...config,skillIds:[skill.id]},updatedAt:new Date("2026-01-01")},
+  {userId:student,title:"Newest active",config:{...config,skillIds:[skill.id]},updatedAt:new Date("2026-02-01")},
+ ]);
+ expect(await S.latestActivePracticeSession(student)).toMatchObject({title:"Newest active"});
+ expect(await S.latestActivePracticeSession(randomUUID())).toBeNull();
+});

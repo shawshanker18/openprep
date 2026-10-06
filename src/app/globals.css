@@ -171,3 +171,10 @@ body.lesson-focus-mode main { max-width: none; padding-top: 1rem; }
 /* Question text can't be selected, copied by long-press or dragged; typed answers stay editable. */
 .question-content { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 .question-content input, .question-content textarea { -webkit-user-select: text; user-select: text; }
+
+/* iOS zooms the page when a small text field receives focus, which can shift the layout after rotation. */
+@media (pointer: coarse) {
+  input:not([type=checkbox], [type=radio], [type=range], [type=hidden], [type=button], [type=submit]), textarea, select {
+    font-size: max(1rem, 1em);
+  }
+}
