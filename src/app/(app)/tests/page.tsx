@@ -90,7 +90,7 @@ export default async function TestsPage({ searchParams }: PageProps<"/tests">) {
         </div>
       </details>
 
-      <section className="flex flex-col gap-2">
+      <section id="history" className="flex scroll-mt-4 flex-col gap-2">
         <h2 className="font-medium">History</h2>
         {history.length === 0 ? <p className="text-sm text-muted-foreground">{page > 1 ? "No older tests." : "No tests yet."}</p> : (
           <table className="w-full text-left text-sm">
@@ -99,7 +99,7 @@ export default async function TestsPage({ searchParams }: PageProps<"/tests">) {
               {history.map((t) => {
                 const r = t.result as (TestResult & { total?: { total: number } }) | null;
                 const label = t.status !== "completed" ? t.status.replace("_", " ")
-                  : t.kind === "diagnostic" ? "Profile"
+                  : t.kind === "diagnostic" ? "Completed"
                   : typeof r?.total === "number" ? `≈ ${r.total}`
                   : r?.sections ? Object.values(r.sections).map((x) => `${x!.correct}/${x!.total}`).join(" · ") : "Not scored";
                 return (
@@ -107,7 +107,7 @@ export default async function TestsPage({ searchParams }: PageProps<"/tests">) {
                     <td className="py-2 tabular-nums">{formatDate(t.startedAt, profile.timezone)}</td>
                     <td>{KIND[t.kind] ?? t.kind}</td>
                     <td className="tabular-nums">{label}</td>
-                    <td className="text-right"><Link className="underline" href={t.status === "in_progress" ? `/test/${t.id}` : `/test/${t.id}/results`}>{t.status === "in_progress" ? "Resume" : "View"}</Link></td>
+                    <td className="text-right"><Link className="underline" href={t.status === "in_progress" ? `/test/${t.id}` : `/test/${t.id}/results${t.kind === "diagnostic" && t.status === "completed" ? "?review=mistakes" : ""}`}>{t.status === "in_progress" ? "Resume" : t.kind === "diagnostic" && t.status === "completed" ? "Review mistakes" : "View"}</Link></td>
                   </tr>
                 );
               })}
