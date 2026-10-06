@@ -36,11 +36,11 @@ export async function countDueReviews(userId: string, now = new Date()) {
 }
 
 /** Pick a question in one skill: similar-question after a miss, else adaptive difficulty. `tags` (if any) is a strict filter. */
-async function pickInSkill(userId: string, skillId: string, exclude: string[], now: Date, forced?: Difficulty, tags: string[] = [], exploratory = false): Promise<Question | null> {
+async function pickInSkill(userId: string, skillId: string, exclude: string[], now: Date, forced?: Difficulty, tags: string[] = [], exploratory = false, allowed: Difficulty[] = []): Promise<Question | null> {
   // Only the fields selection needs; the full text is fetched for the one question picked.
   const slim = { id: questions.id, difficulty: questions.difficulty, tags: questions.tags };
   const [pool, seen, queued, [state], [last]] = await Promise.all([
-    db.select(slim).from(questions).where(and(eq(questions.skillId, skillId), eq(questions.status, "active"), availableQuestion(userId), exclude.length ? notInArray(questions.id, exclude) : undefined, forced ? eq(questions.difficulty, forced) : undefined)),
+    db.select(slim).from(questions).where(and(eq(questions.skillId, skillId), eq(questions.status, "active"), availableQuestion(userId), exclude.length ? notInArray(questions.id, exclude) : undefined, forced ? eq(questions.difficulty, forced) : undefined, allowed.length ? inArray(questions.difficulty, allowed) : undefined)),
     db.select({ id: attempts.questionId, at: sql<Date>`max(${attempts.createdAt})` }).from(attempts)
       .where(and(eq(attempts.userId, userId), eq(attempts.skillId, skillId))).groupBy(attempts.questionId),
     db.select({ id: reviewItems.questionId }).from(reviewItems).where(eq(reviewItems.userId, userId)),
@@ -60,7 +60,7 @@ async function pickInSkill(userId: string, skillId: string, exclude: string[], n
 
   // Missed the previous question in this session → one similar question (same difficulty, shared tag).
   const missedJustNow = last && !last.correct && exclude.includes(last.q.id);
-  const want = forced ?? (missedJustNow ? (last.q.difficulty as Difficulty) : targetDifficulty(state?.theta ?? 0, Math.random));
+  const want = forced ?? (allowed.length ? allowed[Math.floor(Math.random()*allowed.length)]! : undefined) ?? (missedJustNow ? (last.q.difficulty as Difficulty) : targetDifficulty(state?.theta ?? 0, Math.random));
   const nearest=candidates.filter(c=>c.difficulty===want);
   const broad=nearest.length>=8 ? nearest : candidates;
   const pick = exploratory ? broad[Math.floor(Math.random()*broad.length)] : pickQuestion(candidates, want, now, Math.random, missedJustNow ? last.q.tags : []);
@@ -82,7 +82,7 @@ export async function timeLimitFor(userId: string, q: Question, timing: Timing |
 
 export type PracticeSelection = {
   mode: PracticeMode; skillId?: string; exclude: string[]; difficulty?: SetDifficulty; ids?: string[];
-  skillIds?: string[]; tags?: string[]; timing?: Timing;
+  skillIds?: string[]; difficulties?: Difficulty[]; tags?: string[]; timing?: Timing;
   context?: DeliveryContext; exploratory?: boolean; paper?: { nonce: string; count: number };
 };
 export async function selectPracticeQuestion(userId: string, profile: Profile, input: PracticeSelection) {
@@ -113,8 +113,8 @@ export async function selectPracticeQuestion(userId: string, profile: Profile, i
     }
     const start = rotateOver ? input.exclude.length % rotateOver : 0;
     for (const skillId of [...skills.slice(start, rotateOver), ...skills.slice(0, start), ...skills.slice(rotateOver)]) {
-      const want = input.difficulty === "mixed" ? ((1 + Math.floor(Math.random() * 3)) as Difficulty) : forced;
-      q = await pickInSkill(userId, skillId, exclude, now, want, input.tags);
+      const want = input.difficulties?.length ? undefined : input.difficulty === "mixed" ? ((1 + Math.floor(Math.random() * 3)) as Difficulty) : forced;
+      q = await pickInSkill(userId, skillId, exclude, now, want, input.tags, false, input.difficulties);
       if (q) break;
     }
   } else if (input.mode === "skill") {
