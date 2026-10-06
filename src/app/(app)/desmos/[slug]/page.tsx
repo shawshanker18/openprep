@@ -11,7 +11,7 @@ import { listDesmosLessons } from "@/server/lessons";
 
 export async function generateMetadata({ params }: PageProps<"/desmos/[slug]">) {
   const { slug } = await params;
-  return { title: (await listDesmosLessons()).find((l) => l.slug === slug)?.title ?? "GeoGebra lesson" };
+  return { title: (await listDesmosLessons()).find((l) => l.slug === slug)?.title ?? "Desmos lesson" };
 }
 
 export default async function DesmosLessonPage({ params }: PageProps<"/desmos/[slug]">) {
@@ -21,7 +21,7 @@ export default async function DesmosLessonPage({ params }: PageProps<"/desmos/[s
   const lesson = index >= 0 ? lessons[index] : undefined;
   if (!lesson) notFound();
   const { userId } = await requireUser();
-  // Opening the lesson records it (with today's date, so a GeoGebra block in today's plan counts as done).
+  // Opening the lesson records it (with today's date, so a Desmos block in today's plan counts as done).
   await db.insert(lessonProgress).values({ userId, skillId: `desmos:${slug}` })
     .onConflictDoUpdate({ target: [lessonProgress.userId, lessonProgress.skillId], set: { completedAt: new Date() } });
   return (

@@ -50,23 +50,14 @@ export function LessonWorkspace({
       <div className="grid min-h-0 min-w-0 flex-1 gap-6 overflow-hidden lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <section className={`min-w-0 ${calculatorSide === "left" ? "lg:order-2" : "lg:order-1"}`}>
           <div className="rounded-xl border p-5">
-            <Link href="/desmos" className="mb-5 inline-block text-sm text-muted-foreground hover:underline">← GeoGebra lessons</Link>
+            <Link href="/desmos" className="mb-5 inline-block text-sm text-muted-foreground hover:underline">← Desmos lessons</Link>
             <div className="prose-op">{children}</div>
-          </div>
-          <div className="mt-4 rounded-xl border bg-muted/30 p-4 text-sm">
-            <p className="font-medium">How to learn this</p>
-            <ul className="mt-2 list-disc space-y-1 pl-5 text-muted-foreground">
-              <li>Read the example, then reproduce it in the calculator.</li>
-              <li>Change one value and observe what changes on the graph.</li>
-              <li>Use Practice math when you are ready to try a real question.</li>
-            </ul>
           </div>
         </section>
         <section className={`min-w-0 ${calculatorSide === "left" ? "lg:order-1" : "lg:order-2"}`}>
           <div className="sticky top-4 rounded-xl border bg-background p-3">
             <div className="mb-2 flex items-center justify-between px-1 text-sm font-medium">
-              <span>GeoGebra calculator</span>
-              <span className="text-xs text-muted-foreground">Try it as you learn</span>
+              <span>Desmos calculator</span>
             </div>
             {calculator}
           </div>

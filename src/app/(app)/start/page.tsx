@@ -18,8 +18,8 @@ export default async function StartPage() {
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold">Start from scratch</h1>
         <p className="text-sm text-muted-foreground">
-          Learn the SAT from zero, one topic at a time. We start with how the test works and the GeoGebra calculator, then teach every Math and
-          Reading and Writing topic as if you have never seen it. Skip anything you already know.
+          SAT format, calculator basics, and Math and Reading and Writing lessons. Work through the topics in order,
+          or skip topics you already know.
         </p>
       </div>
 

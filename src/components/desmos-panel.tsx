@@ -1,97 +1,85 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Calculator, Expand, LoaderCircle, Minimize } from "lucide-react";
 import { watchCalculatorSize } from "@/lib/calculator-size";
 import { Button } from "@/components/ui/button";
 
-type GeoGebraApi = { evalCommand(command: string): void; setSize(width: number, height: number): void; remove():void };
-type GeoGebraApplet = { inject(target: string): void };
-declare global { interface Window { GGBApplet?: new (opts: Record<string, unknown>, prereq: boolean) => GeoGebraApplet } }
+type DesmosApi = {
+  setExpression(expression: { id: string; latex: string }): void;
+  resize(): void;
+  destroy(): void;
+};
+declare global {
+  interface Window {
+    Desmos?: { GraphingCalculator(element: HTMLElement, options?: Record<string, unknown>): DesmosApi };
+  }
+}
 
 const EMPTY_EXPRESSIONS: string[] = [];
-const FALLBACK = "https://www.geogebra.org/graphing";
+const FALLBACK = "https://www.desmos.com/calculator";
+const API_KEY = process.env.NEXT_PUBLIC_DESMOS_API_KEY;
 let loading: Promise<void> | null = null;
 
-function loadGeoGebra(): Promise<void> {
-  if (window.GGBApplet) return Promise.resolve();
+function loadDesmos(): Promise<void> {
+  if (window.Desmos) return Promise.resolve();
+  if (!API_KEY) return Promise.reject(new Error("Desmos API key is not configured"));
   loading ??= new Promise((resolve, reject) => {
-    const s = document.createElement("script");
-    s.src = "https://www.geogebra.org/apps/deployggb.js";
-    s.onload = () => {
-      if(window.GGBApplet) resolve();
-      else {loading=null;s.remove();reject(new Error("geogebra"));}
-    };
-    s.onerror = () => { loading = null; s.remove(); reject(new Error("geogebra")); };
-    document.head.appendChild(s);
+    const script = document.createElement("script");
+    script.src = `https://www.desmos.com/api/v1.11/calculator.js?apiKey=${encodeURIComponent(API_KEY)}`;
+    const fail = () => { loading = null; script.remove(); reject(new Error("Desmos could not load")); };
+    script.onload = () => { if (window.Desmos) resolve(); else fail(); };
+    script.onerror = fail;
+    document.head.appendChild(script);
   });
   return loading;
 }
 
-/** Inline GeoGebra graphing calculator with a Desmos-like surrounding layout and controls. */
+/** Desmos calculator with a hosted embed when the API key is unavailable. */
 export function DesmosCalculator({ expressions = EMPTY_EXPRESSIONS, className = "h-96" }: { expressions?: string[]; className?: string }) {
   const el = useRef<HTMLDivElement>(null);
   const viewport = useRef<HTMLDivElement>(null);
   const shell = useRef<HTMLDivElement>(null);
   const sizing = useRef<ReturnType<typeof watchCalculatorSize>|null>(null);
-  const id = useId().replace(/:/g, "");
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");
   const [fullscreen, setFullscreen] = useState(false);
   const expressionKey = JSON.stringify(expressions);
   useEffect(() => {
-    let cancelled=false, scriptReady=false, injected=false, timedOut=false;
-    const target=el.current;
-    const host=viewport.current;
-    if(!target || !host) return;
-    let apiInstance:GeoGebraApi|null=null;
-    let parameters:Record<string,unknown>|null=null;
-    let timeout:number|null=null;
-    const fail=()=>{if(!cancelled){timedOut=true;setState("error");}};
-    // The host is observed before injection, so hidden panels never initialize at an invented size.
-    // GeoGebra writes inline dimensions to its injection target. Measure a separate
-    // layout-owned viewport so its previous size cannot freeze the next measurement.
-    const watcher=watchCalculatorSize(host,(width,height)=>{
-      if(cancelled || timedOut) return;
-      if(parameters) {parameters.width=width;parameters.height=height;}
-      if(apiInstance) {
-        apiInstance.setSize(width,height);
+    let cancelled = false, scriptReady = false, timedOut = false;
+    const target = el.current;
+    const host = viewport.current;
+    if (!target || !host || !API_KEY) return;
+    let calculator: DesmosApi | null = null;
+    const fail = () => { if (!cancelled) { timedOut = true; setState("error"); } };
+    const timeout = window.setTimeout(fail, 15_000);
+    const watcher = watchCalculatorSize(host, () => {
+      if (cancelled || timedOut || !scriptReady || !window.Desmos) return;
+      try {
+        if (!calculator) {
+          calculator = window.Desmos.GraphingCalculator(target, { autosize: false });
+          (JSON.parse(expressionKey) as string[]).forEach((latex, index) =>
+            calculator!.setExpression({ id: `lesson-${index}`, latex }));
+        }
+        calculator.resize();
+        window.clearTimeout(timeout);
         setState("ready");
-      } else if(scriptReady && !injected && window.GGBApplet) {
-        injected=true;
-        timeout=window.setTimeout(fail,20_000);
-        parameters={
-          id, appName:"graphing", width, height, showToolBar:false, showAlgebraInput:true, showMenuBar:false,
-          // Resize the actual views rather than scaling an old canvas to fit the page.
-          disableAutoScale:true, autoHeight:false, preventFocus:true,
-          showResetIcon:true, showZoomButtons:true, enableLabelDrags:false, enableShiftDragZoom:true,
-          appletOnLoad:(api:GeoGebraApi)=>{
-            if(cancelled || timedOut){api.remove();return;}
-            apiInstance=api;
-            if(timeout!==null) window.clearTimeout(timeout);
-            (JSON.parse(expressionKey) as string[]).forEach(expression=>api.evalCommand(expression));
-            // GeoGebra's callback can run before its canvas layout is painted. Re-measure over two frames.
-            watcher.refresh();
-          },
-        };
-        const applet=new window.GGBApplet(parameters,true);
-        applet.inject(id);
-      }
+      } catch { fail(); }
     });
-    sizing.current=watcher;
-    timeout=window.setTimeout(fail,15_000);
-    loadGeoGebra().then(()=>{
-      if(cancelled || timedOut) return;
-      if(timeout!==null) window.clearTimeout(timeout);
-      scriptReady=true;watcher.refresh();
-    },fail);
-    return ()=>{
-      cancelled=true;
-      if(timeout!==null) window.clearTimeout(timeout);
+    sizing.current = watcher;
+    loadDesmos().then(() => {
+      if (cancelled || timedOut) return;
+      scriptReady = true;
+      watcher.refresh();
+    }, fail);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeout);
       watcher.disconnect();
-      if(sizing.current===watcher) sizing.current=null;
-      apiInstance?.remove();target.replaceChildren();
+      if (sizing.current === watcher) sizing.current = null;
+      calculator?.destroy();
+      target.replaceChildren();
     };
-  },[expressionKey,id]);
+  }, [expressionKey]);
   useEffect(() => {
     sizing.current?.refresh();
     if (!fullscreen) return;
@@ -111,14 +99,14 @@ export function DesmosCalculator({ expressions = EMPTY_EXPRESSIONS, className = 
     document.addEventListener("keydown", escape);
     return () => { document.body.style.overflow = original; document.removeEventListener("keydown", escape); inertSiblings.forEach(({element,before})=>{element.toggleAttribute('inert',before);});previousFocus?.focus(); };
   }, [fullscreen]);
-  if (state === "error") {
+  if (!API_KEY || state === "error") {
     return (
       <div ref={shell} role={fullscreen ? "dialog" : undefined} aria-modal={fullscreen || undefined} aria-label="Graphing calculator" className={fullscreen ? "fixed inset-0 z-50 flex flex-col gap-2 bg-background p-4" : `relative flex min-h-[320px] min-w-[280px] max-w-full resize flex-col gap-2 overflow-auto ${className}`} title="Drag the bottom-right corner to resize">
         <button type="button" className="absolute right-3 top-3 z-20 rounded-md border bg-background p-2 hover:bg-muted" onClick={() => setFullscreen((v) => !v)} aria-label={fullscreen ? "Exit full-screen calculator" : "Open full-screen calculator"}>
           {fullscreen ? <Minimize className="size-4" /> : <Expand className="size-4" />}
         </button>
-        <iframe title="GeoGebra graphing calculator" src={`${FALLBACK}?embed=true`} className="min-h-0 flex-1 w-full rounded-md border" allowFullScreen />
-        <p className="text-xs text-muted-foreground">If the embedded calculator is blocked, <a className="underline" href={FALLBACK} target="_blank" rel="noopener noreferrer">open GeoGebra</a>.
+        <iframe title="Desmos graphing calculator" src={FALLBACK} className="min-h-0 flex-1 w-full rounded-md border" allowFullScreen />
+        <p className="text-xs text-muted-foreground">If the embedded calculator is blocked, <a className="underline" href={FALLBACK} target="_blank" rel="noopener noreferrer">open Desmos</a>.
           {expressions.length > 0 && <> Enter: {expressions.map((e) => <code key={e} className="mx-1 rounded bg-muted px-1">{e}</code>)}</>}</p>
       </div>
     );
@@ -129,7 +117,7 @@ export function DesmosCalculator({ expressions = EMPTY_EXPRESSIONS, className = 
     </button>
     {state === "loading" && <div className="absolute inset-0 z-10 flex items-center justify-center gap-2 bg-background text-sm text-muted-foreground"><LoaderCircle className="size-4 animate-spin" /> Loading calculator…</div>}
     <div ref={viewport} className="relative min-h-0 min-w-0 w-full flex-1 overflow-hidden">
-      <div ref={el} id={id} className="absolute inset-0" />
+      <div ref={el} className="absolute inset-0" />
     </div>
   </div>;
 }
