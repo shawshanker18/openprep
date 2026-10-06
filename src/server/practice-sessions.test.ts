@@ -142,3 +142,28 @@ it("applies selected difficulties to question previews and every question in a m
     expect([2,3]).toContain(question.question.difficulty);
   }
 });
+it("steps adaptive difficulty up after correct answers and down after misses, including skill switches and SAT boundaries", async () => {
+  const student=randomUUID();
+  const second=SKILLS.find(s=>s.section==='math' && s.id!==skill.id)!;
+  const {localDate,weekOf}=await import('@/engine/plan');
+  await database.insert(schema.profiles).values({id:student,weeklyFocus:{weekOf:weekOf(localDate(new Date(),'Asia/Kolkata')),skillIds:[skill.id,second.id]}});
+  await database.insert(schema.skillState).values(SKILLS.map(s=>({userId:student,skillId:s.id})));
+  const profile=(await database.select().from(schema.profiles).where(eq(schema.profiles.id,student)))[0]!;
+  await database.insert(schema.questions).values([skill,second].flatMap(s=>[1,2,3].flatMap(d=>[0,1,2,3].map(n=>({id:`adaptive-${s.id}-${d}-${n}`,skillId:s.id,section:s.section,domain:s.domain,difficulty:d,type:'mcq' as const,stemMd:'Solve this question',choices:[{id:'A',md:'Correct'},{id:'B',md:'Incorrect'}],answer:{choice:'A'},explanationMd:'Stored solution'})))));
+  const random=vi.spyOn(Math,'random').mockReturnValue(0.5);
+  try {
+    const sid=await S.createPracticeSession(student,{mode:'smart',count:8},'Recommended Practice');
+    const levels=[2,3,2,1,1,2,3,3], responses=['A','B','B','B','A','A','A','A'];
+    for(let position=0;position<levels.length;position++) {
+      const current=await S.loadPracticeSession(student,profile,sid,position===0?{kind:'resume'}:{kind:'next',position:position-1});
+      expect(current.done).toBe(false);
+      if(current.done) throw new Error('No question selected');
+      expect(current.question.difficulty).toBe(levels[position]);
+      if(position===5) expect(current.question.skillId).toBe(second.id);
+      const old=new Date(Date.now()-6000);
+      await database.update(schema.questionServes).set({servedAt:old}).where(eq(schema.questionServes.userId,student));
+      await database.update(schema.practiceSessionItems).set({servedAt:old}).where(and(eq(schema.practiceSessionItems.sessionId,sid),eq(schema.practiceSessionItems.position,position)));
+      await S.answerPracticeSession(student,sid,position,{response:responses[position]!,timeMs:6000,confidence:2});
+    }
+  } finally {random.mockRestore();}
+});

@@ -36,7 +36,7 @@ export async function countDueReviews(userId: string, now = new Date()) {
 }
 
 /** Pick a question in one skill: similar-question after a miss, else adaptive difficulty. `tags` (if any) is a strict filter. */
-async function pickInSkill(userId: string, skillId: string, exclude: string[], now: Date, forced?: Difficulty, tags: string[] = [], exploratory = false, allowed: Difficulty[] = []): Promise<Question | null> {
+async function pickInSkill(userId: string, skillId: string, exclude: string[], now: Date, forced?: Difficulty, tags: string[] = [], exploratory = false, allowed: Difficulty[] = [], adaptiveTarget?: Difficulty): Promise<Question | null> {
   // Only the fields selection needs; the full text is fetched for the one question picked.
   const slim = { id: questions.id, difficulty: questions.difficulty, tags: questions.tags };
   const [pool, seen, queued, [state], [last]] = await Promise.all([
@@ -47,23 +47,28 @@ async function pickInSkill(userId: string, skillId: string, exclude: string[], n
     db.select().from(skillState).where(and(eq(skillState.userId, userId), eq(skillState.skillId, skillId))),
     db.select({ q: slim, correct: attempts.correct }).from(attempts)
       .innerJoin(questions, eq(questions.id, attempts.questionId))
-      .where(and(eq(attempts.userId, userId), eq(attempts.skillId, skillId)))
-      .orderBy(desc(attempts.createdAt)).limit(1),
+      .where(and(eq(attempts.userId, userId), eq(attempts.skillId, skillId), inArray(attempts.context,["practice","review"]), exclude.length ? inArray(attempts.questionId,exclude) : undefined))
+      .orderBy(desc(attempts.createdAt),desc(attempts.id)).limit(1),
   ]);
   const lastSeen = new Map(seen.map((s) => [s.id, new Date(s.at)]));
   const blocked = new Set([...exclude, ...queued.map((r) => r.id)]);
-  // Review-queue questions are held back for review — unless that would leave nothing to practice (thin bank).
   const tagged = tags.length ? pool.filter((q) => q.tags.some((t) => tags.includes(t))) : pool;
-  const open = tagged.filter((q) => !blocked.has(q.id));
-  const candidates = (open.length ? open : tagged.filter((q) => !exclude.includes(q.id)))
-    .map((q) => ({ ...q, difficulty: q.difficulty as Difficulty, lastSeenAt: lastSeen.get(q.id) ?? null }));
-
-  // Missed the previous question in this session → one similar question (same difficulty, shared tag).
+  const adaptive = forced === undefined && !allowed.length && !exploratory;
   const missedJustNow = last && !last.correct && exclude.includes(last.q.id);
-  const want = forced ?? (allowed.length ? allowed[Math.floor(Math.random()*allowed.length)]! : undefined) ?? (missedJustNow ? (last.q.difficulty as Difficulty) : targetDifficulty(state?.theta ?? 0, Math.random));
+  const afterAnswer = last ? Math.max(1,Math.min(3,last.q.difficulty+(last.correct?1:-1))) as Difficulty : undefined;
+  const want = forced ?? (allowed.length ? allowed[Math.floor(Math.random()*allowed.length)]! : undefined)
+    ?? (adaptive ? adaptiveTarget ?? afterAnswer : undefined)
+    ?? (missedJustNow ? last.q.difficulty as Difficulty : targetDifficulty(state?.theta ?? 0,Math.random));
+  // In adaptive mode, difficulty takes precedence over novelty or the review queue.
+  // If the requested level is exhausted, use the closest available SAT level.
+  const distance = Math.min(...tagged.map(q=>Math.abs(q.difficulty-want)));
+  const eligible = adaptive ? tagged.filter(q=>Math.abs(q.difficulty-want)===distance) : tagged;
+  const open = eligible.filter(q=>!blocked.has(q.id));
+  const candidates = (open.length ? open : eligible.filter(q=>!exclude.includes(q.id)))
+    .map(q=>({...q,difficulty:q.difficulty as Difficulty,lastSeenAt:lastSeen.get(q.id)??null}));
   const nearest=candidates.filter(c=>c.difficulty===want);
   const broad=nearest.length>=8 ? nearest : candidates;
-  const pick = exploratory ? broad[Math.floor(Math.random()*broad.length)] : pickQuestion(candidates, want, now, Math.random, missedJustNow ? last.q.tags : []);
+  const pick = exploratory ? broad[Math.floor(Math.random()*broad.length)] : pickQuestion(candidates,want,now,Math.random,missedJustNow?last.q.tags:[]);
   if (!pick) return null;
   const [q] = await db.select().from(questions).where(eq(questions.id, pick.id));
   return q ?? null;
@@ -121,19 +126,30 @@ export async function selectPracticeQuestion(userId: string, profile: Profile, i
     if (!input.skillId || !SKILL_BY_ID[input.skillId]) return null;
     q = await pickInSkill(userId, input.skillId, exclude, now, forced, [], input.exploratory);
   } else {
-    // Smart: weekly focus, switching skill every 5 answers today; every 6th question is a due review.
-    // ponytail: "today" = last 24h, not the local calendar day; switch to localDate() if rotation feels off.
+    // Follow the latest answer in this session even when recommended practice changes skills.
+    const [previous] = await db.select({difficulty:questions.difficulty,correct:attempts.correct}).from(attempts)
+      .innerJoin(questions,eq(questions.id,attempts.questionId))
+      .where(and(eq(attempts.userId,userId),inArray(attempts.context,["practice","review"]),
+        input.exclude.length ? inArray(attempts.questionId,input.exclude) : undefined))
+      .orderBy(desc(attempts.createdAt),desc(attempts.id)).limit(1);
+    const adaptiveTarget = previous ? Math.max(1,Math.min(3,previous.difficulty+(previous.correct?1:-1))) as Difficulty : undefined;
     const startOfDay = new Date(now.getTime() - 24 * 3_600_000);
     const [{ c: today }] = (await db.select({ c: count() }).from(attempts)
-      .where(and(eq(attempts.userId, userId), gte(attempts.createdAt, startOfDay), inArray(attempts.context, ["practice", "review"])))) as [{ c: number }];
-    if (today > 0 && today % 6 === 5) q = await dueReview(userId, now, exclude);
-    if (!q) {
+      .where(and(eq(attempts.userId,userId),gte(attempts.createdAt,startOfDay),inArray(attempts.context,["practice","review"])))) as [{c:number}];
+    {
       const focus = await ensureWeeklyFocus(userId, profile, now);
       const rotated = focus.length ? [...focus.slice(Math.floor(today / 5) % focus.length), ...focus] : [];
       const fallback = (await skillsByPriority(userId, profile)).map((s) => s.skillId);
-      for (const skillId of [...new Set([...rotated, ...fallback])]) {
-        q = await pickInSkill(userId, skillId, exclude, now);
+      const skillOrder = [...new Set([...rotated, ...fallback])];
+      for (const skillId of skillOrder) {
+        q = await pickInSkill(userId,skillId,exclude,now,adaptiveTarget);
         if (q) break;
+      }
+      if (!q && adaptiveTarget !== undefined) {
+        for (const skillId of skillOrder) {
+          q = await pickInSkill(userId,skillId,exclude,now,undefined,[],false,[],adaptiveTarget);
+          if (q) break;
+        }
       }
     }
   }
