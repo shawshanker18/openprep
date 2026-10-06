@@ -61,7 +61,7 @@ export default async function StartPage() {
                   {s.status === "done" ? <CircleCheck className="size-4 shrink-0 text-primary" aria-label="Done" />
                     : s.status === "skipped" ? <SkipForward className="size-4 shrink-0 text-muted-foreground" aria-label="Skipped" />
                     : <Circle className="size-4 shrink-0 text-muted-foreground" aria-label="Not done" />}
-                  <span className={`flex-1 ${s.status === "skipped" ? "text-muted-foreground" : ""}`}>{s.title}{covered.has(s.ref) && <span className="ml-2 inline-block rounded bg-emerald-50 px-2 py-0.5 text-xs text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200">Likely covered in school</span>}</span>
+                  <span className={`flex-1 ${s.status === "skipped" ? "text-muted-foreground" : ""}`}>{s.title}{covered.has(s.ref) && <span className="ml-2 inline-block rounded bg-neutral-50 px-2 py-0.5 text-xs text-neutral-800 dark:bg-neutral-950 dark:text-neutral-200">Likely covered in school</span>}</span>
                   {s.status === "skipped" && <span className="text-xs text-muted-foreground">Skipped</span>}
                   <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
                 </Link>

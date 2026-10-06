@@ -44,7 +44,7 @@ export default async function AdminUser({ params }: PageProps<"/admin/users/[id]
             {d.recent.map((a, i) => (
               <li key={i} className="flex flex-wrap justify-between gap-2 px-3 py-2">
                 <span>{SKILL_BY_ID[a.skill_id]?.name ?? a.skill_id} <span className="text-muted-foreground">· {a.context}</span></span>
-                <span className="tabular-nums text-muted-foreground"><span className={a.correct ? "text-emerald-700" : "text-red-700"}>{a.correct ? "right" : "wrong"}</span> · {Math.round(a.time_ms / 1000)}s · {when(a.created_at)}</span>
+                <span className="tabular-nums text-muted-foreground"><span className={a.correct ? "text-neutral-700" : "text-red-700"}>{a.correct ? "right" : "wrong"}</span> · {Math.round(a.time_ms / 1000)}s · {when(a.created_at)}</span>
               </li>
             ))}
           </ul>
