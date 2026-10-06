@@ -35,7 +35,7 @@ export default async function StepPage({ params }: PageProps<"/start/[step]">) {
         <Link href="/start" className="text-sm text-muted-foreground hover:text-foreground">← Start from scratch</Link>
         <p className="text-sm text-muted-foreground">Step {i + 1} of {steps.length} · {step.group}</p>
         <h1 className="text-2xl font-semibold">{step.title}</h1>
-        {likelyCoveredSkills(profile).has(step.ref) && <p className="text-sm text-emerald-700 dark:text-emerald-300">Likely covered in school. You can still study the full lesson and practice here.</p>}
+        {likelyCoveredSkills(profile).has(step.ref) && <p className="text-sm text-neutral-700 dark:text-neutral-300">Likely covered in school. You can still study the full lesson and practice here.</p>}
         {step.status === "done" && <p className="text-sm text-muted-foreground">✓ You finished this topic</p>}
         {step.status === "skipped" && <p className="text-sm text-muted-foreground">You skipped this topic. Read it now and press Done to count it.</p>}
       </div>

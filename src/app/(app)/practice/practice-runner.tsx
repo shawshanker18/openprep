@@ -285,7 +285,7 @@ export function PracticeRunner({ sessionId, userId, mode, title, block, set, bac
       {r && (
         <div ref={resultRef} className="flex flex-col gap-4 rounded-lg border p-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className={cn("font-semibold", r.correct ? "text-emerald-700" : "text-red-700")}>
+            <p className={cn("font-semibold", r.correct ? "text-neutral-700" : "text-red-700")}>
               {r.correct ? "✓ Correct" : `✗ Not quite${"accepted" in r.revealed.answer ? `. The accepted answer is ${r.revealed.answer.accepted.join(" or ")}` : ""}`}
             </p>
             <span className="rounded-full bg-muted px-2 py-0.5 text-xs tabular-nums">

@@ -49,7 +49,7 @@ export default async function SkillsPage({ searchParams }: PageProps<"/skills">)
               <li key={s.id}>
                 <Link href={`/skills/${s.id}`} className="flex flex-col gap-1 rounded-md border p-3 hover:bg-muted">
                   <div className="flex items-baseline justify-between gap-2 text-sm">
-                    <span>{i + 1}. {s.name}{covered.has(s.id) && <span className="ml-2 inline-block text-xs text-emerald-700 dark:text-emerald-300">Likely covered in school</span>}</span>
+                    <span>{i + 1}. {s.name}{covered.has(s.id) && <span className="ml-2 inline-block text-xs text-neutral-700 dark:text-neutral-300">Likely covered in school</span>}</span>
                     <span className="shrink-0 text-xs text-muted-foreground tabular-nums">{s.status === "unknown" ? STATUS_LABEL.unknown : `${s.mastery}% · ${STATUS_LABEL[s.status]}`}</span>
                   </div>
                   <MasteryBar pct={s.mastery} measured={s.status !== "unknown"} selfRating={s.selfRating} />
@@ -70,7 +70,7 @@ export default async function SkillsPage({ searchParams }: PageProps<"/skills">)
                 {skills.filter((s) => s.domain === d).map((s) => (
                   <Link key={s.id} href={`/skills/${s.id}`} className="flex flex-col gap-1 rounded-md p-1 hover:bg-muted">
                     <div className="flex items-baseline justify-between gap-2 text-sm">
-                      <span>{s.name}{covered.has(s.id) && <span className="ml-2 inline-block text-xs text-emerald-700 dark:text-emerald-300">Likely covered in school</span>}</span>
+                      <span>{s.name}{covered.has(s.id) && <span className="ml-2 inline-block text-xs text-neutral-700 dark:text-neutral-300">Likely covered in school</span>}</span>
                       <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
                         {s.status === "unknown" ? STATUS_LABEL.unknown : `${s.mastery}% · ${STATUS_LABEL[s.status]}`}
                         {s.pace === "slow" && " · slow"}

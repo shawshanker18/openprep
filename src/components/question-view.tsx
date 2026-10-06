@@ -52,13 +52,13 @@ export function QuestionView({ question: q, value, onChange, disabled, correct, 
                     "flex items-center gap-3 rounded-lg border p-3 text-left transition-colors",
                     !disabled && "hover:bg-muted",
                     chosen && "border-primary ring-1 ring-primary",
-                    isRight && "border-emerald-600 bg-emerald-50 dark:bg-emerald-950/40",
+                    isRight && "border-neutral-600 bg-neutral-50 dark:bg-neutral-950/40",
                     isWrong && "border-red-600 bg-red-50 dark:bg-red-950/40",
                   )}>
                   <span className={cn("flex size-7 shrink-0 items-center justify-center rounded-full border text-sm font-medium",
                     chosen && "bg-primary text-primary-foreground")}>{c.id}</span>
                   <Markdown className="min-w-0 flex-1">{c.md}</Markdown>
-                  {isRight && <Check className="size-5 text-emerald-700" aria-label="Correct answer" />}
+                  {isRight && <Check className="size-5 text-neutral-700" aria-label="Correct answer" />}
                   {isWrong && <X className="size-5 text-red-700" aria-label="Your answer" />}
                 </button>
               );
