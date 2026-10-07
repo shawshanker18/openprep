@@ -1,3 +1,12 @@
-import Link from "next/link";
 import { GuestNavigation } from "./navigation";
-export default function GuestLayout({children}:{children:React.ReactNode}){return <div className="flex min-w-0 flex-1 flex-col lg:flex-row"><GuestNavigation/><div className="min-w-0 flex-1"><header className="flex flex-wrap items-center justify-between gap-2 border-b px-4 py-3"><Link href="/guest" className="font-semibold lg:hidden">OpenPrep</Link><p className="text-sm text-muted-foreground">Guest · Explore freely and answer 10 questions</p><Link className="rounded-lg bg-primary px-4 py-2 text-sm text-primary-foreground" href="/login">Continue to OpenPrep</Link></header><main className="mx-auto w-full min-w-0 max-w-5xl p-4 sm:p-6">{children}</main></div></div>}
+
+export default function GuestLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex min-w-0 flex-1 flex-col lg:flex-row">
+      <GuestNavigation />
+      <div className="min-w-0 flex-1">
+        <main className="mx-auto w-full min-w-0 max-w-5xl p-4 sm:p-6">{children}</main>
+      </div>
+    </div>
+  );
+}
