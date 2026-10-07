@@ -10,8 +10,8 @@ import { ReferenceSheet } from "@/components/reference-sheet";
 import { DesmosToggle } from "@/components/desmos-panel";
 import { cn, isTyping } from "@/lib/utils";
 import type { PublicQuestion } from "@/server/questions";
-import { abandon, reportFocusLoss, saveResponse, startModule } from "./actions";
-import { EndTest, useTestLockdown } from "./lockdown";
+import { abandon, saveResponse, startModule } from "./actions";
+import { EndTest } from "./end-test";
 import { sendModuleSubmission } from "@/lib/submit-module";
 import { readDraft, writeDraft } from "@/lib/answer-drafts";
 
@@ -60,26 +60,6 @@ export function TestRunner({ userId, sessionId, module: m, items: initial, serve
     enteredAt.current = t;
   }, [pos]);
   useEffect(() => { enteredAt.current = screen === "question" ? now() : 0; }, [screen, pos]);
-
-  // Locked in the apps for the whole test: every module, the break and the intro.
-  useTestLockdown(sessionId);
-
-  // While a module runs, leaving the window is counted on the results (everywhere, apps included).
-  const running = screen === "question" || screen === "review";
-  useEffect(() => {
-    if (!running) return;
-    let last = 0;
-    const lost = () => {
-      if (Date.now() - last < 3000) return; // blur + visibilitychange fire together
-      last = Date.now();
-      void reportFocusLoss(sessionId).catch(()=>undefined);
-      toast.warning("Return to the test window to continue.");
-    };
-    const onVis = () => { if (document.hidden) lost(); };
-
-    document.addEventListener("visibilitychange", onVis);
-    return () => {  document.removeEventListener("visibilitychange", onVis); };
-  }, [running, sessionId]);
 
   // The latest answer for each question the server may not have yet (waiting to save, or a save failed). They are
   // sent again on every move and before submitting, so a network blip never loses one. (Server actions run one at a

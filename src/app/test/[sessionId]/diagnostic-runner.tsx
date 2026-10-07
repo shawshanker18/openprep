@@ -8,7 +8,7 @@ import { QuestionView } from "@/components/question-view";
 import { DIAGNOSTIC_LENGTH } from "@/engine/diagnostic";
 import type { PublicQuestion } from "@/server/questions";
 import { answerDiagnostic, endDiagnostic } from "./actions";
-import { EndTest, useTestLockdown } from "./lockdown";
+import { EndTest } from "./end-test";
 import { DesmosToggle } from "@/components/desmos-panel";
 
 /** One question at a time, no feedback, no going back (spec 04 §5.2 item 5). */
@@ -16,7 +16,6 @@ export function DiagnosticRunner({ sessionId, initial, initialIndex }: {
   sessionId: string; initial: PublicQuestion; initialIndex: number;
 }) {
   const router = useRouter();
-  useTestLockdown(sessionId);
   const [q, setQ] = useState(initial);
   const [index, setIndex] = useState(initialIndex);
   const [value, setValue] = useState<string | null>(null);

@@ -24,3 +24,18 @@ it("commits repeated cooldown bypass attempts and blocks only the offending acco
  await expect(checkRapidSkips(c,"new",t+10000)).rejects.toThrow(/48 hours/);
  await expect(checkRapidSkips(c,"new",t+199+48*3600000)).resolves.toBeUndefined();
 });
+
+it("allows human-speed countdown use but detects sustained machine-fast timed bursts",async()=>{
+ const human="00000000-0000-0000-0000-000000000004",robot="00000000-0000-0000-0000-000000000005";
+ let h=t,r=t;
+ for(let cycle=0;cycle<40;cycle++){
+   for(let n=0;n<20;n++){await checkRapidSkips(human,"h"+cycle+"-"+n,h);h+=300;}
+   h+=7700;
+ }
+ let detected=false;
+ for(let cycle=0;cycle<60&&!detected;cycle++){
+   for(let n=0;n<20;n++){try{await checkRapidSkips(robot,"r"+cycle+"-"+n,r);}catch(err){expect(String(err)).toMatch(/48 hours/);detected=true;break;}r+=50;}
+   r+=7950;
+ }
+ expect(detected).toBe(true);
+},30000);

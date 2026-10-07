@@ -23,11 +23,6 @@ function isAppUrl(url, site) {
   try { return new URL(url).origin === new URL(site).origin; } catch { return false; }
 }
 
-/** A running test's page on our site (/test/<uuid>, not its results). */
-function isTestPage(url, site) {
-  try { return isAppUrl(url, site) && /^\/test\/[0-9a-f-]{36}$/i.test(new URL(url).pathname); } catch { return false; }
-}
-
 /** Only hand real web links to the OS (never file:, javascript:, custom schemes from page content). */
 function isExternalWebUrl(url) {
   try { return ["https:", "http:"].includes(new URL(url).protocol); } catch { return false; }
@@ -41,4 +36,4 @@ function reminderDue(now, hour, lastFiredDay) {
   return hour != null && now.getHours() === hour && lastFiredDay !== localDay(now);
 }
 
-module.exports = { authLinkPath, isAppUrl, isTestPage, isExternalWebUrl, localDay, reminderDue };
+module.exports = { authLinkPath, isAppUrl, isExternalWebUrl, localDay, reminderDue };

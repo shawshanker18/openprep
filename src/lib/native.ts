@@ -7,31 +7,13 @@ type LocalNotifications = {
 };
 declare global {
   interface Window {
-    openprepDesktop?: { setLockdown(on: boolean, kind?: "test" | "focus"): void; setReminder(hour: number | null): void; googleSignIn?: boolean };
+    openprepDesktop?: { setReminder(hour: number | null): void; googleSignIn?: boolean };
     Capacitor?: { isNativePlatform?(): boolean; isPluginAvailable?(name: string): boolean; Plugins?: {
-      SignIn?: { openInBrowser(o: { url: string }): Promise<void> }; LocalNotifications?: LocalNotifications; Lockdown?: { start(o: { kind: "test" | "focus" }): Promise<void>; stop(): Promise<void> } } };
+      SignIn?: { openInBrowser(o: { url: string }): Promise<void> }; LocalNotifications?: LocalNotifications } };
   }
 }
 
 export const inNativeApp = () => typeof window !== "undefined" && (!!window.openprepDesktop || !!window.Capacitor?.isNativePlatform?.());
-
-/**
- * Lockdown in the apps; no-op on the website. "test" is strict (the app can't be left until the test ends);
- * "focus" is a study session the student can end at any time. Android pins the screen for both.
- */
-export function setLockdown(on: boolean, kind: "test" | "focus" = "test") {
-  window.openprepDesktop?.setLockdown(on, kind); // the desktop app debounces releases itself
-  const android = window.Capacitor?.Plugins?.Lockdown;
-  if (!android) return;
-  // Between test modules the page remounts (unlock, then lock): a late release keeps Android from asking to pin again.
-  clearTimeout(androidRelease);
-  if (!on) { androidRelease = setTimeout(() => { androidPinned = null; void android.stop().catch(() => {}); }, 1500); return; }
-  if (androidPinned === kind) return; // (focus → test re-tells the app: a test is stricter)
-  androidPinned = kind;
-  void android.start({ kind }).catch(() => { androidPinned = null; });
-}
-let androidRelease: ReturnType<typeof setTimeout> | undefined;
-let androidPinned: "test" | "focus" | null = null;
 
 /** Android app: may OpenPrep show notifications? (The desktop app and the website handle this themselves: true.) */
 export async function nativeNotificationsAllowed() {

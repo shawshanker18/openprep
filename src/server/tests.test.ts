@@ -191,11 +191,6 @@ it("a question in a live test can't be answered (and revealed) through practice"
   expect(await P.submitAnswer(USER, { questionId: first!.questionId, response: "A", timeMs: 5000, confidence: 3 })).toBeNull();
   // ...and practice doesn't serve it at all (it would be stuck on a question it can't grade).
   expect(await P.nextQuestion(USER, {} as schema.Profile, { mode: "list", ids: [first!.questionId], exclude: [] })).toBeNull();
-  await T.recordFocusLoss(USER, r.id);
-  await T.recordFocusLoss(USER, r.id);
-  await T.recordFocusLoss(OTHER, r.id); // not theirs: ignored
-  const [live] = await db.select().from(schema.testSessions).where(eq(schema.testSessions.id, r.id));
-  expect((live!.config as { focusLost?: number }).focusLost).toBe(2);
   await T.abandonTest(USER, r.id);
   // Once the test is over, practice can serve and reveal it as usual.
   await P.nextQuestion(USER, {} as schema.Profile, { mode: "list", ids: [first!.questionId], exclude: [] });
@@ -231,22 +226,6 @@ it("server clock: reported time is capped by real elapsed time, and the sweep cl
 it("full mock freshness: false when a section doesn't have enough unseen questions", async () => {
   // The test bank has plenty of math but no Reading and Writing questions at all.
   expect(await T.freshFullMock(OTHER)).toBe(false);
-});
-
-it("lockdown binds a test to the first app install that locks it", async () => {
-  const r = await T.startTest(OTHER, { kind: "module", section: "math" });
-  if (!r.ok) throw new Error(r.error);
-  const config = async () => (await db.select().from(schema.testSessions).where(eq(schema.testSessions.id, r.id)))[0]!.config as Record<string, unknown>;
-  await T.markLocked(OTHER, r.id, null); // an app too old to have the secret
-  expect(await config()).toMatchObject({ lockdown: true });
-  expect((await config()).lockKey).toBeUndefined();
-  await T.markLocked(OTHER, r.id, "hash-of-install-A");
-  expect((await config()).lockKey).toBe("hash-of-install-A");
-  await T.markLocked(OTHER, r.id, "hash-of-install-B"); // another install (or a browser faking one) can't take it over
-  await T.markLocked(OTHER, r.id, null);
-  expect((await config()).lockKey).toBe("hash-of-install-A");
-  await T.markLocked(USER, r.id, "someone-else"); // not their test
-  expect((await config()).lockKey).toBe("hash-of-install-A");
 });
 
 it("test starts have a speed limit, not a quota", async () => {

@@ -27,7 +27,7 @@ export function LoginForm({ google: showGoogle, inApp = false }: { google: boole
       if(!prepared.ok){setRefused(prepared.error);setState("error");return;}
     const { error } = await createClient().auth.signInWithOtp({ email, options: { emailRedirectTo: redirectTo() } });
     // The sign-up cap explains itself; anything else gets the general message.
-    if (error && /Too many new accounts|create your account on the OpenPrep/.test(error.message)) setRefused(error.message);
+    if (error && /Please continue with email on the OpenPrep/.test(error.message)) setRefused(error.message);
     setState(error ? "error" : "sent");
     } catch {
       setRefused("Couldn't reach OpenPrep. Check your connection and try again.");

@@ -20,7 +20,7 @@ export function GuestPractice() {
   const move=(n:number)=>{setPosition(n);setValue(null);};
   return <div className="flex min-w-0 flex-col gap-5">
     <p className="text-sm text-muted-foreground">Try up to 10 questions across both subjects. Your answers stay in this browser.</p>
-    {answered>=GUEST_LIMIT&&<section role="status" className="rounded-xl border p-4"><h2 className="font-semibold">You’ve completed your 10 guest questions</h2><p className="my-2 text-sm">Keep exploring lessons and reviewing answers, or sign in to continue practicing.</p><Link className="underline" href="/login">Sign in to continue</Link></section>}
+    {answered>=GUEST_LIMIT&&<section role="status" className="rounded-xl border p-4"><h2 className="font-semibold">You’ve completed your 10 guest questions</h2><p className="my-2 text-sm">Keep exploring lessons and reviewing answers, or continue with Google or email to keep practicing.</p><Link className="underline" href="/login">Continue to OpenPrep</Link></section>}
     <div className="flex flex-wrap items-center gap-3"><label className="text-sm">Subject <select aria-label="Subject" value={section} onChange={e=>{setSection(e.target.value as "math"|"rw");move(0);}} className="ml-2 rounded-lg border bg-background p-2"><option value="math">Math</option><option value="rw">Reading and Writing</option></select></label><span className="text-sm tabular-nums">{correct}/{answered} correct</span></div>
     <nav aria-label="Questions" className="flex flex-wrap gap-2">{qs.map((x,i)=><Button key={x.id} size="sm" variant={position===i?"default":"outline"} aria-current={position===i?"step":undefined} onClick={()=>move(i)}>{i+1}{answers[x.id]?" ✓":""}</Button>)}</nav>
     <p className="text-sm">Question {position+1} of {qs.length}</p>

@@ -1,6 +1,6 @@
 // Protect against rapid automated requests, without daily/weekly study quotas.
 export const DELIVERY_POLICY = {
-  minute: 60,
+  minute: 300,
   pendingMs: 24 * 3_600_000,
   paperHours: 24,
   setsPerMinute: 30,

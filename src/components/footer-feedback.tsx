@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-/** Footer link to /feedback. Never on test pages: leaving a locked test by a link would be a way out of lockdown. */
+/** Footer feedback link, omitted from test pages to keep the layout focused. */
 export function FooterFeedback() {
   const path = usePathname();
   if (path.startsWith("/test/")) return null;
