@@ -52,7 +52,7 @@ export function LoginForm({ google: showGoogle, inApp = false }: { google: boole
     </div>
   );
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4 [@media(max-height:800px)]:gap-3">
       <label className="flex items-start gap-2.5 text-sm text-muted-foreground">
         <input type="checkbox" className="mt-0.5 size-4 accent-foreground" checked={age} onChange={(e) => setAge(e.target.checked)} />
         <span>
@@ -67,7 +67,7 @@ export function LoginForm({ google: showGoogle, inApp = false }: { google: boole
 
       {showGoogle && (inApp ? <AppGoogleButton enabled={canContinue}>{or}</AppGoogleButton> : <><GoogleButton enabled={canContinue} privacyAccepted={privacyAccepted}/>{or}</>)}
 
-      <form onSubmit={magic} className="flex flex-col gap-5">
+      <form onSubmit={magic} className="flex flex-col gap-3">
         <label className="flex flex-col gap-2 text-sm font-medium">
           Email
           <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Your email address"
@@ -75,7 +75,7 @@ export function LoginForm({ google: showGoogle, inApp = false }: { google: boole
             className="h-12 rounded-xl bg-muted px-4 text-base font-normal outline-none ring-ring placeholder:text-muted-foreground focus:ring-2" />
         </label>
         <button type="submit" disabled={!canContinue || state === "sending"}
-          className="h-14 rounded-2xl bg-foreground text-base font-medium text-background transition-opacity disabled:opacity-40">
+          className="h-12 rounded-2xl bg-foreground text-base font-medium text-background transition-opacity disabled:opacity-40">
           {state === "sending" ? "Sending…" : "Continue with email"}
         </button>
         {state === "error" && <p role="alert" className="text-sm text-destructive">{refused ?? "Couldn\u2019t send the link. Try again in a minute."}</p>}

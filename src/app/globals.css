@@ -131,7 +131,7 @@
     /* Phones: scrolling something into view (focus, scrollIntoView) clears the fixed bottom nav. */
     scroll-padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
   }
-  @media (width >= 48rem) {
+  @media (width >= 64rem) {
     html { scroll-padding-bottom: 0; }
   }
 }
@@ -176,5 +176,12 @@ body.lesson-focus-mode main { max-width: none; padding-top: 1rem; }
 @media (pointer: coarse) {
   input:not([type=checkbox], [type=radio], [type=range], [type=hidden], [type=button], [type=submit]), textarea, select {
     font-size: max(1rem, 1em);
+  }
+}
+
+/* Keep controls reachable beneath the tablet/mobile navigation. */
+@media (width < 64rem) {
+  body:has(.bottom-nav) > .site-footer {
+    padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
   }
 }

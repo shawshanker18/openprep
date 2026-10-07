@@ -68,7 +68,7 @@ export default async function StepPage({ params }: PageProps<"/start/[step]">) {
         </article>
       ) : <p className="text-muted-foreground">The lesson for this topic is coming soon.</p>)}
 
-      <div className="sticky bottom-16 z-10 flex flex-wrap items-center gap-2 rounded-xl border bg-background p-3 md:bottom-4">
+      <div className="sticky bottom-[calc(4rem+env(safe-area-inset-bottom))] z-10 flex flex-wrap items-center gap-2 rounded-xl border bg-background p-3 lg:bottom-4">
         <form action={stepAction.bind(null, step.key, "done")}><Button type="submit">{step.status === "done" ? "Next topic" : "Done, next topic"}</Button></form>
         {step.status !== "done" && <form action={stepAction.bind(null, step.key, "skip")}><Button type="submit" variant="outline">Skip this topic</Button></form>}
         <span className="ml-auto flex gap-1">
