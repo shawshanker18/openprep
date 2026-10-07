@@ -15,7 +15,7 @@ export function FeedbackDialog({ iconOnly = false }: { iconOnly?: boolean }) {
           : "flex items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm hover:bg-muted short:py-1 tiny:py-0.5"}>
         <MessageSquare className="size-4" />{!iconOnly && "Send feedback"}
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="gap-3 sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Send feedback</DialogTitle>
           <DialogDescription>Bugs, errors, reviews and ideas all welcome. We read every message.</DialogDescription>

@@ -98,7 +98,6 @@ export const attempts = pgTable("attempts", {
 }, (t) => [
   index("att_user_time").on(t.userId, t.createdAt),
   index("att_user_skill_time").on(t.userId, t.skillId, t.createdAt),
-  index("att_user_question").on(t.userId, t.questionId),
   index("att_user_question_created_idx").on(t.userId, t.questionId, t.createdAt.desc(), t.id.desc()),
 ]);
 

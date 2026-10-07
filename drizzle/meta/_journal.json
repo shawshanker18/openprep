@@ -127,6 +127,13 @@
       "when": 1791375900000,
       "tag": "0017_remove_test_lockdown",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1791398161782,
+      "tag": "0018_drop_redundant_attempt_index",
+      "breakpoints": true
     }
   ]
 }
