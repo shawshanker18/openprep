@@ -23,6 +23,13 @@ const FALLBACK = "https://www.desmos.com/testing/collegeboard/graphing";
 // (125%, 150%, 175%) never leaves a sliver of it showing along the top edge.
 const API_KEY = process.env.NEXT_PUBLIC_DESMOS_API_KEY;
 let loading: Promise<void> | null = null;
+/** High-contrast on purpose: the calculator is white, so light-grey icons disappeared into it. */
+const CONTROL = "inline-flex items-center gap-1.5 rounded-md bg-neutral-900 px-3 py-2 text-xs font-medium text-white shadow-md hover:bg-neutral-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600";
+/** Open the calculator as its own window next to this one; if the browser blocks pop-ups the link opens a normal tab. */
+function openInWindow(event: React.MouseEvent) {
+  const popup = window.open(FALLBACK, "openprep-desmos", "popup=yes,width=1100,height=780");
+  if (popup) { popup.opener = null; event.preventDefault(); }
+}
 
 function loadDesmos(): Promise<void> {
   if (window.Desmos) return Promise.resolve();
@@ -106,15 +113,15 @@ export function DesmosCalculator({ expressions = EMPTY_EXPRESSIONS, className = 
   return (
     <div ref={shell} role={fullscreen ? "dialog" : undefined} aria-modal={fullscreen || undefined}
       aria-label="Desmos graphing calculator"
-      className={fullscreen ? "fixed inset-0 z-50 flex flex-col bg-white" : `relative flex min-h-[320px] min-w-0 max-w-full resize flex-col overflow-hidden border border-neutral-300 bg-white ${className}`}>
-      <div className="absolute right-2 bottom-2 z-20 flex items-center gap-1 rounded-lg border bg-white/95 p-1 text-neutral-700">
-        <div className="flex items-center gap-1">
-          <a href={FALLBACK} target="_blank" rel="noopener noreferrer" className="rounded p-2 text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900" aria-label="Open Desmos in a new tab"><ExternalLink className="size-4" /></a>
-          <button type="button" className="rounded p-2 text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900"
-            onClick={() => setFullscreen((value) => !value)} aria-label={fullscreen ? "Exit full-screen calculator" : "Open full-screen calculator"}>
-            {fullscreen ? <Minimize className="size-4" /> : <Expand className="size-4" />}
-          </button>
-        </div>
+      className={fullscreen ? "fixed inset-0 z-50 flex flex-col bg-white" : `relative flex min-h-[320px] min-w-0 max-w-full flex-col overflow-hidden border border-neutral-300 bg-white ${className}`}>
+      <div className="absolute right-3 bottom-3 z-20 flex items-center gap-2">
+        <a href={FALLBACK} target="_blank" rel="noopener noreferrer" onClick={openInWindow} className={CONTROL}>
+          <ExternalLink className="size-4" />New window
+        </a>
+        <button type="button" className={CONTROL} onClick={() => setFullscreen((value) => !value)}
+          aria-label={fullscreen ? "Exit full-screen calculator" : "Open full-screen calculator"}>
+          {fullscreen ? <Minimize className="size-4" /> : <Expand className="size-4" />}{fullscreen ? "Exit full screen" : "Full screen"}
+        </button>
       </div>
       {hosted ? (
         <>

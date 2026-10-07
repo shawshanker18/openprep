@@ -1,6 +1,5 @@
 "use server";
 
-import { submitOwnedModule } from "@/server/test-submission";
 import { DeliveryBlocked } from "@/server/delivery-policy";
 import { limitPractice } from "@/server/ratelimit";
 import { redirect } from "next/navigation";
@@ -50,11 +49,6 @@ export async function saveResponse(input: z.input<typeof Save>) {
   const p = Save.safeParse(input);
   if (!p.success) return { ok: false as const, error: "Invalid answer." };
   return save(userId, p.data);
-}
-
-export async function submitModule(input: unknown) {
-  const {userId}=await requireUser();
-  return submitOwnedModule(userId,input);
 }
 
 /** End a diagnostic early: answers so far are kept, the student carries on (as if skipped) and can retake it later. */

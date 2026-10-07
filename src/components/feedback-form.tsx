@@ -57,7 +57,7 @@ export function FeedbackForm({ kind: initialKind = "bug", page, prefill = "", on
   }
 
   return (
-    <form onSubmit={submit} className="flex flex-col gap-4">
+    <form onSubmit={submit} className="flex flex-col gap-3 short:gap-2">
       <label className="flex flex-col gap-1 text-sm">What is it about?
         <Choice value={kind} onValueChange={(v) => setKind(v as FeedbackKind)} options={KINDS} />
       </label>
@@ -75,12 +75,12 @@ export function FeedbackForm({ kind: initialKind = "bug", page, prefill = "", on
         </div>
       )}
       <label className="flex flex-col gap-1 text-sm">{PROMPT[kind]}
-        <textarea required minLength={5} maxLength={4000} rows={5} value={message} onChange={(e) => setMessage(e.target.value)}
-          className="rounded-md border bg-background px-3 py-2 text-base" />
+        <textarea required minLength={5} maxLength={4000} value={message} onChange={(e) => setMessage(e.target.value)}
+          className="h-28 resize-none rounded-md border bg-background px-3 py-2 text-base short:h-20 tiny:h-14" />
       </label>
       <label className="flex flex-col gap-1 text-sm">How can we reach you? (optional)
         <input value={contact} onChange={(e) => setContact(e.target.value)} maxLength={200} placeholder="Email or another way to contact you"
-          className="h-11 rounded-md border bg-background px-3 text-base" />
+          className="h-10 rounded-md border bg-background px-3 text-base" />
       </label>
       {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
       <Button type="submit" className="self-start" disabled={pending}>{pending ? "Sending…" : "Send feedback"}</Button>

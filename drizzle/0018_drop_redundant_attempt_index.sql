@@ -1,0 +1,1 @@
+DROP INDEX "att_user_question";
