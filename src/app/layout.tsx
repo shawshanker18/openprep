@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { FooterFeedback } from "@/components/footer-feedback";
+import { SiteFooter } from "@/components/footer-feedback";
 import { Geist, Geist_Mono } from "next/font/google";
 import "katex/dist/katex.min.css";
 import "./globals.css";
@@ -30,9 +30,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <ThemeProvider>
         <TooltipProvider>{children}</TooltipProvider>
         <Toaster />
-        <footer className="site-footer mt-auto border-t px-4 py-3 text-center text-xs text-muted-foreground">
-          SAT® is a trademark registered by the College Board, which is not affiliated with, and does not endorse, OpenPrep.<FooterFeedback />
-        </footer>
+        <SiteFooter />
         </ThemeProvider>
       </body>
     </html>
