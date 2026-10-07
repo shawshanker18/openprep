@@ -1,11 +1,16 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { SIGNUP_REFUSALS } from "@/server/signup";
 import { createClient } from "@/lib/supabase/server";
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
   const google = searchParams.get("flow") === "google";
-  if (searchParams.has("error")) return NextResponse.redirect(`${origin}/login?error=google`);
+  if (searchParams.has("error")) {
+    const description=searchParams.get("error_description")??"";
+    const signupRequired=SIGNUP_REFUSALS.some(message=>description.includes(message));
+    return NextResponse.redirect(`${origin}/login?error=${signupRequired?"google_signup":"google"}`);
+  }
   if (code) {
     // The PKCE verifier lives where the sign-in was requested. No verifier here means the link was opened somewhere
     // else: usually the email app's browser after asking from the desktop/Android app, so hand the code back to it.

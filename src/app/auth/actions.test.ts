@@ -33,3 +33,7 @@ it('starts Google OAuth with server PKCE callback and a login hint',async()=>{
  expect(await beginGoogleOAuth('student@example.com',true)).toMatchObject({ok:true});
  expect(oauth).toHaveBeenCalledWith({provider:'google',options:{redirectTo:'https://openprep.site/auth/callback?flow=google',skipBrowserRedirect:true,queryParams:{login_hint:'student@example.com',prompt:'select_account'}}});
 });
+it('opens Google directly without asking existing users to type their email',async()=>{
+ const oauth=vi.fn(async()=>({data:{url:'https://example.com/authorize'},error:null}));mocks.client.mockResolvedValue({auth:{signInWithOAuth:oauth}});
+ expect(await beginGoogleOAuth(null,true)).toMatchObject({ok:true});expect(mocks.ticket).not.toHaveBeenCalled();expect(oauth).toHaveBeenCalledWith({provider:'google',options:{redirectTo:'https://openprep.site/auth/callback?flow=google',skipBrowserRedirect:true,queryParams:{prompt:'select_account'}}});
+});

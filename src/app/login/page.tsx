@@ -70,8 +70,8 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
             <h1 className="text-xl font-medium">Sign in or create your free account</h1>
             <p className="text-sm text-muted-foreground">SAT questions, lessons, and practice. Free to use.</p>
           </div>
-          {error && <p role="alert" className="rounded-xl border border-destructive p-3 text-sm text-destructive">{error === "google" ? "Google sign-in could not finish. Use the same Google email you entered, or request an email sign-in link below." : "That sign-in link didn’t work or has expired. Request a new one below."}</p>}
-          <LoginForm google={p.google} inApp={inApp} />
+          {error && <p role="alert" className="rounded-xl border border-destructive p-3 text-sm text-destructive">{error === "google_signup" ? "For a new account, confirm your Google email below and try again." : error === "google" ? "Google sign-in could not finish. Try again or request an email sign-in link below." : "That sign-in link didn’t work or has expired. Request a new one below."}</p>}
+          <LoginForm google={p.google} inApp={inApp} googleSignup={error === "google_signup"} />
         </div>
       </div>
       <div className="hidden min-w-0 p-3 lg:block [@media(max-height:600px)]:hidden">
