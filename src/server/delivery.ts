@@ -1,5 +1,5 @@
 import "server-only";
-import { and, eq, gte, inArray } from "drizzle-orm";
+import { and, eq, gte, inArray, sql } from "drizzle-orm";
 import { db, type Tx } from "@/db";
 import { attempts, deliveryGuards, deliveryWindows, questionExposures, questionServes, questions, type Question } from "@/db/schema";
 import type { DeliveryContext } from "./delivery-context";
@@ -9,19 +9,29 @@ import { DELIVERY_POLICY as P, DeliveryBlocked } from "./delivery-policy";
 export async function lockDelivery(tx: Tx, userId: string, context: DeliveryContext) {
   const scopes = [`user:${userId}`, ...(context.ip ? [`ip:${context.ip}`] : []), ...(context.device ? [`device:${context.device}`] : [])].sort();
   for (const id of scopes) {
-    await tx.insert(deliveryGuards).values({ id }).onConflictDoNothing();
-    await tx.select().from(deliveryGuards).where(eq(deliveryGuards.id, id)).for("update");
-    await tx.update(deliveryGuards).set({expiresAt:new Date(Date.now()+7*86_400_000)}).where(eq(deliveryGuards.id,id));
+    const expiresAt = new Date(Date.now() + 7 * 86_400_000);
+    // An upsert acquires the row lock and updates its expiry in one round trip.
+    await tx.insert(deliveryGuards).values({ id, expiresAt })
+      .onConflictDoUpdate({ target: deliveryGuards.id, set: { expiresAt } });
   }
 }
 
 /** Must run inside a transaction. Throwing rolls back every consumed bucket. */
 export async function consumeWindow(tx: Tx, id: string, max: number, ms: number, amount = 1, now = Date.now()) {
-  await tx.insert(deliveryWindows).values({ id, times: [], expiresAt: new Date(now + ms) }).onConflictDoNothing();
-  const [row] = await tx.select().from(deliveryWindows).where(eq(deliveryWindows.id, id)).for("update");
-  const times = row!.times.filter(t => t > now - ms);
-  if (times.length + amount > max) throw new DeliveryBlocked();
-  await tx.update(deliveryWindows).set({ times: [...times, ...Array<number>(amount).fill(now)], expiresAt: new Date(now + ms) }).where(eq(deliveryWindows.id, id));
+  if (!Number.isSafeInteger(amount) || amount < 1 || amount > max) throw new DeliveryBlocked();
+  const additions = JSON.stringify(Array<number>(amount).fill(now));
+  const recent = sql`coalesce((select jsonb_agg(t.value)
+    from jsonb_array_elements(${deliveryWindows.times}) as t(value)
+    where (t.value::text)::bigint > ${now - ms}), '[]'::jsonb)`;
+  // ON CONFLICT serializes competing increments; the WHERE guard refuses overflow atomically.
+  const accepted = await tx.insert(deliveryWindows)
+    .values({ id, times: JSON.parse(additions) as number[], expiresAt: new Date(now + ms) })
+    .onConflictDoUpdate({
+      target: deliveryWindows.id,
+      set: { times: sql`${recent} || ${additions}::jsonb`, expiresAt: new Date(now + ms) },
+      setWhere: sql`jsonb_array_length(${recent}) + ${amount} <= ${max}`,
+    }).returning({ id: deliveryWindows.id });
+  if (!accepted.length) throw new DeliveryBlocked();
 }
 
 export async function eventQuota(userId: string, context: DeliveryContext, kind: "set" | "similar" | "asset") {
