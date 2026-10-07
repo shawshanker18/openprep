@@ -127,7 +127,7 @@ export async function selectPracticeQuestion(userId: string, profile: Profile, i
     if (!input.skillId || !SKILL_BY_ID[input.skillId]) return null;
     q = await pickInSkill(userId, input.skillId, exclude, now, forced, [], input.exploratory);
   } else {
-    // Follow the latest answer in this session even when recommended practice changes skills.
+    // Follow the latest answer in this session even when adaptive practice changes skills.
     const [previous] = await db.select({difficulty:questions.difficulty,correct:attempts.correct}).from(attempts)
       .innerJoin(questions,eq(questions.id,attempts.questionId))
       .where(and(eq(attempts.userId,userId),inArray(attempts.context,["practice","review"]),
