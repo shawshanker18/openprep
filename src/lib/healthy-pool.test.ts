@@ -34,3 +34,16 @@ it("returns a bounded failure when the replacement is also unavailable", async (
   expect(id).toBe(2);
 });
 
+it("recycle replaces a stalled pool at once, closes the old one and probes the new one afresh", async () => {
+  let id = 0;
+  const close = vi.fn(async () => {});
+  const probe = vi.fn(async () => {});
+  const pool = healthyPool(() => ({ id: ++id }), probe, close);
+  await pool.ready();
+  vi.spyOn(console, "warn").mockImplementation(() => {});
+  pool.recycle();
+  expect(pool.current.id).toBe(2);
+  expect(close).toHaveBeenCalledExactlyOnceWith({ id: 1 });
+  await pool.ready(); // the cached "healthy" verdict belonged to the old pool
+  expect(probe).toHaveBeenCalledTimes(2);
+});

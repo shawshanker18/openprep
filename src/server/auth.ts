@@ -5,6 +5,7 @@ import { eq } from "drizzle-orm";
 import { createClient } from "@/lib/supabase/server";
 import { db, ensureDatabase } from "@/db";
 import { profiles } from "@/db/schema";
+import { guarded } from "./guard";
 
 export type AuthUser = { id: string; email: string | null; name: string | null };
 
@@ -25,14 +26,17 @@ export const getUserId = cache(async (): Promise<string | null> => (await getAut
 export const requireUser = cache(async () => {
   const userId = await getUserId();
   if (!userId) redirect("/login");
-  await ensureDatabase();
-  // One round trip for returning users; the insert only runs on a first visit.
-  let [profile] = await db.select().from(profiles).where(eq(profiles.id, userId));
-  if (!profile) {
-    await db.insert(profiles).values({ id: userId }).onConflictDoNothing();
-    [profile] = await db.select().from(profiles).where(eq(profiles.id, userId));
-  }
-  return { userId, profile: profile! };
+  // The first database touch of every signed-in page: bounded, so a stalled connection fails fast and gets replaced.
+  return guarded((async () => {
+    await ensureDatabase();
+    // One round trip for returning users; the insert only runs on a first visit.
+    let [profile] = await db.select().from(profiles).where(eq(profiles.id, userId));
+    if (!profile) {
+      await db.insert(profiles).values({ id: userId }).onConflictDoNothing();
+      [profile] = await db.select().from(profiles).where(eq(profiles.id, userId));
+    }
+    return { userId, profile: profile! };
+  })());
 });
 
 /** Whether to offer the optional starting-point diagnostic. Never an access restriction. */
