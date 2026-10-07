@@ -14,14 +14,17 @@ export async function proxy(request: NextRequest) {
     cookieOptions: SESSION_COOKIE_OPTIONS,
     cookies: {
       getAll: () => request.cookies.getAll(),
-      setAll: (toSet) => {
+      setAll: (toSet, headers) => {
         toSet.forEach(({ name, value }) => request.cookies.set(name, value));
         response = NextResponse.next({ request });
         toSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
+        Object.entries(headers ?? {}).forEach(([name, value]) => response.headers.set(name, value));
       },
     },
   });
-  const { data: { user } } = await supabase.auth.getUser(); // verifies the session and refreshes it if needed
+  const { data } = await supabase.auth.getClaims(); // verifies JWT locally when asymmetric signing is enabled and refreshes expired sessions
+  const user = data?.claims?.sub && !data.claims.is_anonymous ? data.claims : null;
+  // Protected layouts/actions still call getUser() to enforce server-side session revocation.
   if (newDevice) response.cookies.set(DEVICE_COOKIE, device!, { httpOnly:true, secure:process.env.NODE_ENV === "production", sameSite:"lax", path:"/", maxAge:365*86_400 });
   // Signed-out writes (server actions, forms) are capped per IP before any of our code runs.
   const ip = trustedIp(request.headers) ?? "unknown-network";
