@@ -34,9 +34,11 @@ async function answeredCount(tx: Tx, userId: string, sessionId: string) {
 
 /** Best question for a spec: same skill+difficulty, else same skill nearest difficulty, else anywhere in the domain. */
 async function pickFor(tx: Tx, spec: DiagSpec, used: Set<string>): Promise<Question | null> {
-  const pool = (await tx.select().from(questions)
-    .where(and(eq(questions.domain, spec.domain), eq(questions.status, "active"))))
-    .filter((q) => !used.has(q.id));
+  // The diagnostic is a test, so it draws from the test pool; only if that has nothing left in the domain does it fall back to the whole bank.
+  const inDomain = (pool?: "test") => tx.select().from(questions)
+    .where(and(eq(questions.domain, spec.domain), eq(questions.status, "active"), pool ? eq(questions.pool, pool) : undefined));
+  let pool = (await inDomain("test")).filter((q) => !used.has(q.id));
+  if (!pool.length) pool = (await inDomain()).filter((q) => !used.has(q.id));
   if (!pool.length) return null;
   const score = (q: Question) =>
     (q.skillId === spec.skillId ? 0 : 10) + Math.abs(q.difficulty - spec.difficulty) + Math.random() * 0.5;

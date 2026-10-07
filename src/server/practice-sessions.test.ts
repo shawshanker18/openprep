@@ -169,16 +169,20 @@ it("steps adaptive difficulty up after correct answers and down after misses, in
     }
   } finally {random.mockRestore();}
 });
-it("reserves fresh test questions from practice while allowing review after an attempt",async()=>{
- const {availableQuestion}=await import("./question-availability");
- const candidate=await pg.query<{id:string}>("select 'reserved-' || n as id from generate_series(1,100) n where mod(abs(hashtext('reserved-' || n)::bigint),5)=0 limit 1");
- const id=candidate.rows[0]!.id;
- await database.insert(schema.questions).values({id,skillId:skill.id,section:skill.section,domain:skill.domain,difficulty:2,type:"mcq",stemMd:"Reserved",choices:[{id:"A",md:"1"}],answer:{choice:"A"},explanationMd:""});
- const lookup=(includeReserved=false)=>database.select().from(schema.questions).where(and(eq(schema.questions.id,id),availableQuestion(other,undefined,includeReserved)));
- expect(await lookup()).toHaveLength(0);
- expect(await lookup(true)).toHaveLength(1);
+it("keeps test-pool questions out of practice until the student has answered them, and out of the study pool for tests",async()=>{
+ const {availableQuestion,availableTestQuestion}=await import("./question-availability");
+ const id="test-pool-question";
+ await database.insert(schema.questions).values({id,skillId:skill.id,section:skill.section,domain:skill.domain,difficulty:2,type:"mcq",stemMd:"Reserved",choices:[{id:"A",md:"1"}],answer:{choice:"A"},explanationMd:"",pool:"test"});
+ const study="study-pool-question";
+ await database.insert(schema.questions).values({id:study,skillId:skill.id,section:skill.section,domain:skill.domain,difficulty:2,type:"mcq",stemMd:"Study",choices:[{id:"A",md:"1"}],answer:{choice:"A"},explanationMd:"",pool:"study"});
+ const practice=(qid:string)=>database.select().from(schema.questions).where(and(eq(schema.questions.id,qid),availableQuestion(other)));
+ const mock=(qid:string)=>database.select().from(schema.questions).where(and(eq(schema.questions.id,qid),availableTestQuestion(other)));
+ expect(await practice(id)).toHaveLength(0);   // unseen test question: never in practice
+ expect(await mock(id)).toHaveLength(1);
+ expect(await practice(study)).toHaveLength(1);
+ expect(await mock(study)).toHaveLength(0);    // study questions never appear in mock tests
  await database.insert(schema.attempts).values({userId:other,questionId:id,skillId:skill.id,response:"A",correct:true,timeMs:5000,context:"practice",thetaBefore:0,thetaAfter:0});
- expect(await lookup()).toHaveLength(1);
+ expect(await practice(id)).toHaveLength(1);   // answered once: reviewable
 });
 it("finds the newest active session even when completed history would fill the first page",async()=>{
  const student=randomUUID();await database.insert(schema.profiles).values({id:student});

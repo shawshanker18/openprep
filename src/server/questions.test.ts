@@ -7,7 +7,7 @@ it("toPublic never leaks the answer or its hints", () => {
     id: "m-alg-lin1-0001", skillId: "m-alg-lin1", section: "math", domain: "m-alg", difficulty: 3, type: "mcq",
     passageMd: null, stemMd: "stem", choices: [{ id: "A", md: "1" }], answer: { choice: "A" },
     explanationMd: "secret", choiceRationales: { B: "x" }, fastMethodMd: "fast", desmos: { expressions: [], stepsMd: "" },
-    tags: ["t"], status: "active", version: 1,
+    tags: ["t"], status: "active", version: 1, pool: "study",
   };
   const pub = toPublic(q,"alice");
   expect(pub.section).toBe("math"); // Safe label for the section currently being answered.
