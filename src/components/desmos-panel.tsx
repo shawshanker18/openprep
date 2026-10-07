@@ -19,6 +19,8 @@ declare global {
 
 const EMPTY_EXPRESSIONS: string[] = [];
 const FALLBACK = "https://www.desmos.com/testing/collegeboard/graphing";
+// The hosted page has a 50 px green header at every width. Crop a few pixels more so fractional display scaling
+// (125%, 150%, 175%) never leaves a sliver of it showing along the top edge.
 const API_KEY = process.env.NEXT_PUBLIC_DESMOS_API_KEY;
 let loading: Promise<void> | null = null;
 
@@ -116,7 +118,7 @@ export function DesmosCalculator({ expressions = EMPTY_EXPRESSIONS, className = 
       </div>
       {hosted ? (
         <>
-          <div className="relative min-h-0 w-full flex-1 overflow-hidden"><iframe title="Desmos graphing calculator" src={FALLBACK} className="absolute -top-[50px] left-0 h-[calc(100%+50px)] w-full border-0" allowFullScreen /></div>
+          <div className="relative min-h-0 w-full flex-1 overflow-hidden"><iframe title="Desmos graphing calculator" src={FALLBACK} className="absolute -top-[54px] left-0 h-[calc(100%+54px)] w-full border-0" allowFullScreen /></div>
           {expressions.length > 0 && <div className="shrink-0 border-t border-neutral-200 bg-neutral-50 px-3 py-2 text-xs text-neutral-600">
             Equations {expressions.map((expression) => <Markdown key={expression} className="mx-1 inline-block rounded bg-white px-2 py-1 text-neutral-900">{`$${expression}$`}</Markdown>)}
           </div>}

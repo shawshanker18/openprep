@@ -10,7 +10,7 @@ export function FeedbackDialog() {
   const [open, setOpen] = useState(false);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className="flex items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm hover:bg-muted">
+      <DialogTrigger className="flex items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm hover:bg-muted short:py-1">
         <MessageSquare className="size-4" />Send feedback
       </DialogTrigger>
       <DialogContent>

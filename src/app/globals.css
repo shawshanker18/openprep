@@ -3,6 +3,10 @@
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
+/* Sidebar layout only when the window is wide AND tall enough for it; otherwise the phone layout (menu + bottom tabs). */
+@custom-variant desk (@media (min-width: 64rem) and (min-height: 38rem));
+/* Compact density for shorter windows so the sidebar always fits without scrolling. */
+@custom-variant short (@media (max-height: 54rem));
 
 @theme inline {
   --color-background: var(--background);
@@ -131,7 +135,7 @@
     /* Phones: scrolling something into view (focus, scrollIntoView) clears the fixed bottom nav. */
     scroll-padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
   }
-  @media (width >= 64rem) {
+  @media (min-width: 64rem) and (min-height: 38rem) {
     html { scroll-padding-bottom: 0; }
   }
 }
@@ -186,12 +190,5 @@ body.lesson-focus-mode main { max-width: none; padding-top: 1rem; }
   }
 }
 
-/* Hide sidebar scrollbar chrome while retaining wheel, touch and keyboard scrolling. */
-.app-sidebar,
-aside:has(> nav[aria-label="App navigation"]) {
-  scrollbar-width: none;
-}
-.app-sidebar::-webkit-scrollbar,
-aside:has(> nav[aria-label="App navigation"])::-webkit-scrollbar {
-  display: none;
-}
+/* The sidebar never scrolls: it is compact on short windows and replaced by the phone layout when it cannot fit. */
+.app-sidebar { overflow: hidden; }
