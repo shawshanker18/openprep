@@ -57,7 +57,7 @@ export default async function StepPage({ params }: PageProps<"/start/[step]">) {
           <section className="flex flex-col gap-3 rounded-xl border p-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="font-medium">Try it yourself</p>
-              <p className="text-sm text-muted-foreground">Five introductory SAT practice questions. Start with the lower SAT difficulty, then build up in Recommended Practice.</p>
+              <p className="text-sm text-muted-foreground">Five introductory SAT practice questions. Start with the lower SAT difficulty, then build up in Adaptive Practice.</p>
             </div>
             <Button variant="outline" render={<Link href={`/practice?mode=set&skills=${step.ref}&difficulty=1&count=5&from=/start/${step.key}`} />}>Practice 5 questions</Button>
           </section>
