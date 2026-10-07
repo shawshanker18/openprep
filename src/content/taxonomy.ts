@@ -52,6 +52,8 @@ export const SKILLS: Skill[] = [
 
 // Null prototype: ids come from URLs and forms, so "constructor" / "toString" must not resolve to anything.
 export const SKILL_BY_ID: Record<string, Skill | undefined> = Object.assign(Object.create(null), Object.fromEntries(SKILLS.map((k) => [k.id, k])));
+/** Name for compact lists: drops clarifying parentheses, e.g. "Form, Structure, and Sense (grammar)" → "Form, Structure, and Sense". */
+export const shortSkillName = (name: string) => name.replace(/\s*\([^)]*\)/g, "").trim();
 export const skillsIn = (domain: string) => SKILLS.filter((k) => k.domain === domain);
 export const skillWeight = (k: Skill) => DOMAINS[k.domain].weight / skillsIn(k.domain).length;
 

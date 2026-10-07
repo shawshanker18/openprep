@@ -17,6 +17,7 @@ import { consumeWindow, exposeQuestions, lockDelivery } from "./delivery";
 import { deliveryContext } from "./delivery-context";
 import { DeliveryBlocked } from "./delivery-policy";
 import { toPublic, toRevealed } from "./questions";
+import { memo } from "@/lib/memo";
 
 export type TestKind = "full" | "section" | "module" | "mini" | "weakness" | "custom";
 type Section = "rw" | "math";
@@ -395,14 +396,26 @@ export async function sweepTests(now = new Date()) {
   return { submitted: expired.length, abandoned: stale.length };
 }
 
+/** Active questions per section. The bank only changes on a content import, so a minute of caching is plenty. */
+const activeBankSize = memo(60_000, async () => {
+  const rows = await db.select({ section: questions.section, n: sql<number>`count(*)::int` }).from(questions)
+    .where(eq(questions.status, "active")).groupBy(questions.section);
+  return Object.fromEntries(rows.map((r) => [r.section, r.n])) as Partial<Record<Section, number>>;
+});
+
 /**
  * Plan 02 §7: a full mock should be at least 80% questions this student hasn't answered yet. False when the bank
  * is too thin for that (the Tests page then says so, but still lets them start).
  */
 export async function freshFullMock(userId: string) {
-  const rows = await db.select({
-    section: questions.section,
-    unseen: sql<number>`count(*) filter (where not exists (select 1 from attempts a where a.user_id = ${userId} and a.question_id = "questions"."id"))::int`,
-  }).from(questions).where(eq(questions.status, "active")).groupBy(questions.section);
-  return (["rw", "math"] as const).every((s) => (rows.find((r) => r.section === s)?.unseen ?? 0) >= 0.8 * 2 * moduleBlueprint(s, "base").count);
+  // Unseen = active bank size minus the active questions this student has answered. Both sides read small indexed
+  // sets instead of anti-joining the whole bank against attempts on every Tests page view.
+  const [bank, answered] = await Promise.all([
+    activeBankSize(),
+    db.select({ section: questions.section, n: sql<number>`count(distinct ${attempts.questionId})::int` }).from(attempts)
+      .innerJoin(questions, and(eq(questions.id, attempts.questionId), eq(questions.status, "active")))
+      .where(eq(attempts.userId, userId)).groupBy(questions.section),
+  ]);
+  return (["rw", "math"] as const).every((s) =>
+    (bank[s] ?? 0) - (answered.find((r) => r.section === s)?.n ?? 0) >= 0.8 * 2 * moduleBlueprint(s, "base").count);
 }

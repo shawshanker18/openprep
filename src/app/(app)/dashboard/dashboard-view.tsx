@@ -7,7 +7,7 @@ import { diagnosticPending } from "@/server/auth";
 import type { getDashboard } from "@/server/daily";
 import type { getSkillSummary } from "@/server/analytics";
 import type { homeData } from "@/server/home";
-import { SKILL_BY_ID } from "@/content/taxonomy";
+import { SKILL_BY_ID, shortSkillName } from "@/content/taxonomy";
 import { bestTestDate, predictedScore, readyBy } from "@/engine/plan";
 import { formatDate } from "@/lib/dates";
 import type { AuthUser } from "@/server/auth";
@@ -83,7 +83,7 @@ export function DashboardView({profile,user,d,summary,home,community,savedPracti
   const resume: { title: string; detail: string; href: string; action: string }[] = [];
   if (home.openTest) resume.push({ title: KIND[home.openTest.kind] ?? "Test", detail: `In progress · started ${formatDate(home.openTest.startedAt, profile.timezone, true)}`, href: `/test/${home.openTest.id}`, action: "Resume" });
   if(savedPractice) resume.push({title:savedPractice.title,detail:"Saved practice session",href:`/practice?session=${savedPractice.id}`,action:"Resume"});
-  if (!savedPractice && home.lastPractice) resume.push({ title: SKILL_BY_ID[home.lastPractice.skillId]?.name ?? "Practice", detail: `Last practiced ${ago(home.lastPractice.at)}`, href: `/practice?skill=${home.lastPractice.skillId}`, action: "Continue" });
+  if (!savedPractice && home.lastPractice) resume.push({ title: shortSkillName(SKILL_BY_ID[home.lastPractice.skillId]?.name ?? "Practice"), detail: `Last practiced ${ago(home.lastPractice.at)}`, href: `/practice?skill=${home.lastPractice.skillId}`, action: "Continue" });
   if (home.course.next) resume.push({ title: home.course.next.title, detail: `Start from scratch · ${home.course.done} of ${home.course.total} done`, href: `/start/${home.course.next.key}`, action: "Continue" });
   if (d.dueReviews > 0) resume.push({ title: "Mistakes to review", detail: `${d.dueReviews} due now`, href: "/practice?mode=review", action: "Review" });
   const primary = resume[0] ?? { href: "/practice", action: "Start practicing" };
@@ -112,13 +112,21 @@ export function DashboardView({profile,user,d,summary,home,community,savedPracti
       <section className="rounded-xl border p-5">
         <h2 className="font-semibold">Today&apos;s plan</h2>
         <p className="mt-1 text-sm text-muted-foreground">A study plan based on your schedule and skills.</p>
-        <ul className="mt-3 flex flex-col gap-2">{d.blocks.map((block,i) => {
+        <ul className="mt-4 flex flex-col divide-y overflow-hidden rounded-lg border">{d.blocks.map((block,i) => {
           const skill = 'skillId' in block ? SKILL_BY_ID[block.skillId] : null;
           const href = block.kind==='learn' ? `/skills/${block.skillId}` : block.kind==='desmos' ? `/desmos/${block.lessonSlug}` : block.kind==='review' ? `/practice?mode=review&block=${i}` : `/practice?skill=${block.skillId}&block=${i}`;
-          const label = block.kind==='learn' ? 'Learn' : block.kind==='desmos' ? 'Desmos' : block.kind==='review' ? 'Review mistakes' : 'Practice';
-          return <li key={i} className="flex items-center justify-between gap-3 text-sm"><Link prefetch={false} className="min-w-0 flex-1 break-words underline" href={href}>{label}{skill ? ` · ${skill.name}` : ''}</Link><span className="shrink-0 text-muted-foreground">{block.done ? 'Done' : `${block.minutes} min`}</span></li>;
+          const label = block.kind==='learn' ? 'Learn' : block.kind==='desmos' ? 'Desmos' : block.kind==='review' ? 'Review' : 'Practice';
+          const title = skill ? shortSkillName(skill.name) : block.kind==='review' ? 'Mistakes due' : 'Calculator lesson';
+          return <li key={i}><Link prefetch={false} href={href} className="flex min-h-12 items-center gap-3 px-3 py-2.5 text-sm transition-colors hover:bg-muted">
+            <span className="w-[4.5rem] shrink-0 text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</span>
+            <span className={`min-w-0 flex-1 break-words font-medium ${block.done ? 'text-muted-foreground' : ''}`}>{title}</span>
+            <span className="shrink-0 text-xs tabular-nums text-muted-foreground">{block.done ? '✓ Done' : `${block.minutes} min`}</span>
+          </Link></li>;
         })}</ul>
-        <div className="mt-4 flex flex-wrap gap-4 text-sm"><Link className="underline" href="/question-bank">Choose your own questions</Link><Link className="underline" href="/start">Start from scratch</Link></div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Button size="sm" variant="outline" render={<Link href="/question-bank" />}>Choose your own questions</Button>
+          <Button size="sm" variant="outline" render={<Link href="/start" />}>Start from scratch</Button>
+        </div>
         {community && <p className="mt-3 text-xs text-muted-foreground">{community.users.toLocaleString()} all-time users · {community.active.toLocaleString()} active in the last 30 days · {community.answered.toLocaleString()} questions answered · {community.tests.toLocaleString()} tests completed.</p>}
       </section>
 
@@ -171,7 +179,7 @@ export function DashboardView({profile,user,d,summary,home,community,savedPracti
         <Card title="Skills to work on" className="order-2">
           {weakest.length ? weakest.map((k) => (
             <Link key={k.id} href={`/practice?skill=${k.id}`} className="flex flex-col gap-1 rounded-md p-1 hover:bg-muted">
-              <span className="flex justify-between gap-2 text-sm"><span className="min-w-0 flex-1 break-words">{k.name}</span><span className="tabular-nums text-muted-foreground">{k.mastery}%</span></span>
+              <span className="flex justify-between gap-2 text-sm"><span className="min-w-0 flex-1 break-words">{shortSkillName(k.name)}</span><span className="tabular-nums text-muted-foreground">{k.mastery}%</span></span>
               <MasteryBar pct={k.mastery} measured />
             </Link>
           )) : <p className="text-sm text-muted-foreground">Answer some questions and your weakest skills show up here.</p>}

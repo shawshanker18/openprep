@@ -12,13 +12,15 @@ import { getChecklist, getNotifications } from "@/server/notifications";
 import { getSkillSummary } from "@/server/analytics";
 import { levelOf, points } from "@/engine/course";
 import { isAdmin } from "@/server/admin";
+import { safely } from "@/lib/safely";
 
 export default async function AppLayout({ children }: LayoutProps<"/">) {
   const { userId, profile } = await requireUser();
   if (profile.onboardingStep !== "done" && profile.onboardingStep !== "diagnostic_skipped" && profile.onboardingStep !== "diagnostic") redirect("/onboarding");
+  // Furniture, not content: if any of these is slow or fails the page still renders without it.
   const [checklist, user, admin] = await Promise.all([
-    getChecklist(userId, profile), getAuthUser(),
-    isAdmin(userId),
+    safely(() => getChecklist(userId, profile), []), safely(() => getAuthUser(), null),
+    safely(() => isAdmin(userId), false),
   ]);
   const nav = { checklist, user: user?.name ?? user?.email ?? "Settings", signOut, isAdmin: admin };
   const chips = <Suspense fallback={null}><MasteryPoints userId={userId} /></Suspense>;
@@ -53,12 +55,13 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
 }
 
 async function MasteryPoints({ userId }: { userId: string }) {
-  const summary = await getSkillSummary(userId);
+  const summary = await safely(() => getSkillSummary(userId), null);
+  if (!summary) return null;
   const mastery = points(summary.skills.map((k) => levelOf(k.n, k.status))).earned;
   return <Link href="/skills" className="flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm tabular-nums hover:bg-muted" title="Mastery points across your skills"><Award className="size-4" />{mastery.toLocaleString("en-US")} points</Link>;
 }
 
 async function UserNotifications({ userId, profile }: { userId: string; profile: Profile }) {
-  const notifications = await getNotifications(userId, profile);
+  const notifications = await safely(() => getNotifications(userId, profile), []);
   return <NotificationBell items={notifications} align="right" />;
 }

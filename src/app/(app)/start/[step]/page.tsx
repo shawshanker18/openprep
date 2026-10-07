@@ -48,7 +48,7 @@ export default async function StepPage({ params }: PageProps<"/start/[step]">) {
           <Markdown className="text-[15px]">{desmos.md}</Markdown>
           <DesmosCalculator expressions={desmos.expressions} className="h-[28rem]" />
         </div>
-      ) : <p className="text-muted-foreground">This lesson is coming soon.</p>)}
+      ) : <p className="text-muted-foreground">This lesson is not available right now. Please pick another step.</p>)}
 
       {step.kind === "skill" && (lesson ? (
         <article className="flex max-w-3xl flex-col gap-6">
@@ -62,7 +62,7 @@ export default async function StepPage({ params }: PageProps<"/start/[step]">) {
             <Button variant="outline" render={<Link href={`/practice?mode=set&skills=${step.ref}&difficulty=1&count=5&from=/start/${step.key}`} />}>Practice 5 questions</Button>
           </section>
         </article>
-      ) : <p className="text-muted-foreground">The lesson for this topic is coming soon.</p>)}
+      ) : <p className="text-muted-foreground">This lesson is not available right now. Please pick another topic.</p>)}
 
       <div className="sticky bottom-[calc(4rem+env(safe-area-inset-bottom))] z-10 flex flex-wrap items-center gap-2 rounded-xl border bg-background p-3 lg:bottom-4">
         <form action={stepAction.bind(null, step.key, "done")}><Button type="submit">{step.status === "done" ? "Next topic" : "Done, next topic"}</Button></form>

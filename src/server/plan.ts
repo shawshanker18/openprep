@@ -1,9 +1,9 @@
 // Weekly focus (spec 03 §5.1). Frozen for the ISO week; recomputed on the first visit of a new week.
 import "server-only";
 import { memo } from "@/lib/memo";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { profiles, questions, skillState, type Profile } from "@/db/schema";
+import { profiles, skillState, type Profile } from "@/db/schema";
 import { SKILLS, skillWeight } from "@/content/taxonomy";
 import { localDate, weekOf } from "@/engine/plan";
 import { sectionTarget, targetTheta } from "@/engine/score";
@@ -11,8 +11,11 @@ import { skillPriority, weeklyFocus } from "@/engine/select";
 
 /** Skills that have at least one active question — you can't focus practice on a skill with no questions. */
 export const skillsWithQuestions = memo(600_000, async () => {
-  const rows = await db.selectDistinct({ skillId: questions.skillId }).from(questions).where(eq(questions.status, "active"));
-  return new Set(rows.map((r) => r.skillId));
+  // One indexed probe per skill instead of DISTINCT over every active question (that scan took 60 ms, up to 1 s).
+  const ids = sql.join(SKILLS.map((s) => sql`(${s.id})`), sql`, `);
+  const rows = await db.select({ id: sql<string>`s.id` }).from(sql`(values ${ids}) as s(id)`)
+    .where(sql`exists (select 1 from questions q where q.skill_id = s.id and q.status = 'active')`);
+  return new Set(rows.map((r) => r.id));
 });
 
 /** All skills in priority order (highest expected score gain first), restricted to skills with questions. */

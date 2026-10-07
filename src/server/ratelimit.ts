@@ -26,7 +26,13 @@ export async function databaseLimit(userId:string, kind:"request"|"answer"="requ
     // A rejected answer must still count as a request.
     if(kind==="answer" && questionId) await db.transaction(tx=>consumeWindow(tx,`answer:${userId}:${questionId}`,LIMITS.answersPerQuestionPerMinute,60_000));
     return null;
-  } catch(e) { return e instanceof DeliveryBlocked ? SLOW_DOWN : 'Practice is temporarily unavailable. Please try again shortly.'; }
+  } catch(e) {
+    if (e instanceof DeliveryBlocked) return SLOW_DOWN;
+    // The throttle's own bookkeeping failed (database hiccup), which says nothing about this student. Blocking here
+    // would turn every blip into "Practice is unavailable" for everyone. The real work still needs the database.
+    console.warn("Practice throttle unavailable; allowing request", e instanceof Error ? e.message : e);
+    return null;
+  }
 }
 
 const anonymous = redis && new Ratelimit({ redis, prefix: "openprep:anon", limiter: Ratelimit.slidingWindow(300, "1 m") });
@@ -34,7 +40,8 @@ const anonymous = redis && new Ratelimit({ redis, prefix: "openprep:anon", limit
 export async function anonymousLimited(ip: string) {
   if (anonymous) { try { if (!(await anonymous.limit(ip)).success) return true; } catch { /* Database remains authoritative. */ } }
   try { await db.transaction(tx=>consumeWindow(tx,`anonymous:${digest(ip)}`,300,60_000)); return false; }
-  catch { return true; }
+  // Only an exceeded limit is a 429. A database error must not lock signed-out visitors out of signing in.
+  catch (e) { return e instanceof DeliveryBlocked; }
 }
 
 export const redisConfigured = () => !!redis;

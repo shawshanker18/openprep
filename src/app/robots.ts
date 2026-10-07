@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const SITE = process.env.NEXT_PUBLIC_SITE_URL || "https://openprep-opal.vercel.app";
+const SITE = process.env.NEXT_PUBLIC_SITE_URL || "https://www.openprep.site";
 
 /** Only the public pages are worth indexing; everything else needs an account. */
 export default function robots(): MetadataRoute.Robots {
