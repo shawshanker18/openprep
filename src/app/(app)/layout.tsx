@@ -26,7 +26,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
 
   return (
     <div className="flex min-w-0 max-w-full flex-1 flex-col pb-[calc(4rem+env(safe-area-inset-bottom))] lg:flex-row lg:pb-0">
-      <aside className="app-sidebar sticky top-0 z-10 hidden h-dvh w-56 shrink-0 flex-col gap-4 overflow-y-auto border-r p-4 lg:flex">
+      <aside className="app-sidebar fixed inset-y-0 left-0 z-10 hidden h-dvh w-56 shrink-0 flex-col gap-4 overflow-y-auto border-r p-4 lg:flex">
         <Link href="/dashboard" className="text-lg font-semibold">OpenPrep</Link>
         <NavLinks {...nav} />
       </aside>
@@ -35,7 +35,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
         <Link href="/dashboard" className="font-semibold">OpenPrep</Link>
         {bell}
       </header>
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="app-content flex min-w-0 flex-1 flex-col lg:ml-56 [.lesson-focus-mode_&]:ml-0">
         <div className="app-topbar sticky top-0 z-10 hidden items-center justify-end gap-2 border-b bg-background px-8 py-2 lg:flex">
           <CurrentSection />
           {chips}
