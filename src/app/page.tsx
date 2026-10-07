@@ -5,7 +5,7 @@ import { Markdown } from '@/components/markdown';
 export const dynamic='force-dynamic';
 const features=[
   {icon:Compass,title:'Find your starting point',body:'An optional diagnostic samples Math and Reading and Writing skills. Review your wrong answers when you are ready, with your selection and the correct answer side by side.'},
-  {icon:BookOpen,title:'Practice what you need',body:'Recommended Practice adjusts difficulty after each answer. Or choose multiple topics and difficulties in the Question Bank, preview questions, and start your own set.'},
+  {icon:BookOpen,title:'Adaptive Practice',body:'Adaptive Practice adjusts difficulty after each answer. Or choose multiple topics and difficulties in the Question Bank, preview questions, and start your own set.'},
   {icon:ClipboardCheck,title:'Get used to test day',body:'Take a full SAT-style test with timed, adaptive modules, or a short test in one subject. Use the SAT Desmos calculator and review answers after the test.'},
   {icon:ChartNoAxesCombined,title:'See your progress',body:'Follow a daily plan, track skills and score estimates, revisit mistakes, and resume saved sessions. Start from scratch lessons stay available for every topic.'},
 ];
