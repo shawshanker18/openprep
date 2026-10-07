@@ -18,21 +18,25 @@ Postgres is the authority, including when Redis is missing or fails. A transacti
 
 Every fresh question in practice, test modules, test starts and diagnostic responses uses this ledger. Test results also pass it, closing a result-page bypass. Existing delivered/answered content is backfilled by the migration. Reopening the same exposed question does not charge another new-question allowance.
 
-| Scope | New questions in rolling 24 hours | New questions in rolling 7 days |
+| Scope | Unanswered allowance in rolling 24 hours | Unanswered allowance in rolling 7 days |
 | --- | ---: | ---: |
 | Account | 180 | 600 |
 | Skill within an account | 60 | 180 |
 | Signed browser device across accounts | 360 | 1,200 |
 | Trusted IP across accounts | 1,800 | 6,000 |
 
-The limits live in src/server/delivery-policy.ts. Shared-network limits are higher to accommodate families and schools; monitor and tune these values from actual student use.
+The limits live in src/server/delivery-policy.ts. Each distinct, nonblank server-recorded answer replenishes one exposure slot in its account, skill, device and network windows. Both correct and incorrect answers count. An answer must have at least five seconds of server-capped recorded time and occur at least five seconds after first exposure. Repeated attempts on the same question, skips, drafts, pre-exposure answers and another account's answers cannot multiply credit. The queries count exposures with an eligible owned attempt, rather than counting attempts. Existing row locks make the allowance check and new exposures atomic across concurrent requests.
+
+These are collection allowances, not maximum numbers of questions a student may solve. Students who keep answering can work through 60, 500 or 1,000 distinct questions without a volume-based daily or weekly lockout. Large totals can span multiple saved sessions; session-size and test-format limits are unchanged. Existing burst, paper and set limits remain. Shared-network allowances and completion credit accommodate families and schools. Blank answers remain accepted for learning, but do not earn new collection allowance.
+
+This catches collection without sufficient answer progress and rejects implausibly fast requests. It does not prove that a person, rather than a paced script, supplied an answer. Correctness, shared IPs, volume alone and browser developer tools are not reliable proof of automation. Do not automatically ban students on those signals.
 
 Additional controls:
 
 - Practice: at most 12 deliveries per rolling minute. Unanswered questions and unfinished sessions do not block new practice. Resume preserves the original clock and consumes no new exposure.
 - A practice/diagnostic answer needs five seconds of server-measured elapsed time. Supplying a larger client time does not satisfy this requirement. Wrong or blank answers still reveal explanations after acceptance, for learning.
 - Test creation is atomically capped at four starts per account, eight per device and forty per IP in five minutes; concurrent requests cannot create extra sessions.
-- Test modules cannot be submitted until at least five seconds per item have elapsed since starting. Normal SAT deadlines and server-side expiry still apply. Starting and viewing modules charge exposure; tests cannot bypass daily/weekly allowances.
+- Test modules may be submitted early. Recorded per-item time is capped against the server-measured total module time; instant/bulk guesses do not earn full collection credit. Normal SAT deadlines and server-side expiry still apply. Starting and viewing modules charge exposure; test routes use the same progress-based allowances.
 - Practice requests: 10 per rolling 10 seconds per account; 20 per device and 100 per IP. Answers also have a three-per-question-per-minute bucket. Rejected answers still count as requests. These database limits are identical during Redis outages.
 - Paper tokens have an encrypted random nonce, an account binding and a two-hour expiry. Creation is capped at 60 per day per account, with shared device/IP caps. Each actual practice delivery consumes the token's server-side question allowance. Client exclusions or counters cannot reset it.
 - Similar-question requests require an answered question, have a 30-per-day account quota plus shared quotas, and randomly sample a broader skill pool. They do not return neighbor lists or similarity scores.

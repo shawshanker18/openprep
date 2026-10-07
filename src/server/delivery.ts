@@ -1,5 +1,5 @@
 import "server-only";
-import { and, count, eq, gte, inArray } from "drizzle-orm";
+import { and, eq, gte, inArray, sql, type SQL } from "drizzle-orm";
 import { db, type Tx } from "@/db";
 import { attempts, deliveryGuards, deliveryWindows, questionExposures, questionServes, questions, type Question } from "@/db/schema";
 import type { DeliveryContext } from "./delivery-context";
@@ -35,6 +35,35 @@ export async function eventQuota(userId: string, context: DeliveryContext, kind:
   });
 }
 
+/** Count each first exposure once, even if its question is answered/reviewed repeatedly.
+ * Completion is read from server-owned attempts, not a client counter. The server caps
+ * recorded answer time; blank/instant answers cannot replenish the collection allowance.
+ */
+async function exposureUsage(tx: Tx, predicate: SQL, now: Date) {
+  const day = new Date(now.getTime() - 86_400_000);
+  const completed = sql`exists (
+    select 1 from ${attempts}
+    where ${attempts.userId} = ${questionExposures.userId}
+      and ${attempts.questionId} = ${questionExposures.questionId}
+      and ${attempts.createdAt} >= ${questionExposures.firstAt} + ${P.minimumAnswerMs} * interval '1 millisecond'
+      and ${attempts.timeMs} >= ${P.minimumAnswerMs}
+      and length(trim(${attempts.response})) > 0
+  )`;
+  const [usage] = await tx.select({
+    day: sql<number>`count(*) filter (where ${questionExposures.firstAt} >= ${day})::int`,
+    week: sql<number>`count(*)::int`,
+    answeredDay: sql<number>`count(*) filter (where ${questionExposures.firstAt} >= ${day} and ${completed})::int`,
+    answeredWeek: sql<number>`count(*) filter (where ${completed})::int`,
+  }).from(questionExposures).where(and(predicate, gte(questionExposures.firstAt, new Date(now.getTime() - 7 * 86_400_000))));
+  return usage!;
+}
+
+async function checkExposureAllowance(tx: Tx, predicate: SQL, limits: {day: number; week: number}, amount: number, now: Date) {
+  const usage = await exposureUsage(tx, predicate, now);
+  if (usage.day + amount > limits.day + usage.answeredDay || usage.week + amount > limits.week + usage.answeredWeek)
+    throw new DeliveryBlocked("New questions are temporarily limited. Answer some of your saved questions, or try again later.");
+}
+
 /** All fresh content, including test modules and diagnostics, passes through this same ledger. */
 export async function exposeQuestions(tx: Tx, userId: string, qs: Pick<Question, "id" | "skillId">[], context: DeliveryContext) {
   if (!qs.length) return;
@@ -53,17 +82,11 @@ export async function exposeQuestions(tx: Tx, userId: string, qs: Pick<Question,
     ...(context.device ? [{ predicate: eq(questionExposures.deviceHash, context.device), limits: P.device }] : []),
   ];
   for (const { predicate, limits } of scopes) {
-    for (const [days, max] of [[1, limits.day], [7, limits.week]]) {
-      const [r] = await tx.select({ n: count() }).from(questionExposures).where(and(predicate, gte(questionExposures.firstAt, new Date(now.getTime() - days! * 86_400_000))));
-      if (r!.n + fresh.length > max!) throw new DeliveryBlocked();
-    }
+    await checkExposureAllowance(tx, predicate, limits, fresh.length, now);
   }
   for (const skill of new Set(fresh.map(q => q.skillId))) {
     const amount = fresh.filter(q => q.skillId === skill).length;
-    for (const [days, max] of [[1, P.skill.day], [7, P.skill.week]]) {
-      const [r] = await tx.select({ n: count() }).from(questionExposures).where(and(eq(questionExposures.userId, userId), eq(questionExposures.skillId, skill), gte(questionExposures.firstAt, new Date(now.getTime() - days! * 86_400_000))));
-      if (r!.n + amount > max!) throw new DeliveryBlocked();
-    }
+    await checkExposureAllowance(tx, and(eq(questionExposures.userId, userId), eq(questionExposures.skillId, skill))!, P.skill, amount, now);
   }
   await tx.insert(questionExposures).values(fresh.map(q => ({ userId, questionId: q.id, skillId: q.skillId, ipHash: context.ip, deviceHash: context.device, firstAt: now })));
 }

@@ -1,4 +1,5 @@
-// Server-only policy. UTC rolling exposure windows; shared-network ceilings are deliberately higher.
+// Server-only policy. Rolling allowances for unanswered exposures, replenished by distinct,
+// server-recorded answers. Shared-network allowances are deliberately higher.
 export const DELIVERY_POLICY = {
   account: { day: 180, week: 600 },
   skill: { day: 60, week: 180 },
