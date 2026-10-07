@@ -52,7 +52,7 @@ export function LoginForm({ google: showGoogle, inApp = false }: { google: boole
     </div>
   );
   return (
-    <div className="flex flex-col gap-4 [@media(max-height:800px)]:gap-3 [@media(max-height:600px)]:gap-2">
+    <div className="flex flex-col gap-4 [@media(min-height:601px)_and_(max-height:800px)]:gap-3 [@media(max-height:600px)]:gap-2">
       <label className="flex items-start gap-2.5 text-sm text-muted-foreground">
         <input type="checkbox" className="mt-0.5 size-4 accent-foreground" checked={age} onChange={(e) => setAge(e.target.checked)} />
         <span>
