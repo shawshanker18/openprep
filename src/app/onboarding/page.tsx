@@ -22,7 +22,7 @@ export default async function OnboardingPage() {
           <form action={beginDiagnostic}><Button size="lg" type="submit">Start the diagnostic</Button></form>
           <form action={skipDiagnostic}><Button size="lg" variant="outline" type="submit">Start practicing</Button></form>
         </div>
-        <p className="text-sm text-muted-foreground">The diagnostic is optional. Question bank, Recommended Practice, tests and your daily plan are available now.</p>
+        <p className="text-sm text-muted-foreground">The diagnostic is optional. Question bank, Adaptive Practice, tests and your daily plan are available now.</p>
       </>}
     </main>
   );
