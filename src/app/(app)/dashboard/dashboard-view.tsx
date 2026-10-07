@@ -137,7 +137,7 @@ export function DashboardView({profile,user,d,summary,home,community,savedPracti
       <div className="grid min-w-0 items-start gap-4 lg:grid-cols-2">
         <Card title="Where you left off">
           {resume.length ? resume.map((r) => <Resume key={r.href} {...r} />) : (
-            <p className="text-sm text-muted-foreground">Nothing yet. <Link className="underline" href="/start">Start from scratch</Link> or try <Link className="underline" href="/practice">recommended practice</Link>.</p>
+            <p className="text-sm text-muted-foreground">Nothing yet. <Link className="underline" href="/start">Start from scratch</Link> or try <Link className="underline" href="/practice">adaptive practice</Link>.</p>
           )}
         </Card>
 
