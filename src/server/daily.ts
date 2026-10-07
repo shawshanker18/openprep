@@ -59,9 +59,12 @@ export const skillStatesOf = cache((userId: string) => db.select().from(skillSta
 
 export async function ensureDaily(userId: string, profile: Profile, now = new Date()) {
   const day = localDate(now, profile.timezone);
-  const focus = await ensureWeeklyFocus(userId, profile, now);
-
-  let [plan] = await db.select().from(dailyPlans).where(and(eq(dailyPlans.userId, userId), eq(dailyPlans.day, day)));
+  const [focus, plans, snapshots] = await Promise.all([
+    ensureWeeklyFocus(userId, profile, now),
+    db.select().from(dailyPlans).where(and(eq(dailyPlans.userId, userId), eq(dailyPlans.day, day))),
+    db.select().from(scoreSnapshots).where(eq(scoreSnapshots.userId, userId)).orderBy(desc(scoreSnapshots.takenAt)).limit(1),
+  ]);
+  let plan = plans[0];
   if (!plan) {
     const weekStart = new Date(`${weekOf(day)}T00:00:00Z`);
     const [states, done, weekCounts, nextDesmos, dueReviews, hasLesson] = await Promise.all([
@@ -92,12 +95,12 @@ export async function ensureDaily(userId: string, profile: Profile, now = new Da
   }
 
   // At most one model snapshot per local day, and only when there's new evidence.
-  const [last] = await db.select().from(scoreSnapshots).where(eq(scoreSnapshots.userId, userId)).orderBy(desc(scoreSnapshots.takenAt)).limit(1);
+  const [last] = snapshots;
   if (!last || localDate(last.takenAt, profile.timezone) !== day) {
     const [newer] = await db.select({ id: attempts.id }).from(attempts)
       .where(and(eq(attempts.userId, userId), last ? gte(attempts.createdAt, last.takenAt) : undefined)).limit(1);
     if (newer) {
-      const states = await db.select().from(skillState).where(eq(skillState.userId, userId));
+      const states = await skillStatesOf(userId);
       const rw = sectionEstimate(states, "rw"), math = sectionEstimate(states, "math");
       await db.insert(scoreSnapshots).values({ userId, source: "model", rw: rw.score, math: math.score, halfWidth: totalEstimate(rw, math).half, takenAt: now });
     }
