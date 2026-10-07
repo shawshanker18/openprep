@@ -15,7 +15,7 @@ export function LoginForm({ google: showGoogle, inApp = false }: { google: boole
   const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [refused, setRefused] = useState<string | null>(null);
   // In the apps the email link opens in a browser, which hands the code back to the app (see /auth/callback).
-  const redirectTo = () => `${window.location.origin}/auth/callback`;
+  const redirectTo = () => `${window.location.origin}/auth/callback?flow=${inApp ? "app" : "email"}`;
 
   const magic = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,6 +41,7 @@ export function LoginForm({ google: showGoogle, inApp = false }: { google: boole
         <p className="font-medium">Check your inbox</p>
         <p className="text-sm text-muted-foreground">We sent a sign-in link to <b className="text-foreground">{email}</b>. It works once.</p>
         {inApp && <p className="text-sm text-muted-foreground">Open it on this device and your browser will send you back to the app.</p>}
+        {!inApp && <p className="text-sm text-muted-foreground">Open the link in this browser. If your email opens another browser, copy the link here.</p>}
         <button className="mt-2 text-sm underline" onClick={() => setState("idle")}>Use a different email</button>
       </div>
     );
