@@ -42,7 +42,7 @@ it("allows skipped slides and initializes every skill before the diagnostic with
   expect(await db.select().from(schema.skillState)).toHaveLength(SKILLS.length);
 });
 
-it("opens bank, Recommended Practice, daily plan, reviews and short tests without any diagnostic", async () => {
+it("opens bank, Adaptive Practice, daily plan, reviews and short tests without any diagnostic", async () => {
   const P = await import("@/server/practice");
   const A = await import("@/app/(app)/practice/actions");
   const { createPaper } = await import("@/server/papers");
