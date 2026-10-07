@@ -105,11 +105,10 @@ export function DesmosCalculator({ expressions = EMPTY_EXPRESSIONS, className = 
     <div ref={shell} role={fullscreen ? "dialog" : undefined} aria-modal={fullscreen || undefined}
       aria-label="Desmos graphing calculator"
       className={fullscreen ? "fixed inset-0 z-50 flex flex-col bg-white" : `relative flex min-h-[320px] min-w-0 max-w-full resize flex-col overflow-hidden border border-neutral-300 bg-white ${className}`}>
-      <div className="flex shrink-0 items-center justify-between gap-3 bg-[#2d2d2d] px-3 py-2 text-white">
-        <span className="text-base font-medium tracking-tight">Desmos</span>
+      <div className="absolute right-2 bottom-2 z-20 flex items-center gap-1 rounded-lg border bg-white/95 p-1 text-neutral-700">
         <div className="flex items-center gap-1">
-          <a href={FALLBACK} target="_blank" rel="noopener noreferrer" className="rounded p-2 text-white/80 hover:bg-white/10 hover:text-white" aria-label="Open Desmos in a new tab"><ExternalLink className="size-4" /></a>
-          <button type="button" className="rounded p-2 text-white/80 hover:bg-white/10 hover:text-white"
+          <a href={FALLBACK} target="_blank" rel="noopener noreferrer" className="rounded p-2 text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900" aria-label="Open Desmos in a new tab"><ExternalLink className="size-4" /></a>
+          <button type="button" className="rounded p-2 text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900"
             onClick={() => setFullscreen((value) => !value)} aria-label={fullscreen ? "Exit full-screen calculator" : "Open full-screen calculator"}>
             {fullscreen ? <Minimize className="size-4" /> : <Expand className="size-4" />}
           </button>
@@ -117,7 +116,7 @@ export function DesmosCalculator({ expressions = EMPTY_EXPRESSIONS, className = 
       </div>
       {hosted ? (
         <>
-          <iframe title="Desmos graphing calculator" src={FALLBACK} className="min-h-0 w-full flex-1 border-0" allowFullScreen />
+          <div className="relative min-h-0 w-full flex-1 overflow-hidden"><iframe title="Desmos graphing calculator" src={FALLBACK} className="absolute -top-[50px] left-0 h-[calc(100%+50px)] w-full border-0" allowFullScreen /></div>
           {expressions.length > 0 && <div className="shrink-0 border-t border-neutral-200 bg-neutral-50 px-3 py-2 text-xs text-neutral-600">
             Equations {expressions.map((expression) => <Markdown key={expression} className="mx-1 inline-block rounded bg-white px-2 py-1 text-neutral-900">{`$${expression}$`}</Markdown>)}
           </div>}
