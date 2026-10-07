@@ -3,7 +3,7 @@ import { cache } from "react";
 import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { createClient } from "@/lib/supabase/server";
-import { db } from "@/db";
+import { db, ensureDatabase } from "@/db";
 import { profiles } from "@/db/schema";
 
 export type AuthUser = { id: string; email: string | null; name: string | null };
@@ -25,6 +25,7 @@ export const getUserId = cache(async (): Promise<string | null> => (await getAut
 export const requireUser = cache(async () => {
   const userId = await getUserId();
   if (!userId) redirect("/login");
+  await ensureDatabase();
   // One round trip for returning users; the insert only runs on a first visit.
   let [profile] = await db.select().from(profiles).where(eq(profiles.id, userId));
   if (!profile) {
@@ -38,3 +39,4 @@ export const requireUser = cache(async () => {
 export const diagnosticPending = (p: { onboardingStep: string }) => p.onboardingStep === "diagnostic_skipped" || p.onboardingStep === "diagnostic";
 
 export type ActionResult<T = undefined> = { ok: true; data: T } | { ok: false; error: string };
+
