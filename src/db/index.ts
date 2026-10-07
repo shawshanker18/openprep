@@ -6,11 +6,11 @@ import { healthyPool } from "@/lib/healthy-pool";
 
 // Supabase transaction pooler does not support prepared statements → prepare: false.
 const create = () => {
-  const client = postgres(process.env.DATABASE_URL!, { prepare: false, max: 5, idle_timeout: 5, connect_timeout: 5, max_lifetime: 60 });
+  const client = postgres(process.env.DATABASE_URL!, { prepare: false, max: 5, idle_timeout: 20, connect_timeout: 5, max_lifetime: 300 });
   return { client, database: drizzle(client, { schema, logger: process.env.DB_LOG === "1" }) };
 };
 const g = globalThis as unknown as { openprepPool?: ReturnType<typeof makePool> };
-const makePool = () => healthyPool(create, ({ client }) => client`select 1`, ({ client }) => client.end({ timeout: 0 }));
+const makePool = () => healthyPool(create, ({ client }) => client`select 1`, ({ client }) => client.end({ timeout: 0 }), 1500, 5000, 21_000);
 const pool = g.openprepPool ??= makePool();
 export const ensureDatabase = () => pool.ready();
 /** A request stalled on the pool: replace it so one stuck connection can never take pages down. */
