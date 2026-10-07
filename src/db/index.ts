@@ -13,6 +13,8 @@ const g = globalThis as unknown as { openprepPool?: ReturnType<typeof makePool> 
 const makePool = () => healthyPool(create, ({ client }) => client`select 1`, ({ client }) => client.end({ timeout: 0 }));
 const pool = g.openprepPool ??= makePool();
 export const ensureDatabase = () => pool.ready();
+/** A request stalled on the pool: replace it so one stuck connection can never take pages down. */
+export const recycleDatabase = () => pool.recycle();
 // Resolve methods against the current client after a failed liveness check replaces the pool.
 export const db = new Proxy({} as ReturnType<typeof create>["database"], {
   get(_target, key) {

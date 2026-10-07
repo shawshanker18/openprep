@@ -1,9 +1,24 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
+/** A page failure is usually a momentary connection hiccup, so try once more by itself (at most once every 30 s). */
+function useAutoRetryOnce(retry: () => void) {
+  useEffect(() => {
+    const key = "openprep:auto-retry";
+    try {
+      if (Date.now() - Number(sessionStorage.getItem(key) ?? 0) < 30_000) return;
+      sessionStorage.setItem(key, String(Date.now()));
+    } catch { return; }
+    const timer = setTimeout(retry, 600);
+    return () => clearTimeout(timer);
+  }, [retry]);
+}
+
 export default function AppError({ error, retry }: { error: Error & { digest?: string }; retry: () => void }) {
+  useAutoRetryOnce(retry);
   return (
     <section className="flex flex-col items-start gap-3 rounded-xl border p-5">
       <h1 className="text-xl font-semibold">Something went wrong</h1>

@@ -25,6 +25,15 @@ export function healthyPool<T>(create: () => T, probe: (pool: T) => PromiseLike<
   }
   return {
     get current() { return current; },
+    /** Throw away the pool right now (a request stalled on it). Anything still using it is cut off; new work gets a fresh one. */
+    recycle() {
+      const stale = current;
+      current = create();
+      checkedAt = 0;
+      pending = null;
+      void Promise.resolve(close(stale)).catch(() => {});
+      console.warn("Recycled the database pool after a stalled request");
+    },
     ready(): Promise<void> {
       if (pending) return pending;
       if (checkedAt && Date.now() - checkedAt < ttlMs) return Promise.resolve();

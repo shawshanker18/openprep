@@ -4,6 +4,7 @@ import { formatDate } from "@/lib/dates";
 import { MasteryBar } from "@/components/mastery-bar";
 import { publicStatsForPage } from "@/server/public-stats";
 import { requireUser } from "@/server/auth";
+import { guarded } from "@/server/guard";
 import { getProgress, getSkillSummary } from "@/server/analytics";
 
 export const metadata = { title: "Progress" };
@@ -58,7 +59,7 @@ function Bars({ rows }: { rows: { label: string; value: number; suffix?: string 
 
 export default async function ProgressPage() {
   const { userId, profile } = await requireUser();
-  const [p, { skills }, usage] = await Promise.all([getProgress(userId, profile.timezone), getSkillSummary(userId), publicStatsForPage()]);
+  const [p, { skills }, usage] = await guarded(Promise.all([getProgress(userId, profile.timezone), getSkillSummary(userId), publicStatsForPage()]));
   const points: Point[] = [
     ...p.snapshots.map((s) => ({ t: s.takenAt.getTime(), total: s.rw + s.math, half: s.halfWidth, source: s.source })),
     ...p.official.map((o) => ({ t: new Date(o.takenOn).getTime(), total: o.math + o.rw, half: 0, source: "official" })),
