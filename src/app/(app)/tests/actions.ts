@@ -5,6 +5,7 @@ import { requireUser } from '@/server/auth';
 import { startTest } from '@/server/tests';
 const Start = z.discriminatedUnion('kind', [
   z.object({kind:z.literal('full')}),
+  z.object({kind:z.literal('section'),section:z.enum(['math','rw'])}),
   z.object({kind:z.literal('module'),section:z.enum(['math','rw'])}),
 ]);
 export async function startTestAction(form: FormData) {

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DesmosCalculator } from "@/components/desmos-panel";
+import { LessonStudyView } from "@/components/lesson-study-view";
 import { Markdown } from "@/components/markdown";
 import { ABOUT_SAT_MD } from "@/content/about-sat";
 import { requireUser } from "@/server/auth";
@@ -52,12 +53,7 @@ export default async function StepPage({ params }: PageProps<"/start/[step]">) {
       {step.kind === "skill" && (lesson ? (
         <article className="flex max-w-3xl flex-col gap-6">
           {lesson.minutes && <p className="text-sm text-muted-foreground">About {lesson.minutes} minutes</p>}
-          {lesson.sections.map((sec) => (
-            <section key={sec.heading} className="flex flex-col gap-2">
-              <h2 className="text-lg font-semibold">{sec.heading.replace(/\((easy|medium|hard)\)/gi, "")}</h2>
-              <Markdown className="text-[15px]">{sec.md}</Markdown>
-            </section>
-          ))}
+          <LessonStudyView sections={lesson.sections} skillId={step.ref} curriculum={profile.curriculum} grade={profile.grade} subjects={profile.subjects} />
           <section className="flex flex-col gap-3 rounded-xl border p-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="font-medium">Try it yourself</p>

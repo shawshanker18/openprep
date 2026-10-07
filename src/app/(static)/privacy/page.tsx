@@ -3,7 +3,7 @@ export const metadata={title:'Privacy Policy'};
 export default function Privacy(){
  return <>
   <h1>Privacy Policy</h1>
-  <p className="text-sm text-muted-foreground">Updated 6 October 2026</p>
+  <p className="text-sm text-muted-foreground">Updated 7 October 2026</p>
   <p>OpenPrep uses the information below to provide SAT practice, save your progress, and keep the service safe.</p>
   <h2>What we collect and why</h2>
   <ul>
@@ -20,6 +20,8 @@ export default function Privacy(){
   <p>When you use the tutor, your submitted messages and relevant question context are sent to the configured AI provider to generate a reply. Google sign-in and the Desmos calculator use those providers&apos; services and privacy policies.</p>
   <h2>Cookies and local storage</h2>
   <p>OpenPrep uses sign-in cookies, a security device cookie, and local storage for preferences, sign-in handoff, and unsent answers. These support account access, safety, and saved progress. We do not currently use Google Analytics, Meta Pixel, or advertising trackers, and we do not sell your personal data.</p>
+  <h2>Guest practice</h2>
+  <p>Guest practice does not create an account. Sample-question answers are stored in your browser and are not added to student learning records. Clear this site’s browser data to remove them. Network and security information may still be processed when you visit the site.</p>
   <h2>Delete your data</h2>
   <p>Go to <Link href="/settings" className="underline">Settings</Link> → Delete my account, type DELETE, and confirm. This removes your sign-in account and linked learning records from the active database. Turning reminders off on a device removes its push subscription. You can clear site data in your browser to remove local drafts and preferences.</p>
   <p>Feedback and security reports may remain after account deletion, with the account link removed where applicable. Limited security records and provider backups may remain under their retention schedules. To request removal of a report or ask a privacy question, use the Feedback link at the bottom of the website and identify the relevant report.</p>

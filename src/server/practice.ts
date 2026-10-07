@@ -198,7 +198,7 @@ export async function resumeQuestion(userId:string,questionId:string,timing:Timi
 }
 
 export async function submitAnswer(userId: string, input: {
-  questionId: string; response: string | null; timeMs: number; confidence: 1 | 2 | 3;
+  questionId: string; response: string | null; timeMs: number; confidence: 1 | 2 | 3 | null;
 }, transaction?: Tx, session?: { id: string; servedAt: Date }) {
   const database=transaction??db;
   const [[q], live, [served]] = await Promise.all([

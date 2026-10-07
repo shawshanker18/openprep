@@ -10,9 +10,9 @@ import { ReferenceSheet } from "@/components/reference-sheet";
 import { DesmosToggle } from "@/components/desmos-panel";
 import { cn, isTyping } from "@/lib/utils";
 import type { PublicQuestion } from "@/server/questions";
-import { abandon, reportFocusLoss, saveResponse, startModule, submitModule } from "./actions";
+import { abandon, reportFocusLoss, saveResponse, startModule } from "./actions";
 import { EndTest, useTestLockdown } from "./lockdown";
-import { withinSubmissionTimeout } from "@/lib/test-submit";
+import { sendModuleSubmission } from "@/lib/submit-module";
 import { readDraft, writeDraft } from "@/lib/answer-drafts";
 
 type Item = { position: number; question: PublicQuestion; response: string | null; flagged: boolean };
@@ -161,10 +161,10 @@ export function TestRunner({ userId, sessionId, module: m, items: initial, serve
       if(auto){autoRetryAt.current=Date.now()+10_000;setSaving('error');} else toast.error(msg);
     };
     setSubmitError(null);
-    const drafts=[...unsaved.current].map(([position,it])=>({position,response:it.response,flagged:it.flagged,timeMsDelta:Math.round(acc.current[position]??0)}));
+    const drafts=items.map((it,position)=>({position,response:it.response,flagged:it.flagged,timeMsDelta:Math.round(acc.current[position]??0)}));
     persist();
     try {
-      const result=await withinSubmissionTimeout(submitModule({moduleId:m.id,drafts}));
+      const result=await sendModuleSubmission(m.id,drafts);
       if(!result.ok) return fail(result.error);
       unsaved.current.clear();writeDraft(draftKey,[]);setSaving('saved');
       setSubmitting(false);submitted.current=false;
@@ -209,7 +209,7 @@ export function TestRunner({ userId, sessionId, module: m, items: initial, serve
   if (screen === "break") return <Break onDone={() => setScreen("intro")} />;
   if (screen === "intro") {
     return (
-      <div className="mx-auto flex max-w-lg flex-col gap-4 py-16 text-center">
+      <div className="mx-auto flex max-w-lg flex-col gap-4 px-4 py-8 text-center">
         <h1 className="text-2xl font-semibold">{title}</h1>
         <p className="text-muted-foreground">
           {items.length} questions{m.timeLimitS ? ` · ${Math.round(m.timeLimitS / 60)} minutes` : " · untimed"}. You can move between questions and flag
@@ -272,10 +272,10 @@ export function TestRunner({ userId, sessionId, module: m, items: initial, serve
       </div>
 
       {screen === "question" && (
-        <footer className="sticky bottom-0 flex items-center justify-between gap-2 border-t bg-background px-4 py-2">
+        <footer className="sticky bottom-0 flex flex-wrap items-center justify-between gap-2 border-t bg-background px-4 py-2 pb-[max(.5rem,env(safe-area-inset-bottom))]">
           <details className="relative">
             <summary className="cursor-pointer list-none rounded-md border px-3 py-1.5 text-sm">Question {pos + 1} of {items.length} ▾</summary>
-            <div className="absolute bottom-10 left-0 w-72 rounded-lg border bg-background p-3 shadow-lg">
+            <div className="absolute bottom-10 left-0 max-h-[min(60dvh,24rem)] w-[min(18rem,calc(100vw-2rem))] overflow-y-auto rounded-lg border bg-background p-3 shadow-lg">
               <Navigator items={items} current={pos} onPick={go} />
               <Button variant="link" size="sm" onClick={() => go("review")}>Go to review page</Button>
             </div>

@@ -18,8 +18,8 @@ export function QuestionView({ question: q, value, onChange, disabled, correct, 
   correct?: string | null; // choice letter, once revealed (MCQ only)
 }) {
   return (
-    <div className={cn("question-content grid w-full min-w-0 gap-6", !compact && "md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-10")}>
-      <section aria-label="Question" className={cn("flex min-w-0 flex-col gap-4", !compact && "md:border-r md:pr-8")}>
+    <div className={cn("question-content grid w-full min-w-0 gap-6", !compact && "lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-10")}>
+      <section aria-label="Question" className={cn("flex min-w-0 flex-col gap-4", !compact && "lg:border-r lg:pr-8")}>
         {showMetadata && <div aria-label="Question details" className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
           <span>Domain: {DOMAINS[q.domain as DomainId]?.name ?? q.domain}</span>
           <span>Skill: {SKILL_BY_ID[q.skillId]?.name ?? q.skillId}</span>

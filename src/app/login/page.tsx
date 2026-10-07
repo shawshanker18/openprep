@@ -35,14 +35,14 @@ function Scene() {
     <svg viewBox="0 0 560 720" preserveAspectRatio="xMidYMid slice" className="size-full" aria-hidden>
       <defs>
         <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#1e1b4b" /><stop offset="1" stopColor="#4338ca" /></linearGradient>
-        <linearGradient id="hill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#0f766e" /><stop offset="1" stopColor="#134e4a" /></linearGradient>
+        <linearGradient id="hill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#334155" /><stop offset="1" stopColor="#0f172a" /></linearGradient>
       </defs>
       <rect width="560" height="720" fill="url(#sky)" />
       {stars.map(([x, y], i) => <circle key={i} cx={x} cy={y} r={i % 3 ? 1.6 : 2.4} fill="#e0e7ff" opacity={0.85} />)}
       <circle cx="455" cy="120" r="34" fill="#fde68a" opacity="0.9" />
       <path d="M0 470 L120 330 L210 410 L330 250 L430 360 L560 220 V720 H0 Z" fill="#3730a3" />
       <path d="M0 560 L150 420 L260 500 L380 380 L560 480 V720 H0 Z" fill="url(#hill)" />
-      <path d="M0 650 C120 600 220 640 330 600 S500 560 560 590 V720 H0 Z" fill="#115e59" />
+      <path d="M0 650 C120 600 220 640 330 600 S500 560 560 590 V720 H0 Z" fill="#1e293b" />
       {/* trail */}
       <path d="M70 700 C150 640 120 600 210 560 S320 520 300 460 S360 380 330 250" fill="none" stroke="#f8fafc" strokeWidth="5" strokeDasharray="2 14" strokeLinecap="round" opacity="0.9" />
       {[[210, 560], [300, 460]].map(([x, y]) => <circle key={x} cx={x} cy={y} r="9" fill="#fbbf24" stroke="#fff" strokeWidth="3" />)}
@@ -62,15 +62,15 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
     <main className="grid min-w-0 flex-1 lg:grid-cols-2 [@media(max-height:600px)]:grid-cols-1">
       <div className="flex min-w-0 flex-col items-center justify-start px-4 py-6 sm:px-6 lg:justify-center [@media(min-height:601px)_and_(max-height:800px)]:py-4 [@media(max-height:600px)]:py-2">
         <div className="flex w-full max-w-[400px] flex-col gap-5 [@media(min-height:601px)_and_(max-height:800px)]:gap-3 [@media(max-height:600px)]:gap-2">
-          <Link href="/" className="flex items-center justify-center gap-2.5">
+          <div className="flex items-center justify-between gap-2"><Link href="/" className="flex min-w-0 items-center gap-2">
             <Mark className="size-9 [@media(max-height:800px)]:size-8" />
-            <span className="text-2xl font-semibold tracking-tight">OpenPrep</span>
-          </Link>
+            <span className="text-xl font-semibold tracking-tight">OpenPrep</span>
+          </Link><Link href="/guest" className="shrink-0 rounded-lg border px-2 py-2 text-xs font-medium hover:bg-muted">Continue as guest</Link></div>
           <div className="flex flex-col gap-1 text-center">
             <h1 className="text-xl font-medium">Sign in or create your free account</h1>
             <p className="text-sm text-muted-foreground">SAT questions, lessons, and practice. Free to use.</p>
           </div>
-          {error && <p role="alert" className="rounded-xl border border-destructive p-3 text-sm text-destructive">That sign-in link didn&apos;t work or has expired. Request a new one below.</p>}
+          {error && <p role="alert" className="rounded-xl border border-destructive p-3 text-sm text-destructive">{error === "google" ? "Google sign-in could not finish. Use the same Google email you entered, or request an email sign-in link below." : "That sign-in link didn’t work or has expired. Request a new one below."}</p>}
           <LoginForm google={p.google} inApp={inApp} />
         </div>
       </div>

@@ -1,5 +1,6 @@
 "use server";
 
+import { submitOwnedModule } from "@/server/test-submission";
 import { DeliveryBlocked } from "@/server/delivery-policy";
 import { limitPractice } from "@/server/ratelimit";
 import { redirect } from "next/navigation";
@@ -13,7 +14,7 @@ import { requireUser } from "@/server/auth";
 import { internalId } from "@/server/questions";
 import { appKeyHash, mayContinue } from "@/server/lockdown";
 import { answerDiagnostic as answer } from "@/server/diagnostic";
-import { abandonTest, markLocked, recordFocusLoss, saveResponse as save, startModule as start, submitModule as submit } from "@/server/tests";
+import { abandonTest, markLocked, recordFocusLoss, saveResponse as save, startModule as start } from "@/server/tests";
 
 /** A test locked in one app install can't be started, answered or submitted from anywhere else. */
 async function lockedOut(userId: string, where: { moduleId: string } | { sessionId: string }) {
@@ -65,19 +66,9 @@ export async function saveResponse(input: z.input<typeof Save>) {
   return save(userId, p.data);
 }
 
-const Submit = z.object({moduleId:z.uuid(),drafts:z.array(Save.omit({moduleId:true})).max(100).default([])});
-export async function submitModule(input: z.input<typeof Submit>) {
+export async function submitModule(input: unknown) {
   const {userId}=await requireUser();
-  const parsed=Submit.safeParse(input);
-  if(!parsed.success) return {ok:false as const,error:"Invalid module submission."};
-  const {moduleId,drafts}=parsed.data;
-  if(await lockedOut(userId,{moduleId})) return {ok:false as const,error:LOCKED};
-  const limited=await limitPractice(userId,"request");
-  if(limited) return {ok:false as const,error:limited};
-  try {
-    const result=await submit(userId,moduleId,drafts);
-    return result ? {ok:true as const,...result} : {ok:false as const,error:"This module could not be submitted. Reload to check its saved status and try again."};
-  } catch(e) {if(e instanceof DeliveryBlocked)return {ok:false as const,error:e.message};throw e;}
+  return submitOwnedModule(userId,input);
 }
 
 /** End a diagnostic early: answers so far are kept, the student carries on (as if skipped) and can retake it later. */

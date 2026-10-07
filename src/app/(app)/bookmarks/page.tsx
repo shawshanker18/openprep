@@ -35,7 +35,7 @@ export default async function BookmarksPage({searchParams}:PageProps<"/bookmarks
   const more=rows.length>10;
   const shown=rows.slice(0,10).map(r=>{
     const q={id:r.id,stemMd:r.stem,passageMd:r.passage,choices:r.choices};
-    return {...r,stem:questionMarkdown(q,r.stem,userId),passage:r.passage?questionMarkdown(q,r.passage,userId):null};
+    return {...r,stem:questionMarkdown(q,r.stem,userId),passage:r.passage?questionMarkdown(q,r.passage,userId):null, choices:r.choices?.map(c=>({...c,md:questionMarkdown(q,c.md,userId)}))??null};
   });
 
   return (
@@ -47,8 +47,9 @@ export default async function BookmarksPage({searchParams}:PageProps<"/bookmarks
         <ul className="flex flex-col gap-3">
           {shown.map((r) => (
             <li key={publicId(r.id, userId)} className="flex flex-col gap-2 rounded-lg border p-4 text-sm">
-              {r.passage && <Markdown className="line-clamp-3 text-muted-foreground">{r.passage}</Markdown>}
+              {r.passage && <Markdown className="text-muted-foreground">{r.passage}</Markdown>}
               <Markdown>{r.stem}</Markdown>
+              {r.choices?.length ? <ol aria-label="Answer choices" className="flex flex-col gap-2">{r.choices.map(c=><li key={c.id} className="flex min-w-0 items-start gap-3 rounded-lg border p-3"><span className="font-semibold">{c.id}</span><Markdown className="min-w-0 flex-1">{c.md}</Markdown></li>)}</ol> : <p className="text-muted-foreground">Student-produced response</p>}
               <BookmarkNote questionId={publicId(r.id, userId)} note={r.note} />
               {r.answered && (
                 <details>

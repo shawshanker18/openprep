@@ -2,6 +2,7 @@ import Link from "next/link";
 import { DOMAINS, type DomainId } from "@/content/taxonomy";
 import { formatDate } from "@/lib/dates";
 import { MasteryBar } from "@/components/mastery-bar";
+import { publicStats } from "@/server/public-stats";
 import { requireUser } from "@/server/auth";
 import { getProgress, getSkillSummary } from "@/server/analytics";
 
@@ -54,11 +55,10 @@ function Bars({ rows }: { rows: { label: string; value: number; suffix?: string 
   );
 }
 
-const CONF = ["", "Guessed", "Unsure", "Sure"];
 
 export default async function ProgressPage() {
   const { userId, profile } = await requireUser();
-  const [p, { skills }] = await Promise.all([getProgress(userId, profile.timezone), getSkillSummary(userId)]);
+  const [p, { skills }, usage] = await Promise.all([getProgress(userId, profile.timezone), getSkillSummary(userId), publicStats().catch(()=>null)]);
   const points: Point[] = [
     ...p.snapshots.map((s) => ({ t: s.takenAt.getTime(), total: s.rw + s.math, half: s.halfWidth, source: s.source })),
     ...p.official.map((o) => ({ t: new Date(o.takenOn).getTime(), total: o.math + o.rw, half: 0, source: "official" })),
@@ -67,6 +67,7 @@ export default async function ProgressPage() {
   return (
     <div className="flex flex-col gap-10">
       <h1 className="text-2xl font-semibold">Progress</h1>
+      {usage && <section className="flex flex-col gap-3"><h2 className="font-medium">OpenPrep usage</h2><dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">{[[usage.users,"Registered users"],[usage.active,"Active in the last 30 days"],[usage.answered,"Questions answered"],[usage.tests,"Tests completed"]].map(([n,label])=><div key={String(label)} className="min-w-0 rounded-xl border p-3"><dt className="text-xs text-muted-foreground">{label}</dt><dd className="text-xl font-semibold tabular-nums">{Number(n).toLocaleString()}</dd></div>)}</dl><p className="text-xs text-muted-foreground">Aggregate counts only. Other students’ scores and progress are private.</p></section>}
 
       <section className="flex flex-col gap-3">
         <h2 className="font-medium">Estimated score</h2>
@@ -74,9 +75,11 @@ export default async function ProgressPage() {
         <p className="text-xs text-muted-foreground">The line is your estimated score and the shaded band is how sure we are. Circles are past estimates, blue diamonds are practice tests, and black diamonds are official SAT scores.</p>
       </section>
 
-      {p.official.length > 0 && (
+      {(
         <section className="flex flex-col gap-2">
-          <h2 className="font-medium">Official scores</h2>
+          <h2 className="font-medium">Official SAT scores</h2>
+          <Link href="/settings#scores" className="self-start underline">Add your official SAT result</Link>
+          <p className="text-xs text-muted-foreground">Your scores stay private to your account.</p>
           <ul className="text-sm tabular-nums">{p.official.map((o) => <li key={o.id}>{o.takenOn}: {o.math + o.rw} (Math {o.math}, R&amp;W {o.rw})</li>)}</ul>
           {p.superscore && <p className="text-sm">Superscore: <b>{p.superscore.total}</b> (Math {p.superscore.math} + R&amp;W {p.superscore.rw})</p>}
         </section>
@@ -96,13 +99,9 @@ export default async function ProgressPage() {
         })}
       </section>
 
-      <div className="grid gap-10 lg:grid-cols-2">
+      <div className="flex flex-col gap-6">
         <section className="flex flex-col gap-3"><h2 className="font-medium">Review your work</h2><Link className="underline" href="/mistakes">Recent mistakes</Link><Link className="underline" href="/skills">Skills</Link><Link className="underline" href="/tests#history">Test history</Link><Link className="underline" href="/practice/sessions">Practice history</Link><Link className="underline" href="/bookmarks">Saved questions</Link></section>
-        <section className="flex flex-col gap-3">
-          <h2 className="font-medium">How sure vs. how right · 30 days</h2>
-          {p.calibration.length ? <Bars rows={p.calibration.sort((a, b) => a.confidence - b.confidence).map((c) => ({ label: `${CONF[c.confidence]} (${c.n})`, value: c.accuracy, suffix: "%" }))} />
-            : <p className="text-sm text-muted-foreground">Answer some practice questions to see this.</p>}
-        </section>
+
       </div>
 
       <section className="flex flex-col gap-3">
