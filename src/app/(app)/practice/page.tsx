@@ -10,7 +10,7 @@ import { createPracticeSession, getPracticeSession, listPracticeSessions } from 
 import { z } from "zod";
 import { PracticeRunner } from "./practice-runner";
 
-export const metadata = { title: "Practice" };
+export const metadata = { title: "Adaptive Practice" };
 
 const list = (v: string | string[] | undefined) => [v ?? []].flat().flatMap((x) => x.split(",")).filter(Boolean);
 
@@ -19,9 +19,9 @@ async function loadPage({ searchParams }: PageProps<"/practice">) {
   const { userId, profile } = await requireUser();
   if (Object.keys(sp).length === 0) {
     const saved = (await listPracticeSessions(userId)).find(s => s.status === 'active');
-    return <div className="flex flex-col gap-6"><h1 className="text-2xl font-semibold">Practice</h1>
+    return <div className="flex flex-col gap-6"><h1 className="text-2xl font-semibold">Adaptive Practice</h1>
       {saved && <section className="rounded-xl border p-5"><h2 className="font-medium">Continue practicing</h2><p className="mb-3 text-sm">{saved.title}</p><Button render={<Link href={`/practice?session=${saved.id}`} />}>Resume session</Button></section>}
-      <section className="rounded-xl border p-5"><h2 className="font-medium">Recommended Practice</h2><p className="my-3 text-sm text-muted-foreground">Questions chosen for your skills. Correct answers move the next question up a SAT difficulty level; incorrect answers move it down. At Easy or Hard, the difficulty stays within the SAT range.</p><Button render={<Link prefetch={false} href="/practice?recommended=1" />}>Start recommended practice</Button></section>
+      <section className="rounded-xl border bg-muted/40 p-5"><p className="mb-2 text-xs font-medium text-muted-foreground">YOUR LEVEL · YOUR PROGRESS</p><h2 className="text-lg font-semibold">Questions that adapt to you</h2><p className="my-3 text-sm text-muted-foreground">Practice that adapts to your answers and skill progress. Correct answers raise the next question’s difficulty; incorrect answers lower it, within the SAT’s Easy–Hard range. Review each explanation, then keep building.</p><Button render={<Link prefetch={false} href="/practice?adaptive=1" />}>Start adaptive practice</Button></section>
       <section><h2 className="font-medium">Choose your own practice</h2><p className="my-2 text-sm text-muted-foreground">Select skills, difficulty and length in the Question Bank.</p><Link className="underline" href="/question-bank">Open Question Bank</Link></section>
       <div className="flex gap-4 text-sm"><Link className="underline" href="/practice/sessions">Saved sessions</Link><Link className="underline" href="/start">Start from scratch</Link><Link className="underline" href="/desmos">Desmos</Link></div>
     </div>;
@@ -72,7 +72,7 @@ async function loadPage({ searchParams }: PageProps<"/practice">) {
   }
 
   const plain = difficulty === "mixed" ? undefined : difficulty;
-  const title = mode === "review" ? (skillId ? `Review · ${SKILL_BY_ID[skillId]!.name}` : "Review") : skillId ? SKILL_BY_ID[skillId]!.name : "Recommended practice";
+  const title = mode === "review" ? (skillId ? `Review · ${SKILL_BY_ID[skillId]!.name}` : "Review") : skillId ? SKILL_BY_ID[skillId]!.name : "Adaptive Practice";
   const sessionId=await createPracticeSession(userId, {mode,skillId,difficulty:plain},title);
   redirect(`/practice?session=${sessionId}${blockQuery}`);
 }
