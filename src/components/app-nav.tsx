@@ -33,7 +33,7 @@ export const NAV_GROUPS = [
   {
     label: "Practice",
     items: [
-      { href: "/practice", label: "Recommended Practice", icon: Sparkles },
+      { href: "/practice", label: "Adaptive Practice", icon: Sparkles },
       { href: "/question-bank", label: "Question bank", icon: Library },
       { href: "/tests", label: "Practice tests", icon: ClipboardList },
     ],
