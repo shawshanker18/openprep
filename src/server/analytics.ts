@@ -2,7 +2,7 @@
 import "server-only";
 import { cache } from "react";
 import { skillStatesOf } from "./daily";
-import { and, desc, eq, gte, isNotNull, sql } from "drizzle-orm";
+import { and, desc, eq, gte, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { attempts, lessonProgress, questions, reviewItems, satAttempts, scoreSnapshots } from "@/db/schema";
 import { SKILLS, SKILL_BY_ID } from "@/content/taxonomy";
@@ -73,13 +73,9 @@ export async function getSkillDetail(userId: string, skillId: string) {
 export async function getProgress(userId: string, timezone: string) {
   const since = new Date(Date.now() - 30 * 86_400_000);
   const mine30 = and(eq(attempts.userId, userId), gte(attempts.createdAt, since));
-  const [snapshots, official, byType, byConfidence, daily] = await Promise.all([
+  const [snapshots, official, daily] = await Promise.all([
     db.select().from(scoreSnapshots).where(eq(scoreSnapshots.userId, userId)).orderBy(scoreSnapshots.takenAt),
     db.select().from(satAttempts).where(eq(satAttempts.userId, userId)).orderBy(satAttempts.takenOn),
-    db.select({ type: attempts.mistakeType, n: sql<number>`count(*)::int` }).from(attempts)
-      .where(and(mine30, eq(attempts.correct, false))).groupBy(attempts.mistakeType),
-    db.select({ confidence: attempts.confidence, n: sql<number>`count(*)::int`, c: sql<number>`count(*) filter (where ${attempts.correct})::int` })
-      .from(attempts).where(and(mine30, isNotNull(attempts.confidence))).groupBy(attempts.confidence),
     db.select({
       day: sql<string>`to_char(${attempts.createdAt} at time zone ${timezone}, 'YYYY-MM-DD')`,
       n: sql<number>`count(*)::int`, ms: sql<number>`sum(${attempts.timeMs})::bigint`,
@@ -88,8 +84,6 @@ export async function getProgress(userId: string, timezone: string) {
   return {
     snapshots, official,
     superscore: superscore(official),
-    mistakesByType: byType.filter((r) => r.type),
-    calibration: byConfidence.map((r) => ({ confidence: r.confidence!, n: r.n, accuracy: Math.round((100 * r.c) / r.n) })),
     daily: daily.map((d) => ({ day: d.day, n: d.n, minutes: Math.round(Number(d.ms) / 60000) })),
   };
 }
