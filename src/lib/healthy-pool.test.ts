@@ -47,3 +47,20 @@ it("recycle replaces a stalled pool at once, closes the old one and probes the n
   await pool.ready(); // the cached "healthy" verdict belonged to the old pool
   expect(probe).toHaveBeenCalledTimes(2);
 });
+it("replaces a pool that sat unused past the idle limit at once, without waiting for a probe to time out", async () => {
+  vi.useFakeTimers();
+  let id = 0;
+  const close = vi.fn(async () => {});
+  const probe = vi.fn((p: { id: number }) => (p.id === 1 && probe.mock.calls.length > 1 ? new Promise(() => {}) : Promise.resolve()));
+  const pool = healthyPool(() => ({ id: ++id }), probe, close, 3000, 5000, 6000);
+  await pool.ready();
+  await vi.advanceTimersByTimeAsync(3000);
+  await pool.ready();
+  expect(id).toBe(1); // used again inside the idle window: same pool
+  await vi.advanceTimersByTimeAsync(7000);
+  await pool.ready(); // resolves immediately; a hanging probe on the old pool would have taken 3 s
+  expect(id).toBe(2);
+  expect(close).toHaveBeenCalledExactlyOnceWith({ id: 1 });
+  expect(pool.current.id).toBe(2);
+  expect(probe).toHaveBeenCalledTimes(1); // the replacement was not probed, and the stale pool never was
+});

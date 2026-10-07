@@ -45,7 +45,7 @@ export function DiagnosticRunner({ sessionId, initial, initialIndex }: {
         <div className="h-full bg-primary transition-all" style={{ width: `${(100 * index) / DIAGNOSTIC_LENGTH}%` }} />
       </div>
       {q.section === "math" && <DesmosToggle />}
-      <QuestionView key={q.id} question={q} value={value} onChange={setValue} disabled={pending} showMetadata={false} />
+      <QuestionView key={q.id} question={q} value={value} onChange={setValue} disabled={pending} showMetadata={false} large />
       <div className="flex flex-col gap-2">
         <Button size="lg" className="self-start" disabled={pending || value===null} onClick={()=>submit(value)}>{pending ? "Saving…" : "Next question"}</Button>
       </div>
