@@ -25,13 +25,13 @@ beforeAll(async () => {
     for (const stmt of fs.readFileSync(path.join(dir, file), "utf8").split("--> statement-breakpoint")) await pg.exec(stmt);
   await db.insert(schema.profiles).values([{ id: USER }, { id: OTHER }]);
   await db.insert(schema.skillState).values(SKILLS.map((s) => ({ userId: USER, skillId: s.id })));
-  // 12 questions per math skill × difficulty mix → plenty for two math modules. Correct answer is always "A".
+  // 24 questions per math skill, half in each pool (12 test + 12 study), difficulty mix 1-3. Correct answer is always "A".
   const qs: schema.Question[] = [];
   for (const s of SKILLS.filter((k) => k.section === "math"))
-    for (let i = 0; i < 12; i++)
+    for (let i = 0; i < 24; i++)
       qs.push({ id: `${s.id}-${String(i).padStart(4, "0")}`, skillId: s.id, section: "math", domain: s.domain, difficulty: (i % 3) + 1,
         type: "mcq", passageMd: null, stemMd: "s", choices: [], answer: { choice: "A" }, explanationMd: "e", choiceRationales: null,
-        fastMethodMd: null, desmos: null, tags: [], status: "active", version: 1 });
+        fastMethodMd: null, desmos: null, tags: [], status: "active", version: 1, pool: i % 2 ? "test" : "study" });
   await db.insert(schema.questions).values(qs);
 });
 
@@ -138,7 +138,7 @@ it("full test on a thin bank: an empty routed R&W module is skipped and Math sti
   await db.insert(schema.questions).values(Array.from({ length: 5 }, (_, i) => ({
     id: `rw-ei-transitions-${String(i).padStart(4, "0")}`, skillId: "rw-ei-transitions", section: "rw", domain: "rw-ei",
     difficulty: (i % 3) + 1, type: "mcq", passageMd: "p", stemMd: "s", choices: [], answer: { choice: "A" }, explanationMd: "e",
-    choiceRationales: null, fastMethodMd: null, desmos: null, tags: [], status: "active", version: 1,
+    choiceRationales: null, fastMethodMd: null, desmos: null, tags: [], status: "active", version: 1, pool: "test" as const,
   })));
   const r = await T.startTest(USER, { kind: "full" });
   if (!r.ok) throw new Error(r.error);
@@ -182,9 +182,9 @@ it("a question in a live test can't be answered (and revealed) through practice"
   const r = await T.startTest(USER, { kind: "mini", skillId: SKILLS.find((s) => s.section === "math")!.id });
   if (!r.ok) throw new Error(r.error);
   const [m] = await modules(r.id);
-  // Use a non-reserved item so this checks active-test exclusion independently of the fresh test reserve.
+  // A mini test is a skill drill, so its items are study-pool questions that practice could otherwise serve.
   const [first]=await db.select({questionId:schema.testItems.questionId}).from(schema.testItems)
-    .where(and(eq(schema.testItems.moduleId,m!.id),sql`mod(abs(hashtext(${schema.testItems.questionId})::bigint),5)<>0`)).limit(1);
+    .where(eq(schema.testItems.moduleId,m!.id)).limit(1);
   expect(first).toBeDefined();
   expect(await T.inRunningTest(USER, first!.questionId)).toBe(true);
   await db.update(schema.questionServes).set({servedAt:new Date(Date.now()-6000)});

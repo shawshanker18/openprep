@@ -63,7 +63,10 @@ export const questions = pgTable("questions", {
   tags: jsonb("tags").$type<string[]>().notNull().default([]),
   status: text("status").notNull().default("active"), // active | retired
   version: integer("version").notNull().default(1),
+  // study = practice and the question bank; test = mock tests and the diagnostic only (see docs/QUESTION_POOLS.md).
+  pool: text("pool").notNull().default("study"),
 }, (t) => [
+  check("questions_pool_check", sql`${t.pool} in ('study', 'test')`),
   index("q_skill_diff").on(t.skillId, t.difficulty, t.status),
   index("questions_active_skill_difficulty_id_idx").on(t.skillId, t.difficulty, t.id).where(sql`${t.status} = 'active'`),
 ]);

@@ -1,4 +1,4 @@
-import { availableQuestion, reservedForTests } from "./question-availability";
+import { availableQuestion, availableTestQuestion, poolForTestKind, type QuestionPool } from "./question-availability";
 // Tests: assembly, module lifecycle, server-authoritative timing, scoring at completion (spec 03 §7–8, 04 §5).
 // Mastery is only updated when the whole session completes; abandoned sessions change nothing.
 import "server-only";
@@ -34,15 +34,15 @@ export function serverCappedTime(clientMs: number, servedAt: Date | null, now: D
   return Math.max(1000, Math.min(clientMs, Math.max(1000, serverMs)));
 }
 
-/** Active questions matching a filter, with when this user last saw each. */
-async function pool(tx: Tx, userId: string, where: ReturnType<typeof and>) {
+/** Active questions matching a filter from one pool, with when this user last saw each. Mock tests read the test pool, skill drills the study pool. */
+async function pool(tx: Tx, userId: string, where: ReturnType<typeof and>, which: QuestionPool) {
   const rows = await tx.select({ q: {
     id: questions.id, skillId: questions.skillId, domain: questions.domain,
     difficulty: questions.difficulty, type: questions.type, tags: questions.tags,
-  }, reserved: reservedForTests().mapWith(Boolean), seen: sql<Date | null>`max(${attempts.createdAt})` }).from(questions)
+  }, seen: sql<Date | null>`max(${attempts.createdAt})` }).from(questions)
     .leftJoin(attempts, and(eq(attempts.questionId, questions.id), eq(attempts.userId, userId)))
-    .where(and(eq(questions.status, "active"), availableQuestion(userId,undefined,true), where)).groupBy(questions.id);
-  return rows.map((r) => ({ ...r.q, reserved:r.reserved, difficulty: r.q.difficulty as Difficulty, type: r.q.type as "mcq" | "spr", lastSeenAt: r.seen ? new Date(r.seen) : null }));
+    .where(and(eq(questions.status, "active"), which === "test" ? availableTestQuestion(userId) : availableQuestion(userId), where)).groupBy(questions.id);
+  return rows.map((r) => ({ ...r.q, reserved: which === "test", difficulty: r.q.difficulty as Difficulty, type: r.q.type as "mcq" | "spr", lastSeenAt: r.seen ? new Date(r.seen) : null }));
 }
 
 async function usedIds(tx: Tx, sessionId: string) {
@@ -67,7 +67,8 @@ async function skillSetModule(tx: Tx, userId: string, sessionId: string, idx: nu
   const split = largestRemainder(count, skillIds.map(() => 1));
   const picked: PoolQ[] = [];
   // Load the selected skills together instead of repeating the same join per skill.
-  const rows = skillIds.length ? await pool(tx, userId, inArray(questions.skillId, skillIds)) : [];
+  // Mini, weakness and custom tests are skill drills: they study from the study pool and leave the mock-test pool untouched.
+  const rows = skillIds.length ? await pool(tx, userId, inArray(questions.skillId, skillIds), "study") : [];
   const bySkill = new Map<string, typeof rows>();
   for (const question of rows) {
     const group = bySkill.get(question.skillId);
@@ -116,7 +117,7 @@ export async function startTest(userId: string, input: {
     if (input.kind === "full" || input.kind === "section" || input.kind === "module") {
       const sec = sections[0] ?? "rw";
       const bp = moduleBlueprint(sec, "base", timed);
-      await insertModule(tx, id, 0, sec, "base", bp.timeLimitS, assembleModule(bp, await pool(tx, userId, eq(questions.section, sec)), new Set(), Math.random));
+      await insertModule(tx, id, 0, sec, "base", bp.timeLimitS, assembleModule(bp, await pool(tx, userId, eq(questions.section, sec), poolForTestKind(input.kind)), new Set(), Math.random));
     } else if (input.kind === "mini") {
       const skill = SKILL_BY_ID[input.skillId ?? ""];
       if (!skill) throw new Error("mini test needs a skill");
@@ -184,7 +185,7 @@ async function submitModuleTx(tx: Tx, userId: string, sessionId: string, moduleI
   if (cfg.adaptive && si >= 0 && si + 1 < cfg.sections.length) next.push({ section: cfg.sections[si + 1]!, route: "base" });
   for (const n of next) {
     const bp = moduleBlueprint(n.section, n.route, cfg.timed);
-    const qs = assembleModule(bp, await pool(tx, userId, eq(questions.section, n.section)), await usedIds(tx, sessionId), Math.random);
+    const qs = assembleModule(bp, await pool(tx, userId, eq(questions.section, n.section), poolForTestKind(s.kind)), await usedIds(tx, sessionId), Math.random);
     if (qs.length) { await insertModule(tx, sessionId, m.idx + 1, n.section, n.route, bp.timeLimitS, qs); return; }
   }
   await finishSession(tx, userId, s, now);

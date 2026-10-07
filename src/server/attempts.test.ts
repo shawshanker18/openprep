@@ -18,7 +18,7 @@ const now = new Date("2026-10-01T10:00:00Z");
 const q = (id: string, difficulty: number, answer: string): schema.Question => ({
   id, skillId: "m-adv-nonlin-eq", section: "math", domain: "m-adv", difficulty, type: "mcq", passageMd: null,
   stemMd: "s", choices: [], answer: { choice: answer }, explanationMd: "e", choiceRationales: null,
-  fastMethodMd: null, desmos: null, tags: [], status: "active", version: 1,
+  fastMethodMd: null, desmos: null, tags: [], status: "active", version: 1, pool: "study",
 });
 const Q1 = q("m-adv-nonlin-eq-0001", 2, "B");
 const Q2 = q("m-adv-nonlin-eq-0002", 2, "C");
