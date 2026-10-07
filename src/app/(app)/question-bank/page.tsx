@@ -21,6 +21,6 @@ export default async function QuestionBankPage({searchParams}: PageProps<'/quest
     {message && <p role="alert">{message}</p>}
     <QuestionBankPicker key={`${skills.join(',')}:${difficulties.join(',')}:${count}`} initialSkills={skills} initialDifficulties={difficulties} initialCount={count} previews={previews} />
     {sp.preview==='1' && !previews.length && !message && <p>No available questions match these filters. Try other skills or a mixed difficulty.</p>}
-    <div className="flex gap-4 text-sm"><Link className="underline" href="/practice">Recommended practice</Link><Link className="underline" href="/bookmarks">Saved questions</Link></div>
+    <div className="flex gap-4 text-sm"><Link className="underline" href="/practice">Adaptive Practice</Link><Link className="underline" href="/bookmarks">Saved questions</Link></div>
   </div>;
 }
