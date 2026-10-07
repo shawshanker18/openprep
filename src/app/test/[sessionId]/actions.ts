@@ -7,25 +7,13 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { text } from "@/lib/text";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { db } from "@/db";
-import { profiles, testModules, testSessions } from "@/db/schema";
+import { profiles } from "@/db/schema";
 import { requireUser } from "@/server/auth";
 import { internalId } from "@/server/questions";
-import { appKeyHash, mayContinue } from "@/server/lockdown";
 import { answerDiagnostic as answer } from "@/server/diagnostic";
-import { abandonTest, markLocked, recordFocusLoss, saveResponse as save, startModule as start } from "@/server/tests";
-
-/** A test locked in one app install can't be started, answered or submitted from anywhere else. */
-async function lockedOut(userId: string, where: { moduleId: string } | { sessionId: string }) {
-  const [r] = "moduleId" in where
-    ? await db.select({ config: testSessions.config }).from(testModules).innerJoin(testSessions, eq(testSessions.id, testModules.sessionId))
-      .where(and(eq(testModules.id, where.moduleId), eq(testSessions.userId, userId)))
-    : await db.select({ config: testSessions.config }).from(testSessions)
-      .where(and(eq(testSessions.id, where.sessionId), eq(testSessions.userId, userId)));
-  return r ? !(await mayContinue(r.config)) : false;
-}
-const LOCKED = "This test is locked to the OpenPrep app it was started in. Continue it there, or end it.";
+import { abandonTest, saveResponse as save, startModule as start } from "@/server/tests";
 
 const Answer = z.object({
   sessionId: z.uuid(),
@@ -39,7 +27,6 @@ export async function answerDiagnostic(input: z.input<typeof Answer>) {
   const { userId } = await requireUser();
   const parsed = Answer.safeParse(input);
   if (!parsed.success) return { ok: false as const, error: "Invalid answer." };
-  if (await lockedOut(userId, { sessionId: parsed.data.sessionId })) return { ok: false as const, error: LOCKED };
   const questionId = await internalId(parsed.data.questionId, userId);
   if (!questionId) return { ok: false as const, error: "That question was already answered. Reload to continue." };
   const limited=await limitPractice(userId,"answer",questionId);
@@ -49,7 +36,7 @@ export async function answerDiagnostic(input: z.input<typeof Answer>) {
 
 export async function startModule(moduleId: string) {
   const { userId } = await requireUser();
-  if (!z.uuid().safeParse(moduleId).success || (await lockedOut(userId, { moduleId }))) return false;
+  if (!z.uuid().safeParse(moduleId).success) return false;
   if(await limitPractice(userId,"request")) return false;
   try { return await start(userId, moduleId); } catch(e) { if(e instanceof DeliveryBlocked) return false; throw e; }
 }
@@ -62,7 +49,6 @@ export async function saveResponse(input: z.input<typeof Save>) {
   const { userId } = await requireUser();
   const p = Save.safeParse(input);
   if (!p.success) return { ok: false as const, error: "Invalid answer." };
-  if (await lockedOut(userId, { moduleId: p.data.moduleId })) return { ok: false as const, error: LOCKED };
   return save(userId, p.data);
 }
 
@@ -90,14 +76,3 @@ export async function abandon(sessionId: string) {
   redirect("/tests");
 }
 
-/** The test is running in an app's lockdown mode: from now on it can only be continued in an app. */
-export async function markLockdown(sessionId: string) {
-  const { userId } = await requireUser();
-  if (z.uuid().safeParse(sessionId).success) await markLocked(userId, sessionId, await appKeyHash());
-}
-
-/** The student left the test window (tab switch, app switch, or lost focus). Counted on the results page. */
-export async function reportFocusLoss(sessionId: string) {
-  const { userId } = await requireUser();
-  if (z.uuid().safeParse(sessionId).success) await recordFocusLoss(userId, sessionId);
-}

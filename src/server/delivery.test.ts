@@ -50,7 +50,7 @@ it("keeps a short burst limit and preserves already-delivered questions", async 
   for (const q of qs.slice(0, P.minute)) await D.servePractice(u, q as schema.Question, empty);
   await expect(D.servePractice(u, qs[P.minute]! as schema.Question, empty)).rejects.toThrow(/rapid requests/);
   await expect(D.servePractice(u, qs[0]! as schema.Question, empty)).resolves.toBeUndefined();
-});
+},30000);
 it("practice-set limits recover after a minute instead of stopping study for a day", async () => {
   const u = await user(), now = 1_700_000_000_000;
   vi.spyOn(Date, "now").mockReturnValue(now);

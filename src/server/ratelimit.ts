@@ -7,7 +7,7 @@ import { consumeWindow } from "./delivery";
 import { deliveryContext, type DeliveryContext } from "./delivery-context";
 import { digest } from "./delivery-identity";
 import { DeliveryBlocked } from "./delivery-policy";
-export const LIMITS = { requests: { max: 30, window: "10 s" }, answersPerQuestionPerMinute: 10 } as const;
+export const LIMITS = { requests: { max: 100, window: "10 s" }, answersPerQuestionPerMinute: 10 } as const;
 export const SLOW_DOWN = "Too many requests. Please wait a moment and try again.";
 const redis = process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN ? Redis.fromEnv() : null;
 

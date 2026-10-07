@@ -67,7 +67,7 @@ export default async function ProgressPage() {
   return (
     <div className="flex flex-col gap-10">
       <h1 className="text-2xl font-semibold">Progress</h1>
-      {usage && <section className="flex flex-col gap-3"><h2 className="font-medium">OpenPrep usage</h2><dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">{[[usage.users,"Registered users"],[usage.active,"Active in the last 30 days"],[usage.answered,"Questions answered"],[usage.tests,"Tests completed"]].map(([n,label])=><div key={String(label)} className="min-w-0 rounded-xl border p-3"><dt className="text-xs text-muted-foreground">{label}</dt><dd className="text-xl font-semibold tabular-nums">{Number(n).toLocaleString()}</dd></div>)}</dl><p className="text-xs text-muted-foreground">Aggregate counts only. Other students’ scores and progress are private.</p></section>}
+      {usage && <section className="flex flex-col gap-3"><h2 className="font-medium">OpenPrep usage</h2><dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">{[[usage.users,"Students"],[usage.active,"Active in the last 30 days"],[usage.answered,"Questions answered"],[usage.tests,"Tests completed"]].map(([n,label])=><div key={String(label)} className="min-w-0 rounded-xl border p-3"><dt className="text-xs text-muted-foreground">{label}</dt><dd className="text-xl font-semibold tabular-nums">{Number(n).toLocaleString()}</dd></div>)}</dl><p className="text-xs text-muted-foreground">Aggregate counts only. Other students’ scores and progress are private.</p></section>}
 
       <section className="flex flex-col gap-3">
         <h2 className="font-medium">Estimated score</h2>

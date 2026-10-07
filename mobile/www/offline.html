@@ -10,11 +10,6 @@
 <script>
   var home = "https://openprep-opal.vercel.app/dashboard";
   document.getElementById("retry").onclick = function () { location.href = home; };
-  // Called by the app when a test is locked: back to the test (the app also retries it every few seconds).
-  window.openprepTest = function (test) {
-    document.getElementById("msg").textContent = "Your test is still running and stays locked. Reconnecting…";
-    document.getElementById("retry").onclick = function () { location.href = test; };
-  };
 </script>
 </body>
 </html>

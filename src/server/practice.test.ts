@@ -24,7 +24,6 @@ beforeAll(async()=>{
  await db.insert(schema.questions).values(ids.map(id=>({id,skillId:skill.id,section:skill.section,domain:skill.domain,difficulty:2,type:'mcq' as const,stemMd:'stem',choices:[{id:'A',md:'1'}],answer:{choice:'A'},explanationMd:'explanation'})));
 });
 const serve=(user:string,id:string)=>P.nextQuestion(user,{} as schema.Profile,{mode:'list',ids:[id],exclude:[]});
-const age=()=>db.update(schema.questionServes).set({servedAt:new Date(Date.now()-6000)});
 it('IDs differ between accounts and resolve only delivered content',async()=>{
  const pub=Q.publicId(ids[0]!,USER);
  expect(pub).not.toBe(Q.publicId(ids[0]!,OTHER));

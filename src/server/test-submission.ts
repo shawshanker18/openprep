@@ -4,7 +4,6 @@ import { text } from "@/lib/text";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { testModules, testSessions } from "@/db/schema";
-import { mayContinue } from "@/server/lockdown";
 import { limitPractice } from "@/server/ratelimit";
 import { DeliveryBlocked } from "@/server/delivery-policy";
 import { submitModule } from "@/server/tests";
@@ -15,7 +14,6 @@ export async function submitOwnedModule(userId:string,input:unknown) {
   if(!parsed.success)return {ok:false as const,error:"Invalid module submission."};
   const [owned]=await db.select({config:testSessions.config}).from(testModules).innerJoin(testSessions,eq(testModules.sessionId,testSessions.id)).where(and(eq(testModules.id,parsed.data.moduleId),eq(testSessions.userId,userId))).limit(1);
   if(!owned)return {ok:false as const,error:"This module is unavailable."};
-  if(!(await mayContinue(owned.config)))return {ok:false as const,error:"Continue this test in the OpenPrep app it was started in."};
   const limited=await limitPractice(userId,"request");
   if(limited)return {ok:false as const,error:limited,rateLimited:true};
   try {

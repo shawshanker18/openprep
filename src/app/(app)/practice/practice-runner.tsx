@@ -11,7 +11,6 @@ import { Markdown } from "@/components/markdown";
 import { QuestionView } from "@/components/question-view";
 import { DesmosCalculator, DesmosToggle } from "@/components/desmos-panel";
 import { TutorPanel } from "@/components/tutor-panel";
-import { FocusToggle } from "@/components/focus-toggle";
 import { cn, isTyping } from "@/lib/utils";
 import type { PublicQuestion, RevealedQuestion } from "@/server/questions";
 import { toggleBookmark } from "./actions";
@@ -249,7 +248,6 @@ export function PracticeRunner({ sessionId, userId, mode, title, block, set, bac
           {mode === "smart" && <> · <Link href="/question-bank" className="underline">Choose questions</Link></>}
         </span>
         <div className="flex items-center gap-1">
-          <FocusToggle />
           {s.phase === "answering" && s.limitS && <Countdown key={s.q.id} limitS={s.limitS} elapsedS={savedTimeMs/1000} />}
           <Button variant="ghost" size="sm" aria-label="Bookmark" aria-pressed={bookmarked} onClick={async () => {
             const res = await toggleBookmark({ questionId: s.q.id })
