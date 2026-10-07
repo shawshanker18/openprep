@@ -220,10 +220,10 @@ export function PracticeRunner({ sessionId, userId, mode, title, block, set, bac
   if (s.phase === "done") {
     return (
       <div className="flex flex-col items-start gap-3">
-        <h1 className="text-xl font-semibold">{mode === "review" ? "No reviews due" : "No more questions here yet"}</h1>
+        <h1 className="text-xl font-semibold">{mode === "review" ? "No reviews due" : "No more questions here"}</h1>
         <p className="text-muted-foreground">
           {mode === "review" ? "You're all caught up. Missed questions come back after 1, 3 and 7 days."
-            : "Questions for this skill are coming soon. Try another skill or the lesson."}
+            : "You have worked through the available questions for this skill. Try another skill, or review the lesson."}
           {s.answered > 0 && ` You answered ${s.answered} this session.`}
         </p>
         <Button render={<Link href="/dashboard" />}>Back to dashboard</Button>

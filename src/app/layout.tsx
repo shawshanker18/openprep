@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { SiteFooter } from "@/components/footer-feedback";
+import { ContentProtection } from "@/components/content-protection";
 import { Geist, Geist_Mono } from "next/font/google";
 import "katex/dist/katex.min.css";
 import "./globals.css";
@@ -31,6 +32,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <TooltipProvider>{children}</TooltipProvider>
         <Toaster />
         <SiteFooter />
+        <ContentProtection />
         </ThemeProvider>
       </body>
     </html>

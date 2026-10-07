@@ -72,6 +72,11 @@ export async function sendTest(userId: string) {
  * and haven't been reminded today. At most one reminder per device per day.
  */
 export async function sendDueReminders() {
+  // The cron tick calls this every five minutes. The full query reads pg_timezone_names (~140 ms), so skip it
+  // while no device could possibly be due.
+  const [any] = await db.execute<{ found: boolean }>(sql`
+    select exists(select 1 from push_subscriptions s join profiles p on p.id = s.user_id where p.reminder_hour is not null) as found`);
+  if (!any?.found) return { candidates: 0, sent: 0 };
   const rows = await db.execute<Target & { local_day: string; minutes: number; days_left: number | null }>(sql`
     with tz as (select name from pg_timezone_names),
     due as (
