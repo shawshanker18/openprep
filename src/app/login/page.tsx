@@ -59,23 +59,23 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
   // so there it runs in the real browser and comes back to the app (see /auth/google).
   const inApp = (h.get("user-agent") ?? "").includes("OpenPrepApp");
   return (
-    <main className="grid flex-1 lg:grid-cols-2">
-      <div className="flex flex-col items-center justify-center px-4 py-12">
-        <div className="flex w-full max-w-[400px] flex-col gap-8">
+    <main className="grid min-w-0 flex-1 lg:grid-cols-2 [@media(max-height:600px)]:grid-cols-1">
+      <div className="flex min-w-0 flex-col items-center justify-start px-4 py-6 sm:px-6 lg:justify-center [@media(max-height:800px)]:py-4">
+        <div className="flex w-full max-w-[400px] flex-col gap-5 [@media(max-height:800px)]:gap-3">
           <Link href="/" className="flex items-center justify-center gap-2.5">
-            <Mark className="size-10" />
-            <span className="text-3xl font-semibold tracking-tight">OpenPrep</span>
+            <Mark className="size-9 [@media(max-height:800px)]:size-8" />
+            <span className="text-2xl font-semibold tracking-tight">OpenPrep</span>
           </Link>
           <div className="flex flex-col gap-1 text-center">
-            <h1 className="text-2xl font-medium">Sign in or create your free account</h1>
+            <h1 className="text-xl font-medium">Sign in or create your free account</h1>
             <p className="text-sm text-muted-foreground">SAT questions, lessons, and practice. Free to use.</p>
           </div>
           {error && <p role="alert" className="rounded-xl border border-destructive p-3 text-sm text-destructive">That sign-in link didn&apos;t work or has expired. Request a new one below.</p>}
           <LoginForm google={p.google} inApp={inApp} />
         </div>
       </div>
-      <div className="hidden p-3 lg:block">
-        <div className="sticky top-3 h-[calc(100vh-1.5rem)] overflow-hidden rounded-3xl">
+      <div className="hidden min-w-0 p-3 lg:block [@media(max-height:600px)]:hidden">
+        <div className="sticky top-3 h-[calc(100dvh-1.5rem)] overflow-hidden rounded-3xl">
           <Scene />
         </div>
       </div>

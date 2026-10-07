@@ -70,8 +70,8 @@ export function GoogleButton({ enabled, privacyAccepted=false, nonceHash, onToke
   return (
     <div className="flex w-full flex-col items-center gap-1">
       {enabled ? <div ref={el} className="flex min-h-10 w-full justify-center" /> : (
-        <div className="flex h-11 w-full items-center justify-center rounded-full border text-sm text-muted-foreground">
-          Tick the box above to continue with Google
+        <div className="flex min-h-11 w-full items-center justify-center rounded-full border px-3 py-2 text-center text-sm text-muted-foreground">
+          Accept both agreements to continue with Google
         </div>
       )}
       {error && <p role="alert" className="text-sm text-destructive">{error}</p>}

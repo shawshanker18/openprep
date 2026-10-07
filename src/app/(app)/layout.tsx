@@ -31,24 +31,24 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
   );
 
   return (
-    <div className="flex min-w-0 max-w-full flex-1 flex-col pb-[calc(4rem+env(safe-area-inset-bottom))] md:flex-row md:pb-0">
-      <aside className="app-sidebar sticky top-0 z-10 hidden h-dvh w-56 shrink-0 flex-col gap-4 overflow-y-auto border-r p-4 md:flex">
+    <div className="flex min-w-0 max-w-full flex-1 flex-col pb-[calc(4rem+env(safe-area-inset-bottom))] lg:flex-row lg:pb-0">
+      <aside className="app-sidebar sticky top-0 z-10 hidden h-dvh w-56 shrink-0 flex-col gap-4 overflow-y-auto border-r p-4 lg:flex">
         <Link href="/dashboard" className="text-lg font-semibold">OpenPrep</Link>
         <NavLinks {...nav} />
       </aside>
-      <header className="app-mobile-header sticky top-0 z-10 flex items-center justify-between border-b bg-background py-2 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] md:hidden">
+      <header className="app-mobile-header sticky top-0 z-10 flex items-center justify-between border-b bg-background py-2 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] lg:hidden">
         <MobileMenu {...nav} />
         <Link href="/dashboard" className="font-semibold">OpenPrep</Link>
         <NotificationBell items={notifications} align="right" />
       </header>
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="app-topbar sticky top-0 z-10 hidden items-center justify-end gap-2 border-b bg-background px-8 py-2 md:flex">
+        <div className="app-topbar sticky top-0 z-10 hidden items-center justify-end gap-2 border-b bg-background px-8 py-2 lg:flex">
           <CurrentSection />
           {chips}
           <NotificationBell items={notifications} align="right" />
         </div>
-        <main className="mx-auto w-full min-w-0 max-w-5xl flex-1 px-[max(1rem,env(safe-area-inset-left),env(safe-area-inset-right))] pb-8 pt-6 md:px-8 has-[.question-content]:max-w-none">
-          <div className="mb-4 flex flex-wrap items-center gap-2 md:hidden"><CurrentSection />{chips}</div>
+        <main className="mx-auto w-full min-w-0 max-w-5xl flex-1 px-[max(1rem,env(safe-area-inset-left),env(safe-area-inset-right))] pb-8 pt-6 lg:px-8 has-[.question-content]:max-w-none">
+          <div className="mb-4 flex flex-wrap items-center gap-2 lg:hidden"><CurrentSection />{chips}</div>
           {children}
         </main>
       </div>

@@ -27,12 +27,12 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-background text-foreground">
+      <body className="min-h-dvh min-w-0 flex flex-col bg-background text-foreground">
         <ThemeProvider>
         <TooltipProvider>{children}</TooltipProvider>
         <Toaster />
         <NoInspect />
-        <footer className="mt-auto border-t px-4 py-3 text-center text-xs text-muted-foreground">
+        <footer className="site-footer mt-auto border-t px-4 py-3 text-center text-xs text-muted-foreground">
           SAT® is a trademark registered by the College Board, which is not affiliated with, and does not endorse, OpenPrep.<FooterFeedback />
         </footer>
         </ThemeProvider>
