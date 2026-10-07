@@ -5,10 +5,10 @@
 @custom-variant dark (&:is(.dark *));
 /* Desktop layout (sidebar) for every desktop-width window. Only a window too short for even the tightest sidebar, or a
    narrow phone/tablet window, gets the phone layout (menu + bottom tabs). */
-@custom-variant desk (@media (min-width: 64rem) and (min-height: 26rem));
-/* The sidebar tightens in two steps so it always fits without scrolling. */
+@custom-variant desk (@media (min-width: 64rem) and (min-height: 30rem));
+/* The sidebar tightens item padding in two steps; headings and group spacing never change. */
 @custom-variant short (@media (max-height: 54rem));
-@custom-variant tiny (@media (max-height: 40rem));
+@custom-variant tiny (@media (max-height: 34rem));
 
 @theme inline {
   --color-background: var(--background);
@@ -137,7 +137,7 @@
     /* Phones: scrolling something into view (focus, scrollIntoView) clears the fixed bottom nav. */
     scroll-padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
   }
-  @media (min-width: 64rem) and (min-height: 26rem) {
+  @media (min-width: 64rem) and (min-height: 30rem) {
     html { scroll-padding-bottom: 0; }
   }
 }
