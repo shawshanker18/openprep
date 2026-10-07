@@ -9,7 +9,7 @@ const features=[
   {icon:ClipboardCheck,title:'Get used to test day',body:'Take a full SAT-style test with timed, adaptive modules, or a short test in one subject. Use the SAT Desmos calculator and review answers after the test.'},
   {icon:ChartNoAxesCombined,title:'See your progress',body:'Follow a daily plan, track skills and score estimates, revisit mistakes, and resume saved sessions. Start from scratch lessons stay available for every topic.'},
 ];
-export default async function Landing(){
+export default function Landing(){
   return <main className="min-h-screen bg-[radial-gradient(ellipse_at_top_right,#f5f5f5_0%,transparent_50%)] dark:bg-none">
     <div className="mx-auto max-w-6xl px-5">
       <header className="flex items-center justify-between border-b py-6"><Link href="/" className="text-xl font-semibold tracking-tight">OpenPrep<span className="text-neutral-600">.</span></Link><div className="flex items-center gap-5 text-sm"><a href="#features" className="hidden hover:underline sm:inline">How it works</a><Link href="/login" className="font-medium hover:underline">Sign in</Link></div></header>
