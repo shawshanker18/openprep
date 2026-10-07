@@ -44,7 +44,7 @@ export default async function AdminOverview() {
           <Stat label="Answers today" value={n(o.answers_1d)} sub={`${n(o.answers_7d)} in 7 days`} href="/admin/activity" />
           <Stat label="Tests started" value={n(o.tests_started_7d)} sub="in 7 days" />
           <Stat label="Tests finished" value={n(o.tests_done_7d)} sub="in 7 days" />
-          <Stat label="Questions live" value={n(o.questions)} sub="active in the bank" />
+          <Stat label="Questions live" value={n(o.questions)} sub={`${n(o.study_questions)} study · ${n(o.test_questions)} test`} />
         </div>
       </section>
     </div>

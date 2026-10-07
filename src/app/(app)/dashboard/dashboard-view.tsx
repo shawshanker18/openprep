@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { latestActivePracticeSession } from "@/server/practice-sessions";
 import { Button } from "@/components/ui/button";
 import { MasteryBar } from "@/components/mastery-bar";
+import { BrandBanner } from "@/components/brand";
 import { DiagnosticSuggestion } from "@/components/diagnostic-gate";
 import { diagnosticPending } from "@/server/auth";
 import type { getDashboard } from "@/server/daily";
@@ -65,7 +66,6 @@ export function DashboardView({profile,user,d,summary,home,community,savedPracti
   community:Awaited<ReturnType<typeof publicStats>>;savedPractice:Awaited<ReturnType<typeof latestActivePracticeSession>>;
 }) {
   const first=user?.name?.split(" ")[0];
-  const hello=<h1 className="break-words text-2xl font-semibold">{greeting(profile.timezone)}{first ? `, ${first}` : ""}</h1>;
   const hasEvidence = summary.skills.some((skill) => skill.n > 0);
 
   // The five numbers.
@@ -99,13 +99,10 @@ export function DashboardView({profile,user,d,summary,home,community,savedPracti
 
   return (
     <div className="flex min-w-0 flex-col gap-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          {hello}
-          <p className="text-sm text-muted-foreground">{resume.length ? "Pick up where you left off." : "Answer a few questions to get going."}</p>
-        </div>
+      <BrandBanner eyebrow="Home" title={`${greeting(profile.timezone)}${first ? `, ${first}` : ""}`}
+        description={resume.length ? "Pick up where you left off." : "Answer a few questions to get going."}>
         <Button className="h-auto min-h-11 w-full max-w-full whitespace-normal break-words px-4 py-3 text-left sm:w-auto" render={<Link href={primary.href} />}>{resume[0] ? `${primary.action}: ${resume[0].title}` : primary.action}</Button>
-      </div>
+      </BrandBanner>
 
       {diagnosticPending(profile) && <DiagnosticSuggestion />}
 

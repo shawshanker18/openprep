@@ -68,7 +68,9 @@ export async function overview(now = new Date()) {
       (select count(*)::int from security_reports where status in ('new', 'in_progress')) as open_security,
       (select round(avg(rating)::numeric, 1)::float from feedback where kind = 'review' and rating is not null and created_at >= ${d30}) as rating_30d,
       (select count(*)::int from feedback where kind = 'review' and rating is not null and created_at >= ${d30}) as ratings_30d,
-      (select count(*)::int from questions where status = 'active') as questions`));
+      (select count(*)::int from questions where status = 'active') as questions,
+      (select count(*)::int from questions where status = 'active' and pool = 'study') as study_questions,
+      (select count(*)::int from questions where status = 'active' and pool = 'test') as test_questions`));
   return r!;
 }
 

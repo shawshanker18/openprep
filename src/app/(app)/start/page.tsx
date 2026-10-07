@@ -2,6 +2,7 @@ import { likelyCoveredSkills } from "@/lib/curriculum-coverage";
 import Link from "next/link";
 import { ChevronRight, Circle, CircleCheck, SkipForward } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { BrandBanner } from "@/components/brand";
 import { requireUser } from "@/server/auth";
 import { scratchProgress } from "@/server/scratch";
 
@@ -17,14 +18,9 @@ export default async function StartPage() {
 
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold">Start from scratch</h1>
-        <p className="text-sm text-muted-foreground">
-          SAT format, calculator basics, and Math and Reading and Writing lessons. Work through the topics in order,
-          or skip topics you already know.
-        </p>
-        <p className="text-xs text-muted-foreground">“Likely covered in school” is a guide based on your grade and curriculum. Every topic stays available to learn.</p>
-      </div>
+      <BrandBanner eyebrow="Learn" title="Start from scratch"
+        description="SAT format, calculator basics, and Math and Reading and Writing lessons. Work through the topics in order, or skip topics you already know." />
+      <p className="-mt-3 text-xs text-muted-foreground">“Likely covered in school” is a guide based on your grade and curriculum. Every topic stays available to learn.</p>
 
       <section className="flex flex-col gap-3 rounded-xl border p-5">
         <div className="flex items-baseline justify-between gap-3 text-sm">
