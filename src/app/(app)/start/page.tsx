@@ -16,7 +16,7 @@ export default async function StartPage() {
   const groups = [...new Set(steps.map((s) => s.group))];
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold">Start from scratch</h1>
         <p className="text-sm text-muted-foreground">
@@ -50,10 +50,14 @@ export default async function StartPage() {
         )}
       </section>
 
+      <div className="grid items-start gap-3 sm:grid-cols-2">
       {groups.map((g) => (
-        <section key={g} className="flex flex-col gap-2">
-          <h2 className="text-sm font-medium text-muted-foreground">{g}</h2>
-          <ol className="flex flex-col divide-y rounded-xl border">
+        <details key={g} name="lesson-groups" open={g === next?.group} className="group min-w-0 overflow-hidden rounded-xl border">
+          <summary className="flex cursor-pointer list-none items-center gap-3 p-4 hover:bg-muted [&::-webkit-details-marker]:hidden">
+            <span className="min-w-0 flex-1"><span className="block text-sm font-semibold">{g}</span><span className="text-xs text-muted-foreground">{steps.filter(s=>s.group===g&&s.status==="done").length} of {steps.filter(s=>s.group===g).length} topics done</span></span>
+            <ChevronRight className="size-4 shrink-0 transition-transform group-open:rotate-90" />
+          </summary>
+          <ol className="flex flex-col divide-y border-t">
             {steps.filter((s) => s.group === g).map((s) => (
               <li key={s.key}>
                 <Link href={`/start/${s.key}`} aria-current={s.key === next?.key ? "step" : undefined}
@@ -68,8 +72,9 @@ export default async function StartPage() {
               </li>
             ))}
           </ol>
-        </section>
+        </details>
       ))}
+      </div>
     </div>
   );
 }
