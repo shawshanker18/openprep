@@ -9,6 +9,7 @@ import { NotificationBell } from "@/components/notification-bell";
 import { CurrentSection, MobileMenu, MobileTabs, NavLinks } from "@/components/app-nav";
 import { AppBridge } from "@/components/app-bridge";
 import { SiteFooter } from "@/components/footer-feedback";
+import { BrandLogo } from "@/components/brand";
 import { SidebarToggle } from "@/components/sidebar-toggle";
 import { NavArrows } from "@/components/nav-arrows";
 import { getChecklist, getNotifications } from "@/server/notifications";
@@ -32,12 +33,12 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
   return (
     <div className="flex min-w-0 max-w-full flex-1 flex-col pb-[calc(4rem+env(safe-area-inset-bottom))] desk:flex-row desk:pb-0">
       <aside className="app-sidebar fixed inset-y-0 left-0 z-10 hidden h-dvh w-56 shrink-0 flex-col gap-4 overflow-hidden border-r p-4 short:gap-2 short:p-3 tiny:p-2 desk:flex">
-        <Link href="/dashboard" className="text-lg font-semibold">OpenPrep</Link>
+        <Link href="/dashboard" aria-label="OpenPrep home" className="block"><BrandLogo height={22} /></Link>
         <NavLinks {...nav} />
       </aside>
       <header className="app-mobile-header sticky top-0 z-10 flex items-center justify-between border-b bg-background py-2 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] desk:hidden">
         <MobileMenu {...nav} />
-        <Link href="/dashboard" className="font-semibold">OpenPrep</Link>
+        <Link href="/dashboard" aria-label="OpenPrep home"><BrandLogo height={20} /></Link>
         {bell}
       </header>
       <div className="app-content flex min-w-0 flex-1 flex-col desk:ml-56 [.lesson-focus-mode_&]:ml-0">
