@@ -1,6 +1,5 @@
-// Sign-up cap (3 new accounts per IP per day). Our server issues a ticket before every sign-in attempt; Supabase's
-// before-user-created hook (public.hook_signup_cap, drizzle/0008) only creates an account that holds a fresh ticket,
-// and counts accounts against the ticket's IP. Existing users never need one: the hook only runs for new accounts.
+// Email reservations prevent unsolicited signup. Verified Google identities use one OAuth flow.
+// Short request windows prevent floods without daily account limits on shared networks.
 import "server-only";
 import { headers } from "next/headers";
 import { lt } from "drizzle-orm";
@@ -11,7 +10,7 @@ import { digest, trustedIp } from "./delivery-identity";
 import { DeliveryBlocked } from "./delivery-policy";
 import { signupTickets } from "@/db/schema";
 
-const MAX_TICKETS_PER_HOUR = 30; // per IP: sign-in attempts, so the table can't be flooded
+const MAX_TICKETS_PER_MINUTE = 300;
 
 /** The requester's IP as Vercel saw it (Vercel overwrites X-Forwarded-For, so a client can't fake it). */
 export async function clientIp() {
@@ -24,8 +23,8 @@ export async function issueSignupTicket(email: string, ip: string, now = new Dat
   const context=await deliveryContext();
   try {
     await db.transaction(async tx=>{
-      await consumeWindow(tx,`signup:ip:${digest(ip)}`,MAX_TICKETS_PER_HOUR,3_600_000,1,now.getTime());
-      if(context.device) await consumeWindow(tx,`signup:device:${context.device}`,6,86_400_000,1,now.getTime());
+      await consumeWindow(tx,`signup:ip:${digest(ip)}`,MAX_TICKETS_PER_MINUTE,60_000,1,now.getTime());
+      if(context.device) await consumeWindow(tx,`signup:device:${context.device}`,10,60_000,1,now.getTime());
       await tx.insert(signupTickets).values({email:email.toLowerCase(),ip,createdAt:now});
     });
     return true;
@@ -39,4 +38,4 @@ export async function deleteOldSignupTickets(now = new Date()) {
 }
 
 /** The hook's refusal messages, passed through to the sign-in screens as they are. */
-export const SIGNUP_REFUSALS = ["Too many new accounts from your network today", "Please create your account on the OpenPrep website or app"];
+export const SIGNUP_REFUSALS = ["Please continue with email on the OpenPrep website or app."];

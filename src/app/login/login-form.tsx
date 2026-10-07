@@ -7,7 +7,7 @@ import { OAuthGoogleButton } from "./oauth-google-button";
 import { AppGoogleButton } from "./app-google-button";
 import { prepareEmailSignIn } from "@/app/auth/actions";
 
-export function LoginForm({ google: showGoogle, inApp = false, googleSignup = false }: { google: boolean; inApp?: boolean; googleSignup?: boolean }) {
+export function LoginForm({ google: showGoogle, inApp = false }: { google: boolean; inApp?: boolean }) {
   const [age, setAge] = useState(false);
   const [privacyAccepted,setPrivacyAccepted]=useState(false);
   const canContinue=age && privacyAccepted;
@@ -65,7 +65,7 @@ export function LoginForm({ google: showGoogle, inApp = false, googleSignup = fa
         <span>I accept the <Link className="text-foreground underline" href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</Link>.</span>
       </label>
 
-      {showGoogle && (inApp ? <AppGoogleButton enabled={canContinue}>{or}</AppGoogleButton> : <><OAuthGoogleButton enabled={canContinue} privacyAccepted={privacyAccepted} signupRequired={googleSignup}/>{or}</>)}
+      {showGoogle && (inApp ? <AppGoogleButton enabled={canContinue}>{or}</AppGoogleButton> : <><OAuthGoogleButton enabled={canContinue} privacyAccepted={privacyAccepted}/>{or}</>)}
 
       <form onSubmit={magic} className="flex flex-col gap-3 [@media(max-height:600px)]:gap-2">
         <label className="flex flex-col gap-2 text-sm font-medium">
@@ -82,7 +82,7 @@ export function LoginForm({ google: showGoogle, inApp = false, googleSignup = fa
       </form>
 
       <p className="text-center text-sm text-muted-foreground">
-        New or returning, the same link signs you in. No password needed.
+        No password needed.
       </p>
     </div>
   );

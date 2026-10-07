@@ -88,8 +88,8 @@ async function skillSetModule(tx: Tx, userId: string, sessionId: string, idx: nu
   return insertModule(tx, sessionId, idx, sections.size === 1 ? [...sections][0]! : "mixed", "base", timeLimitS, picked);
 }
 
-// Atomic creation limit. Content exposure additionally uses the shared daily/weekly ledger.
-const START_LIMIT = { ms: 5 * 60_000, max: 4 };
+// Short bursts are bounded; there is no daily test quota.
+const START_LIMIT = { ms: 60_000, max: 20 };
 
 export async function startTest(userId: string, input: {
   kind: TestKind; section?: Section; skillId?: string; skillIds?: string[]; count?: number; timed?: boolean; focus?: string[];
@@ -104,8 +104,8 @@ export async function startTest(userId: string, input: {
       if(open) return {ok:false as const,error:"You already have a test in progress.",resumeId:open.id};
     }
     await consumeWindow(tx,`test-start:user:${userId}`,START_LIMIT.max,START_LIMIT.ms);
-    if(context.device) await consumeWindow(tx,`test-start:device:${context.device}`,8,START_LIMIT.ms);
-    if(context.ip) await consumeWindow(tx,`test-start:ip:${context.ip}`,40,START_LIMIT.ms);
+    if(context.device) await consumeWindow(tx,`test-start:device:${context.device}`,40,START_LIMIT.ms);
+    if(context.ip) await consumeWindow(tx,`test-start:ip:${context.ip}`,1000,START_LIMIT.ms);
     const sections: Section[] = input.kind === "full" ? ["rw", "math"] : input.section ? [input.section] : [];
     const config: Config = { sections, adaptive: input.kind === "full" || input.kind === "section", timed };
     if (input.kind === "custom") Object.assign(config, { skillIds: input.skillIds, count: input.count, tags: input.tags ?? [], difficulty: input.difficulty ?? "mixed", ...(input.title ? { title: input.title } : {}) });

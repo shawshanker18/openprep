@@ -71,8 +71,8 @@ it("parallel Next retries advance once, skipped questions remain unattempted, an
  expect(resumed).toMatchObject({position:1,response:"B",timeMs:17000,result:null});
  await expect(S.loadPracticeSession(user,profile,session,{kind:"jump",position:4})).rejects.toThrow(/not found/);
 });
-it("allows continuing with skipped questions while enforcing minimum answer time",async()=>{
- await expect(S.answerPracticeSession(user,session,1,{response:"B",timeMs:0,confidence:1})).rejects.toThrow(/read the question/);
+it("allows quick answers and continuing with skipped questions",async()=>{
+ await expect(S.answerPracticeSession(user,session,1,{response:"B",timeMs:0,confidence:1})).resolves.toBeUndefined();
  await expect(S.loadPracticeSession(user,profile,session,{kind:"next",position:1})).resolves.toMatchObject({position:2}); // already reached
  await expect(S.loadPracticeSession(user,profile,session,{kind:"next",position:2})).resolves.toMatchObject({position:3});
  expect((await S.getPracticeSession(user,session))?.cursor).toBe(3); // skipped questions do not block the next question
@@ -93,7 +93,7 @@ it("new questions use cumulative session positions; completing then reviewing ke
    const row=(await database.select().from(schema.practiceSessionItems).where(and(eq(schema.practiceSessionItems.sessionId,session),eq(schema.practiceSessionItems.position,n))))[0];
    const serve=(await database.select().from(schema.questionServes).where(eq(schema.questionServes.questionId,row!.questionId)))[0];
    await database.update(schema.practiceSessionItems).set({servedAt:serve!.servedAt}).where(and(eq(schema.practiceSessionItems.sessionId,session),eq(schema.practiceSessionItems.position,n)));
-   await S.answerPracticeSession(user,session,n,{response:"A",timeMs:5000,confidence:2});
+   await S.answerPracticeSession(user,session,n,{response:n===1?"B":"A",timeMs:5000,confidence:2});
  }
  const done=await S.loadPracticeSession(user,profile,session,{kind:"next",position:4});
  expect(done).toMatchObject({done:true,answered:5});

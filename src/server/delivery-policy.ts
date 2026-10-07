@@ -1,14 +1,12 @@
-// Server-only policy. Rolling allowances for unanswered exposures, replenished by distinct,
-// server-recorded answers. Shared-network allowances are deliberately higher.
+// Protect against rapid automated requests, without daily/weekly study quotas.
 export const DELIVERY_POLICY = {
-  account: { day: 180, week: 600 },
-  skill: { day: 60, week: 180 },
-  device: { day: 360, week: 1200 },
-  ip: { day: 1800, week: 6000 },
-  minute: 12, pendingMs: 30 * 60_000, minimumAnswerMs: 5000,
-  paperHours: 2, setsPerDay: 60, similarPerDay: 30,
+  minute: 60,
+  pendingMs: 24 * 3_600_000,
+  paperHours: 24,
+  setsPerMinute: 30,
+  similarPerMinute: 60,
 } as const;
 
 export class DeliveryBlocked extends Error {
-  constructor(message = "Question access is temporarily limited. Please try again later.") { super(message); }
+  constructor(message = "Too many rapid requests. Please wait a minute and try again.") { super(message); }
 }

@@ -1,3 +1,4 @@
+import { checkRapidSkips } from "./rapid-skips";
 import { availableQuestion } from "./question-availability";
 import "server-only";
 import { and, asc, desc, eq } from "drizzle-orm";
@@ -67,6 +68,7 @@ export async function loadPracticeSession(userId: string, profile: Profile, id: 
     const [previous] = selectingSimilar && source ? await db.select({skillId:questions.skillId}).from(questions).where(eq(questions.id,source.questionId)) : [];
     candidate=await selectPracticeQuestion(userId,profile,{...config,mode:selectingSimilar?"skill":config.mode,skillId:previous?.skillId??config.skillId,ids,exclude:beforeItems.map(i=>i.questionId),exploratory:selectingSimilar});
   }
+  if(candidate) await checkRapidSkips(userId,candidate.id);
   return db.transaction(async tx => {
     await lockDelivery(tx,userId,context);
     const session = await owned(tx,userId,id);
@@ -84,8 +86,8 @@ export async function loadPracticeSession(userId: string, profile: Profile, id: 
     if (applySimilar && (!similarSource?.attemptId || navigation.kind!=="next")) throw new DeliveryBlocked("Answer your question first.");
     if (!item && position<config.count) {
       if(applySimilar) {
-        for(const scope of [{id:`similar:user:${userId}`,max:30},...(context.device?[{id:`similar:device:${context.device}`,max:60}]:[]),...(context.ip?[{id:`similar:ip:${context.ip}`,max:300}]:[])])
-          await consumeWindow(tx,scope.id,scope.max,86_400_000);
+        for(const scope of [{id:`similar:user:${userId}`,max:60},...(context.device?[{id:`similar:device:${context.device}`,max:120}]:[]),...(context.ip?[{id:`similar:ip:${context.ip}`,max:3000}]:[])])
+          await consumeWindow(tx,scope.id,scope.max,60_000);
       }
       if(candidate) {
         const candidateId = candidate.id;

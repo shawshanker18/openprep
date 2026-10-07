@@ -4,18 +4,7 @@ import { redirect } from "next/navigation";
 import { getUserId } from "@/server/auth";
 import { LoginForm } from "./login-form";
 
-export const metadata = { title: "Sign in" };
-
-/** Which sign-in methods are switched on in Supabase (cached for 5 minutes). */
-async function providers(): Promise<{ google: boolean; email: boolean }> {
-  try {
-    const r = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1/settings`, {
-      headers: { apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY! }, next: { revalidate: 300 },
-    });
-    const j = (await r.json()) as { external?: { google?: boolean; email?: boolean } };
-    return { google: !!j.external?.google, email: j.external?.email !== false };
-  } catch { return { google: false, email: true }; }
-}
+export const metadata = { title: "Continue to OpenPrep" };
 
 /** Original OpenPrep mark: a rising path to a flag (climb to your target score). */
 function Mark({ className }: { className?: string }) {
@@ -54,7 +43,7 @@ function Scene() {
 
 export default async function LoginPage({ searchParams }: PageProps<"/login">) {
   if (await getUserId()) redirect("/dashboard");
-  const [{ error }, p, h] = await Promise.all([searchParams, providers(), headers()]);
+  const [{ error }, h] = await Promise.all([searchParams, headers()]);
   // Desktop/Android shells add "OpenPrepApp" to their user agent. Google blocks its sign-in inside embedded browsers,
   // so there it runs in the real browser and comes back to the app (see /auth/google).
   const inApp = (h.get("user-agent") ?? "").includes("OpenPrepApp");
@@ -65,13 +54,13 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
           <div className="flex items-center justify-between gap-2"><Link href="/" className="flex min-w-0 items-center gap-2">
             <Mark className="size-9 [@media(max-height:800px)]:size-8" />
             <span className="text-xl font-semibold tracking-tight">OpenPrep</span>
-          </Link><Link href="/guest" className="shrink-0 rounded-lg border px-2 py-2 text-xs font-medium hover:bg-muted">Continue as guest</Link></div>
+          </Link></div>
           <div className="flex flex-col gap-1 text-center">
-            <h1 className="text-xl font-medium">Sign in or create your free account</h1>
+            <h1 className="text-xl font-medium">Continue to OpenPrep</h1>
             <p className="text-sm text-muted-foreground">SAT questions, lessons, and practice. Free to use.</p>
           </div>
-          {error && <p role="alert" className="rounded-xl border border-destructive p-3 text-sm text-destructive">{error === "google_signup" ? "For a new account, confirm your Google email below and try again." : error === "google" ? "Google sign-in could not finish. Try again or request an email sign-in link below." : "That sign-in link didn’t work or has expired. Request a new one below."}</p>}
-          <LoginForm google={p.google} inApp={inApp} googleSignup={error === "google_signup"} />
+          {error && <p role="alert" className="rounded-xl border border-destructive p-3 text-sm text-destructive">{error === "google_signup" || error === "google" ? "Google could not finish. Try again or continue with email." : "That sign-in link didn’t work or has expired. Request a new one below."}</p>}
+          <LoginForm google={true} inApp={inApp} />
         </div>
       </div>
       <div className="hidden min-w-0 p-3 lg:block [@media(max-height:600px)]:hidden">

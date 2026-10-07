@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { CooldownRetry } from "@/components/cooldown-retry";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useReducer, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -195,7 +196,7 @@ export function PracticeRunner({ sessionId, userId, mode, title, block, set, bac
     return (
       <div className="flex flex-col items-start gap-3">
         <p role="alert" className="text-sm">{s.error}</p>
-        <Button variant="outline" onClick={() => start(async()=>{await load();})}>Try again</Button>
+        <CooldownRetry message={s.error} onRetry={() => start(async()=>{await load();})} />
         <Link href="/practice/sessions" className="text-sm underline">Saved sessions</Link>
       </div>
     );

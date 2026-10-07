@@ -15,7 +15,7 @@ it('rejects tampering, invalid lengths and expired papers',async()=>{
   const tampered=Buffer.from(token,'base64url');tampered[15]=tampered[15]!^1;
   expect(readPaper('alice',tampered.toString('base64url'))).toBeNull();
   expect(readPaper('alice','x')).toBeNull();
-  vi.spyOn(Date,'now').mockReturnValue(Date.now()+2*3600_000+1);
+  vi.spyOn(Date,'now').mockReturnValue(Date.now()+24*3600_000+1);
   expect(readPaper('alice',token)).toBeNull();vi.restoreAllMocks();
 });
 

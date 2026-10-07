@@ -12,6 +12,7 @@ import { pickQuestion, targetDifficulty } from "@/engine/select";
 import { recordAttempt } from "./attempts";
 import { ensureWeeklyFocus, skillsByPriority } from "./plan";
 import { toPublic, toRevealed } from "./questions";
+import { checkRapidSkips } from "./rapid-skips";
 import { servePractice } from "./delivery";
 import { deliveryContext, type DeliveryContext } from "./delivery-context";
 import { DELIVERY_POLICY, DeliveryBlocked } from "./delivery-policy";
@@ -159,6 +160,7 @@ export async function nextQuestion(userId: string, profile: Profile, input: Prac
   const now=new Date();
   const q=await selectPracticeQuestion(userId,profile,input);
   if (!q) return null;
+  await checkRapidSkips(userId, q.id);
   await servePractice(userId, q, input.context ?? await deliveryContext(), input.paper);
   const timeLimitS = input.mode === "set" ? await timeLimitFor(userId, q, input.timing) : null;
   const [reviewsDue, [saved]] = await Promise.all([
@@ -220,8 +222,6 @@ export async function submitAnswer(userId: string, input: {
       if(last && last.response===input.response) return {correct:last.correct,attemptId:last.id,revealed:toRevealed(q, userId),masteryBefore:masteryPct(last.thetaBefore),masteryAfter:masteryPct(last.thetaAfter),mistakeGuess:last.mistakeType,skillName:SKILL_BY_ID[q.skillId]?.name??q.skillId};
       return null;
     }
-    if (Date.now() - currentServe.servedAt.getTime() < DELIVERY_POLICY.minimumAnswerMs)
-      throw new DeliveryBlocked("Take a moment to read the question before submitting.");
     // A question in the user's review queue is always recorded as a review, whatever the client says.
     const [queued] = await tx.select().from(reviewItems)
       .where(and(eq(reviewItems.userId, userId), eq(reviewItems.questionId, q.id)));

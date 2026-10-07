@@ -1,5 +1,4 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { SIGNUP_REFUSALS } from "@/server/signup";
 import { createClient } from "@/lib/supabase/server";
 
 export async function GET(request: NextRequest) {
@@ -7,9 +6,7 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get("code");
   const google = searchParams.get("flow") === "google";
   if (searchParams.has("error")) {
-    const description=searchParams.get("error_description")??"";
-    const signupRequired=SIGNUP_REFUSALS.some(message=>description.includes(message));
-    return NextResponse.redirect(`${origin}/login?error=${signupRequired?"google_signup":"google"}`);
+    return NextResponse.redirect(`${origin}/login?error=${google ? "google" : "auth"}`);
   }
   if (code) {
     // The PKCE verifier lives where the sign-in was requested. No verifier here means the link was opened somewhere
