@@ -3,10 +3,12 @@
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
-/* Sidebar layout only when the window is wide AND tall enough for it; otherwise the phone layout (menu + bottom tabs). */
-@custom-variant desk (@media (min-width: 64rem) and (min-height: 38rem));
-/* Compact density for shorter windows so the sidebar always fits without scrolling. */
+/* Desktop layout (sidebar) for every desktop-width window. Only a window too short for even the tightest sidebar, or a
+   narrow phone/tablet window, gets the phone layout (menu + bottom tabs). */
+@custom-variant desk (@media (min-width: 64rem) and (min-height: 26rem));
+/* The sidebar tightens in two steps so it always fits without scrolling. */
 @custom-variant short (@media (max-height: 54rem));
+@custom-variant tiny (@media (max-height: 40rem));
 
 @theme inline {
   --color-background: var(--background);
@@ -135,7 +137,7 @@
     /* Phones: scrolling something into view (focus, scrollIntoView) clears the fixed bottom nav. */
     scroll-padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
   }
-  @media (min-width: 64rem) and (min-height: 38rem) {
+  @media (min-width: 64rem) and (min-height: 26rem) {
     html { scroll-padding-bottom: 0; }
   }
 }
@@ -192,3 +194,6 @@ body.lesson-focus-mode main { max-width: none; padding-top: 1rem; }
 
 /* The sidebar never scrolls: it is compact on short windows and replaced by the phone layout when it cannot fit. */
 .app-sidebar { overflow: hidden; }
+/* Closed by the student (remembered in this browser): the sidebar leaves and the content takes the full width. */
+html[data-sidebar="closed"] .app-sidebar { display: none; }
+html[data-sidebar="closed"] .app-content { margin-left: 0; }

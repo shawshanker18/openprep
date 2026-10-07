@@ -76,7 +76,7 @@ function Checklist({ items, onNavigate }: { items: ChecklistItem[]; onNavigate?:
   const next = items.find((i) => !i.done);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className="flex flex-col gap-2 rounded-md border p-2 text-left text-sm hover:bg-muted short:gap-1 short:p-1.5">
+      <DialogTrigger className="flex flex-col gap-2 rounded-md border p-2 text-left text-sm hover:bg-muted short:gap-1 short:p-1.5 tiny:p-1">
         <span className="flex items-center justify-between px-1">
           <span>Getting started</span><span className="tabular-nums text-muted-foreground">{done}/{items.length}</span>
         </span>
@@ -118,29 +118,29 @@ export function NavLinks({ checklist, user, signOut, isAdmin = false, onNavigate
   const path = usePathname();
   const search = useSearchParams();
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-4 short:gap-2">
+    <div className="flex min-h-0 flex-1 flex-col gap-4 short:gap-2 tiny:gap-1">
       {NAV_GROUPS.map((g) => (
         <div key={g.label ?? "main"} className="flex flex-col gap-0.5">
-          {g.label && <p className="px-2 pb-1 text-xs font-medium text-muted-foreground short:pb-0">{g.label}</p>}
+          {g.label && <p className="px-2 pb-1 text-xs font-medium text-muted-foreground short:pb-0 tiny:hidden">{g.label}</p>}
           {g.items.map(({ href, label, icon: Icon }) => (
             <Link key={href} href={href} onClick={onNavigate} aria-current={isActive(path, search, href) ? "page" : undefined}
-              className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:font-medium short:py-1">
+              className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:font-medium short:py-1 tiny:py-0.5 tiny:text-[13px]">
               <Icon className="size-4" />{label}
             </Link>
           ))}
         </div>
       ))}
-      <div className="mt-auto flex flex-col gap-2 short:gap-1">
+      <div className="mt-auto flex flex-col gap-2 short:gap-1 tiny:gap-0.5">
         <Checklist items={checklist} onNavigate={onNavigate} />
         <FeedbackDialog />
         {isAdmin && (
           <Link href="/admin" onClick={onNavigate} aria-current={path.startsWith("/admin") ? "page" : undefined}
-            className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:font-medium short:py-1">
+            className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:font-medium short:py-1 tiny:py-0.5 tiny:text-[13px]">
             <ShieldCheck className="size-4" />Admin
           </Link>
         )}
         <Link href="/settings" onClick={onNavigate} aria-current={isActive(path, search, "/settings") ? "page" : undefined}
-          className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:font-medium short:py-1">
+          className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:font-medium short:py-1 tiny:py-0.5 tiny:text-[13px]">
           <Settings className="size-4" /><span className="truncate">{user}</span>
         </Link>
         <form action={signOut}><button className="px-2 py-1 text-sm text-muted-foreground hover:text-foreground">Sign out</button></form>
