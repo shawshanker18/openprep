@@ -125,7 +125,7 @@ export function SurveyForm() {
 
       <div className="flex flex-col gap-2 text-sm">
         <label className={field}>Test date
-          <SatDateField name="testDate" disabled={unsureDate || step !== 2} required={!unsureDate && step === 2} />
+          <SatDateField name="testDate" disabled={unsureDate || step !== 2} required={!unsureDate && step === 2} emptyLabel="Choose a date" />
         </label>
         <label className="flex items-center gap-2">
           <input type="checkbox" checked={unsureDate} onChange={(e) => setUnsureDate(e.target.checked)} /> Not sure yet

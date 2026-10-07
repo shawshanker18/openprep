@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { DOMAINS, type DomainId } from "@/content/taxonomy";
 import { formatDate } from "@/lib/dates";
+import { Button } from "@/components/ui/button";
 import { MasteryBar } from "@/components/mastery-bar";
 import { publicStatsForPage } from "@/server/public-stats";
 import { requireUser } from "@/server/auth";
@@ -79,7 +80,7 @@ export default async function ProgressPage() {
       {(
         <section className="flex flex-col gap-2">
           <h2 className="font-medium">Official SAT scores</h2>
-          <Link href="/settings#scores" className="self-start underline">Add your official SAT result</Link>
+          <Button variant="outline" size="sm" className="self-start" render={<Link href="/settings#scores" />}>Add your official SAT result</Button>
           <p className="text-xs text-muted-foreground">Your scores stay private to your account.</p>
           <ul className="text-sm tabular-nums">{p.official.map((o) => <li key={o.id}>{o.takenOn}: {o.math + o.rw} (Math {o.math}, R&amp;W {o.rw})</li>)}</ul>
           {p.superscore && <p className="text-sm">Superscore: <b>{p.superscore.total}</b> (Math {p.superscore.math} + R&amp;W {p.superscore.rw})</p>}
@@ -101,7 +102,12 @@ export default async function ProgressPage() {
       </section>
 
       <div className="flex flex-col gap-6">
-        <section className="flex flex-col gap-3"><h2 className="font-medium">Review your work</h2><Link className="underline" href="/mistakes">Recent mistakes</Link><Link className="underline" href="/skills">Skills</Link><Link className="underline" href="/tests#history">Test history</Link><Link className="underline" href="/practice/sessions">Practice history</Link><Link className="underline" href="/bookmarks">Saved questions</Link></section>
+        <section className="flex flex-col gap-3"><h2 className="font-medium">Review your work</h2>
+          <div className="flex flex-wrap gap-2">
+            {([["/mistakes", "Recent mistakes"], ["/skills", "Skills"], ["/tests#history", "Test history"], ["/practice/sessions", "Practice history"], ["/bookmarks", "Saved questions"]] as const).map(([href, label]) => (
+              <Button key={href} variant="outline" render={<Link href={href} />}>{label}</Button>
+            ))}
+          </div></section>
 
       </div>
 
