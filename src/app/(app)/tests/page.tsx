@@ -57,17 +57,17 @@ export default async function TestsPage({ searchParams }: PageProps<"/tests">) {
 
       <div className="grid gap-4 lg:grid-cols-2">
         <StartCard title="Full practice test" time="2 h 14 min · 98 questions + 10-min break" fields={<input type="hidden" name="kind" value="full" />}>
-          Both sections, adaptive like the real test: how you do in each first module sets the difficulty of the second.
+          Math and Reading and Writing, each with Module 1 and Module 2. Your first-module answers set the second module’s difficulty.
         </StartCard>
-        <StartCard title="Short practice test" time="32 to 35 min · one timed module" fields={<><input type="hidden" name="kind" value="module" />{sectionPick}</>}>
-          Choose Math or Reading and Writing. Review your answers after finishing; this shorter test reports accuracy rather than an SAT score.
+        <StartCard title="Short practice test" time="64 to 70 min · Module 1 + Module 2" fields={<><input type="hidden" name="kind" value="section" />{sectionPick}</>}>
+          Choose Math or Reading and Writing. Module 2 adapts to your Module 1 answers. Finish both to see your estimated section score and review every answer.
         </StartCard>
       </div>
 
       <section id="history" className="flex scroll-mt-4 flex-col gap-2">
         <h2 className="font-medium">History</h2>
         {history.length === 0 ? <p className="text-sm text-muted-foreground">{page > 1 ? "No older tests." : "No tests yet."}</p> : (
-          <table className="w-full text-left text-sm">
+          <div className="max-w-full overflow-x-auto"><table className="w-full min-w-[28rem] text-left text-sm">
             <thead className="text-muted-foreground"><tr><th className="py-1 font-normal">Date</th><th className="font-normal">Test</th><th className="font-normal">Result</th><th /></tr></thead>
             <tbody>
               {history.map((t) => {
@@ -86,7 +86,7 @@ export default async function TestsPage({ searchParams }: PageProps<"/tests">) {
                 );
               })}
             </tbody>
-          </table>
+          </table></div>
         )}
         {(page > 1 || more) && (
           <nav className="flex items-center justify-between text-sm" aria-label="History pages">

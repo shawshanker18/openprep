@@ -1,0 +1,13 @@
+import { beforeEach, expect, it, vi } from "vitest";
+const mocks=vi.hoisted(()=>({user:vi.fn(),submit:vi.fn()}));
+vi.mock("@/server/auth",()=>({getUserId:mocks.user}));
+vi.mock("@/server/test-submission",()=>({submitOwnedModule:mocks.submit}));
+const {POST}=await import("./route");
+const request=(body:unknown={},origin="https://openprep.site")=>new Request("https://openprep.site/api/tests/submit",{method:"POST",headers:{origin,"content-type":"application/json"},body:JSON.stringify(body)});
+beforeEach(()=>{vi.clearAllMocks();mocks.user.mockResolvedValue("student");mocks.submit.mockResolvedValue({ok:true,finished:true});});
+it("rejects cross-origin writes before authentication or database work",async()=>{expect((await POST(request({},"https://attacker.example"))).status).toBe(403);expect(mocks.user).not.toHaveBeenCalled();expect(mocks.submit).not.toHaveBeenCalled();});
+it("returns 401 for signed-out requests without submitting",async()=>{mocks.user.mockResolvedValue(null);expect((await POST(request())).status).toBe(401);expect(mocks.submit).not.toHaveBeenCalled();});
+it("bounds actual request bytes and rejects invalid JSON",async()=>{expect((await POST(request({value:"x".repeat(32768)}))).status).toBe(413);expect(mocks.submit).not.toHaveBeenCalled();});
+it("submits only under the verified user identity and prevents caching",async()=>{const r=await POST(request({moduleId:"module",drafts:[]}));expect(r.status).toBe(200);expect(r.headers.get("cache-control")).toBe("no-store");expect(mocks.submit).toHaveBeenCalledWith("student",{moduleId:"module",drafts:[]});});
+it("returns a retryable failure without leaking backend errors",async()=>{mocks.submit.mockRejectedValue(new Error("private db password/token"));const r=await POST(request());expect(r.status).toBe(503);expect(await r.text()).not.toContain("private db");});
+it("preserves server rate-limit errors",async()=>{mocks.submit.mockResolvedValue({ok:false,error:"Wait",rateLimited:true});expect((await POST(request())).status).toBe(429);});

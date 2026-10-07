@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { clientIp, issueSignupTicket, SIGNUP_REFUSALS } from "@/server/signup";
 
@@ -15,7 +16,7 @@ export async function prepareEmailSignIn(email: string, privacyAccepted: boolean
   if(privacyAccepted!==true)return {ok:false as const,error:"Please accept the Privacy Policy before continuing."};
   const p = z.email().max(254).safeParse(email);
   if(!p.success)return {ok:false as const,error:"Enter a valid email address."};
-  await issueSignupTicket(p.data, await clientIp());
+  if(!(await issueSignupTicket(p.data, await clientIp())))return {ok:false as const,error:"Too many sign-in attempts. Please wait and try again."};
   return {ok:true as const};
 }
 
@@ -38,4 +39,17 @@ export async function signInWithGoogle(input: z.input<typeof Google>) {
   } catch { /* not a readable token: Supabase will reject it */ }
   const { error } = await (await createClient()).auth.signInWithIdToken({ provider: "google", token: p.data.credential, nonce: p.data.nonce });
   return { ok: !error, error: refusal(error?.message) };
+}
+
+/** OAuth starts on the server so its PKCE verifier uses the same HttpOnly cookie handling as the session. */
+export async function beginGoogleOAuth(email: string, privacyAccepted: boolean) {
+  const prepared=await prepareEmailSignIn(email,privacyAccepted);
+  if(!prepared.ok)return prepared;
+  const origin=(await headers()).get("origin");
+  const allowed=new Set(["https://openprep.site","https://www.openprep.site","https://openprep-opal.vercel.app","https://idkwhattodoforthesat.site","https://www.idkwhattodoforthesat.site"]);
+  if(!origin || (!allowed.has(origin) && !(process.env.NODE_ENV==="development" && /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin))))return {ok:false as const,error:"Open sign-in on openprep.site and try again."};
+  const supabase=await createClient();
+  const {data,error}=await supabase.auth.signInWithOAuth({provider:"google",options:{redirectTo:`${origin}/auth/callback?flow=google`,skipBrowserRedirect:true,queryParams:{login_hint:email,prompt:"select_account"}}});
+  if(error || !data.url)return {ok:false as const,error:"Google sign-in is unavailable. Please use the email sign-in link."};
+  return {ok:true as const,url:data.url};
 }

@@ -29,7 +29,7 @@ export async function saveSavedPractice(input:z.input<typeof Draft>) {
   if(limited) return {ok:false as const,error:limited};
   return result(()=>savePracticeDraft(userId,p.data.sessionId,p.data.position,p.data.response,p.data.timeMs));
 }
-const Answer = Draft.extend({confidence:z.union([z.literal(1),z.literal(2),z.literal(3)])});
+const Answer = Draft.extend({confidence:z.union([z.literal(1),z.literal(2),z.literal(3)]).nullable()});
 export async function answerSavedPractice(input:z.input<typeof Answer>) {
   const {userId}=await requireUser();
   const p=Answer.safeParse(input);

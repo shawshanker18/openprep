@@ -62,7 +62,6 @@ const elapsedMs = (since: number, hidden: number, pausedAt:number|null=null) => 
   const now=performance.now();
   return Math.round(now-since-hidden-(pausedAt===null?0:now-pausedAt));
 };
-const CONFIDENCE = [{ v: 1, label: "Guessed" }, { v: 2, label: "Unsure" }, { v: 3, label: "Sure" }] as const;
 const clock = (sec: number) => `${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, "0")}`;
 
 /** Per-question countdown at SAT pace. Runs into overtime rather than cutting the student off. */
@@ -81,12 +80,12 @@ export function PracticeRunner({ sessionId, userId, mode, title, block, set, bac
   set?: SetConfig; back?: string;
 }) {
   const [s, dispatch] = useReducer(reducer, { phase: "restoring", seen: [], answered: 0, correct: 0, ms: 0 });
-  // On a phone the confidence buttons (and later the explanation) are often below the screen: bring them into view
+  // On a phone the submit button (and later the explanation) are often below the screen: bring them into view
   // after the first tap on a choice, and when the answer is revealed. Only as far as needed, never while typing.
-  const confidenceRef = useRef<HTMLDivElement>(null);
+  const submitRef = useRef<HTMLDivElement>(null);
   const resultRef = useRef<HTMLDivElement>(null);
   const picked = s.phase === "answering" && s.value !== null && !!s.q.choices?.length;
-  useEffect(() => { if (picked) confidenceRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" }); }, [picked]);
+  useEffect(() => { if (picked) submitRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" }); }, [picked]);
   useEffect(() => { if (s.phase === "revealed") resultRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" }); }, [s.phase]);
   const [pending, start] = useTransition();
   const shownAt = useRef(0);
@@ -166,11 +165,11 @@ export function PracticeRunner({ sessionId, userId, mode, title, block, set, bac
     return () => document.removeEventListener("visibilitychange", onVis);
   }, []);
 
-  const submit = (confidence: 1 | 2 | 3) => {
+  const submit = () => {
     if (pending || s.phase !== "answering" || s.value === null) return;
     const timeMs = Math.min(86400_000,carriedMs.current + elapsedMs(shownAt.current, hiddenMs.current,hiddenSince.current));
     start(async () => {
-      const res = await answerSavedPractice({ sessionId, position, response: s.value, timeMs, confidence })
+      const res = await answerSavedPractice({ sessionId, position, response: s.value, timeMs, confidence: null })
         .catch(() => ({ ok: false as const, error: "Couldn't submit your answer. Your selection is still here. Check your connection and try again." }));
       if (!res.ok) toast.error(res.error);
       else { writeDraft(draftKey,[]); await load(); }
@@ -266,19 +265,13 @@ export function PracticeRunner({ sessionId, userId, mode, title, block, set, bac
         onChange={(v) => {setSaveStatus("Saving…");dispatch({ type: "select", value: v });}} correct={correctChoice} />
 
       {s.phase === "answering" && (
-        <div ref={confidenceRef} className="flex flex-col gap-2">
+        <div ref={submitRef} className="flex flex-col gap-2">
           <div className="flex flex-wrap items-start gap-2">
             <TutorPanel key={s.q.id} questionId={s.q.id} answered={false} />
             {s.q.section === "math" && <DesmosToggle />}
           </div>
           <Button variant="outline" className="self-start" disabled={pending} onClick={next}>Next question</Button>
-          <span className="text-sm text-muted-foreground">How sure are you? (this submits your answer)</span>
-          <div className="flex flex-wrap gap-2">
-            {CONFIDENCE.map((c) => (
-              <Button key={c.v} size="lg" variant={c.v === 3 ? "default" : "outline"}
-                disabled={s.value === null || pending} onClick={() => submit(c.v)}>{c.label}</Button>
-            ))}
-          </div>
+          <Button size="lg" className="self-start" disabled={s.value === null || pending} onClick={submit}>{pending ? "Submitting…" : "Submit answer"}</Button>
         </div>
       )}
 

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Fragment } from "react";
 import { formatDate } from "@/lib/dates";
 import { Button } from "@/components/ui/button";
 import { DOMAINS, SKILL_BY_ID, type DomainId } from "@/content/taxonomy";
@@ -85,7 +86,7 @@ export function TestResults({ data, timeZone }: { data: Data; timeZone: string }
           );
         })()}
         {r.total != null ? (
-          <h1 className="text-3xl font-semibold tabular-nums">Estimated {r.total - r.halfWidth} to {r.total + r.halfWidth}</h1>
+          <h1 className="text-3xl font-semibold tabular-nums">Estimated {Math.max(400,r.total - r.halfWidth)} to {Math.min(1600,r.total + r.halfWidth)}</h1>
         ) : (
           <h1 className="text-3xl font-semibold tabular-nums">
             {secs.reduce((a, k) => a + r.sections[k]!.correct, 0)} / {secs.reduce((a, k) => a + r.sections[k]!.total, 0)} correct
@@ -96,7 +97,7 @@ export function TestResults({ data, timeZone }: { data: Data; timeZone: string }
             const x = r.sections[k]!;
             return (
               <span key={k}>
-                {k === "rw" ? "Reading & Writing" : "Math"}: {x.score != null ? `${x.score - 30} to ${x.score + 30}` : `${x.correct}/${x.total}`}
+                {k === "rw" ? "Reading & Writing" : "Math"}: {x.score != null ? `${Math.max(200,x.score - 30)} to ${Math.min(800,x.score + 30)}` : `${x.correct}/${x.total}`}
                 {x.score != null && ` · ${x.correct}/${x.total}`} {ROUTE[x.route] && <span className="text-muted-foreground">· {ROUTE[x.route]}</span>}
               </span>
             );
@@ -116,7 +117,7 @@ export function TestResults({ data, timeZone }: { data: Data; timeZone: string }
       <section className="flex flex-col gap-2">
         <h2 className="font-medium">By domain</h2>
         {Object.entries(r.byDomain).map(([d, v]) => (
-          <div key={d} className="grid grid-cols-[minmax(8rem,14rem)_1fr_3rem] items-center gap-3 text-sm">
+          <div key={d} className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_3rem] items-center gap-3 text-sm">
             <span>{DOMAINS[d as DomainId]?.name ?? d}</span>
             <span className="h-2 overflow-hidden rounded-full bg-muted"><span className="block h-full bg-primary" style={{ width: `${(100 * v.correct) / v.total}%` }} /></span>
             <span className="text-right tabular-nums text-muted-foreground">{v.correct}/{v.total}</span>
@@ -133,9 +134,12 @@ export function TestResults({ data, timeZone }: { data: Data; timeZone: string }
 
       <section className="flex flex-col gap-2">
         <h2 className="font-medium">Review every question</h2>
+        <p className="text-sm text-muted-foreground">{Math.round(100 * secs.reduce((n,k)=>n+r.sections[k]!.correct,0) / Math.max(1,secs.reduce((n,k)=>n+r.sections[k]!.total,0)))}% correct overall. Your answers and explanations are below.</p>
         {data.items.map((it, i) => (
-          <ReviewItem key={`${it.moduleIdx}-${it.position}`} n={i + 1} q={it.question} response={it.response} correct={it.correct} timeMs={it.timeMs}
-            attemptId={it.attemptId} mistakeType={it.mistakeType} />
+          <Fragment key={`${it.moduleIdx}-${it.position}`}>
+            {(i===0 || data.items[i-1]!.moduleIdx!==it.moduleIdx) && <h3 className="mt-4 font-medium">{it.question.section==="math"?"Math":"Reading and Writing"} · Module {new Set(data.items.filter(x=>x.moduleIdx<=it.moduleIdx && x.question.section===it.question.section).map(x=>x.moduleIdx)).size}</h3>}
+            <ReviewItem n={i + 1} q={it.question} response={it.response} correct={it.correct} timeMs={it.timeMs} attemptId={it.attemptId} mistakeType={it.mistakeType} />
+          </Fragment>
         ))}
       </section>
 

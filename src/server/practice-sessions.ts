@@ -137,7 +137,7 @@ export async function savePracticeDraft(userId: string, id: string, position: nu
   });
 }
 export async function answerPracticeSession(userId: string, id: string, position: number,
-  input: {response:string|null;timeMs:number;confidence:1|2|3}) {
+  input: {response:string|null;timeMs:number;confidence:1|2|3|null}) {
   const context = await deliveryContext();
   return db.transaction(async tx => {
     await lockDelivery(tx,userId,context);

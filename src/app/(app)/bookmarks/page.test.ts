@@ -1,0 +1,14 @@
+import React from "react";
+import {renderToStaticMarkup} from "react-dom/server";
+import {beforeEach,expect,it,vi} from "vitest";
+const state=vi.hoisted(()=>({answered:false}));
+const row=()=>({id:"q",skillId:"m-alg-lin1",stem:"Choose the result.",passage:"Full passage.",choices:[{id:"A",md:"First option"},{id:"B",md:"Second option"},{id:"C",md:"Third option"},{id:"D",md:"Fourth option"}],answer:{choice:"B"},explanation:"SECRET_EXPLANATION",at:new Date(),note:null,answered:state.answered});
+vi.mock("@/db",()=>({db:{select:()=>({from:()=>({innerJoin:()=>({where:()=>({orderBy:()=>({limit:()=>({offset:async()=>[row()]})})})})})})}}));
+vi.mock("@/server/auth",()=>({requireUser:async()=>({userId:"student",profile:{timezone:"UTC"}})}));
+vi.mock("@/server/questions",()=>({publicId:()=>"public-q",internalId:async()=>"q",questionMarkdown:(_q:unknown,md:string)=>md}));
+vi.mock("./bookmark-note",()=>({BookmarkNote:()=>null}));
+vi.mock("@/components/ui/button",()=>({Button:({children}:{children:React.ReactNode})=>React.createElement("button",null,children)}));
+const {default:Page}=await import("./page");
+beforeEach(()=>{state.answered=false;});
+it("shows all saved answer choices while withholding answers for unattempted questions",async()=>{const html=renderToStaticMarkup(await Page({params:Promise.resolve({}),searchParams:Promise.resolve({})}));for(const label of ['First option','Second option','Third option','Fourth option'])expect(html).toContain(label);expect(html).not.toContain('SECRET_EXPLANATION');expect(html).not.toContain('Show answer');});
+it("reveals an explanation only after the owner has answered",async()=>{state.answered=true;const html=renderToStaticMarkup(await Page({params:Promise.resolve({}),searchParams:Promise.resolve({})}));expect(html).toContain('SECRET_EXPLANATION');expect(html).toContain('Show answer');});

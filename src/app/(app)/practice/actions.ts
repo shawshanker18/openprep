@@ -54,7 +54,7 @@ const Submit = z.object({
   questionId: id,
   response: text().max(8).nullable(),
   timeMs: z.number().int().min(0).max(24 * 3_600_000),
-  confidence: z.union([z.literal(1), z.literal(2), z.literal(3)]),
+  confidence: z.union([z.literal(1), z.literal(2), z.literal(3)]).nullable(),
 });
 export async function submitAnswer(input: z.input<typeof Submit>) {
   const { userId } = await requireUser();

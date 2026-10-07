@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { GoogleButton } from "./google-button";
+import { OAuthGoogleButton } from "./oauth-google-button";
 import { AppGoogleButton } from "./app-google-button";
 import { prepareEmailSignIn } from "@/app/auth/actions";
 
@@ -65,7 +65,7 @@ export function LoginForm({ google: showGoogle, inApp = false }: { google: boole
         <span>I accept the <Link className="text-foreground underline" href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</Link>.</span>
       </label>
 
-      {showGoogle && (inApp ? <AppGoogleButton enabled={canContinue}>{or}</AppGoogleButton> : <><GoogleButton enabled={canContinue} privacyAccepted={privacyAccepted}/>{or}</>)}
+      {showGoogle && (inApp ? <AppGoogleButton enabled={canContinue}>{or}</AppGoogleButton> : <><OAuthGoogleButton enabled={canContinue} privacyAccepted={privacyAccepted}/>{or}</>)}
 
       <form onSubmit={magic} className="flex flex-col gap-3 [@media(max-height:600px)]:gap-2">
         <label className="flex flex-col gap-2 text-sm font-medium">

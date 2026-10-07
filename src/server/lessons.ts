@@ -15,7 +15,7 @@ export async function getLesson(skillId: string) {
     const nl = chunk.indexOf("\n");
     return { heading: chunk.slice(0, nl).trim(), md: chunk.slice(nl + 1).trim() };
   });
-  return { minutes: Number(data.minutes) || null, sections };
+  return { minutes: Number(data.minutes) || null, sections: sections.filter(s => !/^The fast way/i.test(s.heading)) };
 }
 
 export async function lessonExists(skillId: string) {

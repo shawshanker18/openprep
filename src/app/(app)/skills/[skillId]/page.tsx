@@ -15,7 +15,6 @@ import { skillStats, tagsBySkill } from "@/server/practice";
 const TABS = ["performance", "practice", "mistakes"] as const;
 const SELF = ["Don't know", "A little", "Know it", "Very confident"];
 const DIFF = ["", "Easy", "Medium", "Hard"];
-const CONF = ["", "Guessed", "Unsure", "Sure"];
 const fmt = (ms: number) => `${Math.floor(ms / 60000)}m ${Math.round((ms % 60000) / 1000)}s`;
 
 function Sparkline({ points }: { points: number[] }) {
@@ -45,7 +44,6 @@ export default async function SkillPage({ params, searchParams }: PageProps<"/sk
   const [{ skills }, detail, stats, tags] = await Promise.all([
     getSkillSummary(userId), getSkillDetail(userId, skillId), skillStats(userId, skillId), tagsBySkill(),
   ]);
-  const confTotal = stats.confidence.reduce((a, r) => a + r.n, 0);
   const s = skills.find((k) => k.id === skillId)!;
   const measured = s.status !== "unknown";
 
@@ -92,8 +90,7 @@ export default async function SkillPage({ params, searchParams }: PageProps<"/sk
             {[
               ["You said", s.selfRating != null ? SELF[s.selfRating] : "Not yet"],
               ["How sure we are", measured ? `${certaintyPct(s.n)}% (${certaintyLabel(s.n)})` : "Not yet"],
-              ["Your confidence", confTotal ? stats.confidence.toSorted((a, b) => a.confidence - b.confidence)
-                .map((r) => `${CONF[r.confidence]} ${Math.round((100 * r.n) / confTotal)}%`).join(" · ") : "Not yet"],
+
               ["Accuracy", s.accuracy != null ? `${s.accuracy}%` : "Not yet"],
               ["Recent accuracy", stats.recent.n ? `${Math.round((100 * stats.recent.correct) / stats.recent.n)}% (last ${stats.recent.n})` : "Not yet"],
               ["Answered", `${s.n}`],
