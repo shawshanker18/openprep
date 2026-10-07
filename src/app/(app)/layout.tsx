@@ -10,6 +10,7 @@ import { CurrentSection, MobileMenu, MobileTabs, NavLinks } from "@/components/a
 import { AppBridge } from "@/components/app-bridge";
 import { SiteFooter } from "@/components/footer-feedback";
 import { SidebarToggle } from "@/components/sidebar-toggle";
+import { NavArrows } from "@/components/nav-arrows";
 import { getChecklist, getNotifications } from "@/server/notifications";
 import { getSkillSummary } from "@/server/analytics";
 import { levelOf, points } from "@/engine/course";
@@ -30,7 +31,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
 
   return (
     <div className="flex min-w-0 max-w-full flex-1 flex-col pb-[calc(4rem+env(safe-area-inset-bottom))] desk:flex-row desk:pb-0">
-      <aside className="app-sidebar fixed inset-y-0 left-0 z-10 hidden h-dvh w-56 shrink-0 flex-col gap-4 overflow-hidden border-r p-4 short:gap-2 short:p-3 tiny:gap-1 tiny:p-2 desk:flex">
+      <aside className="app-sidebar fixed inset-y-0 left-0 z-10 hidden h-dvh w-56 shrink-0 flex-col gap-4 overflow-hidden border-r p-4 short:gap-2 short:p-3 tiny:p-2 desk:flex">
         <Link href="/dashboard" className="text-lg font-semibold">OpenPrep</Link>
         <NavLinks {...nav} />
       </aside>
@@ -42,6 +43,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
       <div className="app-content flex min-w-0 flex-1 flex-col desk:ml-56 [.lesson-focus-mode_&]:ml-0">
         <div className="app-topbar sticky top-0 z-10 hidden items-center justify-end gap-2 border-b bg-background px-4 py-2 desk:flex">
           <SidebarToggle />
+          <NavArrows />
           <CurrentSection />
           {chips}
           {bell}

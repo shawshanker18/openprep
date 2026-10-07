@@ -6,12 +6,14 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { FeedbackForm } from "@/components/feedback-form";
 
 /** "Send feedback" in the app's menu: the form in a dialog, so the student stays where they are. */
-export function FeedbackDialog() {
+export function FeedbackDialog({ iconOnly = false }: { iconOnly?: boolean }) {
   const [open, setOpen] = useState(false);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className="flex items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm hover:bg-muted short:py-1 tiny:py-0.5 tiny:text-[13px]">
-        <MessageSquare className="size-4" />Send feedback
+      <DialogTrigger aria-label={iconOnly ? "Send feedback" : undefined} title={iconOnly ? "Send feedback" : undefined}
+        className={iconOnly ? "shrink-0 rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground"
+          : "flex items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm hover:bg-muted short:py-1 tiny:py-0.5"}>
+        <MessageSquare className="size-4" />{!iconOnly && "Send feedback"}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
