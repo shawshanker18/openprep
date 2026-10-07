@@ -54,7 +54,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
           <div className="flex items-center justify-between gap-2"><Link href="/" className="flex min-w-0 items-center gap-2">
             <Mark className="size-9 [@media(max-height:800px)]:size-8" />
             <span className="text-xl font-semibold tracking-tight">OpenPrep</span>
-          </Link></div>
+          </Link><Link href="/guest" className="shrink-0 rounded-lg border px-2 py-2 text-xs font-medium hover:bg-muted">Continue as guest</Link></div>
           <div className="flex flex-col gap-1 text-center">
             <h1 className="text-xl font-medium">Continue to OpenPrep</h1>
             <p className="text-sm text-muted-foreground">SAT questions, lessons, and practice. Free to use.</p>
