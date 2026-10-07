@@ -12,7 +12,6 @@ import { sectionEstimate, totalEstimate } from "@/engine/score";
 import { recordAttempt } from "./attempts";
 import { exposeQuestions } from "./delivery";
 import { deliveryContext } from "./delivery-context";
-import { DELIVERY_POLICY } from "./delivery-policy";
 import { questionExposures } from "@/db/schema";
 import { toPublic } from "./questions";
 
@@ -134,8 +133,7 @@ export async function answerDiagnostic(userId: string, input: {
     const cur = items[index];
     if (!cur || cur.q.id !== input.questionId) return { ok: false as const, error: "That question was already answered. Reload to continue." };
     const [exposure]=await tx.select().from(questionExposures).where(and(eq(questionExposures.userId,userId),eq(questionExposures.questionId,cur.q.id)));
-    if(!exposure || now.getTime()-Math.max(exposure.firstAt.getTime(),cur.servedAt?.getTime()??0)<DELIVERY_POLICY.minimumAnswerMs)
-      return {ok:false as const,error:"Take a moment to read the question before submitting."};
+    if(!exposure) return {ok:false as const,error:"Reload this question and try again."};
     const timeMs = serverCappedTime(input.timeMs, cur.servedAt, now);
 
     await tx.update(testItems).set({ response: input.response, timeMs })

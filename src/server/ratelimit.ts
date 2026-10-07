@@ -7,7 +7,7 @@ import { consumeWindow } from "./delivery";
 import { deliveryContext, type DeliveryContext } from "./delivery-context";
 import { digest } from "./delivery-identity";
 import { DeliveryBlocked } from "./delivery-policy";
-export const LIMITS = { requests: { max: 10, window: "10 s" }, answersPerQuestionPerMinute: 3 } as const;
+export const LIMITS = { requests: { max: 30, window: "10 s" }, answersPerQuestionPerMinute: 10 } as const;
 export const SLOW_DOWN = "Too many requests. Please wait a moment and try again.";
 const redis = process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN ? Redis.fromEnv() : null;
 
@@ -18,22 +18,22 @@ export async function databaseLimit(userId:string, kind:"request"|"answer"="requ
   try {
     await db.transaction(async tx => {
       // Always acquire shared buckets in the same order.
-      const buckets = [{id:`request:user:${userId}`,max:10},
-        ...(context.device ? [{id:`request:device:${context.device}`,max:20}] : []),
-        ...(context.ip ? [{id:`request:ip:${context.ip}`,max:100}] : [])].sort((a,b)=>a.id.localeCompare(b.id));
+      const buckets = [{id:`request:user:${userId}`,max:LIMITS.requests.max},
+        ...(context.device ? [{id:`request:device:${context.device}`,max:LIMITS.requests.max * 2}] : []),
+        ...(context.ip ? [{id:`request:ip:${context.ip}`,max:1000}] : [])].sort((a,b)=>a.id.localeCompare(b.id));
       for (const b of buckets) await consumeWindow(tx,b.id,b.max,10_000);
     });
     // A rejected answer must still count as a request.
-    if(kind==="answer" && questionId) await db.transaction(tx=>consumeWindow(tx,`answer:${userId}:${questionId}`,3,60_000));
+    if(kind==="answer" && questionId) await db.transaction(tx=>consumeWindow(tx,`answer:${userId}:${questionId}`,LIMITS.answersPerQuestionPerMinute,60_000));
     return null;
   } catch(e) { return e instanceof DeliveryBlocked ? SLOW_DOWN : 'Practice is temporarily unavailable. Please try again shortly.'; }
 }
 
-const anonymous = redis && new Ratelimit({ redis, prefix: "openprep:anon", limiter: Ratelimit.slidingWindow(30, "1 m") });
-/** Signed-out POSTs (sign-in, reports): 30 per minute per IP. True when this request should get a 429. */
+const anonymous = redis && new Ratelimit({ redis, prefix: "openprep:anon", limiter: Ratelimit.slidingWindow(300, "1 m") });
+/** Signed-out POSTs (sign-in, reports): 300 per minute per IP. True when this request should get a 429. */
 export async function anonymousLimited(ip: string) {
   if (anonymous) { try { if (!(await anonymous.limit(ip)).success) return true; } catch { /* Database remains authoritative. */ } }
-  try { await db.transaction(tx=>consumeWindow(tx,`anonymous:${digest(ip)}`,30,60_000)); return false; }
+  try { await db.transaction(tx=>consumeWindow(tx,`anonymous:${digest(ip)}`,300,60_000)); return false; }
   catch { return true; }
 }
 

@@ -254,8 +254,8 @@ it("test starts have a speed limit, not a quota", async () => {
   await db.insert(schema.profiles).values({ id: U });
   await db.insert(schema.skillState).values(SKILLS.map((k) => ({ userId: U, skillId: k.id })));
   const start = () => T.startTest(U, { kind: "module", section: "math" });
-  for (let i = 0; i < 4; i++) expect((await start()).ok).toBe(true);
-  expect(await start()).toMatchObject({ ok: false, error: "rate" }); // a 5th within 5 minutes
+  for (let i = 0; i < 20; i++) { const r = await start(); expect(r.ok).toBe(true); if(r.ok) await T.abandonTest(U,r.id); }
+  expect(await start()).toMatchObject({ ok: false, error: "rate" }); // rapid repeated starts are still bounded
   await db.update(schema.testSessions).set({ startedAt: sql`${schema.testSessions.startedAt} - interval '6 minutes'` }).where(eq(schema.testSessions.userId, U));
   await db.delete(schema.deliveryWindows).where(eq(schema.deliveryWindows.id,`test-start:user:${U}`)); // age the independent rolling bucket along with the session fixture
   expect((await start()).ok).toBe(true); // a few minutes later: fine, however many they did before

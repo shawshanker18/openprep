@@ -33,7 +33,7 @@ export function AppGoogleButton({ enabled, children }: { enabled: boolean; child
       <div className="flex flex-col items-center gap-1">
         <button type="button" disabled={!enabled} onClick={start}
           className="flex h-11 w-full items-center justify-center gap-2 rounded-full border text-sm font-medium disabled:text-muted-foreground">
-          {enabled ? <><GoogleG /> Continue with Google</> : "Tick the box above to continue with Google"}
+          <GoogleG /> Continue with Google
         </button>
         {state === "opened" && <p className="text-sm text-muted-foreground">Finish in your browser, then tap <b>Open the OpenPrep app</b>.</p>}
         {state === "error" && <p role="alert" className="text-sm text-destructive">Couldn&apos;t open your browser. Use the email link instead.</p>}

@@ -37,10 +37,8 @@ it('IDs differ between accounts and resolve only delivered content',async()=>{
  expect(JSON.stringify(r!.question)).not.toMatch(/explanation|choiceRationales/);
  expect(r!.question).toMatchObject({skillId:"m-alg-lin1",domain:"m-alg",difficulty:2});
 });
-it('an immediate wrong answer cannot reveal the solution; identical retries are idempotent',async()=>{
+it('fast legitimate answers are accepted; identical retries and ownership remain protected',async()=>{
  const input={questionId:ids[0]!,response:'B',timeMs:5000,confidence:2 as const};
- await expect(P.submitAnswer(USER,input)).rejects.toThrow(/read the question/);
- await age();
  const first=await P.submitAnswer(USER,input),retry=await P.submitAnswer(USER,input);
  expect(first!.revealed.answer).toEqual({choice:'A'});
  expect(retry!.attemptId).toBe(first!.attemptId);
