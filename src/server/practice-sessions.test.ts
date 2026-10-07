@@ -154,7 +154,7 @@ it("steps adaptive difficulty up after correct answers and down after misses, in
   await database.insert(schema.questions).values([skill,second].flatMap(s=>[1,2,3].flatMap(d=>[0,1,2,3].map(n=>({id:`adaptive-${s.id}-${d}-${n}`,skillId:s.id,section:s.section,domain:s.domain,difficulty:d,type:'mcq' as const,stemMd:'Solve this question',choices:[{id:'A',md:'Correct'},{id:'B',md:'Incorrect'}],answer:{choice:'A'},explanationMd:'Stored solution'})))));
   const random=vi.spyOn(Math,'random').mockReturnValue(0.5);
   try {
-    const sid=await S.createPracticeSession(student,{mode:'smart',count:8},'Recommended Practice');
+    const sid=await S.createPracticeSession(student,{mode:'smart',count:8},'Adaptive Practice');
     const levels=[2,3,2,1,1,2,3,3], responses=['A','B','B','B','A','A','A','A'];
     for(let position=0;position<levels.length;position++) {
       const current=await S.loadPracticeSession(student,profile,sid,position===0?{kind:'resume'}:{kind:'next',position:position-1});
