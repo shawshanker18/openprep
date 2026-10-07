@@ -185,3 +185,13 @@ body.lesson-focus-mode main { max-width: none; padding-top: 1rem; }
     padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
   }
 }
+
+/* Hide sidebar scrollbar chrome while retaining wheel, touch and keyboard scrolling. */
+.app-sidebar,
+aside:has(> nav[aria-label="App navigation"]) {
+  scrollbar-width: none;
+}
+.app-sidebar::-webkit-scrollbar,
+aside:has(> nav[aria-label="App navigation"])::-webkit-scrollbar {
+  display: none;
+}
