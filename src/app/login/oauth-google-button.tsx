@@ -9,7 +9,9 @@ export function OAuthGoogleButton({ enabled, privacyAccepted }: { enabled: boole
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   function openGoogle() {
-    if (opening.current || !enabled) return;
+    if (opening.current) return;
+    // Stays solid black so it is the first thing seen; if the two boxes are not ticked yet, say what is missing.
+    if (!enabled) { setError("Tick both boxes above to continue with Google."); return; }
     opening.current = true;
     setError(null);
     startTransition(async () => {
@@ -24,7 +26,7 @@ export function OAuthGoogleButton({ enabled, privacyAccepted }: { enabled: boole
     });
   }
   return <div className="flex flex-col gap-2">
-    <Button type="button" className="h-12 w-full rounded-full text-base font-medium" disabled={pending || !enabled} aria-busy={pending} onClick={openGoogle}>
+    <Button type="button" className="h-12 w-full rounded-full text-base font-medium" disabled={pending} aria-busy={pending} aria-disabled={!enabled} onClick={openGoogle}>
       {pending ? "Opening Google…" : "Continue with Google"}
     </Button>
     {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
