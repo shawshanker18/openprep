@@ -2,9 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { CourseCheckForm, LevelBox, LevelLegend, PointsBar } from "@/components/course-ui";
+import { CourseCheckForm, LevelBox, LevelLegend } from "@/components/course-ui";
 import { DOMAINS, skillsIn, type DomainId } from "@/content/taxonomy";
-import { checkCount, LEVEL_BY_ID, points, unitSteps, unitsOf } from "@/engine/course";
+import { checkCount, LEVEL_BY_ID, unitSteps, unitsOf } from "@/engine/course";
 import { requireUser } from "@/server/auth";
 import { getCourseLevels } from "@/server/course";
 
@@ -45,7 +45,6 @@ export default async function UnitPage({ params }: PageProps<"/course/[unit]">) 
       </div>
 
       <section className="flex flex-col gap-3 rounded-xl border p-5">
-        <PointsBar {...points(skills.map((s) => levels[s.id]!.level))} />
         <LevelLegend />
       </section>
 

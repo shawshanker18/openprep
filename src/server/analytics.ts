@@ -36,7 +36,6 @@ export const getSkillSummary = cache(async (userId: string) => {
   return { skills, estimate: { rw, math, total: totalEstimate(rw, math) } };
 });
 
-export type SkillSummary = Awaited<ReturnType<typeof getSkillSummary>>["skills"][number];
 
 /** Everything a skill page shows beyond getSkillSummary (spec 03 §12, 04 §4). */
 export async function getSkillDetail(userId: string, skillId: string) {

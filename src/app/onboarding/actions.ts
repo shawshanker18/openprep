@@ -1,15 +1,13 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
-import { z } from "zod";
+import type { z } from "zod";
 import { db } from "@/db";
 import { profiles, satAttempts, skillState } from "@/db/schema";
 import { SKILLS, TOPICS, boardTopics } from "@/content/taxonomy";
-import { priorTheta, type SelfRating } from "@/engine/prior";
+import { priorTheta } from "@/engine/prior";
 import { requireUser, type ActionResult } from "@/server/auth";
-import { startDiagnostic } from "@/server/diagnostic";
 
 import { Survey } from "@/lib/onboarding";
 
@@ -38,45 +36,4 @@ export async function submitSurvey(input: z.input<typeof Survey>): Promise<Actio
   });
   revalidatePath("/onboarding");
   return { ok: true, data: undefined };
-}
-
-const Ratings = z.record(z.string(), z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3)]).nullable());
-
-export async function submitSelfAssessment(input: z.input<typeof Ratings>): Promise<ActionResult> {
-  const { userId, profile } = await requireUser();
-  if (profile.onboardingStep !== "self") return { ok: false, error: "Self-assessment already submitted." };
-  const parsed = Ratings.safeParse(input);
-  if (!parsed.success) return { ok: false, error: "Invalid ratings." };
-  const studied = new Set(TOPICS.filter((t) => profile.topicsStudied.includes(t.id)).flatMap((t) => t.skills));
-  const implied = new Set(TOPICS.filter((t) => boardTopics(profile.curriculum, profile.grade).includes(t.id)).flatMap((t) => t.skills));
-  const rows = SKILLS.map((s) => {
-    const selfRating = (parsed.data[s.id] ?? null) as SelfRating | null;
-    return {
-      userId, skillId: s.id, selfRating,
-      theta: priorTheta({
-        selfRating, topicStudied: studied.has(s.id), boardImplied: implied.has(s.id),
-        priorSectionScore: s.section === "math" ? profile.priorMath : profile.priorRw,
-      }),
-    };
-  });
-  await db.transaction(async (tx) => {
-    await tx.insert(skillState).values(rows).onConflictDoNothing();
-    await tx.update(profiles).set({ onboardingStep: "diagnostic" }).where(eq(profiles.id, userId));
-  });
-  revalidatePath("/onboarding");
-  return { ok: true, data: undefined };
-}
-
-export async function skipDiagnostic() {
-  const { userId, profile } = await requireUser();
-  if (profile.onboardingStep === "diagnostic")
-    await db.update(profiles).set({ onboardingStep: "diagnostic_skipped" }).where(eq(profiles.id, userId));
-  redirect("/dashboard");
-}
-
-export async function beginDiagnostic() {
-  const { userId, profile } = await requireUser();
-  if (profile.onboardingStep !== "diagnostic" && profile.onboardingStep !== "diagnostic_skipped") redirect("/onboarding");
-  const id = await startDiagnostic(userId);
-  redirect(`/test/${id}`);
 }

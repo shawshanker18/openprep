@@ -1,5 +1,5 @@
 import "server-only";
-import { eq, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import { db } from "@/db";
 import { deliveryWindows, deliveryGuards, questionExposures } from "@/db/schema";
 
@@ -24,8 +24,3 @@ export async function exposureOverview() {
   return { questions, shared };
 }
 
-export async function findCopyOwner(copyRef:string, questionId:string) {
-  const { digest }=await import('./delivery-identity');
-  const rows=await db.select({userId:questionExposures.userId}).from(questionExposures).where(eq(questionExposures.questionId,questionId));
-  return rows.find(r=>digest(`copy:${r.userId}:${questionId}`).slice(0,16)===copyRef)?.userId??null;
-}

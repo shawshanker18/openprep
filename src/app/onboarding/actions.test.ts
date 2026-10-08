@@ -3,7 +3,7 @@ import path from "node:path";
 import { beforeAll, expect, it, vi } from "vitest";
 import { PGlite } from "@electric-sql/pglite";
 import { drizzle } from "drizzle-orm/pglite";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import * as schema from "@/db/schema";
 import { SKILLS } from "@/content/taxonomy";
 
@@ -14,8 +14,7 @@ const userId = "00000000-0000-0000-0000-000000000001";
 vi.mock("@/db", () => ({ db }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("next/navigation", () => ({ redirect: vi.fn() }));
-vi.mock("@/server/diagnostic", () => ({ startDiagnostic: vi.fn() }));
-vi.mock("@/server/auth", () => ({ diagnosticPending: (profile: { onboardingStep: string }) => ["diagnostic", "diagnostic_skipped"].includes(profile.onboardingStep), requireUser: async () => ({ userId, profile: await db.query.profiles.findFirst({ where: eq(schema.profiles.id, userId) }) }) }));
+vi.mock("@/server/auth", () => ({ requireUser: async () => ({ userId, profile: await db.query.profiles.findFirst({ where: eq(schema.profiles.id, userId) }) }) }));
 const { submitSurvey } = await import("./actions");
 
 beforeAll(async () => {
@@ -43,7 +42,6 @@ it("allows skipped slides and initializes every skill before the diagnostic with
 });
 
 it("opens bank, Adaptive Practice, daily plan, reviews and short tests without any diagnostic", async () => {
-  const P = await import("@/server/practice");
   const A = await import("@/app/(app)/practice/actions");
   const { createPaper } = await import("@/server/papers");
   const { getDashboard, isMockDue } = await import("@/server/daily");
@@ -56,7 +54,6 @@ it("opens bank, Adaptive Practice, daily plan, reviews and short tests without a
     type: "mcq" as const, stemMd: "Solve 2x = 4.", choices: [{ id: "A", md: "2" }, { id: "B", md: "4" }], answer: { choice: "A" }, explanationMd: "Divide both sides by 2 to get x = 2.",
   })));
   const profile = (await db.query.profiles.findFirst({ where: eq(schema.profiles.id, userId) }))!;
-  expect((await P.questionBank(userId)).rows).toHaveLength(0);
   const served = await A.nextQuestion({ paperId: await createPaper(userId, { mode: "smart" }), exclude: [] });
   expect(served).toMatchObject({ ok: true });
   if (!served.ok || "done" in served.data) throw new Error("Smart Practice did not serve a question");
@@ -65,7 +62,7 @@ it("opens bank, Adaptive Practice, daily plan, reviews and short tests without a
   expect(answered.ok).toBe(true);
   const state = await db.query.skillState.findFirst({ where: eq(schema.skillState.skillId, skill.id) });
   expect(state?.n).toBe(1);
-  expect((await P.questionBank(userId)).counts.incorrect).toBe(1);
+  expect(await db.select().from(schema.attempts).where(and(eq(schema.attempts.userId, userId), eq(schema.attempts.correct, false)))).toHaveLength(1);
   const dashboard = await getDashboard(userId, profile);
   expect(dashboard.blocks.length).toBeGreaterThan(0);
   // A missed question must still generate a review notification after skipping the diagnostic.

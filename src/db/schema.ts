@@ -305,7 +305,6 @@ export const deliveryWindows = pgTable("delivery_windows", {
   expiresAt: ts("expires_at").notNull(),
 });
 export type Profile = typeof profiles.$inferSelect;
-export type SkillStateRow = typeof skillState.$inferSelect;
 export { r2Files } from "./storage-schema";
 
 

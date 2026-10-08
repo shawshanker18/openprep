@@ -191,15 +191,4 @@ export async function getTodayPlan(userId: string, profile: Profile) {
   return plan ? withProgress(userId, profile, day, plan.blocks as PlanBlock[]) : null;
 }
 
-/** Hand-edit today's plan (it stays frozen for the day). Every block is marked custom so the UI can say so. */
-export async function editTodayPlan(userId: string, profile: Profile, edit: (blocks: PlanBlock[]) => PlanBlock[]) {
-  const { day, blocks } = await ensureDaily(userId, profile);
-  const next = edit(blocks).map((b) => ({ ...b, custom: true as const }));
-  await db.update(dailyPlans).set({ blocks: next }).where(and(eq(dailyPlans.userId, userId), eq(dailyPlans.day, day)));
-}
 
-/** Back to the automatic plan: drop today's row so ensureDaily regenerates it. */
-export async function resetTodayPlan(userId: string, profile: Profile) {
-  const day = localDate(new Date(), profile.timezone);
-  await db.delete(dailyPlans).where(and(eq(dailyPlans.userId, userId), eq(dailyPlans.day, day)));
-}

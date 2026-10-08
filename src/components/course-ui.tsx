@@ -23,16 +23,6 @@ export function LevelLegend() {
   );
 }
 
-export function PointsBar({ earned, max }: { earned: number; max: number }) {
-  const pct = max ? Math.round((100 * earned) / max) : 0;
-  return (
-    <div className="flex flex-col gap-1">
-      <div className="flex justify-between text-sm"><span>{pct}% mastered</span><span className="tabular-nums text-muted-foreground">{earned} / {max} mastery points</span></div>
-      <div className="h-2 overflow-hidden rounded-full bg-muted"><div className="h-full bg-primary" style={{ width: `${pct}%` }} /></div>
-    </div>
-  );
-}
-
 /** Starts a course quiz, unit test or challenge as an untimed custom test (results land in the usual results page). */
 export function CourseCheckForm({ title, skillIds, count, label, variant = "outline" }: {
   title: string; skillIds: string[]; count: number; label: string; variant?: "default" | "outline";

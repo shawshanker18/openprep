@@ -269,27 +269,4 @@ export async function skillStats(userId: string, skillId: string) {
   };
 }
 
-export type BankStatus = "new" | "correct" | "incorrect";
-export const QUESTION_BANK_PAGE_SIZE = 10;
-export type BankFilters = {
-  section?: "math" | "rw"; skillId?: string; difficulty?: 1 | 2 | 3;
-  status?: BankStatus | "saved"; page?: number;
-};
 
-/** Personal history only. Fresh questions are generated sets, never an enumerable catalogue. */
-export async function questionBank(userId: string, filters: BankFilters = {}) {
-  const latest = db.selectDistinctOn([attempts.questionId], { questionId: attempts.questionId, correct: attempts.correct })
-    .from(attempts).where(eq(attempts.userId,userId)).orderBy(attempts.questionId,desc(attempts.createdAt)).as("latest");
-  const matches = and(filters.section ? eq(questions.section,filters.section) : undefined,
-    filters.skillId ? eq(questions.skillId,filters.skillId) : undefined,
-    filters.difficulty ? eq(questions.difficulty,filters.difficulty) : undefined,
-    filters.status === "correct" ? eq(latest.correct,true) : filters.status === "incorrect" ? eq(latest.correct,false) : undefined,
-    filters.status === "saved" ? sql`exists(select 1 from bookmarks b where b.user_id=${userId} and b.question_id=${questions.id})` : undefined,
-    filters.status === "new" ? sql`false` : undefined);
-  const rows = await db.select({id:questions.id,skillId:questions.skillId,section:questions.section,difficulty:questions.difficulty,
-    stem:questions.stemMd,passage:questions.passageMd,last:latest.correct,
-    saved:sql<boolean>`exists(select 1 from bookmarks b where b.user_id=${userId} and b.question_id=${questions.id})`})
-    .from(latest).innerJoin(questions,eq(questions.id,latest.questionId)).where(matches).limit(10);
-  const [counts] = await db.select({attempted:count(),correct:sql<number>`count(*) filter(where ${latest.correct})::int`,incorrect:sql<number>`count(*) filter(where not ${latest.correct})::int`}).from(latest);
-  return {rows: rows.map(r=>({...r,status:r.last?"correct":"incorrect"})),counts:counts!};
-}

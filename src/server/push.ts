@@ -23,7 +23,6 @@ function configure() {
   webpush.setVapidDetails(subject, pub, priv);
   return (configured = true);
 }
-export const pushEnabled = () => !!(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY && process.env.VAPID_SUBJECT);
 
 export async function saveSubscription(userId: string, sub: z.infer<typeof PushSubscriptionInput>) {
   await db.transaction(async (tx) => {

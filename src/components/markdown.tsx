@@ -9,8 +9,6 @@ import { cn } from "@/lib/utils";
 import { QuestionImage } from "./question-image";
 import { normalizeMarkdown } from "@/lib/normalize-markdown";
 
-/** "Worked example 1 (easy)" → "worked-example-1-easy", so pages can link to a lesson section. */
-export const slugify = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
 export function Markdown({ children, className }: { children: string; className?: string }) {
   return (

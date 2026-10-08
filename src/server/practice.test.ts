@@ -66,15 +66,6 @@ it('resuming preserves the server clock and consumes no new exposure',async()=>{
  const [after]=await db.select().from(schema.questionServes).where(and(eq(schema.questionServes.userId,OTHER),eq(schema.questionServes.questionId,served!.questionId)));
  expect(after!.servedAt).toEqual(old);
 });
-it('bank history has no unseen catalogue, totals or saved-before-serve preview',async()=>{
- await db.insert(schema.bookmarks).values({userId:USER,questionId:ids[3]!});
- const bank=await P.questionBank(USER);
- expect(bank.rows.map(r=>r.id)).toEqual([ids[0]]);
- expect(bank.counts).toEqual({attempted:1,correct:0,incorrect:1});
- expect(bank.counts).not.toHaveProperty('total');
- expect((await P.questionBank(USER,{status:'new',page:100})).rows).toEqual([]);
-});
-
 it("plan blocks are done only from real work today (a click can't tick them)", async () => {
   const D = await import("./daily");
   const U3 = "00000000-0000-0000-0000-0000000000ee";

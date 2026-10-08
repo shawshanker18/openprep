@@ -3,8 +3,6 @@ import type { latestActivePracticeSession } from "@/server/practice-sessions";
 import { Button } from "@/components/ui/button";
 import { MasteryBar } from "@/components/mastery-bar";
 import { BrandBanner } from "@/components/brand";
-import { DiagnosticSuggestion } from "@/components/diagnostic-gate";
-import { diagnosticPending } from "@/server/auth";
 import type { getDashboard } from "@/server/daily";
 import type { getSkillSummary } from "@/server/analytics";
 import type { homeData } from "@/server/home";
@@ -103,7 +101,6 @@ export function DashboardView({profile,user,d,summary,home,savedPractice}: {
         <Button className="h-auto min-h-11 w-full max-w-full whitespace-normal break-words px-4 py-3 text-left sm:w-auto" render={<Link href={primary.href} />}>{resume[0] ? `${primary.action}: ${resume[0].title}` : primary.action}</Button>
       </BrandBanner>
 
-      {diagnosticPending(profile) && <DiagnosticSuggestion />}
 
       <section className="rounded-xl border p-5">
         <h2 className="font-semibold">Today&apos;s plan</h2>
