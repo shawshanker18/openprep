@@ -5,7 +5,7 @@ import { ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
- * The test-day screen, like the real digital SAT: a dark top bar (what you are doing, the timer, tools), the question
+ * The test-day screen, like the real digital SAT: a top bar (what you are doing, the timer, tools), the question
  * area in the middle, and a bottom bar (who you are, which question, Back / Next). It covers the whole window so there is
  * no site menu to wander off to. Used by the practice tests, the diagnostic and question-bank practice.
  */
@@ -18,7 +18,7 @@ export function ExamFrame({ top, footer, children }: { top: React.ReactNode; foo
   }, []);
   return (
     <div className="fixed inset-0 z-40 flex flex-col bg-background text-foreground">
-      <header className="dark flex shrink-0 flex-wrap items-center gap-x-4 gap-y-1 border-b-4 border-double border-foreground/30 bg-background px-4 py-2 text-foreground">{top}</header>
+      <header className="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-1 border-b-2 border-dashed border-foreground/40 bg-muted px-4 py-2 text-foreground">{top}</header>
       <main className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-4 lg:overflow-hidden lg:px-6">{children}</main>
       <footer className="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2 border-t-2 border-dashed border-foreground/40 bg-muted px-4 py-2 pb-[max(.5rem,env(safe-area-inset-bottom))]">{footer}</footer>
     </div>
