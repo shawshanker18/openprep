@@ -78,9 +78,9 @@ function Checklist({ items, onNavigate, compact = false }: { items: ChecklistIte
     <Dialog open={open} onOpenChange={setOpen}>
       {compact ? (
         <DialogTrigger aria-label={`Getting started, ${done} of ${items.length} done`} title={`Getting started ${done}/${items.length}`}
-          className="hidden shrink-0 rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground desk:snug:flex"><ListChecks className="size-4" /></DialogTrigger>
+          className="hidden shrink-0 rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground side:snug:flex"><ListChecks className="size-4" /></DialogTrigger>
       ) : (
-        <DialogTrigger className="flex flex-col gap-2 rounded-md border p-2 text-left text-sm hover:bg-muted desk:snug:hidden">
+        <DialogTrigger className="flex flex-col gap-2 rounded-md border p-2 text-left text-sm hover:bg-muted side:snug:hidden">
           <span className="flex items-center justify-between px-1">
             <span>Getting started</span><span className="tabular-nums text-muted-foreground">{done}/{items.length}</span>
           </span>
@@ -139,21 +139,21 @@ export function NavLinks({ checklist, user, signOut, isAdmin = false, onNavigate
         <Checklist items={checklist} onNavigate={onNavigate} />
         {isAdmin && (
           <Link href="/admin" onClick={onNavigate} aria-current={path.startsWith("/admin") ? "page" : undefined}
-            className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:font-medium desk:snug:hidden">
+            className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:font-medium side:snug:hidden">
             <ShieldCheck className="size-4" />Admin
           </Link>
         )}
         {/* Sidebar: account row with feedback and sign out as icons (saves a third of the height). Phone menu: full labels. */}
-        <div className={onNavigate ? "flex flex-col gap-2" : "flex flex-wrap items-center gap-1 desk:snug:justify-between"}>
+        <div className={onNavigate ? "flex flex-col gap-2" : "flex flex-wrap items-center gap-1 side:snug:justify-between"}>
           {onNavigate && <FeedbackDialog />}
           <Link href="/settings" onClick={onNavigate} aria-current={isActive(path, search, "/settings") ? "page" : undefined}
-            className="flex min-w-0 flex-1 items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:font-medium desk:snug:basis-full">
+            className="flex min-w-0 flex-1 items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:font-medium side:snug:basis-full">
             <Settings className="size-4 shrink-0" /><span className="truncate">{user}</span>
           </Link>
           {!onNavigate && <Checklist items={checklist} compact />}
           {!onNavigate && isAdmin && (
             <Link href="/admin" aria-label="Admin" title="Admin" aria-current={path.startsWith("/admin") ? "page" : undefined}
-              className="hidden shrink-0 rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground aria-[current=page]:bg-muted desk:snug:flex"><ShieldCheck className="size-4" /></Link>
+              className="hidden shrink-0 rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground aria-[current=page]:bg-muted side:snug:flex"><ShieldCheck className="size-4" /></Link>
           )}
           {!onNavigate && <FeedbackDialog iconOnly />}
           <form action={signOut} className={onNavigate ? undefined : "shrink-0"}>

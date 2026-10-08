@@ -3,9 +3,14 @@
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
-/* Desktop layout (sidebar) for every desktop-width window. Only a window too short for even the tightest sidebar, or a
-   narrow phone/tablet window, gets the phone layout (menu + bottom tabs). */
-@custom-variant desk (@media (min-width: 64rem) and (min-height: 40rem));
+/* What kind of device is this? The layout follows the input and the room, not just the width:
+   desk = a desktop/laptop shell (top bar, no bottom tabs): wide enough AND either a mouse/trackpad (Mac, Windows, Linux,
+          iPad with a trackpad) or a tall touch screen (iPad landscape). Phones and iPad portrait never get it.
+   side = desk with room for the full sidebar (at least 40rem tall).
+   lap  = desk on a short window (a laptop with a small browser window): same top bar, the menu opens from a button. */
+@custom-variant desk (@media (min-width: 64rem) and ((pointer: fine) or (min-height: 40rem)));
+@custom-variant side (@media (min-width: 64rem) and (min-height: 40rem));
+@custom-variant lap (@media (min-width: 64rem) and (max-height: 39.99rem) and (pointer: fine));
 /* Between 40rem and 44rem tall the sidebar swaps its two big cards (Getting started, Admin) for icons; nothing is squeezed. */
 @custom-variant snug (@media (max-height: 44rem));
 /* Dialogs and forms tighten on short windows. */
@@ -188,11 +193,24 @@ body.lesson-focus-mode main { max-width: none; padding-top: 1rem; }
 }
 
 /* Keep controls reachable beneath the tablet/mobile navigation. */
-@media (width < 64rem) {
+@media not ((min-width: 64rem) and ((pointer: fine) or (min-height: 40rem))) {
   body:has(.bottom-nav) > .site-footer {
     padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
   }
 }
+
+/* Big screens: the whole interface scales up (rem-based) instead of sitting small in the middle of a huge empty window.
+   The height conditions keep the sidebar fitting. 1920 wide ≈ 112%, 2560 ≈ 125%, 4K and wider ≈ 150%. */
+@media (min-width: 1920px) and (min-height: 900px) { html { font-size: 112.5%; } }
+@media (min-width: 2560px) and (min-height: 1200px) { html { font-size: 125%; } }
+@media (min-width: 3200px) and (min-height: 1600px) { html { font-size: 150%; } }
+
+/* Apple, Android and Linux polish. */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; text-rendering: optimizeLegibility; }
+a, button, summary, [role="button"], label, input, select, textarea { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+@media (pointer: coarse) { body { overscroll-behavior-y: none; } }
+/* Slimmer, theme-matched scrollbars where there is a mouse (Linux and Windows draw thick ones; macOS overlays its own). */
+@media (pointer: fine) { * { scrollbar-width: thin; scrollbar-color: color-mix(in oklab, var(--muted-foreground) 45%, transparent) transparent; } }
 
 /* The sidebar never scrolls: it swaps cards for icons on short windows and is replaced by the phone layout when it cannot fit. */
 .app-sidebar { overflow: hidden; }
