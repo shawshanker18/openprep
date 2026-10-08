@@ -29,7 +29,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
         </div>
       </div>
       <div className="hidden min-w-0 p-3 lg:block [@media(max-height:600px)]:hidden">
-        <div className="relative sticky top-3 h-[calc(100dvh-1.5rem)] overflow-hidden rounded-3xl bg-neutral-950 bg-[url('/brand/stage-dark.webp')] bg-cover bg-center text-white">
+        <div className="relative sticky top-3 h-[calc(100dvh-4.25rem)] overflow-hidden rounded-3xl bg-neutral-950 bg-[url('/brand/stage-dark.webp')] bg-cover bg-center text-white">
           <div className="absolute inset-x-0 bottom-0 flex flex-col gap-3 bg-gradient-to-t from-black/80 to-transparent p-10">
             <BrandLogo height={34} invert className="self-start" />
             <p className="max-w-sm text-sm text-white/75">Free SAT questions, lessons, and practice that adapts to you.</p>
