@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import type { ChecklistItem } from "@/server/notifications";
+import { setChecklistHidden, useChecklistHidden } from "@/lib/checklist-visibility";
 
 export const NAV_GROUPS = [
   {
@@ -71,8 +72,9 @@ function isActive(path: string, search: URLSearchParams, href: string) {
 /** Sidebar button that opens the full "Getting started" checklist in its own window. Hidden once everything is done. */
 function Checklist({ items, onNavigate, compact = false }: { items: ChecklistItem[]; onNavigate?: () => void; compact?: boolean }) {
   const [open, setOpen] = useState(false);
+  const hidden = useChecklistHidden();
   const done = items.filter((i) => i.done).length;
-  if (done === items.length) return null;
+  if (done === items.length || hidden) return null;
   const next = items.find((i) => !i.done);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -112,6 +114,8 @@ function Checklist({ items, onNavigate, compact = false }: { items: ChecklistIte
             </li>
           ))}
         </ol>
+        <button type="button" onClick={() => { setChecklistHidden(true); setOpen(false); }}
+          className="min-h-11 self-start rounded-md px-2 text-sm text-muted-foreground underline hover:text-foreground">Hide this list (bring it back in Settings)</button>
       </DialogContent>
     </Dialog>
   );

@@ -8,6 +8,7 @@ import { SUBJECTS, TOPICS } from "@/content/taxonomy";
 import { requireUser } from "@/server/auth";
 import { signOut } from "@/app/auth/actions";
 import { ThemeSelect } from "@/components/theme";
+import { ChecklistToggle } from "@/components/checklist-toggle";
 import { Reminders } from "./reminders";
 import {
   addOfficialScore, deleteAccount, removeOfficialScore, retakeDiagnostic, updateProfile, updateSettings,
@@ -41,6 +42,7 @@ export default async function SettingsPage({ searchParams }: PageProps<"/setting
       <section className="flex flex-col gap-2">
         <h2 className="font-medium">Appearance</h2>
         <ThemeSelect />
+        <ChecklistToggle />
         <p className="text-xs text-muted-foreground">System follows your device. Saved in this browser.</p>
       </section>
       {typeof sp.error === "string" && Object.hasOwn(ERRORS, sp.error) && <p role="alert" className="rounded-md border border-destructive p-3 text-sm text-destructive">{ERRORS[sp.error]}</p>}
