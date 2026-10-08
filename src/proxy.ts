@@ -44,5 +44,5 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   // Public pages with no account data (about, privacy, terms, security, .well-known) skip the session check.
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|sw.js|manifest.webmanifest|robots.txt|sitemap.xml|api/cron/|figures/|\\.well-known/|about$|privacy$|terms$|security$|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|sw.js|manifest.webmanifest|robots.txt|sitemap.xml|api/cron/|figures/|\\.well-known/|about$|privacy$|terms$|security$|learn$|learn/.*$|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
 };

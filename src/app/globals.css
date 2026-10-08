@@ -6,12 +6,13 @@
 /* What kind of device is this? The layout follows the input and the room, not just the width:
    desk = a desktop/laptop shell (top bar, no bottom tabs): wide enough AND either a mouse/trackpad (Mac, Windows, Linux,
           iPad with a trackpad) or a tall touch screen (iPad landscape). Phones and iPad portrait never get it.
-   side = desk with room for the full sidebar (at least 40rem tall).
-   lap  = desk on a short window (a laptop with a small browser window): same top bar, the menu opens from a button. */
+   side = desk with room for the sidebar: a mouse/trackpad window at least 28rem tall, or a touch screen at least 40rem tall.
+          The sidebar sizes itself to the height it is given (row height follows the window), so it never scrolls and never crams.
+   lap  = only a sliver of a window (under 28rem tall): same top bar, the menu opens from a button. */
 @custom-variant desk (@media (min-width: 64rem) and ((pointer: fine) or (min-height: 40rem)));
-@custom-variant side (@media (min-width: 64rem) and (min-height: 40rem));
-@custom-variant lap (@media (min-width: 64rem) and (max-height: 39.99rem) and (pointer: fine));
-/* Between 40rem and 44rem tall the sidebar swaps its two big cards (Getting started, Admin) for icons; nothing is squeezed. */
+@custom-variant side (@media (min-width: 64rem) and (min-height: 28rem) and ((pointer: fine) or (min-height: 40rem)));
+@custom-variant lap (@media (min-width: 64rem) and (max-height: 27.99rem) and (pointer: fine));
+/* Under 44rem tall the sidebar swaps its two big cards (Getting started, Admin) for icons. */
 @custom-variant snug (@media (max-height: 44rem));
 /* Dialogs and forms tighten on short windows. */
 @custom-variant short (@media (max-height: 54rem));
