@@ -18,6 +18,7 @@ export const metadata: Metadata = {
   description: "OpenPrep (Open Prep) is a free SAT prep platform: adaptive practice, over 13,000 SAT questions, full-length practice tests, lessons and a personal study plan. No subscription, no ads.",
   keywords: ["OpenPrep", "Open Prep", "free SAT prep", "SAT practice tests", "SAT questions", "adaptive SAT practice", "digital SAT", "SAT study plan"],
   alternates: { canonical: "./" },
+  other: { "msvalidate.01": "78A7934EB1F51F16CECD72CAD3455A09" }, // Bing Webmaster Tools ownership
   applicationName: "OpenPrep",
   appleWebApp: { capable: true, title: "OpenPrep", statusBarStyle: "default" },
   icons: { icon: [{ url: "/favicon.ico", sizes: "48x48" }, { url: "/icon-192.png", sizes: "192x192", type: "image/png" }], apple: "/apple-icon.png" },
