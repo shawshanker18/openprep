@@ -1,3 +1,4 @@
+import { questionMarkdown } from "@/server/questions";
 import Link from "next/link";
 import { formatDate } from "@/lib/dates";
 import { notFound, redirect } from "next/navigation";
@@ -138,7 +139,7 @@ export default async function SkillPage({ params, searchParams }: PageProps<"/sk
             <ul className="flex flex-col gap-2">
               {detail.missed.map((m) => (
                 <li key={m.id} className="rounded-md border p-3 text-sm">
-                  <Markdown className="line-clamp-2">{m.stem}</Markdown>
+                  <Markdown className="line-clamp-2">{questionMarkdown({ id: m.id, stemMd: "", passageMd: null, choices: null }, m.stem, userId)}</Markdown>
                   <span className="text-xs text-muted-foreground">
                     Missed {formatDate(m.at, profile.timezone)} · {m.dueAt ? `review due ${formatDate(m.dueAt, profile.timezone)}` : "cleared from review"}
                   </span>
