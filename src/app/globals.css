@@ -5,8 +5,10 @@
 @custom-variant dark (&:is(.dark *));
 /* Desktop layout (sidebar) for every desktop-width window. Only a window too short for even the tightest sidebar, or a
    narrow phone/tablet window, gets the phone layout (menu + bottom tabs). */
-@custom-variant desk (@media (min-width: 64rem) and (min-height: 30rem));
-/* The sidebar tightens item padding in two steps; headings and group spacing never change. */
+@custom-variant desk (@media (min-width: 64rem) and (min-height: 40rem));
+/* Between 40rem and 44rem tall the sidebar swaps its two big cards (Getting started, Admin) for icons; nothing is squeezed. */
+@custom-variant snug (@media (max-height: 44rem));
+/* Dialogs and forms tighten on short windows. */
 @custom-variant short (@media (max-height: 54rem));
 @custom-variant tiny (@media (max-height: 34rem));
 
@@ -192,7 +194,7 @@ body.lesson-focus-mode main { max-width: none; padding-top: 1rem; }
   }
 }
 
-/* The sidebar never scrolls: it is compact on short windows and replaced by the phone layout when it cannot fit. */
+/* The sidebar never scrolls: it swaps cards for icons on short windows and is replaced by the phone layout when it cannot fit. */
 .app-sidebar { overflow: hidden; }
 /* Closed by the student (remembered in this browser): the sidebar leaves and the content takes the full width. */
 html[data-sidebar="closed"] .app-sidebar { display: none; }
