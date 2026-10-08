@@ -14,6 +14,11 @@
 @custom-variant lap (@media (min-width: 64rem) and (max-height: 27.99rem) and (pointer: fine));
 /* Under 44rem tall the sidebar swaps its two big cards (Getting started, Admin) for icons. */
 @custom-variant snug (@media (max-height: 44rem));
+/* Exam screens go side by side (passage | question) on any wide screen, and on a phone or tablet turned sideways. */
+@custom-variant split {
+  @media (min-width: 64rem) { @slot; }
+  @media (min-width: 40rem) and (orientation: landscape) { @slot; }
+}
 /* Dialogs and forms tighten on short windows. */
 @custom-variant short (@media (max-height: 54rem));
 @custom-variant tiny (@media (max-height: 34rem));
