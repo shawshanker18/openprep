@@ -32,8 +32,8 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
 
   return (
     <div className="flex min-w-0 max-w-full flex-1 flex-col pb-[calc(4rem+env(safe-area-inset-bottom))] desk:flex-row desk:pb-0">
-      <aside className="app-sidebar fixed inset-y-0 left-0 z-10 hidden h-dvh w-56 shrink-0 flex-col gap-4 overflow-hidden border-r p-4 short:gap-2 short:p-3 tiny:p-2 desk:flex">
-        <Link href="/dashboard" aria-label="OpenPrep home" className="block"><BrandLogo height={22} /></Link>
+      <aside className="app-sidebar fixed inset-y-0 left-0 z-10 hidden h-dvh w-56 shrink-0 flex-col gap-4 overflow-hidden border-r p-4 desk:flex">
+        <Link href="/dashboard" aria-label="OpenPrep home" className="block px-2 pb-4 pt-2"><BrandLogo height={24} /></Link>
         <NavLinks {...nav} />
       </aside>
       <header className="app-mobile-header sticky top-0 z-10 flex items-center justify-between border-b bg-background py-2 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] desk:hidden">
