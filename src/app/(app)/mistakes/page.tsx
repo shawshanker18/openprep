@@ -8,7 +8,7 @@ import { attempts, questions, reviewItems, testItems, testModules, testSessions 
 import { SKILL_BY_ID } from "@/content/taxonomy";
 import { cn } from "@/lib/utils";
 import { requireUser } from "@/server/auth";
-import { publicId } from "@/server/questions";
+import { publicId, questionMarkdown } from "@/server/questions";
 
 export const metadata = { title: "Mistakes" };
 const PER_PAGE = 30;
@@ -67,20 +67,20 @@ export default async function MistakesPage({ searchParams }: PageProps<"/mistake
         <p className="text-muted-foreground">{view === "due" ? "Nothing due right now." : "No mistakes match these filters."}</p>
       ) : (
         <ul className="flex flex-col gap-2">
-          {rows.map((m) => (
+          {rows.map((m) => { const fix = (md: string) => questionMarkdown({ id: m.id, stemMd: "", passageMd: null, choices: null }, md, userId); return (
             <li key={publicId(m.id,userId)} className="flex flex-col gap-1 rounded-md border p-3 text-sm">
-              <Markdown>{m.stem}</Markdown>
+              <Markdown>{fix(m.stem)}</Markdown>
               <p>Your answer: <b>{m.response ?? "Not answered"}</b> · Correct answer: <b>{"choice" in m.answer ? m.answer.choice : m.answer.accepted.join(" or ")}</b></p>
-              {"choice" in m.answer && Array.isArray(m.choices) && <Markdown>{m.choices.find(c => "choice" in m.answer && c.id === m.answer.choice)?.md ?? ""}</Markdown>}
-              {m.response && m.rationale?.[m.response] && <Markdown>{m.rationale[m.response]!}</Markdown>}
-              {m.explanation && <Markdown>{`**Why:** ${m.explanation}`}</Markdown>}
+              {"choice" in m.answer && Array.isArray(m.choices) && <Markdown>{fix(m.choices.find(c => "choice" in m.answer && c.id === m.answer.choice)?.md ?? "")}</Markdown>}
+              {m.response && m.rationale?.[m.response] && <Markdown>{fix(m.rationale[m.response]!)}</Markdown>}
+              {m.explanation && <Markdown>{fix(`**Why:** ${m.explanation}`)}</Markdown>}
               <span className="text-xs text-muted-foreground">
                 <Link className="underline" href={`/skills/${m.skillId}?tab=mistakes`}>{SKILL_BY_ID[m.skillId]?.name}</Link>
                 {" · "}missed {formatDate(m.at, profile.timezone)}
                 {" · "}{m.dueAt ? (m.dueAt <= now ? "due now" : `review ${formatDate(m.dueAt, profile.timezone)}`) : "cleared"}
               </span>
             </li>
-          ))}
+          );})}
         </ul>
       )}
       {(page > 1 || more) && (
