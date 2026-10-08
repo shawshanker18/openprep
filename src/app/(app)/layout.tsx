@@ -2,19 +2,16 @@ import Link from "next/link";
 import { Suspense } from "react";
 import type { Profile } from "@/db/schema";
 import { redirect } from "next/navigation";
-import { Award } from "lucide-react";
 import { getAuthUser, requireUser } from "@/server/auth";
 import { signOut } from "@/app/auth/actions";
 import { NotificationBell } from "@/components/notification-bell";
-import { CurrentSection, MobileMenu, MobileTabs, NavLinks } from "@/components/app-nav";
+import { AccountLinks, CurrentSection, MobileMenu, MobileTabs, NavLinks } from "@/components/app-nav";
 import { AppBridge } from "@/components/app-bridge";
 import { SiteFooter } from "@/components/footer-feedback";
 import { BrandLogo } from "@/components/brand";
 import { SidebarToggle } from "@/components/sidebar-toggle";
 import { NavArrows } from "@/components/nav-arrows";
-import { getChecklist, getNotifications } from "@/server/notifications";
-import { getSkillSummary } from "@/server/analytics";
-import { levelOf, points } from "@/engine/course";
+import { getNotifications } from "@/server/notifications";
 import { isAdmin } from "@/server/admin";
 import { safely } from "@/lib/safely";
 
@@ -22,12 +19,9 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
   const { userId, profile } = await requireUser();
   if (profile.onboardingStep !== "done" && profile.onboardingStep !== "diagnostic_skipped" && profile.onboardingStep !== "diagnostic") redirect("/onboarding");
   // Furniture, not content: if any of these is slow or fails the page still renders without it.
-  const [checklist, user, admin] = await Promise.all([
-    safely(() => getChecklist(userId, profile), []), safely(() => getAuthUser(), null),
-    safely(() => isAdmin(userId), false),
-  ]);
-  const nav = { checklist, user: user?.name ?? user?.email ?? "Settings", signOut, isAdmin: admin };
-  const chips = <Suspense fallback={null}><MasteryPoints userId={userId} /></Suspense>;
+  const [user, admin] = await Promise.all([safely(() => getAuthUser(), null), safely(() => isAdmin(userId), false)]);
+  const nav = { signOut };
+  const account = <AccountLinks isAdmin={admin} user={user?.name ?? user?.email ?? "Account"} />;
   const bell = <Suspense fallback={<span className="inline-block size-9 shrink-0" aria-hidden />}><UserNotifications userId={userId} profile={profile} /></Suspense>;
 
   return (
@@ -39,7 +33,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
       <header className="app-mobile-header sticky top-0 z-10 flex items-center justify-between border-b bg-background py-2 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] desk:hidden">
         <MobileMenu {...nav} />
         <Link href="/dashboard" aria-label="OpenPrep home"><BrandLogo height={20} /></Link>
-        {bell}
+        <div className="flex items-center">{account}{bell}</div>
       </header>
       <div className="app-content flex min-w-0 flex-1 flex-col side:ml-56 [.lesson-focus-mode_&]:ml-0">
         <div className="app-topbar sticky top-0 z-10 hidden items-center justify-end gap-2 border-b bg-background px-4 py-2 desk:flex">
@@ -47,11 +41,11 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
           <span className="hidden lap:inline-flex"><MobileMenu {...nav} /></span>
           <NavArrows />
           <CurrentSection />
-          {chips}
+          {account}
           {bell}
         </div>
         <main className="mx-auto w-full min-w-0 max-w-5xl flex-1 min-[1536px]:max-w-6xl min-[1920px]:max-w-7xl min-[2560px]:max-w-[96rem] min-[3200px]:max-w-[110rem] px-[max(1rem,env(safe-area-inset-left),env(safe-area-inset-right))] pb-8 pt-6 lg:px-8 has-[.question-content]:max-w-none">
-          <div className="mb-4 flex flex-wrap items-center gap-2 desk:hidden"><CurrentSection />{chips}</div>
+          <div className="mb-4 flex flex-wrap items-center gap-2 desk:hidden"><CurrentSection /></div>
           {children}
         </main>
         <SiteFooter scope="app" />
@@ -60,13 +54,6 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
       <AppBridge reminderHour={profile.reminderHour} timezone={profile.timezone} />
     </div>
   );
-}
-
-async function MasteryPoints({ userId }: { userId: string }) {
-  const summary = await safely(() => getSkillSummary(userId), null);
-  if (!summary) return null;
-  const mastery = points(summary.skills.map((k) => levelOf(k.n, k.status))).earned;
-  return <Link href="/skills" className="flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm tabular-nums hover:bg-muted" title="Mastery points across your skills"><Award className="size-4" />{mastery.toLocaleString("en-US")} points</Link>;
 }
 
 async function UserNotifications({ userId, profile }: { userId: string; profile: Profile }) {

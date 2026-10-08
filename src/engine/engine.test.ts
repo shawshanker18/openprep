@@ -368,7 +368,7 @@ describe("plan near the test date", () => {
 });
 
 describe("course", async () => {
-  const { levelOf, unitSteps, points, checkCount } = await import("./course");
+  const { levelOf, unitSteps, checkCount } = await import("./course");
   it("levels: nothing answered is not started; otherwise follows the mastery status", () => {
     expect(levelOf(0, "mastered")).toBe("not-started");
     expect(levelOf(3, "weak")).toBe("attempted");
@@ -386,8 +386,7 @@ describe("course", async () => {
       if (skillsIn(d).length > 3) expect(new Set(quizzed).size).toBe(skillsIn(d).length);
     }
   });
-  it("points and question counts", () => {
-    expect(points(["mastered", "familiar", "not-started"])).toEqual({ earned: 150, max: 300 });
+  it("question counts", () => {
     expect(checkCount("quiz", 3)).toBe(6);
     expect(checkCount("unit-test", 5)).toBe(15);
     expect(checkCount("challenge", 29)).toBe(30);

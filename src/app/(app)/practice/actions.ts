@@ -5,7 +5,6 @@ import { z } from "zod";
 import { text } from "@/lib/text";
 import { db } from "@/db";
 import { attempts, bookmarks, questionReports, questions } from "@/db/schema";
-import { MISTAKE_TYPES } from "@/engine/mistakes";
 import { requireUser } from "@/server/auth";
 import { nextQuestion as next, resumeQuestion, submitAnswer as submit, wasGiven } from "@/server/practice";
 import { limitPractice } from "@/server/ratelimit";
@@ -69,16 +68,6 @@ export async function submitAnswer(input: z.input<typeof Submit>) {
   } catch(e) { if(e instanceof DeliveryBlocked) return {ok:false as const,error:e.message}; throw e; }
 }
 
-export async function setMistakeType(input: { attemptId: string; type: string }) {
-  const { userId } = await requireUser();
-  const p = z.object({ attemptId: z.uuid(), type: z.enum(MISTAKE_TYPES) }).safeParse(input);
-  if (!p.success) return { ok: false as const, error: "Invalid mistake type." };
-  const limited = await limitPractice(userId, "request");
-  if (limited) return { ok: false as const, error: limited };
-  await db.update(attempts).set({ mistakeType: p.data.type })
-    .where(and(eq(attempts.id, p.data.attemptId), eq(attempts.userId, userId), eq(attempts.correct, false)));
-  return { ok: true as const, data: undefined };
-}
 
 export async function toggleBookmark(input: { questionId: string }) {
   const { userId } = await requireUser();

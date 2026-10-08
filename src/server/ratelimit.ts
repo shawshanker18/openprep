@@ -44,4 +44,3 @@ export async function anonymousLimited(ip: string) {
   catch (e) { return e instanceof DeliveryBlocked; }
 }
 
-export const redisConfigured = () => !!redis;

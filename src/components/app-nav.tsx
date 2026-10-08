@@ -5,13 +5,11 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import {
-  BarChart3, Bookmark, BookOpen, Calculator, Check, ClipboardList, GraduationCap, Home, Library, ListChecks, LogOut, Menu, Settings, ShieldCheck, Sparkles, XCircle,
+  BarChart3, Bookmark, BookOpen, Calculator, ClipboardList, GraduationCap, Home, Library, LogOut, Menu, Settings, ShieldCheck, Sparkles, XCircle,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import type { ChecklistItem } from "@/server/notifications";
-import { setChecklistHidden, useChecklistHidden } from "@/lib/checklist-visibility";
+
+const ROW = "flex items-center gap-2 rounded-md px-2 py-1.5 text-sm side:h-[clamp(1.5rem,5.6dvh,2.125rem)] side:py-0 hover:bg-muted";
 
 export const NAV_GROUPS = [
   {
@@ -69,61 +67,7 @@ function isActive(path: string, search: URLSearchParams, href: string) {
   return path === href || path.startsWith(`${href}/`);
 }
 
-/** Sidebar button that opens the full "Getting started" checklist in its own window. Hidden once everything is done. */
-function Checklist({ items, onNavigate, compact = false }: { items: ChecklistItem[]; onNavigate?: () => void; compact?: boolean }) {
-  const [open, setOpen] = useState(false);
-  const hidden = useChecklistHidden();
-  const done = items.filter((i) => i.done).length;
-  if (done === items.length || hidden) return null;
-  const next = items.find((i) => !i.done);
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      {compact ? (
-        <DialogTrigger aria-label={`Getting started, ${done} of ${items.length} done`} title={`Getting started ${done}/${items.length}`}
-          className="hidden shrink-0 rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground side:snug:flex"><ListChecks className="size-4" /></DialogTrigger>
-      ) : (
-        <DialogTrigger className="flex flex-col gap-2 rounded-md border p-2 text-left text-sm hover:bg-muted side:snug:hidden">
-          <span className="flex items-center justify-between px-1">
-            <span>Getting started</span><span className="tabular-nums text-muted-foreground">{done}/{items.length}</span>
-          </span>
-          <span className="mx-1 h-1.5 overflow-hidden rounded-full bg-muted"><span className="block h-full bg-primary" style={{ width: `${(100 * done) / items.length}%` }} /></span>
-        </DialogTrigger>
-      )}
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle>Getting started</DialogTitle>
-          <DialogDescription>
-            {done} of {items.length} done. {next ? `Next up: ${next.label.toLowerCase()}.` : ""}
-          </DialogDescription>
-        </DialogHeader>
-        <div className="h-2 overflow-hidden rounded-full bg-muted"><div className="h-full bg-primary" style={{ width: `${(100 * done) / items.length}%` }} /></div>
-        <ol className="flex flex-col gap-2">
-          {items.map((i, n) => (
-            <li key={i.id} className="flex items-center gap-3 rounded-lg border p-3">
-              <span aria-hidden className={`flex size-7 shrink-0 items-center justify-center rounded-full border text-xs ${i.done ? "bg-primary text-primary-foreground" : ""}`}>
-                {i.done ? <Check className="size-4" /> : n + 1}
-              </span>
-              <span className="flex min-w-0 flex-1 flex-col">
-                <span className={`font-medium ${i.done ? "text-muted-foreground line-through" : ""}`}>{i.label}</span>
-                <span className="text-xs text-muted-foreground">{i.hint}</span>
-              </span>
-              {!i.done && (
-                <Button size="sm" variant={i === next ? "default" : "outline"}
-                  render={<Link href={i.href} onClick={() => { setOpen(false); onNavigate?.(); }} />}>Go</Button>
-              )}
-            </li>
-          ))}
-        </ol>
-        <button type="button" onClick={() => { setChecklistHidden(true); setOpen(false); }}
-          className="min-h-11 self-start rounded-md px-2 text-sm text-muted-foreground underline hover:text-foreground">Hide this list (bring it back in Settings)</button>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-export function NavLinks({ checklist, user, signOut, isAdmin = false, onNavigate }: {
-  checklist: ChecklistItem[]; user: string; signOut: () => Promise<void>; isAdmin?: boolean; onNavigate?: () => void;
-}) {
+export function NavLinks({ signOut, onNavigate }: { signOut: () => Promise<void>; onNavigate?: () => void }) {
   const path = usePathname();
   const search = useSearchParams();
   return (
@@ -139,40 +83,31 @@ export function NavLinks({ checklist, user, signOut, isAdmin = false, onNavigate
           ))}
         </div>
       ))}
-      <div className="mt-auto flex flex-col gap-2">
-        <Checklist items={checklist} onNavigate={onNavigate} />
-        {isAdmin && (
-          <Link href="/admin" onClick={onNavigate} aria-current={path.startsWith("/admin") ? "page" : undefined}
-            className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm side:h-[clamp(1.5rem,5.6dvh,2.125rem)] side:py-0 hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:font-medium side:snug:hidden">
-            <ShieldCheck className="size-4" />Admin
-          </Link>
-        )}
-        {/* Sidebar: account row with feedback and sign out as icons (saves a third of the height). Phone menu: full labels. */}
-        <div className={onNavigate ? "flex flex-col gap-2" : "flex flex-wrap items-center gap-1 side:snug:justify-between"}>
-          {onNavigate && <FeedbackDialog />}
-          <Link href="/settings" onClick={onNavigate} aria-current={isActive(path, search, "/settings") ? "page" : undefined}
-            className="flex min-w-0 flex-1 items-center gap-2 rounded-md px-2 py-1.5 text-sm side:h-[clamp(1.5rem,5.6dvh,2.125rem)] side:py-0 hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:font-medium side:snug:basis-full">
-            <Settings className="size-4 shrink-0" /><span className="truncate">{user}</span>
-          </Link>
-          {!onNavigate && <Checklist items={checklist} compact />}
-          {!onNavigate && isAdmin && (
-            <Link href="/admin" aria-label="Admin" title="Admin" aria-current={path.startsWith("/admin") ? "page" : undefined}
-              className="hidden shrink-0 rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground aria-[current=page]:bg-muted side:snug:flex"><ShieldCheck className="size-4" /></Link>
-          )}
-          {!onNavigate && <FeedbackDialog iconOnly />}
-          <form action={signOut} className={onNavigate ? undefined : "shrink-0"}>
-            {onNavigate
-              ? <button className="px-2 py-1 text-sm text-muted-foreground hover:text-foreground">Sign out</button>
-              : <button type="submit" aria-label="Sign out" title="Sign out" className="rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground"><LogOut className="size-4" /></button>}
-          </form>
-        </div>
+      {/* The menu ends with just two things: feedback and sign out. Settings and Admin live in the top bar. */}
+      <div className="mt-auto flex flex-col gap-0.5">
+        <FeedbackDialog />
+        <form action={signOut}>
+          <button type="submit" className={`${ROW} w-full text-left text-muted-foreground hover:text-foreground`}><LogOut className="size-4" />Sign out</button>
+        </form>
       </div>
     </div>
   );
 }
 
+/** Settings (and Admin, for the one account that has it) as icons beside the notification bell. */
+export function AccountLinks({ isAdmin, user }: { isAdmin: boolean; user: string }) {
+  const path = usePathname();
+  const icon = "rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground aria-[current=page]:bg-muted aria-[current=page]:text-foreground";
+  return (
+    <div className="flex items-center">
+      {isAdmin && <Link href="/admin" aria-label="Admin" title="Admin" aria-current={path.startsWith("/admin") ? "page" : undefined} className={icon}><ShieldCheck className="size-5" /></Link>}
+      <Link href="/settings" aria-label="Settings" title={`Settings · ${user}`} aria-current={path.startsWith("/settings") ? "page" : undefined} className={icon}><Settings className="size-5" /></Link>
+    </div>
+  );
+}
+
 /** Phone/tablet: hamburger that opens the full sidebar as a sheet. */
-export function MobileMenu(props: { checklist: ChecklistItem[]; user: string; signOut: () => Promise<void>; isAdmin?: boolean }) {
+export function MobileMenu(props: { signOut: () => Promise<void> }) {
   const [open, setOpen] = useState(false);
   return (
     <Sheet open={open} onOpenChange={setOpen}>

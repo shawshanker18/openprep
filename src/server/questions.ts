@@ -44,9 +44,6 @@ export function toPublic(q: Question, userId: string): PublicQuestion {
 export function questionMarkdown(q:Pick<Question,'id'|'stemMd'|'passageMd'|'choices'>,s:string,userId:string) {
   return s.replace(/asset:\/\/([\w-]+)/g,(_,id:string)=>`/api/question-assets/${createAssetToken(userId, q.id, id)}/0`);
 }
-export function questionAssetIds(q: Pick<Question,'stemMd'|'passageMd'|'choices'>) {
-  return [...new Set([q.stemMd,q.passageMd??'',...(q.choices?.map(c=>c.md)??[])].flatMap(s=>[...s.matchAll(/asset:\/\/([\w-]+)/g)].map(m=>m[1]!)))];
-}
 
 export const toRevealed = (q: Question, userId: string): RevealedQuestion => ({
   ...toPublic(q, userId), answer: q.answer, explanationMd: questionMarkdown(q,q.explanationMd,userId), choiceRationales: q.choiceRationales ? Object.fromEntries(Object.entries(q.choiceRationales).map(([id, md]) => [id, questionMarkdown(q,md,userId)])) : null,

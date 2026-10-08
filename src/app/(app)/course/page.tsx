@@ -1,11 +1,10 @@
 import Link from "next/link";
 import { BookOpen, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { DiagnosticSuggestion } from "@/components/diagnostic-gate";
-import { CourseCheckForm, LevelBox, LevelLegend, PointsBar } from "@/components/course-ui";
+import { CourseCheckForm, LevelBox, LevelLegend } from "@/components/course-ui";
 import { DOMAINS, SKILLS, skillsIn, type Section } from "@/content/taxonomy";
-import { checkCount, LEVELS, points, unitSteps, unitsOf } from "@/engine/course";
-import { diagnosticPending, requireUser } from "@/server/auth";
+import { checkCount, LEVELS, unitSteps, unitsOf } from "@/engine/course";
+import { requireUser } from "@/server/auth";
 import { getCourseLevels } from "@/server/course";
 
 export const metadata = { title: "SAT course" };
@@ -15,10 +14,9 @@ const SECTIONS: { id: Section; label: string }[] = [{ id: "math", label: "Math" 
 export default async function CoursePage({ searchParams }: PageProps<"/course">) {
   const sp = await searchParams;
   const section: Section = sp.section === "rw" ? "rw" : "math";
-  const { userId, profile } = await requireUser();
+  const { userId } = await requireUser();
   const levels = await getCourseLevels(userId);
   const skills = SKILLS.filter((s) => s.section === section);
-  const total = points(skills.map((s) => levels[s.id]!.level));
   const counts = Object.fromEntries(LEVELS.map((l) => [l.id, skills.filter((s) => levels[s.id]!.level === l.id).length]));
   const units = unitsOf(section);
   const next = units.flatMap((d) => skillsIn(d)).find((s) => !["proficient", "mastered"].includes(levels[s.id]!.level));
@@ -38,10 +36,8 @@ export default async function CoursePage({ searchParams }: PageProps<"/course">)
         ))}
       </nav>
 
-      {diagnosticPending(profile) && <DiagnosticSuggestion />}
 
       <section className="flex flex-col gap-3 rounded-xl border p-5">
-        <PointsBar {...total} />
         <LevelLegend />
         <p className="text-xs text-muted-foreground">
           {LEVELS.filter((l) => counts[l.id]).map((l) => `${counts[l.id]} ${l.label.toLowerCase()}`).join(" · ")}
@@ -73,7 +69,6 @@ export default async function CoursePage({ searchParams }: PageProps<"/course">)
         </li>
         {units.map((d, i) => {
           const steps = unitSteps(d);
-          const unitPoints = points(skillsIn(d).map((s) => levels[s.id]!.level));
           return (
             <li key={d}>
               <Link href={`/course/${d}`} className="flex flex-col gap-3 rounded-xl border p-5 hover:bg-muted">
@@ -82,7 +77,6 @@ export default async function CoursePage({ searchParams }: PageProps<"/course">)
                     <span className="block text-sm text-muted-foreground">Unit {i + 2} · {skillsIn(d).length} skills</span>
                     <span className="font-medium">{DOMAINS[d].name}</span>
                   </span>
-                  <span className="shrink-0 text-sm tabular-nums text-muted-foreground">{unitPoints.max ? Math.round((100 * unitPoints.earned) / unitPoints.max) : 0}%</span>
                 </span>
                 <span className="flex flex-wrap items-center gap-1.5" aria-label="Skill levels in this unit">
                   {steps.map((s, j) => s.kind === "skill"

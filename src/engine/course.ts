@@ -4,12 +4,12 @@ import { DOMAINS, skillsIn, type DomainId, type Section, type Skill } from "@/co
 import type { Status } from "./mastery";
 
 export type Level = "not-started" | "attempted" | "familiar" | "proficient" | "mastered";
-export const LEVELS: { id: Level; label: string; points: number }[] = [
-  { id: "mastered", label: "Mastered", points: 100 },
-  { id: "proficient", label: "Proficient", points: 80 },
-  { id: "familiar", label: "Familiar", points: 50 },
-  { id: "attempted", label: "Attempted", points: 0 },
-  { id: "not-started", label: "Not started", points: 0 },
+export const LEVELS: { id: Level; label: string }[] = [
+  { id: "mastered", label: "Mastered" },
+  { id: "proficient", label: "Proficient" },
+  { id: "familiar", label: "Familiar" },
+  { id: "attempted", label: "Attempted" },
+  { id: "not-started", label: "Not started" },
 ];
 export const LEVEL_BY_ID = Object.fromEntries(LEVELS.map((l) => [l.id, l])) as Record<Level, (typeof LEVELS)[number]>;
 
@@ -36,11 +36,6 @@ export function unitSteps(domain: DomainId): UnitStep[] {
 }
 
 export const unitsOf = (section: Section) => (Object.keys(DOMAINS) as DomainId[]).filter((d) => DOMAINS[d].section === section);
-
-/** Mastery points earned out of the maximum, for any set of skill levels. */
-export function points(levels: Level[]) {
-  return { earned: levels.reduce((a, l) => a + LEVEL_BY_ID[l].points, 0), max: levels.length * 100 };
-}
 
 /** Question count for a course check: a quiz is short, a unit test covers every skill, the challenge is the longest. */
 export const checkCount = (kind: "quiz" | "unit-test" | "challenge", skills: number) =>
