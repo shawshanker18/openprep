@@ -3,7 +3,6 @@ import { SiteFooter } from "@/components/footer-feedback";
 import { ContentProtection } from "@/components/content-protection";
 import { SIDEBAR_RESTORE } from "@/lib/sidebar";
 import { Geist, Geist_Mono } from "next/font/google";
-import "katex/dist/katex.min.css";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";

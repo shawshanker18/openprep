@@ -218,3 +218,18 @@ a, button, summary, [role="button"], label, input, select, textarea { touch-acti
 /* Closed by the student (remembered in this browser): the sidebar leaves and the content takes the full width. */
 html[data-sidebar="closed"] .app-sidebar { display: none; }
 html[data-sidebar="closed"] .app-content { margin-left: 0; }
+
+/* Small screens: nothing scrolls sideways, long words wrap, and everything you tap is at least 44px. */
+body { overflow-wrap: break-word; overflow-x: clip; }
+img, video { max-width: 100%; }
+@media (pointer: coarse) {
+  a[href]:where(.flex, .inline-flex, .block), button, summary, select, [role="button"],
+  input:not([type="checkbox"], [type="radio"], [type="range"], [type="hidden"]) { min-height: 2.75rem; }
+  button:has(> svg:only-child), [data-slot="dialog-close"], [data-slot="sheet-close"] { min-width: 2.75rem; }
+  .site-footer a { display: inline-block; padding: 0.75rem 0.25rem; }
+}
+/* Phones on their side: the tab bar becomes a slim strip so the page keeps its height. */
+@media (orientation: landscape) and (max-height: 34rem) {
+  .bottom-nav a { flex-direction: row; justify-content: center; gap: 0.5rem; padding-block: 0; }
+  .app-mobile-header { padding-block: 0.125rem; }
+}

@@ -28,7 +28,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
   ]);
   const nav = { checklist, user: user?.name ?? user?.email ?? "Settings", signOut, isAdmin: admin };
   const chips = <Suspense fallback={null}><MasteryPoints userId={userId} /></Suspense>;
-  const bell = <Suspense fallback={null}><UserNotifications userId={userId} profile={profile} /></Suspense>;
+  const bell = <Suspense fallback={<span className="inline-block size-9 shrink-0" aria-hidden />}><UserNotifications userId={userId} profile={profile} /></Suspense>;
 
   return (
     <div className="flex min-w-0 max-w-full flex-1 flex-col pb-[calc(4rem+env(safe-area-inset-bottom))] desk:flex-row desk:pb-0">

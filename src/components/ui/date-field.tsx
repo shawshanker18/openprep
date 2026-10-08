@@ -79,7 +79,7 @@ export function DateField({ name, defaultValue, required, disabled, min, max, cl
       </span>
       <Popover.Portal>
         <Popover.Positioner sideOffset={4} align="start" className="z-50">
-          <Popover.Popup className="w-72 rounded-xl bg-popover p-3 text-sm text-popover-foreground shadow-md ring-1 ring-foreground/10 outline-none">
+          <Popover.Popup className="w-72 max-w-[calc(100vw-1rem)] rounded-xl bg-popover p-3 text-sm text-popover-foreground shadow-md ring-1 ring-foreground/10 outline-none">
             <div className="mb-2 flex items-center justify-between">
               <button type="button" onClick={() => shift(-1)} className="rounded-md p-1.5 hover:bg-muted" aria-label="Previous month"><ChevronLeftIcon className="size-4" /></button>
               <span className="flex items-center gap-1 font-medium">

@@ -56,7 +56,7 @@ export default async function LessonPage({ params }: PageProps<"/learn/[skillId]
     <div className="mt-6 rounded-xl border p-5">
       <p className="font-medium">Practice {name} for free</p>
       <p className="text-sm text-muted-foreground">OpenPrep adapts the questions to your level, tracks your progress and builds a study plan. No subscription.</p>
-      <Link href="/login" className="mt-3 inline-block rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">Start practicing free</Link>
+      <Link href="/login" className="mt-3 inline-flex min-h-11 items-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground">Start practicing free</Link>
     </div>
   </>);
 }
