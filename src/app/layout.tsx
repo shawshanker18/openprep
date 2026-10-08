@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://www.openprep.site"),
-  title: { default: "OpenPrep: Free SAT Prep Platform with Practice Tests and Questions", template: "%s · OpenPrep" },
+  title: { default: "OpenPrep (Open Prep): Free SAT Prep Platform | Practice Tests & Questions", template: "%s · OpenPrep" },
   description: "OpenPrep (Open Prep) is a free SAT prep platform: adaptive practice, over 13,000 SAT questions, full-length practice tests, lessons and a personal study plan. No subscription, no ads.",
   keywords: ["OpenPrep", "Open Prep", "free SAT prep", "SAT practice tests", "SAT questions", "adaptive SAT practice", "digital SAT", "SAT study plan"],
   alternates: { canonical: "./" },
