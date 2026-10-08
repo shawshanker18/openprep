@@ -1,3 +1,4 @@
+import { MAX_QUESTIONS_PER_SET } from "@/lib/question-limits";
 import { availableQuestion, availableTestQuestion, poolForTestKind, type QuestionPool } from "./question-availability";
 // Tests: assembly, module lifecycle, server-authoritative timing, scoring at completion (spec 03 §7–8, 04 §5).
 // Mastery is only updated when the whole session completes; abandoned sessions change nothing.
@@ -131,7 +132,7 @@ export async function startTest(userId: string, input: {
       }, null);
     } else {
       const skills = (input.skillIds ?? []).filter((x) => SKILL_BY_ID[x]);
-      const count = Math.min(30, Math.max(5, input.count ?? 10));
+      const count = Math.min(MAX_QUESTIONS_PER_SET, Math.max(5, input.count ?? 10));
       const secs = skills.map((x) => SKILL_BY_ID[x]!.section);
       const limit = timed ? Math.round((count * secs.reduce((a, s) => a + (s === "rw" ? 71 : 95), 0)) / secs.length) : null;
       const d = input.difficulty;

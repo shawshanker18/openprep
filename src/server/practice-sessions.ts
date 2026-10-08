@@ -7,6 +7,7 @@ import { attempts, bookmarks, practiceSessions as sessions, practiceSessionItems
 import { SKILL_BY_ID } from "@/content/taxonomy";
 import { masteryPct } from "@/engine/mastery";
 import { PaperConfigSchema, type PaperConfig } from "./papers";
+import { clampSetSize } from "@/lib/question-limits";
 import { deliveryContext } from "./delivery-context";
 import { consumeWindow, eventQuota, lockDelivery, servePractice } from "./delivery";
 import { DeliveryBlocked } from "./delivery-policy";
@@ -18,6 +19,8 @@ const displayTitle = (title: string) => /^recommended practice$/i.test(title) ? 
 
 export async function createPracticeSession(userId: string, config: PaperConfig, title: string, back?: string) {
   const parsed = PaperConfigSchema.parse(config);
+  // New sessions never exceed the per-set limit, whatever the caller asked for.
+  parsed.count = clampSetSize(parsed.count);
   await eventQuota(userId, await deliveryContext(), "set");
   const [session] = await db.insert(sessions).values({userId, config: parsed, title: displayTitle(title), back}).returning({id: sessions.id});
   return session!.id;

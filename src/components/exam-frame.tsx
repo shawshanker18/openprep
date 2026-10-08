@@ -18,9 +18,9 @@ export function ExamFrame({ top, footer, children }: { top: React.ReactNode; foo
   }, []);
   return (
     <div className="fixed inset-0 z-40 flex flex-col bg-background text-foreground">
-      <header className="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-1 border-b-2 border-dashed border-foreground/40 bg-muted px-4 py-2 text-foreground">{top}</header>
-      <main className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-4 lg:overflow-hidden lg:px-6">{children}</main>
-      <footer className="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2 border-t-2 border-dashed border-foreground/40 bg-muted px-4 py-2 pb-[max(.5rem,env(safe-area-inset-bottom))]">{footer}</footer>
+      <header className="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-0 border-b-2 border-dashed border-foreground/40 bg-muted px-3 py-1 text-foreground">{top}</header>
+      <main className="flex min-h-0 flex-1 flex-col overflow-y-auto px-3 py-2 split:overflow-hidden split:px-5">{children}</main>
+      <footer className="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-1 border-t-2 border-dashed border-foreground/40 bg-muted px-3 py-1 pb-[max(.25rem,env(safe-area-inset-bottom))]">{footer}</footer>
     </div>
   );
 }
@@ -29,12 +29,12 @@ export function ExamFrame({ top, footer, children }: { top: React.ReactNode; foo
 export function ExamTop({ title, subtitle, center, tools }: { title: string; subtitle?: string; center?: React.ReactNode; tools?: React.ReactNode }) {
   return (
     <>
-      <div className="min-w-0 flex-1 basis-40">
-        <p className="truncate text-base font-semibold leading-tight">{title}</p>
-        {subtitle && <p className="truncate text-xs text-muted-foreground">{subtitle}</p>}
+      <div className="flex min-w-0 flex-1 basis-32 items-baseline gap-2">
+        <p className="truncate text-sm font-semibold">{title}</p>
+        {subtitle && <p className="hidden truncate text-xs text-muted-foreground [@media(min-height:36rem)]:block">{subtitle}</p>}
       </div>
-      {center && <div className="order-last flex w-full justify-center sm:order-none sm:w-auto sm:flex-1">{center}</div>}
-      <div className="flex flex-1 basis-40 flex-wrap items-center justify-end gap-2">{tools}</div>
+      {center && <div className="flex justify-center">{center}</div>}
+      <div className="flex flex-1 basis-32 flex-wrap items-center justify-end gap-1.5">{tools}</div>
     </>
   );
 }
@@ -43,9 +43,9 @@ export function ExamTop({ title, subtitle, center, tools }: { title: string; sub
 export function ExamTimer({ label, urgent }: { label: string; urgent?: boolean }) {
   const [show, setShow] = useState(true);
   return (
-    <div className="flex flex-col items-center leading-tight">
-      <span className={cn("text-xl font-semibold tabular-nums", urgent && "text-red-500", !show && "invisible")} aria-live="off">{label}</span>
-      <button type="button" onClick={() => setShow((v) => !v)} className="min-h-7 rounded-full border px-3 text-xs">{show ? "Hide" : "Show"}</button>
+    <div className="flex items-center gap-2 leading-none">
+      <span className={cn("min-w-14 text-center text-lg font-semibold tabular-nums", urgent && "text-red-600", !show && "invisible")} aria-live="off">{label}</span>
+      <button type="button" onClick={() => setShow((v) => !v)} className="min-h-8 rounded-full border px-2.5 text-xs">{show ? "Hide" : "Show"}</button>
     </div>
   );
 }
@@ -68,7 +68,7 @@ export function ExamFooter({ name, label, popup, onBack, onNext, backDisabled, n
       <p className="min-w-0 flex-1 basis-24 truncate text-sm font-semibold">{name}</p>
       <div ref={box} className="relative flex justify-center">
         <button type="button" onClick={() => popup && setOpen((v) => !v)} aria-expanded={popup ? open : undefined}
-          className="flex min-h-10 items-center gap-1.5 rounded-md bg-foreground px-4 text-sm font-semibold text-background">
+          className="flex min-h-9 items-center gap-1.5 rounded-md bg-foreground px-4 text-sm font-semibold text-background">
           {label}{popup && <ChevronUp className={cn("size-4 transition-transform", !open && "rotate-180")} />}
         </button>
         {popup && open && (
@@ -79,8 +79,8 @@ export function ExamFooter({ name, label, popup, onBack, onNext, backDisabled, n
       </div>
       <div className="flex flex-1 basis-24 items-center justify-end gap-2">
         {extra}
-        {onBack && <button type="button" onClick={onBack} disabled={backDisabled} className="min-h-10 rounded-full bg-foreground px-6 text-sm font-semibold text-background disabled:opacity-40">Back</button>}
-        {onNext && <button type="button" onClick={onNext} disabled={nextDisabled} className="min-h-10 rounded-full bg-foreground px-6 text-sm font-semibold text-background disabled:opacity-40">{nextLabel}</button>}
+        {onBack && <button type="button" onClick={onBack} disabled={backDisabled} className="min-h-9 rounded-full bg-foreground px-5 text-sm font-semibold text-background disabled:opacity-40">Back</button>}
+        {onNext && <button type="button" onClick={onNext} disabled={nextDisabled} className="min-h-9 rounded-full bg-foreground px-5 text-sm font-semibold text-background disabled:opacity-40">{nextLabel}</button>}
       </div>
     </>
   );

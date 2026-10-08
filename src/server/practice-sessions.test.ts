@@ -195,3 +195,9 @@ it("finds the newest active session even when completed history would fill the f
  expect(await S.latestActivePracticeSession(student)).toMatchObject({title:"Newest active"});
  expect(await S.latestActivePracticeSession(randomUUID())).toBeNull();
 });
+
+it("a new session is never longer than 50 questions, even if the caller asks for more", async () => {
+  const adaptive = await S.createPracticeSession(user, { mode: "smart", count: 100 }, "Adaptive Practice");
+  const [row] = await database.select().from(schema.practiceSessions).where(eq(schema.practiceSessions.id, adaptive));
+  expect((row!.config as { count: number }).count).toBe(50);
+});

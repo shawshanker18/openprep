@@ -1,3 +1,4 @@
+import { ACCEPTED_SET_SIZES, MAX_QUESTIONS_PER_SET } from '@/lib/question-limits';
 import 'server-only';
 import { createCipheriv, createDecipheriv, createHash, randomBytes, randomUUID } from 'node:crypto';
 import { z } from 'zod';
@@ -12,8 +13,9 @@ export const PaperConfigSchema = z.object({
   // Bounded multi-skill selections from the question bank.
   skillIds:z.array(z.string().min(1).max(64)).max(29).optional(), tags:z.array(z.string().refine(tag => tag === 'desmos')).max(1).optional(),
   timing:z.enum(['auto','off','on']).optional(), ids:z.array(z.string().regex(/^[\w-]{22}$/)).max(50).optional(),
-  count:z.number().int().min(1).max(100).default(100),
-}).refine(config => config.mode !== 'set' || [5,10,20,30].includes(config.count), 'Unsupported practice preset size');
+  // Older sessions may hold up to 100; new ones are capped at MAX_QUESTIONS_PER_SET when created (see practice-sessions.ts).
+  count:z.number().int().min(1).max(100).default(MAX_QUESTIONS_PER_SET),
+}).refine(config => config.mode !== 'set' || ACCEPTED_SET_SIZES.includes(config.count), 'Unsupported practice preset size');
 export type PaperConfig = z.input<typeof PaperConfigSchema>;
 function key() {
   const secret=process.env.QUESTION_ID_SECRET || process.env.CRON_SECRET;

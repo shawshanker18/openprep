@@ -9,6 +9,7 @@ import { getAuthUser, requireUser } from "@/server/auth";
 import { safely } from "@/lib/safely";
 import { createPracticeSession, getPracticeSession, listPracticeSessions } from "@/server/practice-sessions";
 import { z } from "zod";
+import { ACCEPTED_SET_SIZES, MAX_QUESTIONS_PER_SET } from "@/lib/question-limits";
 import { PracticeRunner } from "./practice-runner";
 
 export const metadata = { title: "Adaptive Practice" };
@@ -37,7 +38,7 @@ async function loadPage({ searchParams }: PageProps<"/practice">) {
     if (!session) notFound();
     const studentName=(await safely(()=>getAuthUser(),null))?.name??undefined;
     return <PracticeRunner key={session.id} userId={userId} sessionId={session.id} mode={session.config.mode} studentName={studentName}
-      title={session.title} block={block} set={{count:session.config.count??100}} back={session.back??undefined} />;
+      title={session.title} block={block} set={{count:session.config.count??MAX_QUESTIONS_PER_SET}} back={session.back??undefined} />;
   }
   const skillId = typeof sp.skill === "string" ? sp.skill : undefined;
   const d = sp.difficulty === "mixed" ? "mixed" : Number(sp.difficulty);
@@ -49,7 +50,7 @@ async function loadPage({ searchParams }: PageProps<"/practice">) {
   const back = typeof sp.from === "string" && /^\/(start(\/[a-z-]+)?|course(\/[a-z-]+)?|question-bank(\?[\w=&%.,-]*)?|bookmarks(\?page=\d+)?)$/.test(sp.from) ? sp.from : undefined;
 
   if (mode === "list") {
-    const ids = list(sp.ids).filter((id) => /^[\w-]{22}$/.test(id)).slice(0, 50);
+    const ids = list(sp.ids).filter((id) => /^[\w-]{22}$/.test(id)).slice(0, MAX_QUESTIONS_PER_SET);
     const sessionId=await createPracticeSession(userId, {mode:"list",ids,count:Math.max(1,ids.length)},back?.startsWith('/bookmarks')?'Saved questions':'Question bank',back);
     redirect(`/practice?session=${sessionId}${blockQuery}`);
   }
@@ -64,7 +65,7 @@ async function loadPage({ searchParams }: PageProps<"/practice">) {
     if (tags.length > 1 || tags.some(tag => tag !== "desmos")) notFound();
     const n = Number(sp.count);
     const count = sp.count === undefined ? 10 : n;
-    if (![5, 10, 20, 30].includes(count)) notFound();
+    if (!ACCEPTED_SET_SIZES.includes(count)) notFound();
     const timing = sp.timing === "on" || sp.timing === "off" ? sp.timing : "auto";
     if (!back && !skillIds.length) notFound();
     const title = skillIds.length === 1 ? SKILL_BY_ID[skillIds[0]!]!.name : "Question bank";

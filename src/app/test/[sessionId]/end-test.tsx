@@ -13,7 +13,7 @@ export function EndTest({ action, detail }: { action: () => Promise<void>; detai
         </DialogHeader>
         <DialogFooter>
           <DialogClose render={<Button variant="outline" />}>Keep going</DialogClose>
-          <form action={action}><Button type="submit" variant="destructive">End test</Button></form>
+          <form action={action}><Button type="submit" className="bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-600/40">End test</Button></form>
         </DialogFooter>
       </DialogContent>
     </Dialog>

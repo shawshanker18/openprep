@@ -51,7 +51,7 @@ export function QuestionView({ question: q, value, onChange, disabled, correct, 
   };
 
   const left = (
-    <div className={cn("flex min-w-0 flex-col gap-4", fill && "lg:overflow-y-auto lg:p-6")}>
+    <div className={cn("flex min-w-0 flex-col gap-4", fill && "split:overflow-y-auto split:p-4")}>
       {showMetadata && <div aria-label="Question details" className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
         <span>Domain: {DOMAINS[q.domain as DomainId]?.name ?? q.domain}</span>
         <span>Skill: {SKILL_BY_ID[q.skillId]?.name ?? q.skillId}</span>
@@ -62,7 +62,7 @@ export function QuestionView({ question: q, value, onChange, disabled, correct, 
   );
 
   const right = (
-    <div className={cn("flex min-w-0 flex-col gap-4", fill && "lg:overflow-y-auto lg:p-6")}>
+    <div className={cn("flex min-w-0 flex-col gap-4", fill && "split:overflow-y-auto split:p-4")}>
       {(number != null || onMark || canEliminate) && (
         <div className="flex items-center gap-3 bg-muted px-3 py-1.5 text-sm">
           {number != null && <span className="rounded-sm bg-foreground px-2.5 py-1 text-base font-bold leading-none text-background tabular-nums">{number}</span>}
@@ -101,7 +101,7 @@ export function QuestionView({ question: q, value, onChange, disabled, correct, 
                   }}
                   onClick={() => onChange(c.id)}
                   className={cn(
-                    "flex min-h-14 min-w-0 flex-1 items-center gap-3 rounded-lg border-2 bg-background px-3 py-2 text-left transition-colors",
+                    "flex min-h-12 [@media(max-height:34rem)]:min-h-10 min-w-0 flex-1 items-center gap-3 rounded-lg border-2 bg-background px-3 py-2 text-left transition-colors",
                     !disabled && "hover:border-foreground/50",
                     chosen && "border-foreground bg-muted",
                     isRight && "border-emerald-600 bg-emerald-50 dark:bg-emerald-950/40",
@@ -142,16 +142,16 @@ export function QuestionView({ question: q, value, onChange, disabled, correct, 
   if (compact) return <div className="question-content grid w-full min-w-0 gap-6">{left}{right}</div>;
   return (
     <div ref={wrap} style={{ "--split": `${split}%` } as React.CSSProperties}
-      className={cn("question-content flex w-full min-w-0 flex-col gap-6 lg:flex-row lg:gap-0", fill && "min-h-0 flex-1")}>
-      <div className={cn("min-w-0 lg:shrink-0 lg:grow-0 lg:basis-[var(--split)]", fill ? "flex min-h-0 flex-col" : "lg:pr-6")}>{left}</div>
+      className={cn("question-content flex w-full min-w-0 flex-col gap-6 split:flex-row split:gap-0", fill && "min-h-0 flex-1")}>
+      <div className={cn("min-w-0 split:shrink-0 split:grow-0 split:basis-[var(--split)]", fill ? "split:flex split:min-h-0 split:flex-col" : "split:pr-6")}>{left}</div>
       <div role="separator" aria-orientation="vertical" aria-label="Resize passage and question" aria-valuenow={Math.round(split)} aria-valuemin={25} aria-valuemax={75} tabIndex={0}
         onPointerDown={(e) => e.currentTarget.setPointerCapture(e.pointerId)} onPointerMove={drag}
         onKeyDown={(e) => { if (e.key === "ArrowLeft") setSplit((s) => Math.max(25, s - 3)); if (e.key === "ArrowRight") setSplit((s) => Math.min(75, s + 3)); }}
-        className="group relative hidden w-4 shrink-0 cursor-col-resize touch-none items-stretch justify-center lg:flex">
+        className="group relative hidden w-4 shrink-0 cursor-col-resize touch-none items-stretch justify-center split:flex">
         <span className="w-0.5 bg-foreground/40 group-hover:bg-foreground" />
         <span aria-hidden className="absolute top-1/2 h-8 w-3 -translate-y-1/2 rounded-sm bg-foreground" />
       </div>
-      <div className={cn("min-w-0 lg:flex-1", fill ? "flex min-h-0 flex-col" : "lg:pl-6")}>{right}</div>
+      <div className={cn("min-w-0 split:flex-1", fill ? "split:flex split:min-h-0 split:flex-col" : "split:pl-6")}>{right}</div>
     </div>
   );
 }
