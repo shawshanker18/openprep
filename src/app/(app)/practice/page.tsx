@@ -5,7 +5,8 @@ import { DeliveryBlocked } from "@/server/delivery-policy";
 import { notFound, redirect } from "next/navigation";
 import { SKILL_BY_ID } from "@/content/taxonomy";
 import { getTodayBlock } from "@/server/daily";
-import { requireUser } from "@/server/auth";
+import { getAuthUser, requireUser } from "@/server/auth";
+import { safely } from "@/lib/safely";
 import { createPracticeSession, getPracticeSession, listPracticeSessions } from "@/server/practice-sessions";
 import { z } from "zod";
 import { PracticeRunner } from "./practice-runner";
@@ -34,7 +35,8 @@ async function loadPage({ searchParams }: PageProps<"/practice">) {
     if (!parsed.success) notFound();
     const session = await getPracticeSession(userId, parsed.data);
     if (!session) notFound();
-    return <PracticeRunner key={session.id} userId={userId} sessionId={session.id} mode={session.config.mode}
+    const studentName=(await safely(()=>getAuthUser(),null))?.name??undefined;
+    return <PracticeRunner key={session.id} userId={userId} sessionId={session.id} mode={session.config.mode} studentName={studentName}
       title={session.title} block={block} set={{count:session.config.count??100}} back={session.back??undefined} />;
   }
   const skillId = typeof sp.skill === "string" ? sp.skill : undefined;

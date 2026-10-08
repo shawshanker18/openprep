@@ -9,7 +9,8 @@ import { Bookmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Markdown } from "@/components/markdown";
 import { QuestionView } from "@/components/question-view";
-import { DesmosCalculator, DesmosToggle } from "@/components/desmos-panel";
+import { DesmosCalculator, DesmosDock } from "@/components/desmos-panel";
+import { ExamFooter, ExamFrame, ExamTop } from "@/components/exam-frame";
 import { TutorPanel } from "@/components/tutor-panel";
 import { cn, isTyping } from "@/lib/utils";
 import type { PublicQuestion, RevealedQuestion } from "@/server/questions";
@@ -75,10 +76,12 @@ function Countdown({ limitS, elapsedS = 0 }: { limitS: number; elapsedS?:number 
   return <span className={cn("tabular-nums", left <= 0 && "text-red-700")}>{left > 0 ? clock(left) : `Time's up +${clock(-left)}`}</span>;
 }
 
-export function PracticeRunner({ sessionId, userId, mode, title, block, set, back }: {
+export function PracticeRunner({ sessionId, userId, mode, title, block, set, back, studentName }: {
   sessionId: string; userId: string; mode: Mode; title: string; block?: { index: number; target: number } | null;
-  set?: SetConfig; back?: string;
+  set?: SetConfig; back?: string; studentName?: string;
 }) {
+  // Choices crossed out, per question, kept for this visit.
+  const [crossed, setCrossed] = useState<Record<string, string[]>>({});
   const [s, dispatch] = useReducer(reducer, { phase: "restoring", seen: [], answered: 0, correct: 0, ms: 0 });
   // On a phone the submit button (and later the explanation) are often below the screen: bring them into view
   // after the first tap on a choice, and when the answer is revealed. Only as far as needed, never while typing.
@@ -235,68 +238,70 @@ export function PracticeRunner({ sessionId, userId, mode, title, block, set, bac
   const correctChoice = r && "choice" in r.revealed.answer ? r.revealed.answer.choice : null;
   const rationale = r && !r.correct && s.value ? r.revealed.choiceRationales?.[s.value] : null;
 
+  const target = set?.count ?? Math.max(positions.length, s.answered + 1);
+  const questionNumber = Math.min(position + 1, target);
+  const isMath = s.q.section === "math";
+  const bookmark = async () => {
+    const res = await toggleBookmark({ questionId: s.q.id })
+      .catch(() => ({ ok: false as const, error: "Couldn't save the bookmark. Check your connection and try again." }));
+    if (!res.ok) { toast.error(res.error); return; }
+    setBookmarked(res.data.bookmarked);
+    toast(res.data.bookmarked ? "Bookmarked" : "Bookmark removed");
+  };
+  const finished = !!set && s.answered >= set.count;
+
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
-        <span role="status">{saveStatus}</span>
-        <Button variant="outline" disabled={pending} onClick={()=>start(async()=>{if(await save()) router.push("/practice/sessions");else toast.error("Couldn't save. Please try again.");})}>Save and leave</Button>
-      </div>
-      <QuestionPositions positions={positions} current={position} target={set?.count??100} pending={pending} onJump={at=>navigate("jump",at)} />
-      <div className="flex items-center justify-between gap-2 text-sm text-muted-foreground">
-        <span>
-          {title} · {s.q.section === "rw" ? "Reading and Writing" : "Math"} · {set ? `${s.answered}/${set.count}` : s.answered} answered{block && s.answered < block.target && ` · ${block.target - s.answered} to finish this block`}
-          {mode === "smart" && <> · <Link href="/question-bank" className="underline">Choose questions</Link></>}
-        </span>
-        <div className="flex items-center gap-1">
-          {s.phase === "answering" && s.limitS && <Countdown key={s.q.id} limitS={s.limitS} elapsedS={savedTimeMs/1000} />}
-          <Button variant="ghost" size="sm" aria-label="Bookmark" aria-pressed={bookmarked} onClick={async () => {
-            const res = await toggleBookmark({ questionId: s.q.id })
-              .catch(() => ({ ok: false as const, error: "Couldn't save the bookmark. Check your connection and try again." }));
-            if (!res.ok) { toast.error(res.error); return; }
-            setBookmarked(res.data.bookmarked);
-            toast(res.data.bookmarked ? "Bookmarked" : "Bookmark removed");
-          }}><Bookmark className={bookmarked ? "fill-current" : undefined} /></Button>
+    <ExamFrame
+      top={<ExamTop title={title} subtitle={`${s.q.section === "rw" ? "Reading and Writing" : "Math"}${set ? ` · ${s.answered}/${set.count} answered` : ` · ${s.answered} answered`}${block && s.answered < block.target ? ` · ${block.target - s.answered} to finish this block` : ""}`}
+        center={s.phase === "answering" && s.limitS ? <span className="text-xl font-semibold"><Countdown key={s.q.id} limitS={s.limitS} elapsedS={savedTimeMs / 1000} /></span> : undefined}
+        tools={<>
+          {isMath && <DesmosDock />}
+          <Button variant="ghost" size="sm" aria-label="Bookmark" aria-pressed={bookmarked} onClick={bookmark}><Bookmark className={bookmarked ? "fill-current" : undefined} /></Button>
           <ReportQuestion questionId={s.q.id} />
-        </div>
-      </div>
-
-      <QuestionView key={s.q.id} question={s.q} value={s.value} disabled={s.phase === "revealed" || pending}
-        onChange={(v) => {setSaveStatus("Saving…");dispatch({ type: "select", value: v });}} correct={correctChoice} />
-
-      {s.phase === "answering" && (
-        <div ref={submitRef} className="flex flex-col gap-2">
-          <div className="flex flex-wrap items-start gap-2">
-            <TutorPanel key={s.q.id} questionId={s.q.id} answered={false} />
-            {s.q.section === "math" && <DesmosToggle />}
-          </div>
-          <Button variant="outline" className="self-start" disabled={pending} onClick={next}>Next question</Button>
-          <Button size="lg" className="self-start" disabled={s.value === null || pending} onClick={submit}>{pending ? "Submitting…" : "Submit answer"}</Button>
-        </div>
-      )}
-
-      {r && (
-        <div ref={resultRef} className="flex flex-col gap-4 rounded-lg border p-4">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className={cn("font-semibold", r.correct ? "text-neutral-700" : "text-red-700")}>
-              {r.correct ? "✓ Correct" : `✗ Not quite${"accepted" in r.revealed.answer ? `. The accepted answer is ${r.revealed.answer.accepted.join(" or ")}` : ""}`}
-            </p>
-            <span className="rounded-full bg-muted px-2 py-0.5 text-xs tabular-nums">
-              {r.skillName}: {r.masteryBefore}% → {r.masteryAfter}%
-            </span>
-          </div>
-          <p className="text-sm">Your answer: <b>{s.value ?? "Not answered"}</b> · Correct answer: <b>{"choice" in r.revealed.answer ? r.revealed.answer.choice : r.revealed.answer.accepted.join(" or ")}</b></p>
-          {rationale && <Markdown className="text-sm">{`**Why ${s.value} is wrong:** ${rationale}`}</Markdown>}
-          <Explanation q={r.revealed} />
-          <div className="flex flex-wrap gap-2">
-            <Button size="lg" onClick={next}>{set && s.answered >= set.count ? "See summary" : "Next"}</Button>
-            {!r.correct && !(set && s.answered >= set.count) && (
-              <Button size="lg" variant="outline" onClick={() => { similarTo.current = s.q.id; next(); }}>Try a similar question</Button>
-            )}
-            <TutorPanel key={s.q.id} questionId={s.q.id} answered wrongChoice={!r.correct && !!s.q.choices?.length ? s.value : null} />
-          </div>
-        </div>
-      )}
-    </div>
+          <span role="status" className="hidden w-16 text-center text-xs text-muted-foreground sm:block">{saveStatus}</span>
+          <Button variant="outline" size="sm" disabled={pending} onClick={() => start(async () => { if (await save()) router.push("/practice/sessions"); else toast.error("Couldn't save. Please try again."); })}>Save and leave</Button>
+        </>} />}
+      footer={<ExamFooter name={studentName} label={`Question ${questionNumber} of ${target}`}
+        popup={positions.length > 0 ? (
+          <div><p className="mb-3 text-center text-sm font-semibold">{title}</p>
+            <div className="grid grid-cols-7 gap-1.5">{positions.map((p) => (
+              <button key={p.position} type="button" data-close disabled={pending} aria-current={p.position === position ? "step" : undefined} onClick={() => navigate("jump", p.position)}
+                aria-label={`Question ${p.position + 1}, ${p.attempted ? "attempted" : "unattempted"}`}
+                className={cn("flex h-8 items-center justify-center rounded border text-xs tabular-nums", p.attempted ? "bg-foreground text-background" : "border-dashed", p.position === position && "ring-2 ring-offset-1 ring-foreground")}>{p.position + 1}</button>
+            ))}</div>
+            <Link href="/practice/sessions" className="mt-3 block text-center text-sm underline">Saved sessions</Link>
+          </div>) : undefined}
+        onBack={position > 0 ? () => navigate("jump", position - 1) : undefined} backDisabled={pending}
+        extra={s.phase === "answering" ? <button type="button" disabled={pending} onClick={next} className="min-h-10 rounded-full border-2 border-foreground px-5 text-sm font-semibold disabled:opacity-40">Skip</button> : undefined}
+        onNext={s.phase === "answering" ? submit : next}
+        nextLabel={s.phase === "answering" ? (pending ? "Checking…" : "Check answer") : finished ? "See summary" : "Next"}
+        nextDisabled={s.phase === "answering" ? s.value === null || pending : pending} />}>
+      <QuestionView key={s.q.id} fill question={s.q} value={s.value} disabled={s.phase === "revealed" || pending}
+        number={questionNumber} eliminated={crossed[s.q.id] ?? []} onEliminate={(next) => setCrossed((c) => ({ ...c, [s.q.id]: next }))}
+        onChange={(v) => { setSaveStatus("Saving…"); dispatch({ type: "select", value: v }); }} correct={correctChoice}
+        below={<>
+          {s.phase === "answering" && <div ref={submitRef} className="flex flex-wrap items-start gap-2"><TutorPanel key={s.q.id} questionId={s.q.id} answered={false} /></div>}
+          {r && (
+            <div ref={resultRef} className="flex flex-col gap-4 rounded-lg border p-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className={cn("font-semibold", r.correct ? "text-emerald-700 dark:text-emerald-400" : "text-red-700 dark:text-red-400")}>
+                  {r.correct ? "✓ Correct" : `✗ Not quite${"accepted" in r.revealed.answer ? `. The accepted answer is ${r.revealed.answer.accepted.join(" or ")}` : ""}`}
+                </p>
+                <span className="rounded-full bg-muted px-2 py-0.5 text-xs tabular-nums">{r.skillName}: {r.masteryBefore}% → {r.masteryAfter}%</span>
+              </div>
+              <p className="text-sm">Your answer: <b>{s.value ?? "Not answered"}</b> · Correct answer: <b>{"choice" in r.revealed.answer ? r.revealed.answer.choice : r.revealed.answer.accepted.join(" or ")}</b></p>
+              {rationale && <Markdown className="text-sm">{`**Why ${s.value} is wrong:** ${rationale}`}</Markdown>}
+              <Explanation q={r.revealed} />
+              <div className="flex flex-wrap gap-2">
+                {!r.correct && !finished && (
+                  <Button variant="outline" onClick={() => { similarTo.current = s.q.id; next(); }}>Try a similar question</Button>
+                )}
+                <TutorPanel key={s.q.id} questionId={s.q.id} answered wrongChoice={!r.correct && !!s.q.choices?.length ? s.value : null} />
+              </div>
+            </div>
+          )}
+        </>} />
+    </ExamFrame>
   );
 }
 

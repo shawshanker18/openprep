@@ -5,9 +5,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Flag } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ExamFooter, ExamFrame, ExamTimer, ExamTop } from "@/components/exam-frame";
 import { QuestionView } from "@/components/question-view";
 import { ReferenceSheet } from "@/components/reference-sheet";
-import { DesmosToggle } from "@/components/desmos-panel";
+import { DesmosDock } from "@/components/desmos-panel";
 import { cn, isTyping } from "@/lib/utils";
 import type { PublicQuestion } from "@/server/questions";
 import { abandon, saveResponse, startModule } from "./actions";
@@ -22,15 +23,16 @@ const SECTION = { rw: "Reading and Writing", math: "Math", mixed: "Mixed practic
 const now = () => performance.now();
 const clock = (ms: number) => { const s = Math.max(0, Math.ceil(ms / 1000)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
 
-export function TestRunner({ userId, sessionId, module: m, items: initial, serverNow, breakBefore, heading }: {
-  userId: string; sessionId: string; module: Mod; items: Item[]; serverNow: string; breakBefore: boolean; heading?: string | null;
+export function TestRunner({ userId, sessionId, module: m, items: initial, serverNow, breakBefore, heading, studentName }: {
+  userId: string; sessionId: string; module: Mod; items: Item[]; serverNow: string; breakBefore: boolean; heading?: string | null; studentName?: string;
 }) {
   const router = useRouter();
   const [items, setItems] = useState(initial);
   const [pos, setPos] = useState(0);
   const [screen, setScreen] = useState<"break" | "intro" | "question" | "review">(m.startedAt ? "question" : breakBefore ? "break" : "intro");
   const [left, setLeft] = useState<number | null>(null);
-  const [showTimer, setShowTimer] = useState(true);
+  // Choices the student has crossed out, by question position. Kept here so they are still crossed out after Back / Next.
+  const [crossed, setCrossed] = useState<Record<number, string[]>>({});
   const [saving, setSaving] = useState<"saved" | "saving" | "error">("saved");
   // Explicit flags, not a transition: a slow page refresh must never block answering.
   const [starting, setStarting] = useState(false);
@@ -210,63 +212,41 @@ export function TestRunner({ userId, sessionId, module: m, items: initial, serve
 
   const it = items[pos]!;
   const answered = items.filter((x) => x.response !== null).length;
-  return (
-    <div className="flex min-h-[calc(100dvh-4rem)] flex-col">
-      <header className="sticky top-0 z-10 grid grid-cols-[minmax(0,1fr)_auto] sm:grid-cols-[minmax(0,1fr)_7rem_auto] items-center gap-2 border-b bg-background px-4 py-2 text-sm">
-        <span className="min-w-0 truncate font-medium">{title}</span>
-        {left != null && (
-          <button className={cn("w-20 justify-self-center text-center tabular-nums", left < 5 * 60_000 && "font-bold")} onClick={() => setShowTimer((v) => !v)} aria-live="off">
-            {showTimer ? clock(left) : "Show time"}
-          </button>
-        )}
-        <div className="col-span-2 flex flex-wrap items-center justify-end gap-2 sm:col-span-1">
-          {(m.section === "math" || m.section === "mixed") && <ReferenceSheet />}
-          <span className="w-16 text-center text-xs text-muted-foreground">{saving === "saving" ? "Saving…" : saving === "error" ? "Not saved" : "Saved"}</span>
-          <EndTest action={abandon.bind(null, sessionId)} detail="It won't be scored and your answers so far won't count." />
+  const isMath = m.section === "math" || m.section === "mixed";
+  const top = (
+    <ExamTop title={title} subtitle={screen === "review" ? "Check your work" : `${SECTION[m.section] ?? m.section}`}
+      center={left != null ? <ExamTimer label={clock(left)} urgent={left < 5 * 60_000} /> : undefined}
+      tools={<>
+        {isMath && <DesmosDock />}
+        {isMath && <ReferenceSheet />}
+        <span className="w-16 text-center text-xs text-muted-foreground" role="status">{saving === "saving" ? "Saving…" : saving === "error" ? "Not saved" : "Saved"}</span>
+        <EndTest action={abandon.bind(null, sessionId)} detail="It won't be scored and your answers so far won't count." />
+      </>} />
+  );
+
+  if (screen === "review") {
+    return (
+      <ExamFrame top={top} footer={<ExamFooter name={studentName} label={`${answered} of ${items.length} answered`} onBack={() => go(items.length - 1)} onNext={() => void submit()} nextLabel={submitting ? "Submitting…" : "Submit module"} nextDisabled={submitting} />}>
+        <div className="mx-auto flex w-full max-w-xl flex-col gap-4 py-4">
+          <h2 className="text-xl font-semibold">Check your work</h2>
+          <p className="text-sm text-muted-foreground">{answered} of {items.length} answered. Select a question to go back to it. You cannot return to this module after you submit.</p>
+          <Navigator items={items} current={-1} onPick={go} />
+          {submitError && <p role="alert" className="text-sm text-destructive">{submitError}</p>}
         </div>
-      </header>
+      </ExamFrame>
+    );
+  }
 
-      <div className="flex-1 px-4 py-6">
-        {screen === "question" ? (
-          <div className="flex w-full min-w-0 flex-col gap-4 md:px-4">
-            <div className="flex items-center justify-between">
-              <span className="rounded bg-foreground px-2 py-0.5 text-sm text-background tabular-nums">{pos + 1}</span>
-              <Button variant={it.flagged ? "secondary" : "ghost"} size="sm" onClick={() => update({ flagged: !it.flagged })} aria-pressed={it.flagged}>
-                <Flag className={cn(it.flagged && "fill-current")} /> {it.flagged ? "Flagged" : "Flag for review"}
-              </Button>
-            </div>
-            {(m.section === "math" || m.section === "mixed") && <DesmosToggle />}
-            <QuestionView key={it.question.id} question={it.question} value={it.response} onChange={(v) => update({ response: v })} disabled={submitting} showMetadata={false} />
-          </div>
-        ) : (
-          <div className="mx-auto flex max-w-xl flex-col gap-4">
-            <h2 className="text-xl font-semibold">Check your work</h2>
-            <p className="text-sm text-muted-foreground">{answered} of {items.length} answered. Select a question to go back to it.</p>
-            <Navigator items={items} current={-1} onPick={go} />
-            {submitError && <p role="alert" className="text-sm text-destructive">{submitError}</p>}
-            <Button size="lg" className="self-start" disabled={submitting} onClick={() => void submit()}>
-              {submitting ? "Submitting…" : "Submit module"}
-            </Button>
-          </div>
-        )}
-      </div>
-
-      {screen === "question" && (
-        <footer className="sticky bottom-0 flex flex-wrap items-center justify-between gap-2 border-t bg-background px-4 py-2 pb-[max(.5rem,env(safe-area-inset-bottom))]">
-          <details className="relative">
-            <summary className="cursor-pointer list-none rounded-md border px-3 py-1.5 text-sm">Question {pos + 1} of {items.length} ▾</summary>
-            <div className="absolute bottom-10 left-0 max-h-[min(60dvh,24rem)] w-[min(18rem,calc(100vw-2rem))] overflow-y-auto rounded-lg border bg-background p-3 shadow-lg">
-              <Navigator items={items} current={pos} onPick={go} />
-              <Button variant="link" size="sm" onClick={() => go("review")}>Go to review page</Button>
-            </div>
-          </details>
-          <div className="flex gap-2">
-            <Button variant="outline" disabled={pos === 0} onClick={() => go(pos - 1)}>Back</Button>
-            <Button onClick={() => go(pos + 1 < items.length ? pos + 1 : "review")}>Next</Button>
-          </div>
-        </footer>
-      )}
-    </div>
+  return (
+    <ExamFrame top={top} footer={
+      <ExamFooter name={studentName} label={`Question ${pos + 1} of ${items.length}`}
+        popup={<div><p className="mb-3 text-center text-sm font-semibold">{title}</p><Navigator items={items} current={pos} onPick={go} />
+          <button type="button" data-close onClick={() => go("review")} className="mt-3 min-h-10 w-full rounded-full border text-sm font-medium">Go to review page</button></div>}
+        onBack={() => go(pos - 1)} backDisabled={pos === 0} onNext={() => go(pos + 1 < items.length ? pos + 1 : "review")} nextLabel={pos + 1 < items.length ? "Next" : "Review"} />}>
+      <QuestionView key={it.question.id} fill question={it.question} value={it.response} onChange={(v) => update({ response: v })} disabled={submitting} showMetadata={false}
+        number={pos + 1} marked={it.flagged} onMark={() => update({ flagged: !it.flagged })}
+        eliminated={crossed[pos] ?? []} onEliminate={(next) => setCrossed((c) => ({ ...c, [pos]: next }))} />
+    </ExamFrame>
   );
 }
 
@@ -274,7 +254,7 @@ function Navigator({ items, current, onPick }: { items: Item[]; current: number;
   return (
     <div className="grid grid-cols-7 gap-1.5">
       {items.map((x, i) => (
-        <button key={x.position} onClick={() => onPick(i)} aria-label={`Question ${i + 1}${x.response ? ", answered" : ", unanswered"}${x.flagged ? ", flagged" : ""}`}
+        <button key={x.position} data-close onClick={() => onPick(i)} aria-label={`Question ${i + 1}${x.response ? ", answered" : ", unanswered"}${x.flagged ? ", flagged" : ""}`}
           className={cn("relative flex h-8 items-center justify-center rounded border text-xs tabular-nums",
             x.response ? "bg-primary text-primary-foreground" : "border-dashed", i === current && "ring-2 ring-offset-1 ring-primary")}>
           {i + 1}
