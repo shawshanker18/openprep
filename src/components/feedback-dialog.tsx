@@ -11,7 +11,7 @@ export function FeedbackDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
-        className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm text-muted-foreground side:h-[clamp(1.5rem,5.6dvh,2.125rem)] side:py-0 hover:bg-muted hover:text-foreground">
+        className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm text-muted-foreground side:h-[clamp(1.375rem,5.6dvh,2.125rem)] side:py-0 hover:bg-muted hover:text-foreground">
         <MessageSquare className="size-4" />Send feedback
       </DialogTrigger>
       <DialogContent className="gap-3 sm:max-w-md">

@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
-const ROW = "flex items-center gap-2 rounded-md px-2 py-1.5 text-sm side:h-[clamp(1.5rem,5.6dvh,2.125rem)] side:py-0 hover:bg-muted";
+const ROW = "flex items-center gap-2 rounded-md px-2 py-1.5 text-sm side:h-[clamp(1.375rem,5.6dvh,2.125rem)] side:py-0 hover:bg-muted";
 
 export const NAV_GROUPS = [
   {
@@ -77,7 +77,7 @@ export function NavLinks({ signOut, onNavigate }: { signOut: () => Promise<void>
           {g.label && <p className="px-2 pb-1 text-xs font-medium text-muted-foreground">{g.label}</p>}
           {g.items.map(({ href, label, icon: Icon }) => (
             <Link key={href} href={href} onClick={onNavigate} aria-current={isActive(path, search, href) ? "page" : undefined}
-              className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm side:h-[clamp(1.5rem,5.6dvh,2.125rem)] side:py-0 hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:font-medium">
+              className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm side:h-[clamp(1.375rem,5.6dvh,2.125rem)] side:py-0 hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:font-medium">
               <Icon className="size-4" />{label}
             </Link>
           ))}
