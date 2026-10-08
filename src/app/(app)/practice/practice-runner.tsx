@@ -258,7 +258,7 @@ export function PracticeRunner({ sessionId, userId, mode, title, block, set, bac
           {isMath && <DesmosDock />}
           <Button variant="ghost" size="sm" aria-label="Bookmark" aria-pressed={bookmarked} onClick={bookmark}><Bookmark className={bookmarked ? "fill-current" : undefined} /></Button>
           <ReportQuestion questionId={s.q.id} />
-          <span role="status" className="hidden w-16 text-center text-xs text-muted-foreground sm:block">{saveStatus}</span>
+          <span role="status" className="hidden whitespace-nowrap text-xs text-muted-foreground xl:block">{saveStatus}</span>
           <Button variant="outline" size="sm" disabled={pending} onClick={() => start(async () => { if (await save()) router.push("/practice/sessions"); else toast.error("Couldn't save. Please try again."); })}>Save and leave</Button>
         </>} />}
       footer={<ExamFooter name={studentName} label={`Question ${questionNumber} of ${target}`}
