@@ -148,6 +148,13 @@
       "when": 1791468562730,
       "tag": "0020_question_status_section_index",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1791473174167,
+      "tag": "0021_profile_cbse_chapters",
+      "breakpoints": true
     }
   ]
 }
