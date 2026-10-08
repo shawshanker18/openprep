@@ -8,12 +8,13 @@ import { db } from "@/db";
 import { profiles, satAttempts, testSessions } from "@/db/schema";
 import { createClient } from "@/lib/supabase/server";
 import { SUBJECTS, TOPICS } from "@/content/taxonomy";
-import { CBSE_CHAPTER_IDS } from "@/content/cbse-chapters";
+import { CBSE_CHAPTER_IDS, completedChapters } from "@/content/cbse-chapters";
 import { requireUser, type ActionResult } from "@/server/auth";
 import { PushSubscriptionInput, removeSubscription, saveSubscription, sendTest } from "@/server/push";
 import { startDiagnostic } from "@/server/diagnostic";
 import { localDate } from "@/engine/plan";
 import { isSatDate } from "@/lib/sat-dates";
+import { limitPractice } from "@/server/ratelimit";
 
 const Settings = z.object({
   targetScore: z.coerce.number().int().min(400).max(1600).multipleOf(10),
@@ -54,16 +55,18 @@ export async function updateProfile(form: FormData) {
   });
   if (!p.success) redirect("/settings?error=profile");
   // Chapters only apply to CBSE; switching board clears them so nothing stale marks lessons as covered.
-  await db.update(profiles).set({ ...p.data, chaptersDone: p.data.curriculum === "cbse" ? p.data.chaptersDone : [] }).where(eq(profiles.id, userId));
+  await db.update(profiles).set({ ...p.data, chaptersDone: p.data.curriculum === "cbse" ? completedChapters(p.data.chaptersDone, p.data.grade) : [] }).where(eq(profiles.id, userId));
   revalidatePath("/settings");
   redirect("/settings?saved=1");
 }
 
 const score = z.coerce.number().int().min(200).max(800).multipleOf(10);
 export async function addOfficialScore(form: FormData) {
-  const { userId } = await requireUser();
+  const { userId, profile } = await requireUser();
   const p = z.object({ takenOn: z.iso.date(), math: score, rw: score }).safeParse(Object.fromEntries(form));
   if (!p.success) redirect("/settings?error=score");
+  // A real past sitting: not in the future, and not before the 1600-point scale this app scores on (2016).
+  if (p.data.takenOn < "2016-03-01" || p.data.takenOn > localDate(new Date(), profile.timezone)) redirect("/settings?error=score");
   const [{ n }] = (await db.select({ n: sql<number>`count(*)::int` }).from(satAttempts).where(eq(satAttempts.userId, userId))) as [{ n: number }];
   if (n >= 20) redirect("/settings?error=scores");
   await db.insert(satAttempts).values({ userId, ...p.data });
@@ -124,6 +127,9 @@ export async function unsubscribePush(endpoint: unknown) {
 
 export async function testPush(): Promise<ActionResult<{ devices: number; delivered: number }>> {
   const { userId } = await requireUser();
+  // Each click fans out to every subscribed device through the push services; keep it to a human pace.
+  const limited = await limitPractice(userId, "request");
+  if (limited) return { ok: false, error: limited };
   return { ok: true, data: await sendTest(userId) };
 }
 

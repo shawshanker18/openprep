@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { CBSE_CHAPTERS, skillsFromChapters } from "@/content/cbse-chapters";
+import { CBSE_CHAPTERS, chaptersBelowGrade, completedChapters, skillsFromChapters } from "@/content/cbse-chapters";
 import { SKILL_BY_ID } from "@/content/taxonomy";
 import { likelyCoveredSkills } from "./curriculum-coverage";
 
@@ -10,13 +10,27 @@ it("every chapter id is unique and every mapped skill exists", () => {
 });
 
 it("ticked CBSE chapters decide what is likely covered, instead of the grade guess", () => {
-  const base = { curriculum: "cbse", grade: 12, subjects: ["Mathematics"], topicsStudied: [] as string[] };
-  // Class 12 would guess lots; the student only ticked Quadratic Equations.
+  const base = { curriculum: "cbse", grade: 10, subjects: ["Mathematics"], topicsStudied: [] as string[] };
+  // A Class 10 student has done Class 9; from Class 10 they only ticked Quadratic Equations.
   const covered = likelyCoveredSkills({ ...base, chaptersDone: ["cbse-10-quadratic-equations"] });
-  expect([...covered]).toEqual(["m-adv-nonlin-eq"]);
+  expect(covered.has("m-adv-nonlin-eq")).toBe(true);
+  expect(covered.has("m-geo-circles")).toBe(true); // Class 9 Circles, assumed
+  expect(covered.has("m-geo-trig")).toBe(false); // Class 10 trigonometry not ticked
   // Nothing ticked: falls back to the board/grade guess.
   expect(likelyCoveredSkills({ ...base, chaptersDone: [] }).size).toBeGreaterThan(1);
   // Another board ignores chapters.
   expect(likelyCoveredSkills({ ...base, curriculum: "icse", chaptersDone: ["cbse-10-quadratic-equations"] }).has("m-adv-nonlin-eq")).toBe(true);
   expect(skillsFromChapters(["cbse-11-sets", "nope"]).size).toBe(0);
+});
+
+it("a student in class 11 is assumed to have finished every class 9 and 10 chapter, class 12 every class 9, 10 and 11 chapter", () => {
+  const ids11 = chaptersBelowGrade(11);
+  expect(ids11.length).toBe(CBSE_CHAPTERS.filter((c) => c.grade === 9 || c.grade === 10).length);
+  expect(ids11.every((id) => /^cbse-(9|10)-/.test(id))).toBe(true);
+  expect(chaptersBelowGrade(12).some((id) => id.startsWith("cbse-11-"))).toBe(true);
+  expect(chaptersBelowGrade(12).some((id) => id.startsWith("cbse-12-"))).toBe(false);
+  expect(chaptersBelowGrade(9)).toEqual([]);
+  expect(completedChapters(["cbse-11-sets"], 11)).toContain("cbse-11-sets");
+  const covered = likelyCoveredSkills({ curriculum: "cbse", grade: 11, subjects: ["Mathematics"], topicsStudied: [], chaptersDone: [] });
+  expect(covered.has("m-psda-prob")).toBe(true); // Class 10 Probability, assumed with nothing ticked
 });
