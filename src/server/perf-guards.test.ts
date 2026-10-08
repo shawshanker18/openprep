@@ -26,6 +26,13 @@ it("reminder sweep still runs the full query when a device has a reminder hour",
   expect(execute).toHaveBeenCalledTimes(2);
 });
 
+it("reminder sweep falls back to the slow timezone-catalog query if the database rejects a stored zone", async () => {
+  execute.mockResolvedValueOnce([{ found: true }]).mockRejectedValueOnce(new Error('time zone "Nowhere/Land" not recognized')).mockResolvedValueOnce([]);
+  const { sendDueReminders } = await import("./push");
+  expect(await sendDueReminders()).toEqual({ candidates: 0, sent: 0 });
+  expect(execute).toHaveBeenCalledTimes(3);
+});
+
 it("page stats never hold up a page render when the count is slow", async () => {
   vi.stubEnv("DATABASE_URL", "postgres://example");
   execute.mockReturnValue(new Promise(() => {})); // a count that never returns

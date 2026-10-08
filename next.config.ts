@@ -50,7 +50,12 @@ const nextConfig: NextConfig = {
     return [{
       source: "/sw.js",
       headers: [{ key: "Cache-Control", value: "no-cache, no-store, must-revalidate" }],
-    }, {
+    }, ...["/brand/:path*", "/apple-icon.png", "/icon-192.png", "/icon-512.png", "/icon-maskable.png", "/favicon.ico"].map((source) => ({
+      // Brand pictures and icons rarely change: browsers keep them a day and refresh in the background after that,
+      // so repeat visits on slow connections do not download them again.
+      source,
+      headers: [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }],
+    })), {
       source: "/(.*)",
       headers: [
         { key: "X-Content-Type-Options", value: "nosniff" },

@@ -76,8 +76,11 @@ export async function sendDueReminders() {
   const [any] = await db.execute<{ found: boolean }>(sql`
     select exists(select 1 from push_subscriptions s join profiles p on p.id = s.user_id where p.reminder_hour is not null) as found`);
   if (!any?.found) return { candidates: 0, sent: 0 };
-  const rows = await db.execute<Target & { local_day: string; minutes: number; days_left: number | null }>(sql`
-    with tz as (select name from pg_timezone_names),
+  // Time zones are validated when they are saved, so the cheap query is used first. Only if the database rejects a
+  // stored zone name does it fall back to the slow query that filters through pg_timezone_names (~140 ms).
+  type Row = Target & { local_day: string; minutes: number; days_left: number | null };
+  const query = (guard: boolean) => db.execute<Row>(sql`
+    ${guard ? sql`with tz as (select name from pg_timezone_names),` : sql`with`}
     due as (
       select s.endpoint, s.p256dh, s.auth, s.user_id, s.last_sent_on, p.minutes_per_day as minutes,
         (now() at time zone p.timezone)::date as local_day,
@@ -85,7 +88,7 @@ export async function sendDueReminders() {
         p.timezone
       from push_subscriptions s
       join profiles p on p.id = s.user_id
-      join tz on tz.name = p.timezone
+      ${guard ? sql`join tz on tz.name = p.timezone` : sql``}
       where p.reminder_hour = extract(hour from now() at time zone p.timezone)
         and p.onboarding_step in ('done', 'diagnostic_skipped')
     )
@@ -94,6 +97,7 @@ export async function sendDueReminders() {
       and not exists (select 1 from attempts a where a.user_id = due.user_id
         and a.created_at >= (local_day::timestamp at time zone due.timezone))
     limit 5000`);
+  const rows = await query(false).catch(() => query(true));
   const targets = rows.map((r) => ({
     ...r,
     payload: {

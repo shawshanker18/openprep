@@ -1,0 +1,1 @@
+CREATE INDEX "questions_status_section_pool_idx" ON "questions" USING btree ("status","section","pool");

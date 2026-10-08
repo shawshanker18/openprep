@@ -68,6 +68,8 @@ export const questions = pgTable("questions", {
 }, (t) => [
   check("questions_pool_check", sql`${t.pool} in ('study', 'test')`),
   index("q_skill_diff").on(t.skillId, t.difficulty, t.status),
+  // Pool and bank-size counts group active questions by section; this index answers them without reading every row.
+  index("questions_status_section_pool_idx").on(t.status, t.section, t.pool),
   index("questions_active_skill_difficulty_id_idx").on(t.skillId, t.difficulty, t.id).where(sql`${t.status} = 'active'`),
 ]);
 
