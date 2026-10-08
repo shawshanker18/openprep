@@ -132,6 +132,50 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 }
+/* Dark theme for studying: soft layered grays (page, then cards, then raised surfaces) and off-white text, so there is no
+   harsh pure-black glare or pure-white text. `.dark` below stays deep black for panels that are always dark (the sidebar). */
+/* Dull light: the white is suppressed to a soft paper gray so long study sessions are easier on the eyes. */
+html.dull {
+  color-scheme: light;
+  --background: oklch(0.925 0.005 85);
+  --foreground: oklch(0.22 0 0);
+  --card: oklch(0.95 0.005 85);
+  --card-foreground: oklch(0.22 0 0);
+  --popover: oklch(0.955 0.005 85);
+  --popover-foreground: oklch(0.22 0 0);
+  --primary: oklch(0.25 0 0);
+  --primary-foreground: oklch(0.95 0.005 85);
+  --secondary: oklch(0.89 0.005 85);
+  --secondary-foreground: oklch(0.22 0 0);
+  --muted: oklch(0.89 0.005 85);
+  --muted-foreground: oklch(0.45 0 0);
+  --accent: oklch(0.87 0.005 85);
+  --accent-foreground: oklch(0.22 0 0);
+  --border: oklch(0.82 0.005 85);
+  --input: oklch(0.82 0.005 85);
+  --ring: oklch(0.6 0 0);
+}
+
+html.dark {
+  --background: oklch(0.205 0 0);
+  --foreground: oklch(0.915 0 0);
+  --card: oklch(0.245 0 0);
+  --card-foreground: oklch(0.915 0 0);
+  --popover: oklch(0.27 0 0);
+  --popover-foreground: oklch(0.915 0 0);
+  --primary: oklch(0.9 0 0);
+  --primary-foreground: oklch(0.2 0 0);
+  --secondary: oklch(0.285 0 0);
+  --secondary-foreground: oklch(0.915 0 0);
+  --muted: oklch(0.285 0 0);
+  --muted-foreground: oklch(0.73 0 0);
+  --accent: oklch(0.31 0 0);
+  --accent-foreground: oklch(0.915 0 0);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 16%);
+  --ring: oklch(0.62 0 0);
+}
+
 
 @layer base {
   * {
