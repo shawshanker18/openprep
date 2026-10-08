@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Moon, Sun, MonitorSmartphone } from "lucide-react";
+import { Moon, Sun, SunDim, MonitorSmartphone } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const SEEN_KEY = "openprep-theme-asked";
 const OPTIONS = [
   { value: "light", label: "Light", icon: Sun },
+  { value: "dull", label: "Dull light (softer white)", icon: SunDim },
   { value: "dark", label: "Dark", icon: Moon },
   { value: "system", label: "Match my device", icon: MonitorSmartphone },
 ] as const;

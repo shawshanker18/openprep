@@ -4,9 +4,9 @@ import { ThemeProvider as NextThemes, useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Choice } from "@/components/ui/choice";
 
-/** Light (default) / Dark / System, stored per browser (no account data). Adds the `dark` class that globals.css styles. */
+/** Light (default) / Dull light (a softer, less glaring white) / Dark / System, stored per browser (no account data). Adds the `dark` class that globals.css styles. */
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  return <NextThemes attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>{children}</NextThemes>;
+  return <NextThemes attribute="class" defaultTheme="light" themes={["light", "dull", "dark"]} enableSystem disableTransitionOnChange>{children}</NextThemes>;
 }
 
 export function ThemeSelect() {
@@ -16,7 +16,7 @@ export function ThemeSelect() {
   return (
     <label className="flex flex-col gap-1 text-sm">Theme
       <Choice className="w-48" value={mounted ? (theme ?? "light") : "light"} onValueChange={setTheme} disabled={!mounted}
-        options={[{ value: "light", label: "Light" }, { value: "dark", label: "Dark" }, { value: "system", label: "Match my device" }]} />
+        options={[{ value: "light", label: "Light" }, { value: "dull", label: "Dull light (softer white)" }, { value: "dark", label: "Dark" }, { value: "system", label: "Match my device" }]} />
     </label>
   );
 }
