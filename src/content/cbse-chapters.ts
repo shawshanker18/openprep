@@ -76,3 +76,14 @@ const BY_ID = new Map(CBSE_CHAPTERS.map((ch) => [ch.id, ch]));
 /** SAT skills covered by the ticked chapters (unknown ids are ignored). */
 export const skillsFromChapters = (ids: readonly string[]): Set<string> =>
   new Set(ids.flatMap((id) => BY_ID.get(id)?.skills ?? []));
+
+/**
+ * Chapters a CBSE student has already covered just by being in their class: all of classes 9 up to the one before
+ * their own (a Class 11 student has done every Class 9 and 10 chapter). Their own class is not assumed.
+ */
+export const chaptersBelowGrade = (grade: number | null | undefined): string[] =>
+  grade == null ? [] : CBSE_CHAPTERS.filter((ch) => ch.grade < grade).map((ch) => ch.id);
+
+/** What the student ticked plus everything from the classes below theirs. */
+export const completedChapters = (ticked: readonly string[], grade: number | null | undefined): string[] =>
+  [...new Set([...chaptersBelowGrade(grade), ...ticked])];

@@ -8,6 +8,7 @@ import { SUBJECTS } from "@/content/taxonomy";
 import { submitSurvey } from "./actions";
 import { Choice } from "@/components/ui/choice";
 import { CbseChapterPicker } from "@/components/cbse-chapter-picker";
+import { chaptersBelowGrade } from "@/content/cbse-chapters";
 import { DateField } from "@/components/ui/date-field";
 import { SatDateField } from "@/components/sat-date-field";
 import { Survey } from "@/lib/onboarding";
@@ -29,7 +30,7 @@ export function SurveyForm() {
   };
   const [curriculum, setCurriculum] = useState("cbse");
   const [grade, setGrade] = useState("11");
-  const [chapters, setChapters] = useState<string[]>([]);
+  const [chapters, setChapters] = useState<string[]>(() => chaptersBelowGrade(11));
   const [tookSat, setTookSat] = useState(false);
   const [target, setTarget] = useState(1400);
   const [unsureDate, setUnsureDate] = useState(false);
@@ -88,7 +89,7 @@ export function SurveyForm() {
       <div hidden={step !== 0}><div className="flex flex-col gap-6">
       <div className="grid gap-4 sm:grid-cols-2">
         <label className={field}>Grade
-          <Choice name="grade" value={grade} onValueChange={setGrade} options={[...[8, 9, 10, 11, 12].map((g) => ({ value: String(g), label: `Grade ${g}` })), { value: "13", label: "Other / gap year" }]} />
+          <Choice name="grade" value={grade} onValueChange={(g) => { setGrade(g); setChapters(chaptersBelowGrade(Number(g))); }} options={[...[8, 9, 10, 11, 12].map((g) => ({ value: String(g), label: `Grade ${g}` })), { value: "13", label: "Other / gap year" }]} />
         </label>
         <label className={field}>School curriculum
           <Choice name="curriculum" value={curriculum} onValueChange={setCurriculum} options={[{ value: "cbse", label: "CBSE" }, { value: "icse", label: "ICSE" }, { value: "ib", label: "IB" }, { value: "gcse", label: "GCSE / A-Levels" }, { value: "american", label: "American" }, { value: "other", label: "Other" }]} />
@@ -98,8 +99,8 @@ export function SurveyForm() {
       {curriculum === "cbse" && (
         <fieldset className="flex flex-col gap-2 text-sm">
           <legend className="mb-1">Maths chapters you have finished</legend>
-          <p className="mb-2 text-muted-foreground">Tick what you have already done in school. We use it to mark SAT topics you probably know, and nothing is ever hidden from you.</p>
-          <CbseChapterPicker grade={Number(grade)} onChange={setChapters} />
+          <p className="mb-2 text-muted-foreground">Earlier classes are ticked for you (Class 11 has done 9 and 10). Add anything from your own class. We use it to mark SAT topics you probably know, and nothing is ever hidden from you.</p>
+          <CbseChapterPicker key={grade} defaultChecked={chaptersBelowGrade(Number(grade))} grade={Number(grade)} onChange={setChapters} />
         </fieldset>
       )}
 
