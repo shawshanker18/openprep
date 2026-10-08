@@ -8,6 +8,7 @@ import { SUBJECTS, TOPICS } from "@/content/taxonomy";
 import { requireUser } from "@/server/auth";
 import { signOut } from "@/app/auth/actions";
 import { ThemeSelect } from "@/components/theme";
+import { CbseChapterPicker } from "@/components/cbse-chapter-picker";
 import { Reminders } from "./reminders";
 import {
   addOfficialScore, deleteAccount, removeOfficialScore, retakeDiagnostic, updateProfile, updateSettings,
@@ -94,6 +95,12 @@ export default async function SettingsPage({ searchParams }: PageProps<"/setting
             ))}
           </div>
         </fieldset>
+        {profile.curriculum === "cbse" && (
+          <fieldset className="flex flex-col gap-2 text-sm">
+            <legend className="mb-2">CBSE maths chapters you&apos;ve finished</legend>
+            <CbseChapterPicker defaultChecked={profile.chaptersDone} grade={profile.grade ?? undefined} />
+          </fieldset>
+        )}
         <Button type="submit" className="self-start">Save profile</Button>
       </form>
 

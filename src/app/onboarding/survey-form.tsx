@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { SUBJECTS } from "@/content/taxonomy";
 import { submitSurvey } from "./actions";
 import { Choice } from "@/components/ui/choice";
+import { CbseChapterPicker } from "@/components/cbse-chapter-picker";
 import { DateField } from "@/components/ui/date-field";
 import { SatDateField } from "@/components/sat-date-field";
 import { Survey } from "@/lib/onboarding";
@@ -26,6 +27,9 @@ export function SurveyForm() {
     setStep(next);
     requestAnimationFrame(() => { heading.current?.focus(); heading.current?.scrollIntoView({ block: "start", behavior: "smooth" }); });
   };
+  const [curriculum, setCurriculum] = useState("cbse");
+  const [grade, setGrade] = useState("11");
+  const [chapters, setChapters] = useState<string[]>([]);
   const [tookSat, setTookSat] = useState(false);
   const [target, setTarget] = useState(1400);
   const [unsureDate, setUnsureDate] = useState(false);
@@ -38,6 +42,7 @@ export function SurveyForm() {
       curriculum: skip.includes(0) ? null : f.get("curriculum"),
       subjects: skip.includes(0) ? [] : f.getAll("subjects"),
       topicsStudied: [],
+      chaptersDone: skip.includes(0) || curriculum !== "cbse" ? [] : chapters,
       englishBackground: skip.includes(1) ? null : f.get("english"),
       ratings: {},
       prior: !skip.includes(2) && tookSat ? { math: num("priorMath"), rw: num("priorRw"), takenOn: String(f.get("priorDate")) } : null,
@@ -83,12 +88,20 @@ export function SurveyForm() {
       <div hidden={step !== 0}><div className="flex flex-col gap-6">
       <div className="grid gap-4 sm:grid-cols-2">
         <label className={field}>Grade
-          <Choice name="grade" defaultValue="11" options={[...[8, 9, 10, 11, 12].map((g) => ({ value: String(g), label: `Grade ${g}` })), { value: "13", label: "Other / gap year" }]} />
+          <Choice name="grade" value={grade} onValueChange={setGrade} options={[...[8, 9, 10, 11, 12].map((g) => ({ value: String(g), label: `Grade ${g}` })), { value: "13", label: "Other / gap year" }]} />
         </label>
         <label className={field}>School curriculum
-          <Choice name="curriculum" defaultValue="cbse" options={[{ value: "cbse", label: "CBSE" }, { value: "icse", label: "ICSE" }, { value: "ib", label: "IB" }, { value: "gcse", label: "GCSE / A-Levels" }, { value: "american", label: "American" }, { value: "other", label: "Other" }]} />
+          <Choice name="curriculum" value={curriculum} onValueChange={setCurriculum} options={[{ value: "cbse", label: "CBSE" }, { value: "icse", label: "ICSE" }, { value: "ib", label: "IB" }, { value: "gcse", label: "GCSE / A-Levels" }, { value: "american", label: "American" }, { value: "other", label: "Other" }]} />
         </label>
       </div>
+
+      {curriculum === "cbse" && (
+        <fieldset className="flex flex-col gap-2 text-sm">
+          <legend className="mb-1">Maths chapters you have finished</legend>
+          <p className="mb-2 text-muted-foreground">Tick what you have already done in school. We use it to mark SAT topics you probably know, and nothing is ever hidden from you.</p>
+          <CbseChapterPicker grade={Number(grade)} onChange={setChapters} />
+        </fieldset>
+      )}
 
       <fieldset className="flex flex-col gap-2 text-sm">
         <legend className="mb-2">Subjects you&apos;re studying now</legend>

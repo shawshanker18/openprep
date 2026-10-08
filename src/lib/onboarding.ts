@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { SKILLS, SUBJECTS, TOPICS } from "@/content/taxonomy";
+import { CBSE_CHAPTER_IDS } from "@/content/cbse-chapters";
 import { isSatDate } from "./sat-dates";
 
 const sectionScore = z.number().int().min(200).max(800).multipleOf(10);
@@ -7,6 +8,7 @@ export const Survey = z.object({
   grade: z.number().int().min(8).max(13).nullable(),
   curriculum: z.enum(["cbse", "icse", "ib", "gcse", "american", "other"]).nullable(),
   topicsStudied: z.array(z.enum(TOPICS.map((t) => t.id) as [string, ...string[]])),
+  chaptersDone: z.array(z.enum(CBSE_CHAPTER_IDS)).default([]),
   subjects: z.array(z.enum(SUBJECTS)).default([]),
   englishBackground: z.enum(["first_language", "fluent", "learning"]).nullable(),
   prior: z.object({ math: sectionScore, rw: sectionScore, takenOn: z.iso.date() }).nullable(),

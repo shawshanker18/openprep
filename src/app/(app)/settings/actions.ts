@@ -8,6 +8,7 @@ import { db } from "@/db";
 import { profiles, satAttempts, testSessions } from "@/db/schema";
 import { createClient } from "@/lib/supabase/server";
 import { SUBJECTS, TOPICS } from "@/content/taxonomy";
+import { CBSE_CHAPTER_IDS } from "@/content/cbse-chapters";
 import { requireUser, type ActionResult } from "@/server/auth";
 import { PushSubscriptionInput, removeSubscription, saveSubscription, sendTest } from "@/server/push";
 import { startDiagnostic } from "@/server/diagnostic";
@@ -41,6 +42,7 @@ const ProfileForm = z.object({
   curriculum: z.enum(["cbse", "icse", "ib", "gcse", "american", "other"]),
   subjects: z.array(z.enum(SUBJECTS)),
   topicsStudied: z.array(z.enum(TOPICS.map((t) => t.id) as [string, ...string[]])),
+  chaptersDone: z.array(z.enum(CBSE_CHAPTER_IDS)),
   englishBackground: z.enum(["first_language", "fluent", "learning"]),
 });
 
@@ -48,10 +50,11 @@ export async function updateProfile(form: FormData) {
   const { userId } = await requireUser();
   const p = ProfileForm.safeParse({
     grade: form.get("grade"), curriculum: form.get("curriculum"), englishBackground: form.get("englishBackground"),
-    subjects: form.getAll("subjects"), topicsStudied: form.getAll("topicsStudied"),
+    subjects: form.getAll("subjects"), topicsStudied: form.getAll("topicsStudied"), chaptersDone: form.getAll("chapters"),
   });
   if (!p.success) redirect("/settings?error=profile");
-  await db.update(profiles).set(p.data).where(eq(profiles.id, userId));
+  // Chapters only apply to CBSE; switching board clears them so nothing stale marks lessons as covered.
+  await db.update(profiles).set({ ...p.data, chaptersDone: p.data.curriculum === "cbse" ? p.data.chaptersDone : [] }).where(eq(profiles.id, userId));
   revalidatePath("/settings");
   redirect("/settings?saved=1");
 }
