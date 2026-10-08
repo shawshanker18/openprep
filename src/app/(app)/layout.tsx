@@ -32,7 +32,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
 
   return (
     <div className="flex min-w-0 max-w-full flex-1 flex-col pb-[calc(4rem+env(safe-area-inset-bottom))] desk:flex-row desk:pb-0">
-      <aside className="app-sidebar fixed inset-y-0 left-0 z-10 hidden h-dvh w-56 shrink-0 flex-col gap-4 overflow-hidden border-r p-4 desk:flex">
+      <aside className="app-sidebar fixed inset-y-0 left-0 z-10 hidden h-dvh w-56 shrink-0 flex-col gap-4 overflow-hidden border-r p-4 side:flex">
         <Link href="/dashboard" aria-label="OpenPrep home" className="block px-2 pb-4 pt-2"><BrandLogo height={24} /></Link>
         <NavLinks {...nav} />
       </aside>
@@ -41,15 +41,16 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
         <Link href="/dashboard" aria-label="OpenPrep home"><BrandLogo height={20} /></Link>
         {bell}
       </header>
-      <div className="app-content flex min-w-0 flex-1 flex-col desk:ml-56 [.lesson-focus-mode_&]:ml-0">
+      <div className="app-content flex min-w-0 flex-1 flex-col side:ml-56 [.lesson-focus-mode_&]:ml-0">
         <div className="app-topbar sticky top-0 z-10 hidden items-center justify-end gap-2 border-b bg-background px-4 py-2 desk:flex">
-          <SidebarToggle />
+          <span className="inline-flex lap:hidden"><SidebarToggle /></span>
+          <span className="hidden lap:inline-flex"><MobileMenu {...nav} /></span>
           <NavArrows />
           <CurrentSection />
           {chips}
           {bell}
         </div>
-        <main className="mx-auto w-full min-w-0 max-w-5xl flex-1 px-[max(1rem,env(safe-area-inset-left),env(safe-area-inset-right))] pb-8 pt-6 lg:px-8 has-[.question-content]:max-w-none">
+        <main className="mx-auto w-full min-w-0 max-w-5xl flex-1 min-[1536px]:max-w-6xl min-[1920px]:max-w-7xl min-[2560px]:max-w-[96rem] min-[3200px]:max-w-[110rem] px-[max(1rem,env(safe-area-inset-left),env(safe-area-inset-right))] pb-8 pt-6 lg:px-8 has-[.question-content]:max-w-none">
           <div className="mb-4 flex flex-wrap items-center gap-2 desk:hidden"><CurrentSection />{chips}</div>
           {children}
         </main>
