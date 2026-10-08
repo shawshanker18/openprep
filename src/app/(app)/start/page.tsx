@@ -8,24 +8,34 @@ import { scratchProgress } from "@/server/scratch";
 
 export const metadata = { title: "Start from scratch" };
 
-export default async function StartPage() {
+const isEnglish = (group: string) => group.startsWith("Reading and Writing");
+
+export default async function StartPage({ searchParams }: PageProps<"/start">) {
+  const sp = await searchParams;
   const { userId, profile } = await requireUser();
   const covered=likelyCoveredSkills(profile);
   const { steps, next } = await scratchProgress(userId);
   const done = steps.filter((s) => s.status === "done").length;
   const skipped = steps.filter((s) => s.status === "skipped").length;
-  const groups = [...new Set(steps.map((s) => s.group))];
+  const allGroups = [...new Set(steps.map((s) => s.group))];
+  // Two tabs: English (Reading and Writing) and Maths (SAT basics, Desmos and the Math skills). Opens on the tab that has the next lesson.
+  const tab: "english" | "math" = sp.tab === "english" ? "english" : sp.tab === "math" ? "math" : next && isEnglish(next.group) ? "english" : "math";
+  const groups = allGroups.filter((g) => isEnglish(g) === (tab === "english"));
 
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
-      <BrandBanner eyebrow="Learn" title="Start from scratch"
-        description="SAT format, calculator basics, and Math and Reading and Writing lessons. Work through the topics in order, or skip topics you already know." />
-      <p className="-mt-3 text-xs text-muted-foreground">“Likely covered in school” is a guide based on your grade and curriculum. Every topic stays available to learn.</p>
+      <BrandBanner eyebrow="Learn" title="Start from scratch" description="Short lessons, one topic at a time." />
+
+      <nav aria-label="Subject" className="grid grid-cols-2 gap-1 rounded-xl bg-muted p-1">
+        {([["math", "Maths"], ["english", "English"]] as const).map(([key, label]) => (
+          <Link key={key} href={`/start?tab=${key}`} replace scroll={false} aria-current={tab === key ? "page" : undefined}
+            className="flex min-h-11 items-center justify-center rounded-lg text-sm font-medium text-muted-foreground aria-[current=page]:bg-background aria-[current=page]:text-foreground aria-[current=page]:shadow-sm">{label}</Link>
+        ))}
+      </nav>
 
       <section className="flex flex-col gap-3 rounded-xl border p-5">
         <div className="flex items-baseline justify-between gap-3 text-sm">
-          <span className="font-medium">{done} of {steps.length} topics done</span>
-          {skipped > 0 && <span className="text-muted-foreground">{skipped} skipped</span>}
+          <span className="font-medium">{done} of {steps.length} done</span>
         </div>
         <div className="h-2 overflow-hidden rounded-full bg-muted" role="progressbar" aria-valuenow={done} aria-valuemin={0} aria-valuemax={steps.length} aria-label="Topics done">
           <div className="h-full bg-primary" style={{ width: `${(100 * done) / steps.length}%` }} />
@@ -40,8 +50,7 @@ export default async function StartPage() {
           </div>
         ) : (
           <p className="text-sm">
-            You have been through every topic{skipped ? `, skipping ${skipped}` : ""}. Open any topic below to read it again, or take a practice test on the{" "}
-            <Link href="/tests" className="underline">Tests page</Link>.
+            All topics covered. Open any one to read it again, or <Link href="/tests" className="underline">take a practice test</Link>.
           </p>
         )}
       </section>
@@ -50,7 +59,7 @@ export default async function StartPage() {
       {groups.map((g) => (
         <details key={g} name="lesson-groups" open={g === next?.group} className="group min-w-0 overflow-hidden rounded-xl border">
           <summary className="flex cursor-pointer list-none items-center gap-3 p-4 hover:bg-muted [&::-webkit-details-marker]:hidden">
-            <span className="min-w-0 flex-1"><span className="block text-sm font-semibold">{g}</span><span className="text-xs text-muted-foreground">{steps.filter(s=>s.group===g&&s.status==="done").length} of {steps.filter(s=>s.group===g).length} topics done</span></span>
+            <span className="min-w-0 flex-1"><span className="block text-sm font-semibold">{g}</span><span className="text-xs text-muted-foreground">{steps.filter(s=>s.group===g&&s.status==="done").length} of {steps.filter(s=>s.group===g).length} done</span></span>
             <ChevronRight className="size-4 shrink-0 transition-transform group-open:rotate-90" />
           </summary>
           <ol className="flex flex-col divide-y border-t">
