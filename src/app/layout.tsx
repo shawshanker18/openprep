@@ -14,12 +14,14 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://www.openprep.site"),
-  title: { default: "OpenPrep: free adaptive SAT prep", template: "%s · OpenPrep" },
-  description: "Free SAT questions, lessons, timed practice tests, and progress tracking.",
+  title: { default: "OpenPrep: Free SAT Prep Platform with Practice Tests and Questions", template: "%s · OpenPrep" },
+  description: "OpenPrep (Open Prep) is a free SAT prep platform: adaptive practice, over 13,000 SAT questions, full-length practice tests, lessons and a personal study plan. No subscription, no ads.",
+  keywords: ["OpenPrep", "Open Prep", "free SAT prep", "SAT practice tests", "SAT questions", "adaptive SAT practice", "digital SAT", "SAT study plan"],
+  alternates: { canonical: "./" },
   applicationName: "OpenPrep",
   appleWebApp: { capable: true, title: "OpenPrep", statusBarStyle: "default" },
   icons: { icon: [{ url: "/favicon.ico", sizes: "48x48" }, { url: "/icon-192.png", sizes: "192x192", type: "image/png" }], apple: "/apple-icon.png" },
-  openGraph: { type: "website", siteName: "OpenPrep", title: "OpenPrep: free adaptive SAT prep", description: "Free SAT questions, lessons, timed practice tests, and progress tracking.", images: [{ url: "/brand/og.jpg", width: 1200, height: 630, alt: "OpenPrep" }] },
+  openGraph: { type: "website", siteName: "OpenPrep", title: "OpenPrep: Free SAT Prep Platform", description: "Free adaptive SAT practice, over 13,000 questions, full-length practice tests and a personal study plan.", images: [{ url: "/brand/og.jpg", width: 1200, height: 630, alt: "OpenPrep" }] },
   twitter: { card: "summary_large_image", images: ["/brand/og.jpg"] },
 };
 
@@ -28,10 +30,23 @@ export const viewport: Viewport = {
   themeColor: [{ media: "(prefers-color-scheme: light)", color: "#ffffff" }, { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" }],
 };
 
+const SITE = process.env.NEXT_PUBLIC_SITE_URL || "https://www.openprep.site";
+// Tells search engines what OpenPrep is and what to call it ("OpenPrep", also written "Open Prep").
+const STRUCTURED_DATA = [
+  { "@context": "https://schema.org", "@type": "WebSite", "@id": `${SITE}/#website`, url: `${SITE}/`, name: "OpenPrep", alternateName: ["Open Prep", "OpenPrep SAT"], description: "Free SAT prep platform.", inLanguage: "en" },
+  { "@context": "https://schema.org", "@type": "Organization", "@id": `${SITE}/#organization`, name: "OpenPrep", alternateName: "Open Prep", url: `${SITE}/`, logo: `${SITE}/icon-512.png` },
+  { "@context": "https://schema.org", "@type": "WebApplication", "@id": `${SITE}/#app`, name: "OpenPrep", alternateName: "Open Prep", url: `${SITE}/`, applicationCategory: "EducationalApplication", operatingSystem: "Any (web browser)",
+    description: "Free SAT prep: adaptive practice, over 13,000 SAT questions, full-length practice tests, lessons and a personal study plan.", isAccessibleForFree: true,
+    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" } },
+];
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <head><script dangerouslySetInnerHTML={{ __html: SIDEBAR_RESTORE }} /></head>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: SIDEBAR_RESTORE }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(STRUCTURED_DATA).replace(/</g, "\\u003c") }} />
+      </head>
       <body className="min-h-dvh min-w-0 flex flex-col bg-background text-foreground">
         <ThemeProvider>
         <TooltipProvider>{children}</TooltipProvider>
