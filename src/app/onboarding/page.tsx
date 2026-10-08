@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { requireUser } from "@/server/auth";
 import { beginDiagnostic, skipDiagnostic } from "./actions";
 import { SurveyForm } from "./survey-form";
+import { ThemePrompt } from "@/components/theme-prompt";
 
 export const metadata = { title: "Get started" };
 
@@ -13,6 +14,7 @@ export default async function OnboardingPage() {
 
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-10">
+      <ThemePrompt />
       {survey ? <SurveyForm /> : <>
         <div>
           <h1 className="text-2xl font-semibold">Optional: find your starting point</h1>
