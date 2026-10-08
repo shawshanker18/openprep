@@ -153,3 +153,27 @@ export function DesmosToggle({ className = "h-[65dvh] min-h-[20rem]" }: { classN
     </div>
   );
 }
+
+/**
+ * The test-day calculator: a button for the top bar that slides a half-screen Desmos over the right side of the exam.
+ * It stays mounted after the first open, so graphs are still there when it is reopened.
+ */
+export function DesmosDock() {
+  const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  return (
+    <>
+      <button type="button" aria-expanded={open} onClick={() => { setMounted(true); setOpen((o) => !o); }}
+        className="flex min-h-9 items-center gap-1.5 rounded-md border px-3 text-sm hover:bg-muted"><Calculator className="size-4" />Calculator</button>
+      {mounted && (
+        <div hidden={!open} className="fixed inset-y-0 right-0 z-50 flex w-full flex-col border-l bg-white shadow-2xl sm:w-1/2">
+          <div className="flex shrink-0 items-center justify-between bg-neutral-900 px-3 py-2 text-sm text-white">
+            <span className="font-medium">Calculator</span>
+            <button type="button" onClick={() => setOpen(false)} className="min-h-9 rounded-md px-3 hover:bg-white/10">Close</button>
+          </div>
+          <DesmosCalculator className="min-h-0 flex-1 border-0" />
+        </div>
+      )}
+    </>
+  );
+}

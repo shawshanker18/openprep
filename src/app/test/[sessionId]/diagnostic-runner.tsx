@@ -3,17 +3,17 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { ExamFooter, ExamFrame, ExamTop } from "@/components/exam-frame";
 import { QuestionView } from "@/components/question-view";
 import { DIAGNOSTIC_LENGTH } from "@/engine/diagnostic";
 import type { PublicQuestion } from "@/server/questions";
 import { answerDiagnostic, endDiagnostic } from "./actions";
 import { EndTest } from "./end-test";
-import { DesmosToggle } from "@/components/desmos-panel";
+import { DesmosDock } from "@/components/desmos-panel";
 
 /** One question at a time, no feedback, no going back (spec 04 §5.2 item 5). */
-export function DiagnosticRunner({ sessionId, initial, initialIndex }: {
-  sessionId: string; initial: PublicQuestion; initialIndex: number;
+export function DiagnosticRunner({ sessionId, initial, initialIndex, studentName }: {
+  sessionId: string; initial: PublicQuestion; initialIndex: number; studentName?: string;
 }) {
   const router = useRouter();
   const [q, setQ] = useState(initial);
@@ -33,22 +33,14 @@ export function DiagnosticRunner({ sessionId, initial, initialIndex }: {
   });
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between text-sm text-muted-foreground">
-        <span>Diagnostic · {q.section === "rw" ? "Reading and Writing" : "Math"}</span>
-        <span className="flex items-center gap-2">
-          Question {index + 1} of up to {DIAGNOSTIC_LENGTH}
-          <EndTest action={endDiagnostic.bind(null, sessionId)} detail="The answers you've given so far are kept. You can take the diagnostic again later from your dashboard." />
-        </span>
-      </div>
-      <div className="h-1 overflow-hidden rounded bg-muted">
-        <div className="h-full bg-primary transition-all" style={{ width: `${(100 * index) / DIAGNOSTIC_LENGTH}%` }} />
-      </div>
-      {q.section === "math" && <DesmosToggle />}
-      <QuestionView key={q.id} question={q} value={value} onChange={setValue} disabled={pending} showMetadata={false} large />
-      <div className="flex flex-col gap-2">
-        <Button size="lg" className="self-start" disabled={pending || value===null} onClick={()=>submit(value)}>{pending ? "Saving…" : "Next question"}</Button>
-      </div>
-    </div>
+    <ExamFrame
+      top={<ExamTop title="Diagnostic" subtitle={q.section === "rw" ? "Reading and Writing" : "Math"} tools={<>
+        {q.section === "math" && <DesmosDock />}
+        <EndTest action={endDiagnostic.bind(null, sessionId)} detail="The answers you've given so far are kept. You can take the diagnostic again later from your dashboard." />
+      </>} />}
+      footer={<ExamFooter name={studentName} label={`Question ${index + 1} of up to ${DIAGNOSTIC_LENGTH}`}
+        onNext={() => submit(value)} nextDisabled={pending || value === null} nextLabel={pending ? "Saving…" : "Next"} />}>
+      <QuestionView key={q.id} fill question={q} value={value} onChange={setValue} disabled={pending} showMetadata={false} number={index + 1} />
+    </ExamFrame>
   );
 }
