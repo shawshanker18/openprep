@@ -193,14 +193,24 @@ export function PracticeRunner({ sessionId, userId, mode, title, block, set, bac
     return () => window.removeEventListener("keydown", onKey);
   }, [s, next, pending]);
 
-  if (s.phase === "loading" || s.phase === "restoring") return <p className="text-muted-foreground">Loading…</p>;
+  // Loading and error states already sit inside the exam screen, so opening a question never flashes the site layout
+  // first and then jumps to the full-screen view.
+  if (s.phase === "loading" || s.phase === "restoring") {
+    return (
+      <ExamFrame top={<ExamTop title={title} subtitle="Loading your question…" />} footer={<ExamFooter name={studentName} label="Question" />}>
+        <p role="status" className="m-auto text-muted-foreground">Loading…</p>
+      </ExamFrame>
+    );
+  }
   if (s.phase === "error") {
     return (
-      <div className="flex flex-col items-start gap-3">
-        <p role="alert" className="text-sm">{s.error}</p>
-        <CooldownRetry message={s.error} onRetry={() => start(async()=>{await load();})} />
-        <Link href="/practice/sessions" className="text-sm underline">Saved sessions</Link>
-      </div>
+      <ExamFrame top={<ExamTop title={title} subtitle="Something went wrong" />} footer={<ExamFooter name={studentName} label="Question" />}>
+        <div className="m-auto flex flex-col items-start gap-3">
+          <p role="alert" className="text-sm">{s.error}</p>
+          <CooldownRetry message={s.error} onRetry={() => start(async()=>{await load();})} />
+          <Link href="/practice/sessions" className="text-sm underline">Saved sessions</Link>
+        </div>
+      </ExamFrame>
     );
   }
   if (s.phase === "done" && set) {
