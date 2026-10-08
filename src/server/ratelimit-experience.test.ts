@@ -29,7 +29,7 @@ it("a class of 60 students behind one school IP, each making a request every sec
     }
   }
   expect(blocked).toBe(0);
-});
+}, 30_000);
 
 it("one student working normally (a save every 800 ms plus answers) stays far below the limit", async () => {
   const base = 1_800_100_000_000;

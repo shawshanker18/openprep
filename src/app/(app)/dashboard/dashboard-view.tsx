@@ -13,7 +13,6 @@ import { bestTestDate, predictedScore, readyBy } from "@/engine/plan";
 import { formatDate } from "@/lib/dates";
 import type { AuthUser } from "@/server/auth";
 import type { Profile } from "@/db/schema";
-import type { publicStats } from "@/server/public-stats";
 
 
 const KIND: Record<string, string> = { full: "Full practice test", section: "Section test", module: "Single module", mini: "Mini test", weakness: "Weakness test", custom: "Custom test" };
@@ -60,10 +59,10 @@ const ago = (d: Date, now = new Date()) => {
   return m < 60 ? `${Math.max(1, m)} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} day${Math.round(m / 1440) === 1 ? "" : "s"} ago`;
 };
 
-export function DashboardView({profile,user,d,summary,home,community,savedPractice}: {
+export function DashboardView({profile,user,d,summary,home,savedPractice}: {
   profile:Profile;user:AuthUser|null;d:Awaited<ReturnType<typeof getDashboard>>;
   summary:Awaited<ReturnType<typeof getSkillSummary>>;home:Awaited<ReturnType<typeof homeData>>;
-  community:Awaited<ReturnType<typeof publicStats>>;savedPractice:Awaited<ReturnType<typeof latestActivePracticeSession>>;
+  savedPractice:Awaited<ReturnType<typeof latestActivePracticeSession>>;
 }) {
   const first=user?.name?.split(" ")[0];
   const hasEvidence = summary.skills.some((skill) => skill.n > 0);
@@ -123,9 +122,7 @@ export function DashboardView({profile,user,d,summary,home,community,savedPracti
         <div className="mt-4 flex flex-wrap gap-2">
           <Button size="sm" variant="outline" render={<Link href="/question-bank" />}>Choose your own questions</Button>
           <Button size="sm" variant="outline" render={<Link href="/start" />}>Start from scratch</Button>
-        </div>
-        {community && <p className="mt-3 text-xs text-muted-foreground">{community.users.toLocaleString()} all-time users · {community.active.toLocaleString()} active in the last 30 days · {community.answered.toLocaleString()} questions answered · {community.tests.toLocaleString()} tests completed.</p>}
-      </section>
+        </div>      </section>
 
       <div className="grid min-w-0 grid-cols-1 gap-3 min-[360px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5">
         <Stat label="Goal" value={profile.targetScore ?? "Set goal"} href={profile.targetScore ? undefined : "/settings#goal"} />
