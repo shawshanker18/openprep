@@ -21,9 +21,9 @@ const SITE_PAGES = ["/", "/login", "/onboarding", "/about", "/privacy", "/terms"
  */
 export function SiteFooter({ scope = "site" }: { scope?: "site" | "app" }) {
   const path = usePathname();
-  const visible = (scope === "app" ? APP_PAGES : SITE_PAGES).includes(path);
+  const visible = (scope === "app" ? APP_PAGES : SITE_PAGES).includes(path) || (scope === "site" && path.startsWith("/learn"));
   if (!visible) return null;
   return <footer className="site-footer mt-auto border-t px-4 py-3 text-center text-xs text-muted-foreground">
-    SAT® is a trademark registered by the College Board, which is not affiliated with, and does not endorse, OpenPrep.<FooterFeedback />
+    SAT® is a trademark registered by the College Board, which is not affiliated with, and does not endorse, OpenPrep.{scope === "site" && <> · <Link className="underline" href="/learn">Free SAT lessons</Link></>}<FooterFeedback />
   </footer>;
 }

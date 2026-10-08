@@ -123,13 +123,13 @@ export function NavLinks({ checklist, user, signOut, isAdmin = false, onNavigate
   const path = usePathname();
   const search = useSearchParams();
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-4">
+    <div className="flex min-h-0 flex-1 flex-col gap-4 side:gap-[clamp(0.25rem,1.6dvh,1rem)]">
       {NAV_GROUPS.map((g) => (
         <div key={g.label ?? "main"} className="flex flex-col gap-0.5">
           {g.label && <p className="px-2 pb-1 text-xs font-medium text-muted-foreground">{g.label}</p>}
           {g.items.map(({ href, label, icon: Icon }) => (
             <Link key={href} href={href} onClick={onNavigate} aria-current={isActive(path, search, href) ? "page" : undefined}
-              className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:font-medium">
+              className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm side:h-[clamp(1.5rem,5.6dvh,2.125rem)] side:py-0 hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:font-medium">
               <Icon className="size-4" />{label}
             </Link>
           ))}
@@ -139,7 +139,7 @@ export function NavLinks({ checklist, user, signOut, isAdmin = false, onNavigate
         <Checklist items={checklist} onNavigate={onNavigate} />
         {isAdmin && (
           <Link href="/admin" onClick={onNavigate} aria-current={path.startsWith("/admin") ? "page" : undefined}
-            className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:font-medium side:snug:hidden">
+            className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm side:h-[clamp(1.5rem,5.6dvh,2.125rem)] side:py-0 hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:font-medium side:snug:hidden">
             <ShieldCheck className="size-4" />Admin
           </Link>
         )}
@@ -147,7 +147,7 @@ export function NavLinks({ checklist, user, signOut, isAdmin = false, onNavigate
         <div className={onNavigate ? "flex flex-col gap-2" : "flex flex-wrap items-center gap-1 side:snug:justify-between"}>
           {onNavigate && <FeedbackDialog />}
           <Link href="/settings" onClick={onNavigate} aria-current={isActive(path, search, "/settings") ? "page" : undefined}
-            className="flex min-w-0 flex-1 items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:font-medium side:snug:basis-full">
+            className="flex min-w-0 flex-1 items-center gap-2 rounded-md px-2 py-1.5 text-sm side:h-[clamp(1.5rem,5.6dvh,2.125rem)] side:py-0 hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:font-medium side:snug:basis-full">
             <Settings className="size-4 shrink-0" /><span className="truncate">{user}</span>
           </Link>
           {!onNavigate && <Checklist items={checklist} compact />}
