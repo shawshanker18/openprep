@@ -17,7 +17,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
     <main className="grid min-w-0 flex-1 lg:grid-cols-2 [@media(max-height:600px)]:grid-cols-1">
       <div className="flex min-w-0 flex-col items-center justify-start px-4 py-6 sm:px-6 lg:justify-center [@media(min-height:601px)_and_(max-height:800px)]:py-4 [@media(max-height:600px)]:py-2">
         <div className="flex w-full max-w-[400px] flex-col gap-5 [@media(min-height:601px)_and_(max-height:800px)]:gap-3 [@media(max-height:600px)]:gap-2">
-          <div className="flex items-center justify-between gap-2"><Link href="/" className="flex min-w-0 items-center gap-2">
+          <div className="flex items-center justify-between gap-2"><Link href="/" className="flex min-h-11 min-w-0 items-center gap-2">
             <BrandLogo height={30} />
           </Link></div>
           <div className="flex flex-col gap-1 text-center">

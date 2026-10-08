@@ -18,7 +18,8 @@ export function BrandSymbol({ height = 24, invert, className }: Mark) {
 
 /** Symbol and wordmark together: the logo for headers and the sidebar. */
 export function BrandLogo({ height = 22, invert, className }: Mark) {
-  return <Image src="/brand/logo.webp" alt="OpenPrep" width={900} height={153} unoptimized priority style={sized(height)} className={cn("shrink-0", tone(invert), className)} />;
+  const small = height <= 40; // the half-size file is plenty at header sizes and saves bytes on slow connections
+  return <Image src={small ? "/brand/logo-sm.webp" : "/brand/logo.webp"} alt="OpenPrep" width={small ? 480 : 900} height={small ? 82 : 153} unoptimized priority style={sized(height)} className={cn("shrink-0", tone(invert), className)} />;
 }
 
 const PLATE = { light: "bg-[url('/brand/stage-light.webp')]", dark: "bg-[url('/brand/stage-dark.webp')]" } as const;

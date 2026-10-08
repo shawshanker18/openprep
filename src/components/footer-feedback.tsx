@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 export function FooterFeedback() {
   const path = usePathname();
   if (path.startsWith("/test/")) return null;
-  return <> · <Link className="underline" href="/feedback">Send feedback</Link></>;
+  return <> · <Link className="inline-block px-1 py-1.5 underline" href="/feedback">Send feedback</Link></>;
 }
 
 /** Pages that render inside the signed-in app shell (its footer lives in the content column, never under the sidebar). */
@@ -24,6 +24,6 @@ export function SiteFooter({ scope = "site" }: { scope?: "site" | "app" }) {
   const visible = (scope === "app" ? APP_PAGES : SITE_PAGES).includes(path) || (scope === "site" && path.startsWith("/learn"));
   if (!visible) return null;
   return <footer className="site-footer mt-auto border-t px-4 py-3 text-center text-xs text-muted-foreground">
-    SAT® is a trademark registered by the College Board, which is not affiliated with, and does not endorse, OpenPrep.{scope === "site" && <> · <Link className="underline" href="/learn">Free SAT lessons</Link></>}<FooterFeedback />
+    SAT® is a trademark registered by the College Board, which is not affiliated with, and does not endorse, OpenPrep.{scope === "site" && <> · <Link className="inline-block px-1 py-1.5 underline" href="/learn">Free SAT lessons</Link></>}<FooterFeedback />
   </footer>;
 }

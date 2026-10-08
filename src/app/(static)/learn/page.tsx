@@ -18,7 +18,7 @@ export default async function LearnIndex() {
     {groups.map(({ id, domain, skills }) => (
       <section key={id}>
         <h2>{domain.section === "math" ? "SAT Math" : "SAT Reading and Writing"}: {domain.name}</h2>
-        <ul>{skills.map((k) => <li key={k.id}><Link className="underline" href={`/learn/${k.id}`}>{k.name}</Link></li>)}</ul>
+        <ul>{skills.map((k) => <li key={k.id}><Link className="inline-block py-2 underline" href={`/learn/${k.id}`}>{k.name}</Link></li>)}</ul>
       </section>
     ))}
     <p><Link className="font-medium underline" href="/login">Start free practice with OpenPrep</Link></p>

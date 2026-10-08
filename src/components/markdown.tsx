@@ -4,6 +4,7 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/contrib/mhchem";
+import "katex/dist/katex.min.css"; // only pages that show maths load the maths styles
 import { cn } from "@/lib/utils";
 import { QuestionImage } from "./question-image";
 import { normalizeMarkdown } from "@/lib/normalize-markdown";
