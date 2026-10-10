@@ -7,6 +7,7 @@ const LEVEL = [
   "bg-blue-400 dark:bg-blue-600",
   "bg-blue-600 dark:bg-blue-400",
 ];
+const TEXT = ["text-muted-foreground", "text-blue-900 dark:text-blue-200", "text-blue-950 dark:text-blue-100", "text-blue-950 dark:text-white", "text-white dark:text-blue-950"];
 const WEEKDAY = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 const utc = (d: string, o: Intl.DateTimeFormatOptions) => new Date(`${d}T12:00:00Z`).toLocaleDateString("en-US", { ...o, timeZone: "UTC" });
 const plural = (n: number, w: string) => `${n.toLocaleString()} ${w}${n === 1 ? "" : "s"}`;
@@ -25,7 +26,7 @@ function Tile({ label, value, sub }: { label: string; value: string; sub?: strin
   );
 }
 
-/** GitHub-style year grid that stretches to the available width: a column per week (Monday first), a square per day. */
+/** GitHub-style grid of the last 3 months, stretched to the available width: a column per week (Monday first), a cell per day showing its date and question count. */
 export function ActivityHeatmap({ activity: a }: { activity: Activity }) {
   const cols = a.weeks.length;
   const month = (i: number) => utc(a.weeks[i]![0]!.day, { month: "short" });
@@ -35,7 +36,7 @@ export function ActivityHeatmap({ activity: a }: { activity: Activity }) {
     <section className="flex flex-col gap-4" aria-label="Activity">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 className="text-lg font-semibold">Activity</h2>
-        <p className="text-sm text-muted-foreground">{plural(a.questions, "question")} in the last year</p>
+        <p className="text-sm text-muted-foreground">{plural(a.questions, "question")} in the last 3 months</p>
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
@@ -47,20 +48,22 @@ export function ActivityHeatmap({ activity: a }: { activity: Activity }) {
         <Tile label="This week" value={a.thisWeek.toLocaleString()} sub={a.lastWeek || a.thisWeek ? `questions · ${delta >= 0 ? "+" : "−"}${Math.abs(delta)} vs last week` : undefined} />
       </div>
 
-      {/* rtl on the scroller makes a narrow screen open at the most recent weeks; the inner box stays ltr. */}
-      <div dir="rtl" className="max-w-full overflow-x-auto rounded-xl border bg-card p-4 sm:p-5">
-        <div dir="ltr" className="flex min-w-[40rem] flex-col gap-2">
-          <div className="grid gap-[3px] pl-9" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
+      <div className="rounded-xl border bg-card p-3 sm:p-5">
+        <div className="flex flex-col gap-2">
+          <div className="grid gap-1 pl-6 sm:gap-1.5 sm:pl-8" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
             {a.weeks.map((_, i) => <span key={i} className="whitespace-nowrap text-xs text-muted-foreground">{i === 0 || month(i) !== month(i - 1) ? month(i) : ""}</span>)}
           </div>
-          <div className="flex gap-2">
-            <div className="grid w-7 grid-rows-7 gap-[3px] text-xs text-muted-foreground">
-              {["Mon", "", "Wed", "", "Fri", "", ""].map((d, i) => <span key={i} className="flex items-center">{d}</span>)}
+          <div className="flex gap-1.5 sm:gap-2">
+            <div className="grid w-4 grid-rows-7 gap-1 text-xs text-muted-foreground sm:w-6 sm:gap-1.5">
+              {["M", "T", "W", "T", "F", "S", "S"].map((d, i) => <span key={i} translate="no" className="flex items-center">{d}</span>)}
             </div>
-            <div className="grid min-w-0 flex-1 grid-flow-col grid-rows-7 gap-[3px]" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
+            <div className="grid min-w-0 flex-1 grid-flow-col grid-rows-7 gap-1 sm:gap-1.5" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
               {a.weeks.flat().map((c) => (
                 <span key={c.day} title={c.future ? undefined : tip(c)} aria-label={c.future ? undefined : tip(c)}
-                  className={`aspect-square rounded-[3px] ${c.future ? "invisible" : `${LEVEL[c.level]} hover:ring-2 hover:ring-foreground/40`}`} />
+                  className={`relative flex h-7 items-center justify-center rounded-md sm:h-11 ${c.future ? "invisible" : `${LEVEL[c.level]} ${TEXT[c.level]} hover:ring-2 hover:ring-foreground/40`}`}>
+                  <span className="absolute left-1 top-0.5 hidden text-[10px] leading-none opacity-70 sm:block">{Number(c.day.slice(8))}</span>
+                  {c.questions > 0 && <span className="hidden text-sm font-medium tabular-nums sm:block">{c.questions}</span>}
+                </span>
               ))}
             </div>
           </div>
