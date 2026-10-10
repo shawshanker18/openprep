@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Fragment } from "react";
 import { formatDate } from "@/lib/dates";
+import { testLabel } from "@/lib/test-label";
 import { Button } from "@/components/ui/button";
 import { DOMAINS, SKILL_BY_ID, type DomainId } from "@/content/taxonomy";
 import { type TestResult } from "@/engine/score";
@@ -8,7 +9,6 @@ import type { getTestResult } from "@/server/tests";
 import { ReviewItem } from "./review-item";
 
 type Data = NonNullable<Awaited<ReturnType<typeof getTestResult>>>;
-const KIND = { full: "Full practice test", section: "Section test", module: "Single module", mini: "Mini test", weakness: "Weakness test", custom: "Custom test" } as Record<string, string>;
 const ROUTE = { hard: "You reached the harder second module.", easy: "You were routed to the easier second module." } as Record<string, string>;
 
 /** 75000 → "1:15" */
@@ -74,7 +74,7 @@ export function TestResults({ data, timeZone }: { data: Data; timeZone: string }
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-8 px-4 py-10">
       <div className="flex flex-col gap-1">
-        <p className="text-sm text-muted-foreground">{(s.config as { title?: string }).title ?? KIND[s.kind] ?? s.kind} · {s.completedAt && formatDate(s.completedAt, timeZone)}</p>
+        <p className="text-sm text-muted-foreground">{testLabel(s.kind, s.config)} · {s.completedAt && formatDate(s.completedAt, timeZone)}</p>
         {s.kind === "custom" && (() => {
           const c = s.config as { skillIds?: string[]; tags?: string[]; difficulty?: string; timed?: boolean; count?: number };
           return (
