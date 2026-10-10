@@ -8,7 +8,8 @@ import { db, type Tx } from "@/db";
 import { attempts, questions, scoreSnapshots, skillState, testItems, testModules, testSessions } from "@/db/schema";
 import { SKILL_BY_ID } from "@/content/taxonomy";
 import type { Difficulty } from "@/engine/constants";
-import { assembleModule, largestRemainder, moduleBlueprint, routeFor, type Blueprint, type PoolQ } from "@/engine/assemble";
+import { assembleModule, largestRemainder, moduleBlueprint, routeFor, type Blueprint, type PoolQ, type Route } from "@/engine/assemble";
+import { paperModule, type Paper } from "@/engine/paper";
 import { grade } from "@/engine/grade";
 import { buildTestResult, type ResultItem } from "@/engine/score";
 import { targetDifficulty } from "@/engine/select";
@@ -22,7 +23,7 @@ import { memo } from "@/lib/memo";
 
 export type TestKind = "full" | "section" | "module" | "mini" | "weakness" | "custom";
 type Section = "rw" | "math";
-type Config = { sections: Section[]; adaptive: boolean; timed: boolean; skillIds?: string[]; count?: number; tags?: string[]; difficulty?: Difficulty | "mixed"; title?: string };
+type Config = { sections: Section[]; adaptive: boolean; timed: boolean; paper?: Paper; route?: Route; skillIds?: string[]; count?: number; tags?: string[]; difficulty?: Difficulty | "mixed"; title?: string };
 const GRACE_MS = 10_000;
 
 /**
@@ -45,6 +46,17 @@ async function pool(tx: Tx, userId: string, where: ReturnType<typeof and>, which
     .where(and(eq(questions.status, "active"), which === "test" ? availableTestQuestion(userId) : availableQuestion(userId), where)).groupBy(questions.id);
   return rows.map((r) => ({ ...r.q, reserved: which === "test", difficulty: r.q.difficulty as Difficulty, type: r.q.type as "mcq" | "spr", lastSeenAt: r.seen ? new Date(r.seen) : null }));
 }
+
+/** A section's whole test pool, for fixed practice tests. Deliberately ignores what this student has seen or has open: a paper's content is the same for everyone. */
+async function paperPool(tx: Tx, section: Section) {
+  const rows = await tx.select({ id: questions.id, skillId: questions.skillId, domain: questions.domain, difficulty: questions.difficulty, type: questions.type })
+    .from(questions).where(and(eq(questions.status, "active"), eq(questions.pool, "test"), eq(questions.section, section)));
+  return rows.map((r) => ({ ...r, difficulty: r.difficulty as Difficulty, type: r.type as "mcq" | "spr", lastSeenAt: null }));
+}
+
+/** Heading for a single paper module, e.g. "Practice Test 2 · Math Module 2 (hard)". */
+const moduleTitle = (paper: number, section: Section, route: Route) =>
+  `Practice Test ${paper} · ${section === "math" ? "Math" : "Reading and Writing"} Module ${route === "base" ? 1 : 2}${route === "base" ? "" : ` (${route})`}`;
 
 async function usedIds(tx: Tx, sessionId: string) {
   const rows = await tx.select({ id: testItems.questionId }).from(testItems)
@@ -97,6 +109,8 @@ const START_LIMIT = { ms: 60_000, max: 20 };
 export async function startTest(userId: string, input: {
   kind: TestKind; section?: Section; skillId?: string; skillIds?: string[]; count?: number; timed?: boolean; focus?: string[];
   tags?: string[]; difficulty?: Difficulty | "mixed"; title?: string;
+  /** Fixed practice test 1-4 (full, section or module kinds). `route` picks which module of a single-module start: base = Module 1. */
+  paper?: Paper; route?: Route;
 }): Promise<{ ok: true; id: string } | { ok: false; error: string; resumeId?: string }> {
   const context=await deliveryContext();
   const timed = input.timed ?? (input.kind !== "weakness");
@@ -111,14 +125,18 @@ export async function startTest(userId: string, input: {
     if(context.ip) await consumeWindow(tx,`test-start:ip:${context.ip}`,1000,START_LIMIT.ms);
     const sections: Section[] = input.kind === "full" ? ["rw", "math"] : input.section ? [input.section] : [];
     const config: Config = { sections, adaptive: input.kind === "full" || input.kind === "section", timed };
+    const route = input.paper && input.kind === "module" ? input.route ?? "base" : "base";
+    if (input.paper) Object.assign(config, { paper: input.paper, ...(input.kind === "module" ? { route, title: moduleTitle(input.paper, sections[0] ?? "rw", route) } : {}) });
     if (input.kind === "custom") Object.assign(config, { skillIds: input.skillIds, count: input.count, tags: input.tags ?? [], difficulty: input.difficulty ?? "mixed", ...(input.title ? { title: input.title } : {}) });
     const [s] = await tx.insert(testSessions).values({ userId, kind: input.kind, config }).returning({ id: testSessions.id });
     const id = s!.id;
 
     if (input.kind === "full" || input.kind === "section" || input.kind === "module") {
       const sec = sections[0] ?? "rw";
-      const bp = moduleBlueprint(sec, "base", timed);
-      await insertModule(tx, id, 0, sec, "base", bp.timeLimitS, assembleModule(bp, await pool(tx, userId, eq(questions.section, sec), poolForTestKind(input.kind)), new Set(), Math.random));
+      const bp = moduleBlueprint(sec, route, timed);
+      const qs = input.paper ? paperModule(input.paper, sec, route, await paperPool(tx, sec))
+        : assembleModule(bp, await pool(tx, userId, eq(questions.section, sec), poolForTestKind(input.kind)), new Set(), Math.random);
+      await insertModule(tx, id, 0, sec, route, bp.timeLimitS, qs);
     } else if (input.kind === "mini") {
       const skill = SKILL_BY_ID[input.skillId ?? ""];
       if (!skill) throw new Error("mini test needs a skill");
@@ -186,7 +204,8 @@ async function submitModuleTx(tx: Tx, userId: string, sessionId: string, moduleI
   if (cfg.adaptive && si >= 0 && si + 1 < cfg.sections.length) next.push({ section: cfg.sections[si + 1]!, route: "base" });
   for (const n of next) {
     const bp = moduleBlueprint(n.section, n.route, cfg.timed);
-    const qs = assembleModule(bp, await pool(tx, userId, eq(questions.section, n.section), poolForTestKind(s.kind)), await usedIds(tx, sessionId), Math.random);
+    const qs = cfg.paper ? paperModule(cfg.paper, n.section, n.route, await paperPool(tx, n.section))
+      : assembleModule(bp, await pool(tx, userId, eq(questions.section, n.section), poolForTestKind(s.kind)), await usedIds(tx, sessionId), Math.random);
     if (qs.length) { await insertModule(tx, sessionId, m.idx + 1, n.section, n.route, bp.timeLimitS, qs); return; }
   }
   await finishSession(tx, userId, s, now);
@@ -360,6 +379,26 @@ export async function listTests(userId: string, page = 1) {
 export async function openTests(userId: string) {
   return db.select().from(testSessions).where(and(eq(testSessions.userId, userId), eq(testSessions.status, "in_progress")))
     .orderBy(desc(testSessions.startedAt));
+}
+
+/** Modules finished so far in each unfinished test, and which one is open now, for the Resume cards. */
+export async function openTestProgress(sessionIds: string[]) {
+  if (!sessionIds.length) return new Map<string, { done: number; section?: string; route?: string }>();
+  const mods = await db.select().from(testModules).where(inArray(testModules.sessionId, sessionIds)).orderBy(asc(testModules.idx));
+  const out = new Map<string, { done: number; section?: string; route?: string }>();
+  for (const m of mods) {
+    const p = out.get(m.sessionId) ?? { done: 0 };
+    if (m.submittedAt) p.done++; else Object.assign(p, { section: m.section, route: m.route });
+    out.set(m.sessionId, p);
+  }
+  return out;
+}
+
+/** Finished practice tests (not diagnostics or drills) for the score summary, newest first. */
+export async function completedPracticeTests(userId: string) {
+  return db.select({ id: testSessions.id, kind: testSessions.kind, config: testSessions.config, result: testSessions.result, completedAt: testSessions.completedAt })
+    .from(testSessions).where(and(eq(testSessions.userId, userId), eq(testSessions.status, "completed"), inArray(testSessions.kind, ["full", "section", "module"])))
+    .orderBy(desc(testSessions.completedAt)).limit(200);
 }
 
 /** Questions in this student's unfinished tests (practice mustn't serve them). */
