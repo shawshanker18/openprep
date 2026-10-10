@@ -42,8 +42,16 @@ export default async function LessonPage({ params }: PageProps<"/learn/[skillId]
     author: { "@type": "Organization", name: "OpenPrep" }, publisher: { "@type": "Organization", name: "OpenPrep", logo: { "@type": "ImageObject", url: `${SITE}/icon-512.png` } },
     mainEntityOfPage: `${SITE}/learn/${skillId}`,
   };
+  const crumbs = {
+    "@context": "https://schema.org", "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "OpenPrep", item: `${SITE}/` },
+      { "@type": "ListItem", position: 2, name: "Free SAT lessons", item: `${SITE}/learn` },
+      { "@type": "ListItem", position: 3, name: `SAT ${name}`, item: `${SITE}/learn/${skillId}` },
+    ],
+  };
   return (<>
-    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld).replace(/</g, "\u003c") }} />
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify([ld, crumbs]).replace(/</g, "\u003c") }} />
     <p className="text-sm text-muted-foreground"><Link href="/learn" className="underline">All SAT lessons</Link> · {skill.section === "math" ? "SAT Math" : "SAT Reading and Writing"} · {domain.name}</p>
     <h1>SAT {name}</h1>
     {lesson.minutes && <p className="text-sm text-muted-foreground">About {lesson.minutes} minutes</p>}
