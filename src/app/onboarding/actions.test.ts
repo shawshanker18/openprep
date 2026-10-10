@@ -70,7 +70,9 @@ it("opens bank, Adaptive Practice, daily plan, reviews and short tests without a
   expect((await getNotifications(userId, profile)).some((n) => n.id === "reviews")).toBe(true);
   expect((await isMockDue(userId, null)).due).toBe(false);
   expect((await isMockDue(userId, null, new Date(Date.now() + 8 * 86_400_000))).due).toBe(true);
-  const form = new FormData(); form.set("kind", "module"); form.set("section", "math");
+  const { PAPERS, paperOf } = await import("@/engine/paper");
+  const paper = PAPERS.find((n) => Array.from({ length: 12 }, (_, i) => `${skill.id}-demo-${i}`).some((id) => paperOf(id) === n))!;
+  const form = new FormData(); form.set("scope", "math:base"); form.set("paper", String(paper));
   await startTestAction(form);
   expect(redirect).toHaveBeenLastCalledWith(expect.stringMatching(/^\/test\//));
   expect((await db.select().from(schema.testSessions)).some((session) => session.kind === "diagnostic")).toBe(false);
