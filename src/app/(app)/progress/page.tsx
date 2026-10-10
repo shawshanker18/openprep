@@ -3,7 +3,8 @@ import { DOMAINS, type DomainId } from "@/content/taxonomy";
 import { formatDate } from "@/lib/dates";
 import { Button } from "@/components/ui/button";
 import { MasteryBar } from "@/components/mastery-bar";
-import { publicStatsForPage } from "@/server/public-stats";
+import { ActivityHeatmap } from "@/components/activity-heatmap";
+import { getActivity } from "@/server/activity";
 import { requireUser } from "@/server/auth";
 import { guarded } from "@/server/guard";
 import { getProgress, getSkillSummary } from "@/server/analytics";
@@ -42,25 +43,9 @@ function ScoreChart({ points, target, timeZone }: { points: Point[]; target: num
   );
 }
 
-function Bars({ rows }: { rows: { label: string; value: number; suffix?: string }[] }) {
-  const max = Math.max(1, ...rows.map((r) => r.value));
-  return (
-    <ul className="flex flex-col gap-1.5 text-sm">
-      {rows.map((r) => (
-        <li key={r.label} className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_3rem] items-center gap-2">
-          <span>{r.label}</span>
-          <span className="h-2 rounded-full bg-primary" style={{ width: `${(100 * r.value) / max}%` }} />
-          <span className="text-right tabular-nums text-muted-foreground">{r.value}{r.suffix}</span>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-
 export default async function ProgressPage() {
   const { userId, profile } = await requireUser();
-  const [p, { skills }, usage] = await guarded(Promise.all([getProgress(userId, profile.timezone), getSkillSummary(userId), publicStatsForPage()]));
+  const [p, { skills }, activity] = await guarded(Promise.all([getProgress(userId, profile.timezone), getSkillSummary(userId), getActivity(userId, profile.timezone)]));
   const points: Point[] = [
     ...p.snapshots.map((s) => ({ t: s.takenAt.getTime(), total: s.rw + s.math, half: s.halfWidth, source: s.source })),
     ...p.official.map((o) => ({ t: new Date(o.takenOn).getTime(), total: o.math + o.rw, half: 0, source: "official" })),
@@ -69,7 +54,7 @@ export default async function ProgressPage() {
   return (
     <div className="flex flex-col gap-10">
       <h1 className="text-2xl font-semibold">Progress</h1>
-      {usage && <section className="flex flex-col gap-3"><h2 className="font-medium">OpenPrep usage</h2><dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">{[[usage.users,"Students"],[usage.active,"Active in the last 30 days"],[usage.answered,"Questions answered"],[usage.tests,"Tests completed"]].map(([n,label])=><div key={String(label)} className="min-w-0 rounded-xl border p-3"><dt className="text-xs text-muted-foreground">{label}</dt><dd className="text-xl font-semibold tabular-nums">{Number(n).toLocaleString()}</dd></div>)}</dl><p className="text-xs text-muted-foreground">Aggregate counts only. Other students’ scores and progress are private.</p></section>}
+      <ActivityHeatmap activity={activity} />
 
       <section className="flex flex-col gap-3">
         <h2 className="font-medium">Estimated score</h2>
@@ -110,12 +95,6 @@ export default async function ProgressPage() {
           </div></section>
 
       </div>
-
-      <section className="flex flex-col gap-3">
-        <h2 className="font-medium">Activity · 30 days</h2>
-        {p.daily.length ? <Bars rows={p.daily.map((d) => ({ label: new Date(`${d.day}T12:00:00Z`).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" }), value: d.n, suffix: "" }))} />
-          : <p className="text-sm text-muted-foreground">No activity yet.</p>}
-      </section>
     </div>
   );
 }

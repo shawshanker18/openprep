@@ -33,28 +33,6 @@ it("reminder sweep falls back to the slow timezone-catalog query if the database
   expect(execute).toHaveBeenCalledTimes(3);
 });
 
-it("page stats never hold up a page render when the count is slow", async () => {
-  vi.stubEnv("DATABASE_URL", "postgres://example");
-  execute.mockReturnValue(new Promise(() => {})); // a count that never returns
-  const { publicStatsForPage } = await import("./public-stats");
-  const started = Date.now();
-  expect(await publicStatsForPage(50)).toBeNull();
-  expect(Date.now() - started).toBeLessThan(1000);
-  vi.unstubAllEnvs();
-});
-
-it("page stats are returned when the count is quick, and failures become null", async () => {
-  vi.stubEnv("DATABASE_URL", "postgres://example");
-  execute.mockResolvedValueOnce([{ users: 20, answered: 500, tests: 3, active: 5 }]);
-  const quick = await import("./public-stats");
-  expect(await quick.publicStatsForPage()).toEqual({ users: 20, answered: 500, tests: 3, active: 5 });
-  vi.resetModules();
-  execute.mockRejectedValueOnce(new Error("db down"));
-  const broken = await import("./public-stats");
-  expect(await broken.publicStatsForPage()).toBeNull();
-  vi.unstubAllEnvs();
-});
-
 it("skillsWithQuestions finds exactly the skills that have an active question", { timeout: 60_000 }, async () => {
   const pg = new PGlite();
   const real = drizzle(pg, { schema });
