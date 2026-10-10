@@ -5,6 +5,9 @@ export type Activity = {
   weeks: Cell[][]; // columns are weeks (Monday first), 7 cells each
   activeDays: number; questions: number; minutes: number; tests: number;
   currentStreak: number; longestStreak: number;
+  bestDay: Cell | null; // the day with the most questions answered
+  busiestWeekday: number | null; // 0 = Monday .. 6 = Sunday, by questions answered
+  thisWeek: number; lastWeek: number; // questions answered, this Monday-first week vs the one before
 };
 
 const DAY = 86_400_000;
@@ -13,7 +16,7 @@ const iso = (t: number) => new Date(t).toISOString().slice(0, 10);
 const active = (r: Pick<DayRow, "questions" | "tests">) => r.questions > 0 || r.tests > 0;
 
 /** `today` is the student's local date (YYYY-MM-DD); rows are local-day totals. Shows the last `weeks` weeks ending this week. */
-export function buildActivity(rows: DayRow[], today: string, weeks = 26): Activity {
+export function buildActivity(rows: DayRow[], today: string, weeks = 52): Activity {
   const byDay = new Map(rows.map((r) => [r.day, r]));
   const thisMonday = at(today) - ((new Date(at(today)).getUTCDay() + 6) % 7) * DAY;
   const start = thisMonday - (weeks - 1) * 7 * DAY;
@@ -36,7 +39,13 @@ export function buildActivity(rows: DayRow[], today: string, weeks = 26): Activi
   let current = 0, i = days.length - 1;
   if (i >= 0 && !active(days[i]!)) i--;
   for (; i >= 0 && active(days[i]!); i--) current++;
+  const byWeekday = Array<number>(7).fill(0);
+  for (const w of cells) w.forEach((c, d) => { byWeekday[d]! += c.questions; });
+  const best = days.reduce<Cell | null>((b, c) => (c.questions > (b?.questions ?? 0) ? c : b), null);
+  const weekTotal = (w: Cell[] | undefined) => (w ?? []).reduce((a, c) => a + c.questions, 0);
   return {
+    bestDay: best, busiestWeekday: best ? byWeekday.indexOf(Math.max(...byWeekday)) : null,
+    thisWeek: weekTotal(cells.at(-1)), lastWeek: weekTotal(cells.at(-2)),
     weeks: cells, activeDays: days.filter(active).length, longestStreak: longest, currentStreak: current,
     questions: days.reduce((a, c) => a + c.questions, 0), minutes: days.reduce((a, c) => a + c.minutes, 0), tests: days.reduce((a, c) => a + c.tests, 0),
   };

@@ -31,3 +31,11 @@ it("counts streaks, and an empty today does not break the current one", () => {
 it("ignores activity outside the window", () => {
   expect(buildActivity([row("2025-01-01", 99)], TODAY, 4)).toMatchObject({ activeDays: 0, questions: 0, longestStreak: 0 });
 });
+
+it("reports the best day, busiest weekday and this week against last", () => {
+  const a = buildActivity([row("2026-09-28", 3), row("2026-10-05", 10), row("2026-10-06", 20), row("2026-10-13", 99)], TODAY, 4);
+  expect(a.bestDay).toMatchObject({ day: "2026-10-06", questions: 20 });
+  expect(a.busiestWeekday).toBe(1); // Tuesday
+  expect({ thisWeek: a.thisWeek, lastWeek: a.lastWeek }).toEqual({ thisWeek: 30, lastWeek: 3 });
+  expect(buildActivity([], TODAY, 4)).toMatchObject({ bestDay: null, busiestWeekday: null });
+});
