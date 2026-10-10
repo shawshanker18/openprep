@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   other: { "msvalidate.01": "78A7934EB1F51F16CECD72CAD3455A09" }, // Bing Webmaster Tools ownership
   applicationName: "OpenPrep",
   appleWebApp: { capable: true, title: "OpenPrep", statusBarStyle: "default" },
-  icons: { icon: [{ url: "/favicon.ico", sizes: "48x48" }, { url: "/icon-192.png", sizes: "192x192", type: "image/png" }], apple: "/apple-icon.png" },
+  icons: { icon: [{ url: "/icon-96.png", sizes: "96x96", type: "image/png" }, { url: "/favicon.ico", sizes: "48x48" }, { url: "/icon-192.png", sizes: "192x192", type: "image/png" }], apple: "/apple-icon.png" },
   openGraph: { type: "website", siteName: "OpenPrep", title: "OpenPrep: Free SAT Prep Platform", description: "Free adaptive SAT practice, over 13,000 questions, full-length practice tests and a personal study plan.", images: [{ url: "/brand/og.jpg", width: 1200, height: 630, alt: "OpenPrep" }] },
   twitter: { card: "summary_large_image", images: ["/brand/og.jpg"] },
 };
