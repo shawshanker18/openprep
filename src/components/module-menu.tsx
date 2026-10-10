@@ -25,7 +25,7 @@ export function ModuleMenu({ paper, last }: { paper: number; last: Record<string
         {pending ? <LoaderCircle className="size-4 animate-spin" /> : <ChevronRight className="size-4 text-muted-foreground" />}
       </Menu.Trigger>
       <Menu.Portal>
-        <Menu.Positioner side="right" align="start" sideOffset={6} alignOffset={-6} className="z-50">
+        <Menu.Positioner side="bottom" align="start" sideOffset={6} className="z-50">
           <Menu.Popup className={popup}>
             {MODULE_SECTIONS.map((s) => (
               <Menu.SubmenuRoot key={s.id}>
