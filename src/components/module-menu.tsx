@@ -20,7 +20,7 @@ export function ModuleMenu({ paper, last }: { paper: number; last: Record<string
   };
   return (
     <Menu.Root>
-      <Menu.Trigger openOnHover delay={80} disabled={pending} className="flex h-9 w-fit items-center gap-3 rounded-lg border bg-background px-3 text-sm font-medium outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50">
+      <Menu.Trigger openOnHover delay={80} disabled={pending} className="flex h-9 w-full items-center justify-between rounded-lg border bg-background px-3 text-sm font-medium outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50">
         Individual modules
         {pending ? <LoaderCircle className="size-4 animate-spin" /> : <ChevronRight className="size-4 text-muted-foreground" />}
       </Menu.Trigger>
