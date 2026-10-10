@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ChevronDown } from "lucide-react";
 import { formatDate } from "@/lib/dates";
 import { testLabel } from "@/lib/test-label";
 import { Button } from "@/components/ui/button";
@@ -16,8 +17,8 @@ export const metadata = { title: "Practice tests" };
 
 const ERR: Record<string, string> = { empty: "There aren't enough questions for that test yet.", invalid: "Please check the test options.", rate: "Too many tests started in a few minutes. Please wait a moment and try again." };
 const SECTIONS = [
-  { id: "math", name: "Math", detail: "22 questions · 35 min per module" },
-  { id: "rw", name: "Reading and Writing", detail: "27 questions · 32 min per module" },
+  { id: "math", name: "Math" },
+  { id: "rw", name: "Reading and Writing" },
 ] as const;
 const MODULES: { route: Route; label: string }[] = [{ route: "base", label: "Module 1" }, { route: "easy", label: "Module 2 · Easy" }, { route: "hard", label: "Module 2 · Hard" }];
 const MODULES_IN: Record<string, number> = { full: 4, section: 2 };
@@ -135,28 +136,30 @@ export default async function TestsPage({ searchParams }: PageProps<"/tests">) {
                   ? <Button size="lg" render={<Link href={`/test/${openFull.id}`} />}>Resume full test</Button>
                   : <ScopeButton value="full" variant="default" size="lg" className="w-full">Start full test</ScopeButton>}
 
-                <div className="grid gap-3">
-                  {SECTIONS.map((s) => (
-                    <div key={s.id} className="flex flex-col gap-2 rounded-lg border p-3">
-                      <div>
-                        <h4 className="font-medium">{s.name}</h4>
-                        <p className="text-xs text-muted-foreground">{s.detail}</p>
+                <div className="group rounded-lg border">
+                  <button type="button" className="flex w-full items-center justify-between px-3 py-2 text-sm font-medium">
+                    Individual modules
+                    <ChevronDown className="size-4 text-muted-foreground transition-transform group-focus-within:rotate-180 group-hover:rotate-180" />
+                  </button>
+                  <div className="hidden flex-col gap-3 border-t p-3 group-focus-within:flex group-hover:flex">
+                    {SECTIONS.map((s) => (
+                      <div key={s.id} className="flex flex-col gap-1.5">
+                        <h4 className="text-sm font-medium">{s.name}</h4>
+                        <div className="grid grid-cols-3 gap-1.5">
+                          {MODULES.map((m) => {
+                            const prev = mine.find((t) => t.kind === "module" && cfg(t).sections?.[0] === s.id && cfg(t).route === m.route);
+                            const x = (prev?.result as TestResult | undefined)?.sections[s.id];
+                            return (
+                              <ScopeButton key={m.route} value={`${s.id}:${m.route}`} size="sm" className="h-auto min-w-0 flex-col gap-0 whitespace-normal py-1.5 text-xs leading-tight">
+                                <span>{m.label}</span>
+                                <span className="font-normal text-muted-foreground tabular-nums">{x ? `Last ${x.correct}/${x.total}` : "Not taken"}</span>
+                              </ScopeButton>
+                            );
+                          })}
+                        </div>
                       </div>
-                      <ScopeButton value={s.id} variant="secondary">Adaptive section · both modules</ScopeButton>
-                      <div className="grid grid-cols-3 gap-1.5">
-                        {MODULES.map((m) => {
-                          const prev = mine.find((t) => t.kind === "module" && cfg(t).sections?.[0] === s.id && cfg(t).route === m.route);
-                          const x = (prev?.result as TestResult | undefined)?.sections[s.id];
-                          return (
-                            <ScopeButton key={m.route} value={`${s.id}:${m.route}`} size="sm" className="h-auto min-w-0 flex-col gap-0 whitespace-normal py-1.5 text-xs leading-tight">
-                              <span>{m.label}</span>
-                              <span className="font-normal text-muted-foreground tabular-nums">{x ? `Last ${x.correct}/${x.total}` : "Not taken"}</span>
-                            </ScopeButton>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </form>
             );
