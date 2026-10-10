@@ -3,6 +3,7 @@ import { ArrowRight, BookOpen, ChartNoAxesCombined, Check, ClipboardCheck, Compa
 import { Button } from '@/components/ui/button';
 import { Markdown } from '@/components/markdown';
 import { BrandLogo } from '@/components/brand';
+export const metadata = { alternates: { canonical: '/' } };
 const features=[
   {icon:Compass,title:'Find your starting point',body:'An optional diagnostic samples Math and Reading and Writing skills. Review your wrong answers when you are ready, with your selection and the correct answer side by side.'},
   {icon:BookOpen,title:'Adaptive Practice',body:'Adaptive Practice adjusts difficulty after each answer. Or choose multiple topics and difficulties in the Question Bank, preview questions, and start your own set.'},
