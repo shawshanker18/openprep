@@ -2,7 +2,7 @@
 
 import { useTransition } from "react";
 import { Menu } from "@base-ui/react/menu";
-import { ChevronDown, ChevronRight, LoaderCircle } from "lucide-react";
+import { ChevronRight, LoaderCircle } from "lucide-react";
 import { startTestAction } from "@/app/(app)/tests/actions";
 import { MODULE_ROUTES, MODULE_SECTIONS } from "@/lib/test-modules";
 
@@ -20,12 +20,12 @@ export function ModuleMenu({ paper, last }: { paper: number; last: Record<string
   };
   return (
     <Menu.Root>
-      <Menu.Trigger openOnHover delay={80} disabled={pending} className="flex h-9 w-full items-center justify-between rounded-lg border bg-background px-3 text-sm font-medium outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50">
+      <Menu.Trigger openOnHover delay={80} disabled={pending} className="flex h-9 w-fit items-center gap-3 rounded-lg border bg-background px-3 text-sm font-medium outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50">
         Individual modules
-        {pending ? <LoaderCircle className="size-4 animate-spin" /> : <ChevronDown className="size-4 text-muted-foreground" />}
+        {pending ? <LoaderCircle className="size-4 animate-spin" /> : <ChevronRight className="size-4 text-muted-foreground" />}
       </Menu.Trigger>
       <Menu.Portal>
-        <Menu.Positioner side="bottom" align="start" sideOffset={6} className="z-50">
+        <Menu.Positioner side="right" align="start" sideOffset={6} alignOffset={-6} className="z-50">
           <Menu.Popup className={popup}>
             {MODULE_SECTIONS.map((s) => (
               <Menu.SubmenuRoot key={s.id}>
