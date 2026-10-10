@@ -4,7 +4,7 @@ import { db } from "@/db";
 import { attempts, testSessions } from "@/db/schema";
 import { buildActivity, type DayRow } from "@/engine/activity";
 
-const WEEKS = 13;
+const WEEKS = 52;
 
 /** The student's activity heatmap: questions answered, minutes spent and tests finished per local day. Only their own rows. */
 export async function getActivity(userId: string, timezone: string, weeks = WEEKS) {

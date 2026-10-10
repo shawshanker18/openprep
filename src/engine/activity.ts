@@ -16,7 +16,7 @@ const iso = (t: number) => new Date(t).toISOString().slice(0, 10);
 const active = (r: Pick<DayRow, "questions" | "tests">) => r.questions > 0 || r.tests > 0;
 
 /** `today` is the student's local date (YYYY-MM-DD); rows are local-day totals. Shows the last `weeks` weeks ending this week. */
-export function buildActivity(rows: DayRow[], today: string, weeks = 13): Activity {
+export function buildActivity(rows: DayRow[], today: string, weeks = 52): Activity {
   const byDay = new Map(rows.map((r) => [r.day, r]));
   const thisMonday = at(today) - ((new Date(at(today)).getUTCDay() + 6) % 7) * DAY;
   const start = thisMonday - (weeks - 1) * 7 * DAY;
