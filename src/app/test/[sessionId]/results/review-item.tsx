@@ -1,7 +1,6 @@
 "use client";
 import { Markdown } from '@/components/markdown';
 import { QuestionView } from '@/components/question-view';
-import { TutorPanel } from '@/components/tutor-panel';
 import type { RevealedQuestion } from '@/server/questions';
 export function ReviewItem({n,q,response,correct,timeMs,initiallyOpen}: {
   n:number;q:RevealedQuestion;response:string|null;correct:boolean;attemptId:string|null;mistakeType:string|null;timeMs:number;initiallyOpen?:boolean;
@@ -24,7 +23,6 @@ export function ReviewItem({n,q,response,correct,timeMs,initiallyOpen}: {
         {wrongReason&&<section><h3 className="mb-2 text-sm font-semibold">Why your answer was wrong</h3><Markdown className="text-sm">{wrongReason}</Markdown></section>}
         {!q.explanationMd&&!correctReason&&!wrongReason&&<p className="border-t pt-4 text-sm text-muted-foreground">The correct answer is shown above. This question&apos;s source does not include a written explanation.</p>}
         {q.fastMethodMd&&<details><summary className="cursor-pointer text-sm">Another way to solve it</summary><Markdown className="mt-2 text-sm">{q.fastMethodMd}</Markdown></details>}
-        <details><summary className="cursor-pointer text-sm">More help</summary><div className="mt-2"><TutorPanel questionId={q.id} answered wrongChoice={!correct&&!!q.choices?.length?response:null}/></div></details>
       </aside>
     </div>
   </details>;
