@@ -1,4 +1,14 @@
-# OpenPrep
+<p align="center"><img src="assets/banner.png" alt="openprep" width="100%"></p>
+
+> Free adaptive SAT practice.
+
+| | |
+|---|---|
+| **What it is** | A free SAT practice platform that adapts to each student. |
+| **Source** | Private |
+| **Public overview** | https://github.com/Shashanksaraswat123939/openprep-overview |
+
+---
 
 Free, open-source adaptive SAT prep. Students can start with the question bank, Smart Practice and tests immediately after onboarding.
 An optional diagnostic gives an initial mastery profile; practice answers also personalize the plan. Next.js 16 + Supabase (Postgres + Auth) + Drizzle.
