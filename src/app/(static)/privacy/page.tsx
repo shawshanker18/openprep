@@ -10,14 +10,14 @@ export default function Privacy(){
    <li>Your email for sign-in. Google sign-in also provides account information such as your name, used to greet you.</li>
    <li>Your grade, curriculum, subjects, goals, schedule, and survey answers to recommend lessons and practice.</li>
    <li>Your answers, scores, time spent, saved sessions, and lesson progress to track learning. Tests also count when you leave the test window.</li>
-   <li>Feedback or reports you choose to send, including any contact details you enter.</li>
+   <li>Tutor messages to provide replies, and feedback or reports you choose to send, including any contact details you enter.</li>
    <li>If you enable reminders, your reminder time and device push subscription to deliver notifications.</li>
    <li>Network and device information, including IP addresses or derived identifiers, for sign-up limits, abuse prevention, and security.</li>
   </ul>
-  <p>We do not require a phone number or postal address. Avoid including sensitive personal information in reports.</p>
+  <p>We do not require a phone number or postal address. Avoid including sensitive personal information in tutor messages or reports.</p>
   <h2>Storage and service providers</h2>
   <p>Account and learning records are stored in Supabase. Vercel hosts the website and processes requests. Access to student records requires authentication and ownership checks; authorized administrators can access records needed to operate the service and handle reports.</p>
-  <p>Google sign-in and the Desmos calculator use those providers&apos; services and privacy policies.</p>
+  <p>When you use the tutor, your submitted messages and relevant question context are sent to the configured AI provider to generate a reply. Google sign-in and the Desmos calculator use those providers&apos; services and privacy policies.</p>
   <h2>Cookies and local storage</h2>
   <p>OpenPrep uses sign-in cookies, a security device cookie, and local storage for preferences, sign-in handoff, and unsent answers. These support account access, safety, and saved progress. We do not currently use Google Analytics, Meta Pixel, or advertising trackers, and we do not sell your personal data.</p>
   <h2>Guest practice</h2>

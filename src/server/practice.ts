@@ -172,7 +172,7 @@ export async function nextQuestion(userId: string, profile: Profile, input: Prac
 
 /**
  * Has this question already been handed to this student (served in practice, or answered anywhere)? Answers,
- * bookmarks only work on those, so a script can't read the bank by sending question ids directly
+ * bookmarks and tutor hints only work on those, so a script can't read the bank by sending question ids directly
  * and skipping the serve limits.
  */
 export async function wasGiven(userId: string, questionId: string) {

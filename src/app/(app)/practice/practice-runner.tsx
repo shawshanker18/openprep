@@ -11,6 +11,7 @@ import { Markdown } from "@/components/markdown";
 import { QuestionView } from "@/components/question-view";
 import { DesmosCalculator, DesmosDock } from "@/components/desmos-panel";
 import { ExamFooter, ExamFrame, ExamTop } from "@/components/exam-frame";
+import { TutorPanel } from "@/components/tutor-panel";
 import { cn, isTyping } from "@/lib/utils";
 import type { PublicQuestion, RevealedQuestion } from "@/server/questions";
 import { toggleBookmark } from "./actions";
@@ -289,7 +290,7 @@ export function PracticeRunner({ sessionId, userId, mode, title, block, set, bac
         number={questionNumber} eliminated={crossed[s.q.id] ?? []} onEliminate={(next) => setCrossed((c) => ({ ...c, [s.q.id]: next }))}
         onChange={(v) => { setSaveStatus("Saving…"); dispatch({ type: "select", value: v }); }} correct={correctChoice}
         below={<>
-          {s.phase === "answering" && <div ref={submitRef} className="flex flex-wrap items-start gap-2"></div>}
+          {s.phase === "answering" && <div ref={submitRef} className="flex flex-wrap items-start gap-2"><TutorPanel key={s.q.id} questionId={s.q.id} answered={false} /></div>}
           {r && (
             <div ref={resultRef} className="flex flex-col gap-4 rounded-lg border p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
@@ -305,6 +306,7 @@ export function PracticeRunner({ sessionId, userId, mode, title, block, set, bac
                 {!r.correct && !finished && (
                   <Button variant="outline" onClick={() => { similarTo.current = s.q.id; next(); }}>Try a similar question</Button>
                 )}
+                <TutorPanel key={s.q.id} questionId={s.q.id} answered wrongChoice={!r.correct && !!s.q.choices?.length ? s.value : null} />
               </div>
             </div>
           )}
