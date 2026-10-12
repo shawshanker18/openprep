@@ -7,7 +7,6 @@ import type { getDashboard } from "@/server/daily";
 import type { getSkillSummary } from "@/server/analytics";
 import type { homeData } from "@/server/home";
 import { SKILL_BY_ID, shortSkillName } from "@/content/taxonomy";
-import { bestTestDate, predictedScore, readyBy } from "@/engine/plan";
 import { formatDate } from "@/lib/dates";
 import type { AuthUser } from "@/server/auth";
 import type { Profile } from "@/db/schema";
@@ -15,18 +14,6 @@ import type { Profile } from "@/db/schema";
 
 const KIND: Record<string, string> = { full: "Full practice test", section: "Section test", module: "Single module", mini: "Mini test", weakness: "Weakness test", custom: "Custom test" };
 
-/** One number at the top of the dashboard. Missing data links to where the student sets it. */
-function Stat({ label, value, sub, href, warn, className = "" }: { label: string; value: React.ReactNode; sub?: React.ReactNode; href?: string; warn?: boolean; className?: string }) {
-  const body = (
-    <>
-      <span className="text-sm text-muted-foreground">{label}</span>
-      <span className={`text-xl font-semibold tabular-nums sm:text-2xl ${href ? "underline decoration-dotted underline-offset-4" : ""}`}>{value}</span>
-      {sub && <span className={`text-xs ${warn ? "text-red-700 dark:text-red-400" : "text-muted-foreground"}`}>{sub}</span>}
-    </>
-  );
-  const cls = `flex min-w-0 flex-col gap-1 rounded-xl border p-4 ${className}`;
-  return href ? <Link href={href} className={`${cls} hover:bg-muted`}>{body}</Link> : <div className={cls}>{body}</div>;
-}
 
 function Card({ title, children, className = "" }: { title: string; children: React.ReactNode; className?: string }) {
   return (
@@ -63,18 +50,6 @@ export function DashboardView({profile,user,d,summary,home,savedPractice}: {
   savedPractice:Awaited<ReturnType<typeof latestActivePracticeSession>>;
 }) {
   const first=user?.name?.split(" ")[0];
-  const hasEvidence = summary.skills.some((skill) => skill.n > 0);
-
-  // The five numbers.
-  const ready = hasEvidence && profile.targetScore ? readyBy({ estimate: d.estimate.total, target: profile.targetScore,
-    minutesPerDay: profile.minutesPerDay, daysPerWeek: profile.daysPerWeek, now: new Date() }) : null;
-  const month = (dt: Date) => dt.toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: profile.timezone });
-  const testDay = profile.testDate ? new Date(`${profile.testDate}T12:00:00Z`) : null;
-  const best = hasEvidence && profile.targetScore ? bestTestDate(ready, new Date()) : null;
-  const tooSoon = !!(best && !best.capped && testDay && testDay < best.date);
-  const upcoming = testDay && d.daysLeft != null && d.daysLeft >= 0;
-  const predicted = hasEvidence && upcoming ? predictedScore({ estimate: d.estimate.total, minutesPerDay: profile.minutesPerDay, daysPerWeek: profile.daysPerWeek, daysLeft: d.daysLeft! }) : null;
-
 
   // Where you left off, most urgent first.
   const resume: { title: string; detail: string; href: string; action: string }[] = [];
@@ -120,18 +95,6 @@ export function DashboardView({profile,user,d,summary,home,savedPractice}: {
           <Button size="sm" variant="outline" render={<Link href="/question-bank" />}>Choose your own questions</Button>
           <Button size="sm" variant="outline" render={<Link href="/start" />}>Start from scratch</Button>
         </div>      </section>
-
-      <div className="grid min-w-0 grid-cols-1 gap-3 min-[360px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5">
-        <Stat label="Goal" value={profile.targetScore ?? "Set goal"} href={profile.targetScore ? undefined : "/settings#goal"} />
-        <Stat label="Estimated score" value={hasEvidence ? d.estimate.total : "Not measured yet"} />
-        <Stat label="Predicted" value={predicted ?? (hasEvidence ? "Add test date" : "Start practicing")} sub={predicted != null && "on test day"} href={predicted == null ? (hasEvidence ? "/settings#goal" : "/practice") : undefined} />
-        <Stat label="Best time to take it" value={best ? month(best.date) : hasEvidence ? "Set goal" : "Start practicing"}
-          sub={best?.capped ? `add study time to reach ${profile.targetScore} by then` : tooSoon ? "after your test date" : undefined} warn={tooSoon || best?.capped}
-          href={!hasEvidence ? "/practice" : !best || best.capped ? "/settings#goal" : undefined} />
-        <Stat label="Next SAT" value={upcoming ? formatDate(testDay!, "UTC") : "Add date"}
-          sub={upcoming ? (d.daysLeft === 0 ? "today" : `in ${d.daysLeft} day${d.daysLeft === 1 ? "" : "s"}`) : testDay ? "your last date has passed" : undefined}
-          href={upcoming ? undefined : "/settings#goal"} className="min-[360px]:col-span-2 sm:col-span-1" />
-      </div>
 
       <div className="grid min-w-0 items-start gap-4 lg:grid-cols-2">
         <Card title="Where you left off">

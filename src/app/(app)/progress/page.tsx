@@ -16,8 +16,8 @@ type Point = { t: number; total: number; half: number; source: string };
 /** Estimate over time: model line with a ±range band, other sources as markers. Labels are sized in viewBox units. */
 function ScoreChart({ points, target, timeZone }: { points: Point[]; target: number | null; timeZone: string }) {
   if (points.length < 2) return <p className="text-sm text-muted-foreground">Your score history appears here after a couple of days of practice.</p>;
-  const W = 420, H = 250;
-  const PL = 56, PR = 20, PT = 18, PB = 48; // room on the left for the Y-axis title and ticks, below for the X-axis
+  const W = 800, H = 330;
+  const PL = 64, PR = 28, PT = 26, PB = 58; // room on the left for the Y-axis title and ticks, below for the X-axis
   const t0 = points[0]!.t, t1 = points.at(-1)!.t || t0 + 1;
   const lo = Math.min(...points.map((p) => p.total - p.half)) - 20;
   const hi = Math.max(...points.map((p) => p.total + p.half), target ?? 0) + 20;
@@ -30,7 +30,7 @@ function ScoreChart({ points, target, timeZone }: { points: Point[]; target: num
   const model = points.filter((p) => p.source === "model" || p.source === "diagnostic");
   const band = [...model.map((p) => `${x(p.t)},${y(p.total + p.half)}`), ...[...model].reverse().map((p) => `${x(p.t)},${y(p.total - p.half)}`)].join(" ");
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="w-full max-w-[520px]" role="img" aria-label="Estimated SAT score over time, from the first to the latest estimate">
+    <div className="-mx-1 overflow-x-auto px-1"><svg viewBox={`0 0 ${W} ${H}`} className="w-full min-w-[560px] sm:min-w-0" role="img" aria-label="Estimated SAT score over time, from the first to the latest estimate">
       {ticks.map((v) => (
         <g key={v}>
           <line x1={PL} x2={W - PR} y1={y(v)} y2={y(v)} className="stroke-border" strokeDasharray="3 4" />
@@ -50,10 +50,10 @@ function ScoreChart({ points, target, timeZone }: { points: Point[]; target: num
         const arrivesFromAbove = i === 1 && points.length > 1 && p.total < points.at(-2)!.total;
         return <text key={i} x={x(p.t)} y={y(p.total) + (arrivesFromAbove ? 20 : -9)} textAnchor={i ? "end" : "start"} className="fill-foreground text-[12px] font-medium tabular-nums">{p.total}</text>;
       })}
-      <text x={PL} y={H - 26} className="fill-muted-foreground text-[12px]">{formatDate(t0, timeZone)}</text>
-      <text x={W - PR} y={H - 26} textAnchor="end" className="fill-muted-foreground text-[12px]">{formatDate(t1, timeZone)}</text>
-      <text x={(PL + W - PR) / 2} y={H - 6} textAnchor="middle" className="fill-foreground text-[12px]">Date of each estimate or test (your local time)</text>
-    </svg>
+      <text x={PL} y={H - 30} className="fill-muted-foreground text-[12px]">{formatDate(t0, timeZone)}</text>
+      <text x={W - PR} y={H - 30} textAnchor="end" className="fill-muted-foreground text-[12px]">{formatDate(t1, timeZone)}</text>
+      <text x={(PL + W - PR) / 2} y={H - 8} textAnchor="middle" className="fill-foreground text-[12px]">Date of each estimate or test (your local time)</text>
+    </svg></div>
   );
 }
 
