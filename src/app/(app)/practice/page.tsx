@@ -11,6 +11,7 @@ import { createPracticeSession, getPracticeSession, listPracticeSessions } from 
 import { z } from "zod";
 import { ACCEPTED_SET_SIZES, MAX_QUESTIONS_PER_SET } from "@/lib/question-limits";
 import { PracticeRunner } from "./practice-runner";
+import { PracticeSetup } from "@/components/practice-setup";
 
 export const metadata = { title: "Adaptive Practice" };
 
@@ -23,8 +24,7 @@ async function loadPage({ searchParams }: PageProps<"/practice">) {
     const saved = (await listPracticeSessions(userId)).find(s => s.status === 'active');
     return <div className="flex flex-col gap-6"><h1 className="text-2xl font-semibold">Adaptive Practice</h1>
       {saved && <section className="rounded-xl border p-5"><h2 className="font-medium">Continue practicing</h2><p className="mb-3 text-sm">{saved.title}</p><Button render={<Link href={`/practice?session=${saved.id}`} />}>Resume session</Button></section>}
-      <section className="rounded-xl border bg-muted/40 p-5"><p className="mb-2 text-xs font-medium text-muted-foreground">YOUR LEVEL · YOUR PROGRESS</p><h2 className="text-lg font-semibold">Questions that adapt to you</h2><p className="my-3 text-sm text-muted-foreground">Practice that adapts to your answers and skill progress. Correct answers raise the next question’s difficulty; incorrect answers lower it, within the SAT’s Easy–Hard range. Review each explanation, then keep building.</p><Button render={<Link prefetch={false} href="/practice?adaptive=1" />}>Start adaptive practice</Button></section>
-      <section><h2 className="font-medium">Choose your own practice</h2><p className="my-2 text-sm text-muted-foreground">Select skills, difficulty and length in the Question Bank.</p><Link className="underline" href="/question-bank">Open Question Bank</Link></section>
+      <PracticeSetup />
       <div className="flex gap-4 text-sm"><Link className="underline" href="/practice/sessions">Saved sessions</Link><Link className="underline" href="/start">Start from scratch</Link><Link className="underline" href="/desmos">Desmos</Link></div>
     </div>;
   }
@@ -47,7 +47,7 @@ async function loadPage({ searchParams }: PageProps<"/practice">) {
   const mode = sp.mode === "review" ? "review" : sp.mode === "set" ? "set" : sp.mode === "list" ? "list" : skillId ? "skill" : "smart";
 
   // Where to go when the set is finished: the course or the question bank (only these paths are accepted).
-  const back = typeof sp.from === "string" && /^\/(start(\/[a-z-]+)?|course(\/[a-z-]+)?|question-bank(\?[\w=&%.,-]*)?|bookmarks(\?page=\d+)?)$/.test(sp.from) ? sp.from : undefined;
+  const back = typeof sp.from === "string" && /^\/(start(\/[a-z-]+)?|course(\/[a-z-]+)?|question-bank(\?[\w=&%.,-]*)?|bookmarks(\?page=\d+)?|analysis)$/.test(sp.from) ? sp.from : undefined;
 
   if (mode === "list") {
     const ids = list(sp.ids).filter((id) => /^[\w-]{22}$/.test(id)).slice(0, MAX_QUESTIONS_PER_SET);
@@ -75,6 +75,17 @@ async function loadPage({ searchParams }: PageProps<"/practice">) {
   }
 
   const plain = difficulty === "mixed" ? undefined : difficulty;
+  if (mode === "smart") {
+    // Adaptive: optional skill list (empty = weekly focus), a set length and a timer choice.
+    const chosen = list(sp.skills);
+    if (chosen.some((x) => !SKILL_BY_ID[x]) || chosen.length > 29) notFound();
+    const length = sp.count === undefined ? 10 : Number(sp.count);
+    if (!ACCEPTED_SET_SIZES.includes(length)) notFound();
+    const timing = sp.timing === "off" ? "off" : "auto";
+    const named = chosen.length === 1 ? `${SKILL_BY_ID[chosen[0]!]!.name}` : chosen.length ? `Adaptive · ${chosen.length} skills` : "Adaptive Practice";
+    const sessionId = await createPracticeSession(userId, { mode: "smart", skillIds: chosen.length ? chosen : undefined, count: length, timing }, named);
+    redirect(`/practice?session=${sessionId}${blockQuery}`);
+  }
   const title = mode === "review" ? (skillId ? `Review · ${SKILL_BY_ID[skillId]!.name}` : "Review") : skillId ? SKILL_BY_ID[skillId]!.name : "Adaptive Practice";
   const sessionId=await createPracticeSession(userId, {mode,skillId,difficulty:plain},title);
   redirect(`/practice?session=${sessionId}${blockQuery}`);

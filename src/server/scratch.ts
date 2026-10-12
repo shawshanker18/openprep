@@ -7,6 +7,7 @@ import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { lessonProgress } from "@/db/schema";
 import { DOMAINS, skillsIn, type DomainId } from "@/content/taxonomy";
+import { ORIENTATION } from "@/content/getting-started";
 import { listDesmosLessons } from "./lessons";
 
 export type ScratchStep = {
@@ -21,12 +22,14 @@ export type ScratchStep = {
 const MATH: DomainId[] = ["m-alg", "m-adv", "m-psda", "m-geo"];
 const RW: DomainId[] = ["rw-ii", "rw-cs", "rw-ei", "rw-sec"];
 export const SKIP_PREFIX = "skip:";
+export const GETTING_STARTED = "Getting started";
 
-/** Every step in order: about the SAT, the Desmos basics, then every Math topic, then every Reading and Writing topic. */
+/** Every step in order: getting started, the Desmos basics, then every Math topic, then every Reading and Writing topic. */
 export async function scratchPath(): Promise<ScratchStep[]> {
   const desmos = await listDesmosLessons();
   return [
-    { key: "about-the-sat", done: "scratch:about-the-sat", kind: "intro", title: "What the SAT is and how it works", group: "Getting started", ref: "" },
+    // Orientation lessons: their own group, not part of Maths or English.
+    ...ORIENTATION.map((l): ScratchStep => ({ key: l.key, done: `scratch:${l.key}`, kind: "intro", title: l.title, group: GETTING_STARTED, ref: "" })),
     ...desmos.map((l): ScratchStep => ({ key: `desmos-${l.slug}`, done: `desmos:${l.slug}`, kind: "desmos", title: l.title, group: "Desmos basics", ref: l.slug })),
     ...[...MATH, ...RW].flatMap((d) => skillsIn(d).map((s): ScratchStep => ({
       key: s.id, done: s.id, kind: "skill", title: s.name, group: `${DOMAINS[d].section === "math" ? "Math" : "Reading and Writing"}: ${DOMAINS[d].name}`, ref: s.id,

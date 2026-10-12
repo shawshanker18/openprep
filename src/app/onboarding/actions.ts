@@ -1,5 +1,6 @@
 "use server";
 
+import { refreshCourseAssignment } from "@/server/course-assignment";
 import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
 import type { z } from "zod";
@@ -35,6 +36,7 @@ export async function submitSurvey(input: z.input<typeof Survey>): Promise<Actio
       }) };
     })).onConflictDoNothing();
   });
+  await refreshCourseAssignment(userId);
   revalidatePath("/onboarding");
   return { ok: true, data: undefined };
 }

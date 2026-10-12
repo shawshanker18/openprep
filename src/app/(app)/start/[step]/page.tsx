@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { DesmosCalculator } from "@/components/desmos-panel";
 import { LessonStudyView } from "@/components/lesson-study-view";
 import { Markdown } from "@/components/markdown";
-import { ABOUT_SAT_MD } from "@/content/about-sat";
+import { orientationBy } from "@/content/getting-started";
 import { requireUser } from "@/server/auth";
 import { getLesson, listDesmosLessons } from "@/server/lessons";
 import { scratchPath, scratchProgress } from "@/server/scratch";
@@ -41,7 +41,7 @@ export default async function StepPage({ params }: PageProps<"/start/[step]">) {
         {step.status === "skipped" && <p className="text-sm text-muted-foreground">You skipped this topic. Read it now and press Done to count it.</p>}
       </div>
 
-      {step.kind === "intro" && <article className="max-w-2xl"><Markdown>{ABOUT_SAT_MD}</Markdown></article>}
+      {step.kind === "intro" && <article className="max-w-2xl"><Markdown>{orientationBy(step.key)?.md ?? ""}</Markdown></article>}
 
       {step.kind === "desmos" && (desmos ? (
         <div className="grid gap-6 lg:grid-cols-2">

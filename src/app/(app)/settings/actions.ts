@@ -1,5 +1,6 @@
 "use server";
 
+import { refreshCourseAssignment } from "@/server/course-assignment";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { and, desc, eq, sql } from "drizzle-orm";
@@ -56,6 +57,7 @@ export async function updateProfile(form: FormData) {
   if (!p.success) redirect("/settings?error=profile");
   // Chapters only apply to CBSE; switching board clears them so nothing stale marks lessons as covered.
   await db.update(profiles).set({ ...p.data, chaptersDone: p.data.curriculum === "cbse" ? completedChapters(p.data.chaptersDone, p.data.grade) : [] }).where(eq(profiles.id, userId));
+  await refreshCourseAssignment(userId);
   revalidatePath("/settings");
   redirect("/settings?saved=1");
 }

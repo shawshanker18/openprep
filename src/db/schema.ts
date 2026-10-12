@@ -1,8 +1,9 @@
 // Complete database schema (spec 01 §4). Text columns instead of enums; values validated by zod at the edge.
 import { sql } from "drizzle-orm";
 import {
-  pgTable, check, uuid, text, integer, smallint, real, boolean, timestamp, date, jsonb, primaryKey, index,
+  pgTable, check, uuid, text, integer, smallint, real, boolean, timestamp, date, jsonb, primaryKey, index, uniqueIndex,
 } from "drizzle-orm/pg-core";
+import type { Expr } from "@/engine/assignment";
 
 const ts = (name: string) => timestamp(name, { withTimezone: true });
 const userRef = () => uuid("user_id").notNull().references(() => profiles.id, { onDelete: "cascade" });
@@ -339,3 +340,72 @@ export const practiceSessionItems = pgTable("practice_session_items", {
   check("practice_session_items_position_check", sql`${t.position} >= 0 and ${t.position} < 100`),
   check("practice_session_items_time_check", sql`${t.timeMs} >= 0 and ${t.timeMs} <= 86400000`),
   check("practice_session_items_response_check", sql`${t.response} is null or length(${t.response}) <= 8`)]).enableRLS();
+
+/* ───────── CBSE course assignment (brief §11) ───────── */
+// Completed chapters are read from profiles.chaptersDone, the one existing source of truth. Nothing here duplicates it.
+
+/** A version of the Math Start from Scratch course. Created and published by admins, never by code changes. */
+export const courseVersions = pgTable("course_versions", {
+  id: text("id").primaryKey(), // stable slug, e.g. "math-start-v2"
+  courseId: text("course_id").notNull(),
+  name: text("name").notNull(),
+  description: text("description").notNull().default(""),
+  status: text("status").notNull().default("draft"), // draft | published | retired
+  /** The one version given to students when no rule matches. Only a published version can be the fallback. */
+  isFallback: boolean("is_fallback").notNull().default(false),
+  createdAt: ts("created_at").notNull().defaultNow(),
+  updatedAt: ts("updated_at").notNull().defaultNow(),
+}, (t) => [
+  check("course_versions_status_check", sql`${t.status} in ('draft', 'published', 'retired')`),
+  uniqueIndex("course_versions_one_fallback").on(t.isFallback).where(sql`${t.isFallback}`),
+]).enableRLS();
+
+/**
+ * An assignment rule. Only `live` rules are evaluated. `draft` rules can be edited and previewed freely; `disabled`
+ * rules are kept for history but ignored. Priority decides between matches; see engine/assignment.ts.
+ */
+export const assignmentRules = pgTable("assignment_rules", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  description: text("description").notNull().default(""),
+  status: text("status").notNull().default("draft"), // draft | live | disabled
+  priority: integer("priority").notNull().default(0),
+  targetVersionId: text("target_version_id").notNull().references(() => courseVersions.id),
+  condition: jsonb("condition").$type<Expr>().notNull(),
+  effectiveFrom: ts("effective_from"),
+  effectiveUntil: ts("effective_until"),
+  createdBy: uuid("created_by"),
+  updatedBy: uuid("updated_by"),
+  createdAt: ts("created_at").notNull().defaultNow(),
+  updatedAt: ts("updated_at").notNull().defaultNow(),
+}, (t) => [
+  check("assignment_rules_status_check", sql`${t.status} in ('draft', 'live', 'disabled')`),
+  check("assignment_rules_window_check", sql`${t.effectiveFrom} is null or ${t.effectiveUntil} is null or ${t.effectiveFrom} < ${t.effectiveUntil}`),
+  index("assignment_rules_status_priority_idx").on(t.status, t.priority),
+]).enableRLS();
+
+/** One row each time a student's outcome actually changes (not on every re-check), so the history reads as decisions. */
+export const assignmentHistory = pgTable("assignment_history", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: userRef(),
+  versionId: text("version_id").references(() => courseVersions.id),
+  ruleId: uuid("rule_id").references(() => assignmentRules.id, { onDelete: "set null" }),
+  outcome: text("outcome").notNull(), // assigned | fallback | unresolved
+  reason: text("reason").notNull(),
+  detail: jsonb("detail").$type<Record<string, unknown>>(),
+  evaluatedAt: ts("evaluated_at").notNull().defaultNow(),
+}, (t) => [
+  check("assignment_history_outcome_check", sql`${t.outcome} in ('assigned', 'fallback', 'unresolved')`),
+  index("assignment_history_user_time").on(t.userId, t.evaluatedAt),
+]).enableRLS();
+
+/** The student's current course version: at most one row per student. Lesson progress is never touched by reassignment. */
+export const studentCourseAssignments = pgTable("student_course_assignments", {
+  userId: userRef().primaryKey(),
+  versionId: text("version_id").notNull().references(() => courseVersions.id),
+  ruleId: uuid("rule_id").references(() => assignmentRules.id, { onDelete: "set null" }),
+  outcome: text("outcome").notNull(), // assigned | fallback
+  assignedAt: ts("assigned_at").notNull().defaultNow(),
+  updatedAt: ts("updated_at").notNull().defaultNow(),
+}).enableRLS();
+

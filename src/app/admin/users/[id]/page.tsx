@@ -2,6 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SKILL_BY_ID } from "@/content/taxonomy";
 import { requireAdmin, userDetail, userEmails } from "@/server/admin";
+import { desc, eq } from "drizzle-orm";
+import { db } from "@/db";
+import { assignmentHistory } from "@/db/schema";
 
 export const metadata = { title: "Student" };
 
@@ -11,7 +14,10 @@ export default async function AdminUser({ params }: PageProps<"/admin/users/[id]
   await requireAdmin();
   const { id } = await params;
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
-  const [d, emails] = await Promise.all([userDetail(id), userEmails([id])]);
+  const [d, emails, courseHistory] = await Promise.all([
+    userDetail(id), userEmails([id]),
+    db.select().from(assignmentHistory).where(eq(assignmentHistory.userId, id)).orderBy(desc(assignmentHistory.evaluatedAt)).limit(50),
+  ]);
   if (!d) notFound();
   const e = emails.get(id);
   const p = d.profile;
@@ -74,6 +80,21 @@ export default async function AdminUser({ params }: PageProps<"/admin/users/[id]
           </ul>
         )}
         <Link className="self-start text-sm underline" href="/admin/inbox">Handle these in the inbox</Link>
+      </section>
+
+      <section aria-labelledby="course-history" className="flex flex-col gap-2">
+        <h2 id="course-history" className="font-medium">Course assignment history</h2>
+        <p className="text-xs text-muted-foreground">A row is recorded only when the student&apos;s course changes. Lesson progress is never changed by reassignment.</p>
+        {courseHistory.length === 0 ? <p className="text-sm text-muted-foreground">No course decisions yet. They appear once the student has a completed chapter or a rule or fallback applies.</p> : (
+          <ol className="flex flex-col divide-y rounded-xl border text-sm">
+            {courseHistory.map((h) => (
+              <li key={h.id} className="flex flex-col gap-1 px-3 py-2">
+                <span className="text-xs text-muted-foreground">{when(h.evaluatedAt)} · {h.outcome}{h.versionId ? ` · ${h.versionId}` : ""}</span>
+                <span>{h.reason}</span>
+              </li>
+            ))}
+          </ol>
+        )}
       </section>
     </div>
   );

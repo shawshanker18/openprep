@@ -133,6 +133,9 @@ export async function selectPracticeQuestion(userId: string, profile: Profile, i
       .where(and(eq(attempts.userId,userId),inArray(attempts.context,["practice","review"]),
         input.exclude.length ? inArray(attempts.questionId,input.exclude) : undefined))
       .orderBy(desc(attempts.createdAt),desc(attempts.id)).limit(1);
+    // Adaptive difficulty policy (deterministic, from the latest answer in this session): one step up after a correct
+    // answer, one step down after a wrong one, clamped to Easy..Hard. With no answer yet, the target is left to the
+    // student's own level. Skills are ordered by weekly focus, then priority, or limited to the skills the student chose.
     const adaptiveTarget = previous ? Math.max(1,Math.min(3,previous.difficulty+(previous.correct?1:-1))) as Difficulty : undefined;
     const startOfDay = new Date(now.getTime() - 24 * 3_600_000);
     const [{ c: today }] = (await db.select({ c: count() }).from(attempts)
@@ -141,7 +144,10 @@ export async function selectPracticeQuestion(userId: string, profile: Profile, i
       const focus = await ensureWeeklyFocus(userId, profile, now);
       const rotated = focus.length ? [...focus.slice(Math.floor(today / 5) % focus.length), ...focus] : [];
       const fallback = (await skillsByPriority(userId, profile)).map((s) => s.skillId);
-      const skillOrder = [...new Set([...rotated, ...fallback])];
+      const ranked = [...new Set([...rotated, ...fallback])];
+      const chosen = input.skillIds?.filter((x) => SKILL_BY_ID[x]) ?? [];
+      // Keep the ranking order among the chosen skills; any chosen skill missing from the ranking goes last.
+      const skillOrder = chosen.length ? [...ranked.filter((x) => chosen.includes(x)), ...chosen.filter((x) => !ranked.includes(x))] : ranked;
       for (const skillId of skillOrder) {
         q = await pickInSkill(userId,skillId,exclude,now,adaptiveTarget);
         if (q) break;

@@ -38,4 +38,4 @@ it("allows human-speed countdown use but detects sustained machine-fast timed bu
    r+=7950;
  }
  expect(detected).toBe(true);
-},30000);
+},120000); // ~2,000 sequential PGlite queries: slower than the 30s default under parallel load
