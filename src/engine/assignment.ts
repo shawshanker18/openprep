@@ -4,7 +4,8 @@
 // Policy, in one place:
 //  1. Only rules that are active, inside their effective window, and valid (every chapter they name exists and is active,
 //     and the target course version is published) can match. Invalid rules never match and are reported, never guessed around.
-//  2. A rule matches when its condition is true for the student's completed chapters.
+//  2. A rule matches when the student is in its group (if it names one) and its chapter condition (if it has one) is
+//     true for the student's completed chapters. A rule needs at least a group or a condition.
 //  3. Several matches: the highest `priority` wins. Equal priority: the lower rule id wins. The result is always the same
 //     for the same input, however the rules were listed.
 //  4. Other matches are reported as shadowed, so an admin can see what a rule hides.
@@ -22,7 +23,10 @@ export type AssignmentRule = {
   /** Higher wins when several rules match. */
   priority: number;
   targetVersionId: string;
-  when: Expr;
+  /** Chapter condition. Null = no chapter condition; such a rule must name a group. */
+  when: Expr | null;
+  /** Only members of this group can match. Null/undefined = every student. */
+  audienceGroupId?: string | null;
   /** Inclusive start and exclusive end of the rule's effective window, as ISO dates or instants. Null = open-ended. */
   effectiveFrom?: string | null;
   effectiveUntil?: string | null;
@@ -41,6 +45,8 @@ export type RuleIssue =
 export type EvaluationInput = {
   /** Chapter ids the student has completed. */
   completed: readonly string[];
+  /** Ids of the groups the student belongs to. */
+  groupIds?: readonly string[];
   chapters: readonly ChapterInfo[];
   versions: readonly CourseVersionInfo[];
   rules: readonly AssignmentRule[];
@@ -68,7 +74,8 @@ export type EvaluationResult =
 export const MAX_EXPR_DEPTH = 5;
 export const MAX_EXPR_NODES = 60;
 
-export function exprChapters(expr: Expr): string[] {
+export function exprChapters(expr: Expr | null): string[] {
+  if (!expr) return [];
   if ("chapter" in expr) return [expr.chapter];
   const kids = "all" in expr ? expr.all : expr.any;
   return kids.flatMap(exprChapters);
@@ -108,7 +115,7 @@ const inWindow = (r: AssignmentRule, now: Date) => {
 /** Check one rule against the catalogue. Returns every problem found, so the admin sees them all at once. */
 export function validateRule(rule: AssignmentRule, input: Pick<EvaluationInput, "chapters" | "versions">): RuleIssue[] {
   const issues: RuleIssue[] = [];
-  const problem = exprProblem(rule.when);
+  const problem = rule.when ? exprProblem(rule.when) : rule.audienceGroupId ? null : "a rule needs a chapter condition or a group";
   if (problem) issues.push({ ruleId: rule.id, issue: "invalid_expression", detail: problem });
   else {
     const chapters = new Map(input.chapters.map((c) => [c.id, c]));
@@ -126,6 +133,7 @@ export function validateRule(rule: AssignmentRule, input: Pick<EvaluationInput, 
 
 export function evaluateAssignment(input: EvaluationInput): EvaluationResult {
   const completed = new Set(input.completed);
+  const groups = new Set(input.groupIds ?? []);
   const issues: RuleIssue[] = [];
   const candidates: AssignmentRule[] = [];
 
@@ -135,7 +143,8 @@ export function evaluateAssignment(input: EvaluationInput): EvaluationResult {
     if (!rule.active || !inWindow(rule, input.now)) continue;
     const found = validateRule(rule, input);
     issues.push(...found);
-    if (found.length === 0 && evaluateExpr(rule.when, completed)) candidates.push(rule);
+    const inAudience = !rule.audienceGroupId || groups.has(rule.audienceGroupId);
+    if (found.length === 0 && inAudience && (!rule.when || evaluateExpr(rule.when, completed))) candidates.push(rule);
   }
 
   if (candidates.length === 0) {
@@ -172,7 +181,8 @@ export function priorityTies(rules: readonly AssignmentRule[]): string[][] {
 }
 
 /** A condition's canonical text, so two rules written in a different order still compare as the same condition. */
-export function canonicalExpr(expr: Expr): string {
+export function canonicalExpr(expr: Expr | null): string {
+  if (!expr) return "(any)";
   if ("chapter" in expr) return expr.chapter;
   const op = "all" in expr ? "all" : "any";
   const kids = ("all" in expr ? expr.all : expr.any).map(canonicalExpr).sort();
@@ -181,14 +191,15 @@ export function canonicalExpr(expr: Expr): string {
 
 /**
  * Problems an admin should see before a rule goes live. Shown beside the rule, never blocking a save of a draft.
- * - the same condition under two rules with different targets: a student can only get one of them, so one is hidden
+ * - the same condition and group under two rules with different targets: a student can only get one of them, so one is hidden
  * - the same priority on rules that both match: resolved by rule id, which is arbitrary from the product's point of view
  */
 export function findConflicts(rules: readonly AssignmentRule[]): { kind: "same_condition" | "priority_tie"; ruleIds: string[] }[] {
   const live = rules.filter((r) => r.active);
   const out: { kind: "same_condition" | "priority_tie"; ruleIds: string[] }[] = [];
   const byCondition = new Map<string, AssignmentRule[]>();
-  for (const r of live) byCondition.set(canonicalExpr(r.when), [...(byCondition.get(canonicalExpr(r.when)) ?? []), r]);
+  const key = (r: AssignmentRule) => `${r.audienceGroupId ?? "*"}|${canonicalExpr(r.when)}`;
+  for (const r of live) byCondition.set(key(r), [...(byCondition.get(key(r)) ?? []), r]);
   for (const group of byCondition.values()) {
     if (group.length > 1 && new Set(group.map((r) => r.targetVersionId)).size > 1) {
       out.push({ kind: "same_condition", ruleIds: group.map((r) => r.id).sort() });

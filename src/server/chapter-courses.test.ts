@@ -38,9 +38,17 @@ beforeAll(async () => {
 }, 120_000);
 
 describe("seeding", () => {
+  it("migration 0024 already holds the five courses and their skills, matching the starting data", async () => {
+    const { CHAPTER_COURSES } = await import("@/content/chapter-courses");
+    const rows = await db.select().from(schema.courses);
+    expect(rows.map((c) => [c.id, c.title, c.chapterId]).sort()).toEqual(CHAPTER_COURSES.map((c) => [c.id, c.title, c.chapterId]).sort());
+    const skills = await db.select().from(schema.courseSkills);
+    expect(skills.map((r) => `${r.courseId}:${r.skillId}`).sort()).toEqual(CHAPTER_COURSES.flatMap((c) => c.skills.map((s) => `${c.id}:${s}`)).sort());
+  });
+
   it("creates a default and a covered version, the covered lessons and a draft rule for each of the five courses", async () => {
     const added = await seedChapterCourses(db as never);
-    expect(added).toMatchObject({ versions: 10, lessons: 8, rules: 5, missingLessons: [] });
+    expect(added).toMatchObject({ courses: 0, versions: 10, lessons: 8, rules: 5, missingLessons: [] }); // migration 0024 already created the courses
     const versions = await db.select().from(schema.courseVersions);
     expect(versions.filter((v) => v.isFallback).map((v) => v.id).sort()).toEqual([
       "conic-sections-default", "relations-functions-default", "statistics-default", "straight-lines-default", "trig-functions-default",

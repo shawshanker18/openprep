@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { count } from "drizzle-orm";
 import { db } from "@/db";
-import { studentCourseAssignments } from "@/db/schema";
+import { courses, courseSkills, studentCourseAssignments } from "@/db/schema";
 import { CBSE_CHAPTERS } from "@/content/cbse-chapters";
-import { COURSE_BY_ID } from "@/content/chapter-courses";
 import { findConflicts } from "@/engine/assignment";
 import { requireAdmin } from "@/server/admin";
 import { conditionChapters, loadCatalogData } from "@/server/course-assignment";
+import { listGroups } from "@/server/groups";
 import { saveVersionAction } from "./actions";
 
 export const metadata = { title: "Course assignment" };
@@ -21,6 +21,10 @@ export default async function AssignmentsPage({ searchParams }: PageProps<"/admi
   const data = await loadCatalogData();
   const perVersion = new Map((await db.select({ versionId: studentCourseAssignments.versionId, n: count() }).from(studentCourseAssignments)
     .groupBy(studentCourseAssignments.versionId)).map((r) => [r.versionId, r.n]));
+  const courseRows = await db.select().from(courses).orderBy(courses.title);
+  const skillCount = new Map((await db.select({ courseId: courseSkills.courseId, n: count() }).from(courseSkills).groupBy(courseSkills.courseId)).map((r) => [r.courseId, r.n]));
+  const courseTitle = new Map(courseRows.map((c) => [c.id, c.title]));
+  const groupName = new Map((await listGroups()).map((g) => [g.id, g.name]));
   const nameOf = new Map(data.ruleRows.map((r) => [r.id, r.name]));
   const conflicts = findConflicts(data.rules);
   const rules = data.ruleRows.filter((r) => (status === "all" || r.status === status) && (!q || r.name.toLowerCase().includes(q)));
@@ -37,6 +41,24 @@ export default async function AssignmentsPage({ searchParams }: PageProps<"/admi
       {notice && <p role="status" className="rounded-md border p-3 text-sm">{notice}</p>}
       {error && <p role="alert" className="rounded-md border border-destructive/40 p-3 text-sm text-destructive">{error}</p>}
 
+      <section aria-labelledby="courses" className="flex flex-col gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 id="courses" className="font-medium">Courses</h2>
+          <Link href="/admin/assignments/courses/new" className="min-h-11 inline-flex items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground">New course</Link>
+        </div>
+        <p className="text-sm text-muted-foreground">A course owns the lessons for some SAT skills. Each one has a default version for students who have not covered the chapter and a covered version for those who have. A new course makes both for you.</p>
+        {courseRows.length === 0 ? <p className="text-sm text-muted-foreground">No courses yet.</p> : (
+          <ul className="flex flex-col divide-y rounded-xl border">
+            {courseRows.map((c) => (
+              <li key={c.id} className="flex flex-wrap items-baseline justify-between gap-2 p-4 text-sm">
+                <span><Link href={`/admin/assignments/courses/${c.id}`} className="font-medium underline underline-offset-4">{c.title}</Link> <span className="text-xs text-muted-foreground">({c.id})</span></span>
+                <span className="text-muted-foreground">{c.chapterId ? CHAPTER_TITLE.get(c.chapterId) ?? c.chapterId : "no chapter"} · {skillCount.get(c.id) ?? 0} skill{(skillCount.get(c.id) ?? 0) === 1 ? "" : "s"}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
       <section aria-labelledby="versions" className="flex flex-col gap-4">
         <h2 id="versions" className="font-medium">Course versions</h2>
         {data.versionRows.length === 0 ? <p className="text-sm text-muted-foreground">No versions yet. Add one below before writing rules.</p> : (
@@ -47,7 +69,7 @@ export default async function AssignmentsPage({ searchParams }: PageProps<"/admi
               <tbody>
                 {data.versionRows.map((v) => (
                   <tr key={v.id} className="border-t">
-                    <td className="p-3"><Link href={`/admin/assignments/versions/${v.id}`} className="font-medium underline underline-offset-4">{v.name}</Link> <span className="text-xs text-muted-foreground">({v.id}{COURSE_BY_ID[v.courseId] ? `, ${COURSE_BY_ID[v.courseId]!.title}` : `, ${v.courseId}`})</span></td>
+                    <td className="p-3"><Link href={`/admin/assignments/versions/${v.id}`} className="font-medium underline underline-offset-4">{v.name}</Link> <span className="text-xs text-muted-foreground">({v.id}, {courseTitle.get(v.courseId) ?? v.courseId})</span></td>
                     <td className="p-3">{v.status}</td>
                     <td className="p-3">{v.isFallback ? "Yes" : "No"}</td>
                     <td className="p-3 text-right tabular-nums">{perVersion.get(v.id) ?? 0}</td>
@@ -59,7 +81,11 @@ export default async function AssignmentsPage({ searchParams }: PageProps<"/admi
         )}
         <form action={saveVersionAction} className="grid gap-3 rounded-xl border p-4 sm:grid-cols-2" aria-label="Add or update a course version">
           <label className="flex flex-col gap-1 text-sm font-medium">Version id<input name="id" required pattern="[a-z0-9][a-z0-9-]{1,62}" placeholder="straight-lines-covered" className="min-h-11 rounded-md border bg-background px-3 text-sm font-normal" /></label>
-          <label className="flex flex-col gap-1 text-sm font-medium">Course id<input name="courseId" required defaultValue="straight-lines" className="min-h-11 rounded-md border bg-background px-3 text-sm font-normal" /></label>
+          <label className="flex flex-col gap-1 text-sm font-medium">Course
+            <select name="courseId" required className="min-h-11 rounded-md border bg-background px-3 text-sm font-normal">
+              {courseRows.map((c) => <option key={c.id} value={c.id}>{c.title}</option>)}
+            </select>
+          </label>
           <label className="flex flex-col gap-1 text-sm font-medium">Name<input name="name" required maxLength={120} className="min-h-11 rounded-md border bg-background px-3 text-sm font-normal" /></label>
           <label className="flex flex-col gap-1 text-sm font-medium">Status
             <select name="status" defaultValue="draft" className="min-h-11 rounded-md border bg-background px-3 text-sm font-normal">
@@ -108,7 +134,7 @@ export default async function AssignmentsPage({ searchParams }: PageProps<"/admi
                     <span className="text-xs text-muted-foreground">priority {r.priority}</span>
                   </div>
                   <p className="text-muted-foreground">
-                    {(r.condition as { all?: unknown[] }).all ? "All of" : "Any of"}: {chapters.map((c) => CHAPTER_TITLE.get(c) ?? c).join("; ")} → {target}
+                    {r.groupId ? `Group ${groupName.get(r.groupId) ?? "(deleted)"}` : "Every student"}{chapters.length ? `, ${(r.condition as { all?: unknown[] }).all ? "all of" : "any of"}: ${chapters.map((c) => CHAPTER_TITLE.get(c) ?? c).join("; ")}` : ""} → {target}
                   </p>
                 </li>
               );

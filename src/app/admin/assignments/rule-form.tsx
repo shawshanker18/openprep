@@ -5,15 +5,16 @@ import { saveRuleAction } from "./actions";
 
 export type RuleFormValues = {
   id?: string; name: string; description: string; status: "draft" | "live" | "disabled"; priority: number;
-  targetVersionId: string; op: "all" | "any"; chapters: string[]; effectiveFrom?: string; effectiveUntil?: string;
+  targetVersionId: string; op: "all" | "any"; chapters: string[]; groupId?: string; effectiveFrom?: string; effectiveUntil?: string;
 };
 export type VersionOption = { id: string; name: string; published: boolean };
+export type GroupOption = { id: string; name: string };
 
 const iso = (v?: string) => (v ? v.slice(0, 16) : "");
 const label = "flex flex-col gap-1 text-sm font-medium";
 const input = "min-h-11 rounded-md border bg-background px-3 text-sm font-normal";
 
-export function RuleForm({ values, versions, error }: { values: RuleFormValues; versions: VersionOption[]; error?: string }) {
+export function RuleForm({ values, versions, groups, error }: { values: RuleFormValues; versions: VersionOption[]; groups: GroupOption[]; error?: string }) {
   const grades = [9, 10, 11, 12] as const;
   const slots = Array.from({ length: RULE_SLOTS }, (_, i) => values.chapters[i] ?? "");
   return (
@@ -41,7 +42,18 @@ export function RuleForm({ values, versions, error }: { values: RuleFormValues; 
       </div>
 
       <fieldset className="flex flex-col gap-3">
-        <legend className="mb-1 text-sm font-medium">Completed chapters</legend>
+        <legend className="mb-1 text-sm font-medium">Who it applies to</legend>
+        <label className={label}>User group
+          <select name="groupId" defaultValue={values.groupId ?? ""} className={`${input} sm:max-w-sm`}>
+            <option value="">Every student</option>
+            {groups.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
+          </select>
+          <span className="text-xs font-normal text-muted-foreground">Choose a group to limit the rule to its members. With a group you can leave the chapters empty to give the whole group the same version.</span>
+        </label>
+      </fieldset>
+
+      <fieldset className="flex flex-col gap-3">
+        <legend className="mb-1 text-sm font-medium">Completed chapters (optional with a group)</legend>
         <label className={label}>Match students who have completed
           <select name="op" defaultValue={values.op} className={`${input} sm:max-w-sm`}>
             <option value="all">All of these chapters</option>

@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/server/admin";
-import { RULE_SLOTS, publishVersion, resetVersionLesson, saveRule, saveVersion, saveVersionLesson, setRuleStatus } from "@/server/assignment-admin";
+import { RULE_SLOTS, publishVersion, saveCourse, resetVersionLesson, saveRule, saveVersion, saveVersionLesson, setRuleStatus } from "@/server/assignment-admin";
 
 /** Every privileged action checks admin rights first, before reading its input, so a non-admin never reaches the database. */
 function ruleFromForm(form: FormData) {
@@ -14,6 +14,7 @@ function ruleFromForm(form: FormData) {
     status: String(form.get("status") ?? "draft"),
     priority: String(form.get("priority") ?? "0"),
     targetVersionId: String(form.get("targetVersionId") ?? ""),
+    groupId: String(form.get("groupId") ?? ""),
     op: String(form.get("op") ?? "all"),
     chapters: Array.from({ length: RULE_SLOTS }, (_, i) => String(form.get(`chapter${i}`) ?? "")).filter(Boolean),
     effectiveFrom: String(form.get("effectiveFrom") ?? ""),
@@ -78,4 +79,15 @@ export async function publishVersionAction(form: FormData) {
   const here = `/admin/assignments/versions/${encodeURIComponent(versionId)}`;
   if (!r.ok) redirect(`${here}?error=${note(r.problems)}`);
   redirect(`${here}?${new URLSearchParams({ published: String(r.value.rules), checked: String(r.value.evaluated), changed: String(r.value.changed), ...(r.value.capped ? { capped: "1" } : {}) })}`);
+}
+
+export async function saveCourseAction(form: FormData) {
+  const { adminId } = await requireAdmin();
+  const id = String(form.get("id") ?? "");
+  const r = await saveCourse(adminId, {
+    id, title: String(form.get("title") ?? ""), chapterId: String(form.get("chapterId") ?? ""), skills: form.getAll("skills").map(String),
+  });
+  revalidatePath("/admin/assignments", "layout");
+  if (!r.ok) redirect(`/admin/assignments/courses/${encodeURIComponent(id || "new")}?error=${note(r.problems)}`);
+  redirect(`/admin/assignments/courses/${encodeURIComponent(r.value.id)}?${r.value.created ? "created" : "saved"}=1`);
 }

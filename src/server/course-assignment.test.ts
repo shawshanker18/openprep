@@ -34,6 +34,7 @@ beforeAll(async () => {
   await db.insert(schema.profiles).values([
     { id: A, chaptersDone: ["cbse-9-polynomials"] }, { id: B, chaptersDone: ["cbse-9-polynomials", "cbse-10-polynomials"] }, { id: C, chaptersDone: [] },
   ]);
+  await db.insert(schema.courses).values({ id: "math-start", title: "Math Start" });
   await db.insert(schema.courseVersions).values([
     { id: "v1", courseId: "math-start", name: "Version 1", status: "published" },
     { id: "v2", courseId: "math-start", name: "Version 2", status: "published" },

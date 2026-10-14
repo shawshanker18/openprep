@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { BrandBanner } from "@/components/brand";
 import { requireUser } from "@/server/auth";
 import { safely } from "@/lib/safely";
-import { COURSE_BY_ID } from "@/content/chapter-courses";
 import { studentAssignments } from "@/server/course-assignment";
 import { GETTING_STARTED, scratchProgress } from "@/server/scratch";
 
@@ -82,7 +81,7 @@ export default async function StartPage() {
         <section aria-label="Your chapter routes" className="flex flex-col gap-2 rounded-xl border p-4 text-sm">
           <p className="text-muted-foreground">Your routes through the Class 11 chapters</p>
           <ul className="flex flex-col gap-1">
-            {assigned.map((a) => <li key={a.courseId}><span className="font-medium">{COURSE_BY_ID[a.courseId]?.title ?? a.courseId}</span>: {a.name}</li>)}
+            {assigned.map((a) => <li key={a.courseId}><span className="font-medium">{a.courseTitle ?? a.courseId}</span>: {a.name}</li>)}
           </ul>
         </section>
       )}

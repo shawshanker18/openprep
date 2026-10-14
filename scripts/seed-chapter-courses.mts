@@ -11,7 +11,7 @@ if (!url) { console.error("Set MIGRATE_DATABASE_URL (the owner connection string
 const client = postgres(url, { prepare: false, max: 1 });
 try {
   const added = await seedChapterCourses(drizzle(client, { schema }));
-  console.log(`Added ${added.versions} versions, ${added.lessons} lessons, ${added.rules} draft rules.`);
+  console.log(`Added ${added.courses} courses, ${added.versions} versions, ${added.lessons} lessons, ${added.rules} draft rules.`);
   if (added.missingLessons.length) console.warn(`No covered lesson file for: ${added.missingLessons.join(", ")}`);
 } finally {
   await client.end();

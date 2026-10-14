@@ -169,6 +169,13 @@
       "when": 1791957732380,
       "tag": "0023_chapter_courses",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1791964157515,
+      "tag": "0024_groups_and_courses",
+      "breakpoints": true
     }
   ]
 }

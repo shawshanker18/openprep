@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireAdmin } from "@/server/admin";
 import { loadCatalogData } from "@/server/course-assignment";
+import { listGroups } from "@/server/groups";
 import { RuleForm } from "../../rule-form";
 
 export const metadata = { title: "New rule" };
@@ -9,6 +10,7 @@ export default async function NewRulePage({ searchParams }: PageProps<"/admin/as
   await requireAdmin();
   const sp = await searchParams;
   const data = await loadCatalogData();
+  const groups = (await listGroups()).map((g) => ({ id: g.id, name: g.name }));
   const versions = data.versionRows.map((v) => ({ id: v.id, name: v.name, published: v.status === "published" }));
   return (
     <div className="flex flex-col gap-6">
@@ -16,7 +18,7 @@ export default async function NewRulePage({ searchParams }: PageProps<"/admin/as
       <h1 className="text-xl font-semibold">New rule</h1>
       <p className="text-sm text-muted-foreground">New rules start as drafts. Save it, test it against a sample profile, then publish it.</p>
       <RuleForm values={{ name: "", description: "", status: "draft", priority: 0, targetVersionId: "", op: "all", chapters: [] }}
-        versions={versions} error={typeof sp.error === "string" ? sp.error : undefined} />
+        versions={versions} groups={groups} error={typeof sp.error === "string" ? sp.error : undefined} />
     </div>
   );
 }

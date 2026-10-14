@@ -2,7 +2,7 @@
 // writes are covered by server-side tests once that layer exists.
 import { describe, expect, it } from "vitest";
 import {
-  evaluateAssignment, exprProblem, priorityTies, validateRule, type AssignmentRule, type EvaluationInput,
+  evaluateAssignment, exprProblem, priorityTies, validateRule, type AssignmentRule, type ChapterInfo, type CourseVersionInfo, type EvaluationInput,
 } from "./assignment";
 
 const NOW = new Date("2026-10-12T10:00:00Z");
@@ -170,5 +170,47 @@ describe("conflict detection", () => {
       rule({ id: "r3", when: { chapter: "cbse-11-a" }, targetVersionId: "v2", priority: 5, active: false }),
     ];
     expect(findConflicts(rules)).toEqual([{ kind: "priority_tie", ruleIds: ["r1", "r2"] }]);
+  });
+});
+
+describe("user groups", () => {
+  const chapters: ChapterInfo[] = [{ id: "c1", grade: 11, active: true }, { id: "c2", grade: 11, active: true }];
+  const versions: CourseVersionInfo[] = [{ id: "base", published: true }, { id: "pilot", published: true }, { id: "done", published: true }];
+  const now = new Date("2026-10-14T00:00:00Z");
+  const run = (rules: AssignmentRule[], completed: string[], groupIds: string[]) =>
+    evaluateAssignment({ completed, groupIds, chapters, versions, rules, fallbackVersionId: "base", now });
+  const rule = (over: Partial<AssignmentRule>): AssignmentRule => ({ id: "r", name: "R", active: true, priority: 0, targetVersionId: "pilot", when: null, ...over });
+
+  it("a group-only rule (no chapter condition) applies to members and nobody else", () => {
+    const rules = [rule({ audienceGroupId: "g1" })];
+    expect(run(rules, [], ["g1"])).toMatchObject({ outcome: "assigned", versionId: "pilot" });
+    expect(run(rules, [], ["g2"])).toMatchObject({ outcome: "fallback", versionId: "base" });
+    expect(run(rules, ["c1"], [])).toMatchObject({ outcome: "fallback" });
+  });
+
+  it("a rule with a group and chapters needs both", () => {
+    const rules = [rule({ audienceGroupId: "g1", when: { chapter: "c1" } })];
+    expect(run(rules, ["c1"], ["g1"])).toMatchObject({ outcome: "assigned" });
+    expect(run(rules, ["c1"], [])).toMatchObject({ outcome: "fallback" });
+    expect(run(rules, [], ["g1"])).toMatchObject({ outcome: "fallback" });
+  });
+
+  it("a rule with neither a group nor a condition is invalid and never matches", () => {
+    const r = run([rule({})], ["c1"], ["g1"]);
+    expect(r.outcome).toBe("fallback");
+    expect(r.issues).toEqual([expect.objectContaining({ issue: "invalid_expression" })]);
+  });
+
+  it("a group rule can outrank a general rule by priority", () => {
+    const rules = [rule({ id: "a", targetVersionId: "done", when: { chapter: "c1" }, priority: 5 }), rule({ id: "b", audienceGroupId: "g1", priority: 9 })];
+    expect(run(rules, ["c1"], ["g1"])).toMatchObject({ versionId: "pilot", ruleId: "b" });
+    expect(run(rules, ["c1"], [])).toMatchObject({ versionId: "done", ruleId: "a" });
+  });
+
+  it("conflicts treat the same chapters for different groups as different conditions", () => {
+    const a = rule({ id: "a", when: { chapter: "c1" }, audienceGroupId: "g1", targetVersionId: "pilot", priority: 1 });
+    const b = rule({ id: "b", when: { chapter: "c1" }, audienceGroupId: "g2", targetVersionId: "done", priority: 2 });
+    expect(findConflicts([a, b])).toEqual([]);
+    expect(findConflicts([a, { ...b, audienceGroupId: "g1" }])).toEqual([{ kind: "same_condition", ruleIds: ["a", "b"] }]);
   });
 });

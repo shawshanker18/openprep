@@ -344,7 +344,45 @@ export const practiceSessionItems = pgTable("practice_session_items", {
 /* ───────── CBSE course assignment (brief §11) ───────── */
 // Completed chapters are read from profiles.chaptersDone, the one existing source of truth. Nothing here duplicates it.
 
-/** A version of the Math Start from Scratch course. Created and published by admins, never by code changes. */
+/** A chapter course: a title, the chapter whose completion routes students to its covered version, and the SAT skills whose lessons it owns. */
+export const courses = pgTable("courses", {
+  id: text("id").primaryKey(), // stable slug, e.g. "straight-lines"
+  title: text("title").notNull(),
+  chapterId: text("chapter_id"), // CBSE chapter id; informational, used to draft the "covered at school" rule
+  createdAt: ts("created_at").notNull().defaultNow(),
+  updatedAt: ts("updated_at").notNull().defaultNow(),
+}).enableRLS();
+
+/** Which course owns a SAT skill's lesson. The primary key makes a skill belong to at most one course. */
+export const courseSkills = pgTable("course_skills", {
+  skillId: text("skill_id").primaryKey(),
+  courseId: text("course_id").notNull().references(() => courses.id, { onDelete: "cascade" }),
+}).enableRLS();
+
+/** A named group of students, so a rule can apply to some students only (a class, a cohort, a pilot). */
+export const userGroups = pgTable("user_groups", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  description: text("description").notNull().default(""),
+  createdBy: uuid("created_by"),
+  createdAt: ts("created_at").notNull().defaultNow(),
+  updatedAt: ts("updated_at").notNull().defaultNow(),
+}, (t) => [
+  uniqueIndex("user_groups_name_unique").on(sql`lower(${t.name})`),
+  check("user_groups_name_check", sql`length(${t.name}) between 1 and 80`),
+]).enableRLS();
+
+export const userGroupMembers = pgTable("user_group_members", {
+  groupId: uuid("group_id").notNull().references(() => userGroups.id, { onDelete: "cascade" }),
+  userId: userRef(),
+  addedBy: uuid("added_by"),
+  addedAt: ts("added_at").notNull().defaultNow(),
+}, (t) => [
+  primaryKey({ columns: [t.groupId, t.userId] }),
+  index("user_group_members_user_idx").on(t.userId),
+]).enableRLS();
+
+/** A version of a chapter course. Created and published by admins, never by code changes. */
 export const courseVersions = pgTable("course_versions", {
   id: text("id").primaryKey(), // stable slug, e.g. "math-start-v2"
   courseId: text("course_id").notNull(),
@@ -389,7 +427,10 @@ export const assignmentRules = pgTable("assignment_rules", {
   status: text("status").notNull().default("draft"), // draft | live | disabled
   priority: integer("priority").notNull().default(0),
   targetVersionId: text("target_version_id").notNull().references(() => courseVersions.id),
-  condition: jsonb("condition").$type<Expr>().notNull(),
+  /** Chapters the student must have completed. Null = no chapter condition (then the rule needs a group). */
+  condition: jsonb("condition").$type<Expr>(),
+  /** Only members of this group can match. Null = every student. A group in use by a rule cannot be deleted. */
+  groupId: uuid("group_id").references(() => userGroups.id, { onDelete: "restrict" }),
   effectiveFrom: ts("effective_from"),
   effectiveUntil: ts("effective_until"),
   createdBy: uuid("created_by"),
@@ -398,6 +439,7 @@ export const assignmentRules = pgTable("assignment_rules", {
   updatedAt: ts("updated_at").notNull().defaultNow(),
 }, (t) => [
   check("assignment_rules_status_check", sql`${t.status} in ('draft', 'live', 'disabled')`),
+  check("assignment_rules_scope_check", sql`${t.condition} is not null or ${t.groupId} is not null`),
   check("assignment_rules_window_check", sql`${t.effectiveFrom} is null or ${t.effectiveUntil} is null or ${t.effectiveFrom} < ${t.effectiveUntil}`),
   index("assignment_rules_status_priority_idx").on(t.status, t.priority),
 ]).enableRLS();

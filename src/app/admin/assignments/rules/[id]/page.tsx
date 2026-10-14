@@ -9,6 +9,7 @@ import { evaluateAssignment, evaluateExpr, type Expr } from "@/engine/assignment
 import { requireAdmin } from "@/server/admin";
 import { chapterCatalog, conditionChapters, loadCatalogData, toRule } from "@/server/course-assignment";
 import { previewRuleImpact } from "@/server/assignment-admin";
+import { listGroups } from "@/server/groups";
 import { RuleForm, type RuleFormValues } from "../../rule-form";
 import { setRuleStatusAction } from "../../actions";
 
@@ -18,11 +19,11 @@ const grades = [9, 10, 11, 12] as const;
 
 /** The form's op and chapter list, read back from a stored condition. */
 function formValues(row: typeof assignmentRules.$inferSelect): RuleFormValues {
-  const cond = row.condition as Expr;
-  const op = "any" in cond ? "any" : "all";
+  const cond = row.condition as Expr | null;
+  const op = cond && "any" in cond ? "any" : "all";
   return {
     id: row.id, name: row.name, description: row.description, status: row.status as RuleFormValues["status"], priority: row.priority,
-    targetVersionId: row.targetVersionId, op, chapters: conditionChapters(cond),
+    targetVersionId: row.targetVersionId, op, chapters: conditionChapters(cond), groupId: row.groupId ?? undefined,
     effectiveFrom: row.effectiveFrom?.toISOString(), effectiveUntil: row.effectiveUntil?.toISOString(),
   };
 }
@@ -40,13 +41,16 @@ export default async function EditRulePage({ params, searchParams }: PageProps<"
 
   const sample = [sp.sample ?? []].flat().filter((c): c is string => typeof c === "string" && CHAPTER_TITLE.has(c));
   const ruleAsLive = { ...toRule(row), active: true };
-  const condition = row.condition as Expr;
-  const ruleMatches = evaluateExpr(condition, new Set(sample));
+  const condition = row.condition as Expr | null;
+  const groups = (await listGroups()).map((g) => ({ id: g.id, name: g.name }));
+  const groupName = groups.find((g) => g.id === row.groupId)?.name;
+  const inGroup = sp.inGroup === "1";
+  const ruleMatches = (!row.groupId || inGroup) && (!condition || evaluateExpr(condition, new Set(sample)));
   // The sample run covers this rule's own course: versions, rules and the fallback of other courses never compete with it.
   const courseId = data.courseOfVersion.get(row.targetVersionId);
   const inCourse = (versionId: string) => data.courseOfVersion.get(versionId) === courseId;
   const overall = sp.sampleRun !== undefined ? evaluateAssignment({
-    completed: sample, chapters: chapterCatalog(), versions: data.versions.filter((v) => inCourse(v.id)),
+    completed: sample, groupIds: row.groupId && inGroup ? [row.groupId] : [], chapters: chapterCatalog(), versions: data.versions.filter((v) => inCourse(v.id)),
     rules: data.rules.filter((r) => inCourse(r.targetVersionId)).map((r) => (r.id === id ? ruleAsLive : r)),
     fallbackVersionId: (courseId && data.fallbackByCourse.get(courseId)) || null, now: new Date(),
   }) : null;
@@ -118,6 +122,7 @@ export default async function EditRulePage({ params, searchParams }: PageProps<"
               </details>
             ))}
           </div>
+          {row.groupId && <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="inGroup" value="1" defaultChecked={inGroup} />The student is a member of the group {groupName ?? "(deleted)"}</label>}
           <button type="submit" name="sampleRun" value="1" className="min-h-11 self-start rounded-md border px-4 text-sm font-medium hover:bg-muted">Test this profile</button>
         </form>
         {sp.sampleRun !== undefined && (
@@ -141,7 +146,7 @@ export default async function EditRulePage({ params, searchParams }: PageProps<"
 
       <section aria-labelledby="edit" className="flex flex-col gap-4">
         <h2 id="edit" className="font-medium">Edit rule</h2>
-        <RuleForm values={values} versions={versions} error={undefined} />
+        <RuleForm values={values} versions={versions} groups={groups} error={undefined} />
       </section>
     </div>
   );

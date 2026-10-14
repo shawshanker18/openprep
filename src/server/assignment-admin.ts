@@ -4,9 +4,10 @@ import "server-only";
 import { and, eq, ne } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db";
-import { assignmentRules, courseVersionLessons, courseVersions } from "@/db/schema";
+import { assignmentRules, courseSkills, courses, courseVersionLessons, courseVersions, userGroups } from "@/db/schema";
 import { CBSE_CHAPTERS } from "@/content/cbse-chapters";
-import { COURSE_BY_ID } from "@/content/chapter-courses";
+import { SKILL_BY_ID } from "@/content/taxonomy";
+import { ensureCourse } from "@/server/course-builder";
 import { audit } from "@/server/admin";
 import { exprProblem, validateRule, type AssignmentRule, type Expr } from "@/engine/assignment";
 import { chapterCatalog, loadCatalogData, previewImpact, recalculateAll, toRule } from "@/server/course-assignment";
@@ -24,6 +25,8 @@ const Rule = z.object({
   targetVersionId: z.string().min(1, "Choose a course version"),
   op: z.enum(["all", "any"]),
   chapters: z.array(z.string()).max(RULE_SLOTS),
+  /** Only members of this group can match. Blank = every student. */
+  groupId: z.union([z.literal(""), z.uuid()]).optional(),
   effectiveFrom: z.string().trim().optional(),
   effectiveUntil: z.string().trim().optional(),
 });
@@ -58,8 +61,8 @@ export function buildCondition(op: "all" | "any", chapters: string[]): Expr | nu
 /** Everything wrong with a rule draft, reported together so the admin fixes them in one pass. */
 export async function ruleProblems(input: RuleInput, expr: Expr | null): Promise<Problem[]> {
   const problems: Problem[] = [];
-  if (!expr) problems.push({ field: "chapters", message: "Choose at least one completed chapter" });
-  else {
+  if (!expr && !input.groupId) problems.push({ field: "chapters", message: "Choose at least one completed chapter, or a user group" });
+  if (expr) {
     const p = exprProblem(expr);
     if (p) problems.push({ field: "chapters", message: `Condition is invalid: ${p}` });
     for (const c of new Set(collect(expr))) {
@@ -71,6 +74,10 @@ export async function ruleProblems(input: RuleInput, expr: Expr | null): Promise
   if (until === "invalid") problems.push({ field: "effectiveUntil", message: "End date is not a valid date" });
   if (from instanceof Date && until instanceof Date && from >= until) problems.push({ field: "effectiveUntil", message: "End date must be after the start date" });
 
+  if (input.groupId) {
+    const [group] = await db.select({ id: userGroups.id }).from(userGroups).where(eq(userGroups.id, input.groupId));
+    if (!group) problems.push({ field: "groupId", message: "That user group does not exist" });
+  }
   const data = await loadCatalogData();
   const version = data.versions.find((v) => v.id === input.targetVersionId);
   if (!version) problems.push({ field: "targetVersionId", message: "That course version does not exist" });
@@ -86,11 +93,11 @@ export async function saveRule(adminId: string, form: unknown): Promise<Ok<{ id:
   const input = parsed.data;
   const expr = buildCondition(input.op, input.chapters);
   const problems = await ruleProblems(input, expr);
-  if (problems.length || !expr) return { ok: false, problems };
+  if (problems.length) return { ok: false, problems };
 
   const row = {
     name: input.name, description: input.description, status: input.status, priority: input.priority,
-    targetVersionId: input.targetVersionId, condition: expr,
+    targetVersionId: input.targetVersionId, condition: expr, groupId: input.groupId || null,
     effectiveFrom: dateOrNull(input.effectiveFrom) as Date | null, effectiveUntil: dateOrNull(input.effectiveUntil) as Date | null,
     updatedBy: adminId, updatedAt: new Date(),
   };
@@ -144,12 +151,12 @@ export async function previewRuleImpact(id: string | null, form: unknown) {
   if (!parsed.success) return { ok: false as const, problems: parsed.error.issues.map((i) => ({ field: String(i.path[0] ?? "form"), message: i.message })) };
   const input = parsed.data;
   const expr = buildCondition(input.op, input.chapters);
-  if (!expr) return { ok: false as const, problems: [{ field: "chapters", message: "Choose at least one completed chapter" }] };
+  if (!expr && !input.groupId) return { ok: false as const, problems: [{ field: "chapters", message: "Choose at least one completed chapter, or a user group" }] };
   const data = await loadCatalogData();
   const others = data.rules.filter((r) => r.id !== id);
   const candidate: AssignmentRule = {
     id: id ?? "preview-candidate", name: input.name, active: input.status === "live", priority: input.priority,
-    targetVersionId: input.targetVersionId, when: expr,
+    targetVersionId: input.targetVersionId, when: expr, audienceGroupId: input.groupId || null,
     effectiveFrom: dateOrNull(input.effectiveFrom) instanceof Date ? (dateOrNull(input.effectiveFrom) as Date).toISOString() : null,
     effectiveUntil: dateOrNull(input.effectiveUntil) instanceof Date ? (dateOrNull(input.effectiveUntil) as Date).toISOString() : null,
   };
@@ -166,6 +173,8 @@ export async function saveVersion(adminId: string, form: unknown): Promise<Ok<{ 
   if (!parsed.success) return { ok: false, problems: parsed.error.issues.map((i) => ({ field: String(i.path[0] ?? "form"), message: i.message })) };
   const v = parsed.data;
   if (v.isFallback && v.status !== "published") return { ok: false, problems: [{ field: "isFallback", message: "Only a published version can be the fallback" }] };
+  const [course] = await db.select({ id: courses.id }).from(courses).where(eq(courses.id, v.courseId));
+  if (!course) return { ok: false, problems: [{ field: "courseId", message: "That course does not exist. Create the course first." }] };
   await db.transaction(async (tx) => {
     if (v.isFallback) await tx.update(courseVersions).set({ isFallback: false }).where(and(eq(courseVersions.isFallback, true), eq(courseVersions.courseId, v.courseId), ne(courseVersions.id, v.id)));
     await tx.insert(courseVersions).values({ id: v.id, courseId: v.courseId, name: v.name, description: v.description, status: v.status, isFallback: v.isFallback })
@@ -196,7 +205,8 @@ export async function saveVersionLesson(adminId: string, form: unknown): Promise
   const body = stripFrontmatter(parsed.data.body);
   const [version] = await db.select().from(courseVersions).where(eq(courseVersions.id, versionId));
   if (!version) return { ok: false, problems: [{ field: "versionId", message: "That course version does not exist" }] };
-  if (!COURSE_BY_ID[version.courseId]?.skills.includes(skillId)) return { ok: false, problems: [{ field: "skillId", message: "That skill is not part of this course" }] };
+  const [owned] = await db.select({ skillId: courseSkills.skillId }).from(courseSkills).where(and(eq(courseSkills.skillId, skillId), eq(courseSkills.courseId, version.courseId)));
+  if (!owned) return { ok: false, problems: [{ field: "skillId", message: "That skill is not part of this course" }] };
   if (!/^## \S/m.test(body)) return { ok: false, problems: [{ field: "body", message: "Start each section with a \"## Heading\" line" }] };
   const mins = typeof minutes === "number" ? minutes : null;
   await db.insert(courseVersionLessons).values({ versionId, skillId, body, minutes: mins, updatedBy: adminId })
@@ -237,4 +247,54 @@ export async function publishVersion(adminId: string, versionId: string): Promis
   const run = await recalculateAll();
   await audit(adminId, "assignment.recalculate", versionId, { evaluated: run.evaluated, changed: run.changed, capped: run.capped });
   return { ok: true, value: { rules: drafts.length, ...run } };
+}
+
+/* ───────── courses ───────── */
+const CourseForm = z.object({
+  id: z.string().regex(/^[a-z0-9][a-z0-9-]{1,62}$/, "Use lowercase letters, numbers and dashes (2–63 characters)"),
+  title: z.string().trim().min(1, "Give the course a title").max(120),
+  chapterId: z.string().optional(),
+  skills: z.array(z.string()).max(20),
+});
+
+/**
+ * Create a course, or edit an existing one's title, chapter and skills. A new course also gets its default version
+ * (published, the course's fallback), its covered version (draft) and, when it names a chapter, a draft rule that sends
+ * students who finished that chapter to the covered version. Nothing reaches students until published.
+ */
+export async function saveCourse(adminId: string, form: unknown): Promise<Ok<{ id: string; created: boolean }>> {
+  const parsed = CourseForm.safeParse(form);
+  if (!parsed.success) return { ok: false, problems: parsed.error.issues.map((i) => ({ field: String(i.path[0] ?? "form"), message: i.message })) };
+  const { id, title } = parsed.data;
+  const chapterId = parsed.data.chapterId || null;
+  const skills = [...new Set(parsed.data.skills.filter(Boolean))];
+  const problems: Problem[] = [];
+  if (chapterId && !KNOWN_CHAPTERS.has(chapterId)) problems.push({ field: "chapterId", message: `Unknown chapter ${chapterId}` });
+  for (const s of skills) if (!SKILL_BY_ID[s]) problems.push({ field: "skills", message: `Unknown skill ${s}` });
+
+  const owners = new Map((await db.select().from(courseSkills)).map((r) => [r.skillId, r.courseId]));
+  for (const s of skills) if (owners.get(s) && owners.get(s) !== id) problems.push({ field: "skills", message: `${SKILL_BY_ID[s]?.name ?? s} already belongs to the course ${owners.get(s)}` });
+  const [existing] = await db.select().from(courses).where(eq(courses.id, id));
+  // Dropping a skill that a version has customised would orphan that text, so it has to be reset first.
+  for (const [skill, owner] of owners) {
+    if (owner !== id || skills.includes(skill)) continue;
+    const [text] = await db.select({ v: courseVersionLessons.versionId }).from(courseVersionLessons)
+      .innerJoin(courseVersions, eq(courseVersions.id, courseVersionLessons.versionId))
+      .where(and(eq(courseVersionLessons.skillId, skill), eq(courseVersions.courseId, id))).limit(1);
+    if (text) problems.push({ field: "skills", message: `${SKILL_BY_ID[skill]?.name ?? skill} has customised lessons. Reset them before removing the skill.` });
+  }
+  if (problems.length) return { ok: false, problems };
+
+  if (!existing) {
+    await ensureCourse(db as never, { id, title, chapterId, skills });
+    await audit(adminId, "course.create", id, { chapterId, skills });
+    return { ok: true, value: { id, created: true } };
+  }
+  await db.transaction(async (tx) => {
+    await tx.update(courses).set({ title, chapterId, updatedAt: new Date() }).where(eq(courses.id, id));
+    await tx.delete(courseSkills).where(eq(courseSkills.courseId, id));
+    if (skills.length) await tx.insert(courseSkills).values(skills.map((skillId) => ({ skillId, courseId: id })));
+  });
+  await audit(adminId, "course.update", id, { chapterId, skills });
+  return { ok: true, value: { id, created: false } };
 }
