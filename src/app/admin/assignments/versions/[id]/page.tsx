@@ -17,10 +17,15 @@ export default async function VersionLessonsPage({ params, searchParams }: PageP
   const [version] = await db.select().from(courseVersions).where(eq(courseVersions.id, id));
   if (!version) notFound();
   const sp = await searchParams;
-  const [course] = await db.select().from(courses).where(eq(courses.id, version.courseId));
-  const saved = new Map((await db.select().from(courseVersionLessons).where(eq(courseVersionLessons.versionId, id))).map((r) => [r.skillId, r]));
-  const draftRules = (await db.select({ id: assignmentRules.id }).from(assignmentRules).where(and(eq(assignmentRules.targetVersionId, id), eq(assignmentRules.status, "draft")))).length;
-  const skills = (await db.select({ id: courseSkills.skillId }).from(courseSkills).where(eq(courseSkills.courseId, version.courseId)).orderBy(courseSkills.skillId)).map((r) => r.id);
+  const [[course], savedRows, draftRows, skillRows] = await Promise.all([
+    db.select().from(courses).where(eq(courses.id, version.courseId)),
+    db.select().from(courseVersionLessons).where(eq(courseVersionLessons.versionId, id)),
+    db.select({ id: assignmentRules.id }).from(assignmentRules).where(and(eq(assignmentRules.targetVersionId, id), eq(assignmentRules.status, "draft"))),
+    db.select({ id: courseSkills.skillId }).from(courseSkills).where(eq(courseSkills.courseId, version.courseId)).orderBy(courseSkills.skillId),
+  ]);
+  const saved = new Map(savedRows.map((r) => [r.skillId, r]));
+  const draftRules = draftRows.length;
+  const skills = skillRows.map((r) => r.id);
   const sources = new Map(await Promise.all(skills.map(async (s) => [s, await getLessonSource(s)] as const)));
   const notice = typeof sp.saved === "string" ? "Saved. Students on this version see it now." : typeof sp.reset === "string" ? "Back to the built-in lesson." : null;
   const error = typeof sp.error === "string" ? sp.error : null;

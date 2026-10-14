@@ -1,7 +1,5 @@
-// Admin writes for course assignment: parse, validate, save, publish, audit. Callers must have
-// checked admin rights already (see app/admin/assignments/actions.ts); every function here re-validates its input.
 import "server-only";
-import { and, eq, ne } from "drizzle-orm";
+import { and, eq, inArray, ne } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db";
 import { assignmentRules, courseSkills, courses, courseVersionLessons, courseVersions, userGroups } from "@/db/schema";
@@ -25,7 +23,6 @@ const Rule = z.object({
   targetVersionId: z.string().min(1, "Choose a course version"),
   op: z.enum(["all", "any"]),
   chapters: z.array(z.string()).max(RULE_SLOTS),
-  /** Only members of this group can match. Blank = every student. */
   groupId: z.union([z.literal(""), z.uuid()]).optional(),
   effectiveFrom: z.string().trim().optional(),
   effectiveUntil: z.string().trim().optional(),
@@ -43,7 +40,7 @@ const Version = z.object({
 export type VersionInput = z.infer<typeof Version>;
 
 export type Problem = { field: string; message: string };
-type Ok<T> = { ok: true; value: T } | { ok: false; problems: Problem[] };
+export type Ok<T> = { ok: true; value: T } | { ok: false; problems: Problem[] };
 
 const dateOrNull = (v: string | undefined) => {
   if (!v) return null;
@@ -51,14 +48,12 @@ const dateOrNull = (v: string | undefined) => {
   return Number.isNaN(d.getTime()) ? "invalid" : d;
 };
 
-/** Turn the form's chapter slots into one condition. Blank slots are ignored; duplicates collapse. */
 export function buildCondition(op: "all" | "any", chapters: string[]): Expr | null {
   const picked = [...new Set(chapters.filter(Boolean))];
   if (!picked.length) return null;
   return op === "all" ? { all: picked.map((c) => ({ chapter: c })) } : { any: picked.map((c) => ({ chapter: c })) };
 }
 
-/** Everything wrong with a rule draft, reported together so the admin fixes them in one pass. */
 export async function ruleProblems(input: RuleInput, expr: Expr | null): Promise<Problem[]> {
   const problems: Problem[] = [];
   if (!expr && !input.groupId) problems.push({ field: "chapters", message: "Choose at least one completed chapter, or a user group" });
@@ -86,7 +81,6 @@ export async function ruleProblems(input: RuleInput, expr: Expr | null): Promise
 }
 const collect = (e: Expr): string[] => ("chapter" in e ? [e.chapter] : ("all" in e ? e.all : e.any).flatMap(collect));
 
-/** Validate and save a rule. Saving a draft never changes anyone's course; only publishing does (see setRuleStatus). */
 export async function saveRule(adminId: string, form: unknown): Promise<Ok<{ id: string }>> {
   const parsed = Rule.safeParse(form);
   if (!parsed.success) return { ok: false, problems: parsed.error.issues.map((i) => ({ field: String(i.path[0] ?? "form"), message: i.message })) };
@@ -114,10 +108,6 @@ export async function saveRule(adminId: string, form: unknown): Promise<Ok<{ id:
   return { ok: true, value: { id } };
 }
 
-/**
- * Publish, disable or return a rule to draft. Going live checks the whole rule again and recalculates students at once,
- * so the outcome of publishing is the same whichever admin does it.
- */
 export async function setRuleStatus(adminId: string, id: string, status: (typeof STATUSES)[number]): Promise<Ok<{ evaluated: number; changed: number; capped: boolean }>> {
   const [row] = await db.select().from(assignmentRules).where(eq(assignmentRules.id, id));
   if (!row) return { ok: false, problems: [{ field: "id", message: "Rule not found" }] };
@@ -145,7 +135,6 @@ const describeIssue = (i: ReturnType<typeof validateRule>[number]) => {
   }
 };
 
-/** What publishing this draft would change, as counts. Read-only: nothing is written. */
 export async function previewRuleImpact(id: string | null, form: unknown) {
   const parsed = Rule.safeParse({ ...(form as object), id: id ?? undefined });
   if (!parsed.success) return { ok: false as const, problems: parsed.error.issues.map((i) => ({ field: String(i.path[0] ?? "form"), message: i.message })) };
@@ -166,7 +155,6 @@ export async function previewRuleImpact(id: string | null, form: unknown) {
   return { ok: true as const, impact };
 }
 
-/** Create or edit a course version. Each course has at most one fallback version, and only a published one can be. */
 export async function saveVersion(adminId: string, form: unknown): Promise<Ok<{ id: string }>> {
   const raw = form as Record<string, unknown>;
   const parsed = Version.safeParse({ ...raw, isFallback: raw.isFallback === "on" || raw.isFallback === true });
@@ -181,13 +169,11 @@ export async function saveVersion(adminId: string, form: unknown): Promise<Ok<{ 
       .onConflictDoUpdate({ target: courseVersions.id, set: { courseId: v.courseId, name: v.name, description: v.description, status: v.status, isFallback: v.isFallback, updatedAt: new Date() } });
   });
   await audit(adminId, "course_version.save", v.id, { status: v.status, fallback: v.isFallback });
-  // Publishing, retiring or moving the fallback changes where students land, so recalculate every time.
   const run = await recalculateAll();
   await audit(adminId, "assignment.recalculate", v.id, { evaluated: run.evaluated, changed: run.changed, capped: run.capped });
   return { ok: true, value: { id: v.id } };
 }
 
-/** Lesson text for one skill of one version, as admins edit it: the `##` sections, with any pasted frontmatter removed. */
 const LessonText = z.object({
   versionId: z.string().min(1),
   skillId: z.string().min(1),
@@ -197,7 +183,6 @@ const LessonText = z.object({
 
 export const stripFrontmatter = (md: string) => md.replace(/^\uFEFF?---\r?\n[\s\S]*?\r?\n---\r?\n?/, "").trim();
 
-/** Save the lesson a version teaches for one of its course's skills. Takes effect for students on that version at once. */
 export async function saveVersionLesson(adminId: string, form: unknown): Promise<Ok<{ versionId: string; skillId: string }>> {
   const parsed = LessonText.safeParse(form);
   if (!parsed.success) return { ok: false, problems: parsed.error.issues.map((i) => ({ field: String(i.path[0] ?? "form"), message: i.message })) };
@@ -215,24 +200,17 @@ export async function saveVersionLesson(adminId: string, form: unknown): Promise
   return { ok: true, value: { versionId, skillId } };
 }
 
-/** Drop a version's own text for a skill, so it teaches the built-in lesson again. */
 export async function resetVersionLesson(adminId: string, versionId: string, skillId: string): Promise<Ok<{ removed: boolean }>> {
   const gone = await db.delete(courseVersionLessons).where(and(eq(courseVersionLessons.versionId, versionId), eq(courseVersionLessons.skillId, skillId))).returning({ skillId: courseVersionLessons.skillId });
   if (gone.length) await audit(adminId, "course_version.lesson_reset", versionId, { skillId });
   return { ok: true, value: { removed: gone.length > 0 } };
 }
 
-/**
- * Publish a course version and take its draft rules live in one step, then recalculate students once. This is the
- * "go live" button for a chapter route: the version must be published before a rule may target it, so doing it by hand
- * means two saves and two recalculations.
- */
 export async function publishVersion(adminId: string, versionId: string): Promise<Ok<{ rules: number; evaluated: number; changed: number; capped: boolean }>> {
   const [version] = await db.select().from(courseVersions).where(eq(courseVersions.id, versionId));
   if (!version) return { ok: false, problems: [{ field: "id", message: "That course version does not exist" }] };
   if (version.status === "retired") return { ok: false, problems: [{ field: "id", message: "A retired version cannot be published" }] };
 
-  // Check the draft rules as they would be once live, before anything is written.
   const data = await loadCatalogData();
   const versions = data.versions.map((v) => (v.id === versionId ? { ...v, published: true } : v));
   const drafts = data.ruleRows.filter((r) => r.targetVersionId === versionId && r.status === "draft");
@@ -249,7 +227,6 @@ export async function publishVersion(adminId: string, versionId: string): Promis
   return { ok: true, value: { rules: drafts.length, ...run } };
 }
 
-/* ───────── courses ───────── */
 const CourseForm = z.object({
   id: z.string().regex(/^[a-z0-9][a-z0-9-]{1,62}$/, "Use lowercase letters, numbers and dashes (2–63 characters)"),
   title: z.string().trim().min(1, "Give the course a title").max(120),
@@ -257,11 +234,6 @@ const CourseForm = z.object({
   skills: z.array(z.string()).max(20),
 });
 
-/**
- * Create a course, or edit an existing one's title, chapter and skills. A new course also gets its default version
- * (published, the course's fallback), its covered version (draft) and, when it names a chapter, a draft rule that sends
- * students who finished that chapter to the covered version. Nothing reaches students until published.
- */
 export async function saveCourse(adminId: string, form: unknown): Promise<Ok<{ id: string; created: boolean }>> {
   const parsed = CourseForm.safeParse(form);
   if (!parsed.success) return { ok: false, problems: parsed.error.issues.map((i) => ({ field: String(i.path[0] ?? "form"), message: i.message })) };
@@ -275,13 +247,12 @@ export async function saveCourse(adminId: string, form: unknown): Promise<Ok<{ i
   const owners = new Map((await db.select().from(courseSkills)).map((r) => [r.skillId, r.courseId]));
   for (const s of skills) if (owners.get(s) && owners.get(s) !== id) problems.push({ field: "skills", message: `${SKILL_BY_ID[s]?.name ?? s} already belongs to the course ${owners.get(s)}` });
   const [existing] = await db.select().from(courses).where(eq(courses.id, id));
-  // Dropping a skill that a version has customised would orphan that text, so it has to be reset first.
-  for (const [skill, owner] of owners) {
-    if (owner !== id || skills.includes(skill)) continue;
-    const [text] = await db.select({ v: courseVersionLessons.versionId }).from(courseVersionLessons)
+  const dropped = [...owners].filter(([skill, owner]) => owner === id && !skills.includes(skill)).map(([skill]) => skill);
+  if (dropped.length) {
+    const customised = new Set((await db.select({ skillId: courseVersionLessons.skillId }).from(courseVersionLessons)
       .innerJoin(courseVersions, eq(courseVersions.id, courseVersionLessons.versionId))
-      .where(and(eq(courseVersionLessons.skillId, skill), eq(courseVersions.courseId, id))).limit(1);
-    if (text) problems.push({ field: "skills", message: `${SKILL_BY_ID[skill]?.name ?? skill} has customised lessons. Reset them before removing the skill.` });
+      .where(and(inArray(courseVersionLessons.skillId, dropped), eq(courseVersions.courseId, id)))).map((r) => r.skillId));
+    for (const skill of dropped) if (customised.has(skill)) problems.push({ field: "skills", message: `${SKILL_BY_ID[skill]?.name ?? skill} has customised lessons. Reset them before removing the skill.` });
   }
   if (problems.length) return { ok: false, problems };
 

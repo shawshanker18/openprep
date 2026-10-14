@@ -10,7 +10,7 @@ export default async function NewRulePage({ searchParams }: PageProps<"/admin/as
   await requireAdmin();
   const sp = await searchParams;
   const data = await loadCatalogData();
-  const groups = (await listGroups()).map((g) => ({ id: g.id, name: g.name }));
+  const groups = await listGroups();
   const versions = data.versionRows.map((v) => ({ id: v.id, name: v.name, published: v.status === "published" }));
   return (
     <div className="flex flex-col gap-6">

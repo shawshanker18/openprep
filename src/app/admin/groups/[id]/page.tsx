@@ -5,12 +5,11 @@ import { z } from "zod";
 import { db } from "@/db";
 import { assignmentRules, userGroups } from "@/db/schema";
 import { requireAdmin, userEmails } from "@/server/admin";
+import { input, label } from "@/app/admin/form-styles";
 import { groupMemberIds } from "@/server/groups";
 import { addMembersAction, deleteGroupAction, removeMemberAction, saveGroupAction } from "../actions";
 
 export const metadata = { title: "Group" };
-const label = "flex flex-col gap-1 text-sm font-medium";
-const input = "min-h-11 rounded-md border bg-background px-3 text-sm font-normal";
 
 export default async function GroupPage({ params, searchParams }: PageProps<"/admin/groups/[id]">) {
   await requireAdmin();
@@ -19,9 +18,11 @@ export default async function GroupPage({ params, searchParams }: PageProps<"/ad
   const [group] = await db.select().from(userGroups).where(eq(userGroups.id, id));
   if (!group) notFound();
   const sp = await searchParams;
-  const members = await groupMemberIds(id);
+  const [members, rules] = await Promise.all([
+    groupMemberIds(id),
+    db.select({ id: assignmentRules.id, name: assignmentRules.name, status: assignmentRules.status }).from(assignmentRules).where(eq(assignmentRules.groupId, id)),
+  ]);
   const emails = await userEmails(members.map((m) => m.userId));
-  const rules = await db.select({ id: assignmentRules.id, name: assignmentRules.name, status: assignmentRules.status }).from(assignmentRules).where(eq(assignmentRules.groupId, id));
   const error = typeof sp.error === "string" ? sp.error : null;
   const added = typeof sp.added === "string" ? `Added ${sp.added} student${sp.added === "1" ? "" : "s"}${sp.already && sp.already !== "0" ? `; ${sp.already} already in the group` : ""}. Their courses were re-checked.` : null;
 

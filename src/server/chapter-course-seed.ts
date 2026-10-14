@@ -1,14 +1,9 @@
-// Creates the starting data for the five Class 11 chapter courses: each course through ensureCourse (course, skills,
-// default and covered versions, draft rule), plus the covered-route lessons from content/chapter-courses/covered.
-// Nothing is published until an admin does it (publishVersion), and nothing an admin has edited is overwritten.
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
 import * as schema from "../db/schema";
 import { CHAPTER_COURSES, coveredVersionId } from "../content/chapter-courses";
 import { ensureCourse, type Db } from "./course-builder";
-
-export { COVERED_PRIORITY, ruleName } from "./course-builder";
 
 export async function seedChapterCourses(db: Db, root = process.cwd()) {
   const added = { courses: 0, versions: 0, lessons: 0, rules: 0, missingLessons: [] as string[] };

@@ -4,13 +4,12 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { courses, courseSkills, courseVersions } from "@/db/schema";
 import { CBSE_CHAPTERS } from "@/content/cbse-chapters";
-import { DOMAINS, SKILLS } from "@/content/taxonomy";
+import { DOMAINS, SKILLS, skillsIn } from "@/content/taxonomy";
+import { input, label } from "@/app/admin/form-styles";
 import { requireAdmin } from "@/server/admin";
 import { saveCourseAction } from "../../actions";
 
 export const metadata = { title: "Course" };
-const label = "flex flex-col gap-1 text-sm font-medium";
-const input = "min-h-11 rounded-md border bg-background px-3 text-sm font-normal";
 
 export default async function CoursePage({ params, searchParams }: PageProps<"/admin/assignments/courses/[id]">) {
   await requireAdmin();
@@ -69,8 +68,9 @@ export default async function CoursePage({ params, searchParams }: PageProps<"/a
             {domainIds.map((d) => (
               <div key={d} className="flex flex-col gap-2 rounded-lg border p-3">
                 <p className="text-sm font-medium">{DOMAINS[d as keyof typeof DOMAINS]?.name ?? d}</p>
-                {SKILLS.filter((s) => s.domain === d).map((s) => {
-                  const other = owners.get(s.id) && owners.get(s.id) !== id ? owners.get(s.id) : null;
+                {skillsIn(d).map((s) => {
+                  const owner = owners.get(s.id);
+                  const other = owner && owner !== id ? owner : null;
                   return (
                     <label key={s.id} className={`flex items-start gap-2 text-sm ${other ? "text-muted-foreground" : ""}`}>
                       <input type="checkbox" name="skills" value={s.id} defaultChecked={mine.has(s.id)} disabled={!!other} className="mt-1" />

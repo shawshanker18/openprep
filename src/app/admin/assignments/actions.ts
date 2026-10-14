@@ -4,8 +4,8 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/server/admin";
 import { RULE_SLOTS, publishVersion, saveCourse, resetVersionLesson, saveRule, saveVersion, saveVersionLesson, setRuleStatus } from "@/server/assignment-admin";
+import { note } from "@/server/form-note";
 
-/** Every privileged action checks admin rights first, before reading its input, so a non-admin never reaches the database. */
 function ruleFromForm(form: FormData) {
   return {
     id: form.get("id") || undefined,
@@ -21,8 +21,6 @@ function ruleFromForm(form: FormData) {
     effectiveUntil: String(form.get("effectiveUntil") ?? ""),
   };
 }
-
-const note = (problems: { message: string }[]) => encodeURIComponent(problems.map((p) => p.message).join(" · ").slice(0, 400));
 
 export async function saveRuleAction(form: FormData) {
   const { adminId } = await requireAdmin();

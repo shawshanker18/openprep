@@ -1,5 +1,3 @@
-// Course assignment end to end on real Postgres (PGlite, all migrations applied): rules, publishing, history,
-// reassignment, fallbacks and impact previews. Every check reads the database, not just the return value.
 import fs from "node:fs";
 import path from "node:path";
 import { beforeAll, describe, expect, it, vi } from "vitest";
@@ -18,9 +16,9 @@ const studentAssignment = async (id: string) => (await studentAssignments(id)).f
 const { saveRule, setRuleStatus, saveVersion, previewRuleImpact } = await import("./assignment-admin");
 
 const ADMIN = "00000000-0000-4000-8000-00000000ad01";
-const A = "00000000-0000-4000-8000-00000000a001"; // completed 9-polynomials
-const B = "00000000-0000-4000-8000-00000000a002"; // completed 9-a and 10-a
-const C = "00000000-0000-4000-8000-00000000a003"; // nothing completed
+const A = "00000000-0000-4000-8000-00000000a001";
+const B = "00000000-0000-4000-8000-00000000a002";
+const C = "00000000-0000-4000-8000-00000000a003";
 const rule = (over: Record<string, unknown> = {}) => ({
   name: "Rule", description: "", status: "live", priority: "10", targetVersionId: "v1", op: "all", chapters: ["cbse-9-polynomials"], ...over,
 });
@@ -117,7 +115,6 @@ describe("assignment and history", () => {
   it("with no rule left for a student, they move to the fallback version", async () => {
     await saveVersion(ADMIN, { id: "v2", courseId: "math-start", name: "Version 2", status: "published", isFallback: "on" });
     await setRuleStatus(ADMIN, await ruleId("Move A"), "disabled");
-    // "Nine A" also matches student A, so it has to go too before A has no rule left.
     await setRuleStatus(ADMIN, await ruleId("Nine A"), "disabled");
     expect(await studentAssignment(A)).toMatchObject({ versionId: "v2", outcome: "fallback" });
     expect(await studentAssignment(C)).toMatchObject({ versionId: "v2", outcome: "fallback" });

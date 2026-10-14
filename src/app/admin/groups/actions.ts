@@ -5,9 +5,8 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireAdmin } from "@/server/admin";
 import { addMembers, deleteGroup, removeMember, saveGroup, userIdsByEmail } from "@/server/groups";
+import { note } from "@/server/form-note";
 
-/** Every privileged action checks admin rights first, before reading its input, so a non-admin never reaches the database. */
-const note = (problems: { message: string }[]) => encodeURIComponent(problems.map((p) => p.message).join(" · ").slice(0, 400));
 const idOf = (form: FormData) => { const id = String(form.get("id") ?? ""); return z.uuid().safeParse(id).success ? id : ""; };
 
 export async function saveGroupAction(form: FormData) {

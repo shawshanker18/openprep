@@ -20,7 +20,6 @@ export default async function StartPage() {
   const done = steps.filter((s) => s.status === "done").length;
   const skipped = steps.filter((s) => s.status === "skipped").length;
   const allGroups = [...new Set(steps.map((s) => s.group))];
-  // One page: Maths and English are sections of the same list, so switching between them never reloads anything.
   const mathGroups = allGroups.filter((g) => !isGettingStarted(g) && !isEnglish(g));
   const englishGroups = allGroups.filter((g) => !isGettingStarted(g) && isEnglish(g));
   const orientation = steps.filter((s) => isGettingStarted(s.group));

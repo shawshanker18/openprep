@@ -1,16 +1,11 @@
-// User groups: named sets of students that a course assignment rule can be limited to (a class, a cohort, a pilot).
-// Callers must have checked admin rights already (see app/admin/groups/actions.ts). Changing who is in a group
-// re-checks those students' courses straight away, so a rule scoped to the group takes effect without a manual run.
 import "server-only";
 import { and, asc, count, eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db";
 import { assignmentRules, profiles, userGroupMembers, userGroups } from "@/db/schema";
 import { audit, userDirectory } from "@/server/admin";
+import type { Ok } from "@/server/assignment-admin";
 import { refreshCourseAssignment } from "@/server/course-assignment";
-
-export type Problem = { field: string; message: string };
-type Ok<T> = { ok: true; value: T } | { ok: false; problems: Problem[] };
 
 export const MAX_ADD_AT_ONCE = 500;
 
@@ -20,7 +15,6 @@ const Group = z.object({
   description: z.string().trim().max(500).default(""),
 });
 
-/** Create a group, or rename/describe an existing one. Names are unique ignoring case. */
 export async function saveGroup(adminId: string, form: unknown): Promise<Ok<{ id: string }>> {
   const parsed = Group.safeParse(form);
   if (!parsed.success) return { ok: false, problems: parsed.error.issues.map((i) => ({ field: String(i.path[0] ?? "form"), message: i.message })) };
@@ -38,7 +32,6 @@ export async function saveGroup(adminId: string, form: unknown): Promise<Ok<{ id
   return { ok: true, value: { id: created!.id } };
 }
 
-/** Delete a group. Refused while any rule (even a disabled one) names it, so a rule never silently widens to everyone. */
 export async function deleteGroup(adminId: string, id: string): Promise<Ok<{ members: number }>> {
   const [used] = await db.select({ n: count() }).from(assignmentRules).where(eq(assignmentRules.groupId, id));
   if (used!.n > 0) return { ok: false, problems: [{ field: "id", message: `${used!.n} rule${used!.n === 1 ? " uses" : "s use"} this group. Change or delete ${used!.n === 1 ? "it" : "them"} first.` }] };
@@ -49,7 +42,6 @@ export async function deleteGroup(adminId: string, id: string): Promise<Ok<{ mem
   return { ok: true, value: { members: members!.n } };
 }
 
-/** Add students to a group by user id. Unknown ids are skipped and counted. Those students are re-checked at once. */
 export async function addMembers(adminId: string, groupId: string, userIds: string[]): Promise<Ok<{ added: number; skipped: number }>> {
   const [group] = await db.select({ id: userGroups.id }).from(userGroups).where(eq(userGroups.id, groupId));
   if (!group) return { ok: false, problems: [{ field: "id", message: "Group not found" }] };
@@ -83,7 +75,6 @@ export async function groupMemberIds(groupId: string) {
     .where(eq(userGroupMembers.groupId, groupId)).orderBy(asc(userGroupMembers.addedAt)).limit(1000));
 }
 
-/** Emails pasted by an admin (one per line, commas or spaces also work) turned into user ids. Unknown emails are returned, not guessed. */
 export async function userIdsByEmail(raw: string): Promise<{ ids: string[]; missing: string[]; tooMany: boolean }> {
   const emails = [...new Set(raw.split(/[\s,;]+/).map((e) => e.trim().toLowerCase()).filter((e) => e.includes("@")))];
   const ids: string[] = [], missing: string[] = [];

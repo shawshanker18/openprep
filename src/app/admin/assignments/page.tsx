@@ -3,9 +3,9 @@ import { count } from "drizzle-orm";
 import { db } from "@/db";
 import { courses, courseSkills, studentCourseAssignments } from "@/db/schema";
 import { CBSE_CHAPTERS } from "@/content/cbse-chapters";
-import { findConflicts } from "@/engine/assignment";
+import { exprChapters, findConflicts } from "@/engine/assignment";
 import { requireAdmin } from "@/server/admin";
-import { conditionChapters, loadCatalogData } from "@/server/course-assignment";
+import { loadCatalogData } from "@/server/course-assignment";
 import { listGroups } from "@/server/groups";
 import { saveVersionAction } from "./actions";
 
@@ -18,13 +18,17 @@ export default async function AssignmentsPage({ searchParams }: PageProps<"/admi
   const sp = await searchParams;
   const status = STATUS_FILTER.includes(sp.status as never) ? (sp.status as (typeof STATUS_FILTER)[number]) : "all";
   const q = typeof sp.q === "string" ? sp.q.trim().slice(0, 100).toLowerCase() : "";
-  const data = await loadCatalogData();
-  const perVersion = new Map((await db.select({ versionId: studentCourseAssignments.versionId, n: count() }).from(studentCourseAssignments)
-    .groupBy(studentCourseAssignments.versionId)).map((r) => [r.versionId, r.n]));
-  const courseRows = await db.select().from(courses).orderBy(courses.title);
-  const skillCount = new Map((await db.select({ courseId: courseSkills.courseId, n: count() }).from(courseSkills).groupBy(courseSkills.courseId)).map((r) => [r.courseId, r.n]));
+  const [data, perVersionRows, courseRows, skillCountRows, groups] = await Promise.all([
+    loadCatalogData(),
+    db.select({ versionId: studentCourseAssignments.versionId, n: count() }).from(studentCourseAssignments).groupBy(studentCourseAssignments.versionId),
+    db.select().from(courses).orderBy(courses.title),
+    db.select({ courseId: courseSkills.courseId, n: count() }).from(courseSkills).groupBy(courseSkills.courseId),
+    listGroups(),
+  ]);
+  const perVersion = new Map(perVersionRows.map((r) => [r.versionId, r.n]));
+  const skillCount = new Map(skillCountRows.map((r) => [r.courseId, r.n]));
   const courseTitle = new Map(courseRows.map((c) => [c.id, c.title]));
-  const groupName = new Map((await listGroups()).map((g) => [g.id, g.name]));
+  const groupName = new Map(groups.map((g) => [g.id, g.name]));
   const nameOf = new Map(data.ruleRows.map((r) => [r.id, r.name]));
   const conflicts = findConflicts(data.rules);
   const rules = data.ruleRows.filter((r) => (status === "all" || r.status === status) && (!q || r.name.toLowerCase().includes(q)));
@@ -124,7 +128,7 @@ export default async function AssignmentsPage({ searchParams }: PageProps<"/admi
         {rules.length === 0 ? <p className="text-sm text-muted-foreground">No rules match. Create one, or clear the filters.</p> : (
           <ul className="flex flex-col divide-y rounded-xl border">
             {rules.map((r) => {
-              const chapters = conditionChapters(r.condition as never);
+              const chapters = exprChapters(r.condition);
               const target = data.versionRows.find((v) => v.id === r.targetVersionId)?.name ?? r.targetVersionId;
               return (
                 <li key={r.id} className="flex flex-col gap-1 p-4 text-sm">

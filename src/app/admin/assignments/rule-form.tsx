@@ -1,5 +1,5 @@
-// The rule editor. Server-rendered and works without JavaScript: eight chapter slots, all-of or any-of, and a date window.
 import { CBSE_CHAPTERS } from "@/content/cbse-chapters";
+import { input, label } from "@/app/admin/form-styles";
 import { RULE_SLOTS } from "@/server/assignment-admin";
 import { saveRuleAction } from "./actions";
 
@@ -11,8 +11,6 @@ export type VersionOption = { id: string; name: string; published: boolean };
 export type GroupOption = { id: string; name: string };
 
 const iso = (v?: string) => (v ? v.slice(0, 16) : "");
-const label = "flex flex-col gap-1 text-sm font-medium";
-const input = "min-h-11 rounded-md border bg-background px-3 text-sm font-normal";
 
 export function RuleForm({ values, versions, groups, error }: { values: RuleFormValues; versions: VersionOption[]; groups: GroupOption[]; error?: string }) {
   const grades = [9, 10, 11, 12] as const;

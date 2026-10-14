@@ -1,4 +1,3 @@
-// User groups and admin-made courses end to end on real Postgres (PGlite, all migrations applied).
 import fs from "node:fs";
 import path from "node:path";
 import { beforeAll, describe, expect, it, vi } from "vitest";
@@ -24,7 +23,7 @@ const { seedChapterCourses } = await import("./chapter-course-seed");
 const ADMIN = "00000000-0000-4000-8000-00000000ad01";
 const ANN = EMAILS["ann@example.com"]!;
 const BOB = EMAILS["bob@example.com"]!;
-const CY = "00000000-0000-4000-8000-00000000c003"; // not in any group
+const CY = "00000000-0000-4000-8000-00000000c003";
 const routeOf = async (id: string, course: string) => (await studentAssignments(id)).find((a) => a.courseId === course)?.versionId;
 
 beforeAll(async () => {
@@ -76,7 +75,6 @@ describe("making a course", () => {
     await db.delete(schema.courseVersionLessons).where(eq(schema.courseVersionLessons.skillId, "m-alg-lin2"));
     expect(await edit(["m-alg-linfunc"])).toMatchObject({ ok: true, value: { created: false } });
     expect((await db.select().from(schema.courseSkills).where(eq(schema.courseSkills.courseId, "straight-lines"))).map((r) => r.skillId)).toEqual(["m-alg-linfunc"]);
-    // the freed skill can now belong to another course
     expect(await saveCourse(ADMIN, { id: "extra", title: "Extra", skills: ["m-alg-lin2"] })).toMatchObject({ ok: true, value: { created: true } });
   });
 

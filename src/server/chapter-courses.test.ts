@@ -1,5 +1,3 @@
-// Chapter courses end to end on real Postgres (PGlite, all migrations applied): seeding, publishing, one version of
-// every course per student, independence between chapters, and the lesson a student actually reads.
 import fs from "node:fs";
 import path from "node:path";
 import { beforeAll, describe, expect, it, vi } from "vitest";
@@ -19,10 +17,10 @@ const { getStudentLesson } = await import("./course-lessons");
 const { seedChapterCourses } = await import("./chapter-course-seed");
 
 const ADMIN = "00000000-0000-4000-8000-00000000ad01";
-const LINES = "00000000-0000-4000-8000-00000000b001"; // finished Straight Lines only
-const FUNCS = "00000000-0000-4000-8000-00000000b002"; // finished Relations and Functions only
-const NONE = "00000000-0000-4000-8000-00000000b003"; // finished nothing
-const BOTH = "00000000-0000-4000-8000-00000000b004"; // finished both
+const LINES = "00000000-0000-4000-8000-00000000b001";
+const FUNCS = "00000000-0000-4000-8000-00000000b002";
+const NONE = "00000000-0000-4000-8000-00000000b003";
+const BOTH = "00000000-0000-4000-8000-00000000b004";
 const routeOf = async (id: string, course: string) => (await studentAssignments(id)).find((a) => a.courseId === course)?.versionId;
 
 beforeAll(async () => {
@@ -48,7 +46,7 @@ describe("seeding", () => {
 
   it("creates a default and a covered version, the covered lessons and a draft rule for each of the five courses", async () => {
     const added = await seedChapterCourses(db as never);
-    expect(added).toMatchObject({ courses: 0, versions: 10, lessons: 8, rules: 5, missingLessons: [] }); // migration 0024 already created the courses
+    expect(added).toMatchObject({ courses: 0, versions: 10, lessons: 8, rules: 5, missingLessons: [] });
     const versions = await db.select().from(schema.courseVersions);
     expect(versions.filter((v) => v.isFallback).map((v) => v.id).sort()).toEqual([
       "conic-sections-default", "relations-functions-default", "statistics-default", "straight-lines-default", "trig-functions-default",

@@ -1,6 +1,3 @@
-// The lesson a student reads for a skill that belongs to a course: the text saved for the version they are on, or null
-// when there is none (the caller then shows the built-in lesson file). Only published versions are used, and only for
-// the course that owns the skill.
 import "server-only";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";

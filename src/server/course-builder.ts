@@ -1,7 +1,3 @@
-// Making a chapter course: the course itself, the skills whose lessons it owns, a published default version (its
-// fallback), a covered version in draft, and a draft rule that sends students who finished the chapter to it.
-// Shared by the admin "new course" form and the seed script. Every insert skips what already exists, so running it
-// again never overwrites an admin's edits. No "server-only" import: the seed script runs it outside Next.
 import { and, eq } from "drizzle-orm";
 import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
 import * as schema from "../db/schema";
@@ -16,10 +12,9 @@ export const ruleName = (courseTitle: string) => `${courseTitle}: covered at sch
 export type CourseSpec = { id: string; title: string; chapterId: string | null; skills: string[] };
 
 export async function ensureCourse(db: Db, spec: CourseSpec) {
-  const added = { course: false, versions: 0, skills: 0, rule: false };
+  const added = { course: false, versions: 0, rule: false };
   added.course = (await db.insert(courses).values({ id: spec.id, title: spec.title, chapterId: spec.chapterId }).onConflictDoNothing().returning({ id: courses.id })).length > 0;
-  for (const skillId of spec.skills)
-    added.skills += (await db.insert(courseSkills).values({ skillId, courseId: spec.id }).onConflictDoNothing().returning({ id: courseSkills.skillId })).length;
+  if (spec.skills.length) await db.insert(courseSkills).values(spec.skills.map((skillId) => ({ skillId, courseId: spec.id }))).onConflictDoNothing();
 
   const covered = coveredVersionId(spec.id);
   added.versions += (await db.insert(courseVersions).values([

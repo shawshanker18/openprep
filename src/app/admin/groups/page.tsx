@@ -1,11 +1,10 @@
 import Link from "next/link";
 import { requireAdmin } from "@/server/admin";
+import { input, label } from "@/app/admin/form-styles";
 import { listGroups } from "@/server/groups";
 import { saveGroupAction } from "./actions";
 
 export const metadata = { title: "Groups" };
-const label = "flex flex-col gap-1 text-sm font-medium";
-const input = "min-h-11 rounded-md border bg-background px-3 text-sm font-normal";
 
 export default async function GroupsPage({ searchParams }: PageProps<"/admin/groups">) {
   await requireAdmin();

@@ -1,5 +1,3 @@
-// 
-// writes are covered by server-side tests once that layer exists.
 import { describe, expect, it } from "vitest";
 import {
   evaluateAssignment, exprProblem, priorityTies, validateRule, type AssignmentRule, type ChapterInfo, type CourseVersionInfo, type EvaluationInput,

@@ -1,15 +1,3 @@
-// CBSE chapter-aware course assignment: a pure, deterministic evaluator. No database access here, so every
-// rule is unit-tested on its own. Persistence, admin editing and the publish lifecycle live in the server layer.
-//
-// Policy, in one place:
-//  1. Only rules that are active, inside their effective window, and valid (every chapter they name exists and is active,
-//     and the target course version is published) can match. Invalid rules never match and are reported, never guessed around.
-//  2. A rule matches when the student is in its group (if it names one) and its chapter condition (if it has one) is
-//     true for the student's completed chapters. A rule needs at least a group or a condition.
-//  3. Several matches: the highest `priority` wins. Equal priority: the lower rule id wins. The result is always the same
-//     for the same input, however the rules were listed.
-//  4. Other matches are reported as shadowed, so an admin can see what a rule hides.
-//  5. No match: the explicit fallback version if one is configured, otherwise "unresolved". Nothing is invented.
 
 export type Expr =
   | { chapter: string }
@@ -20,14 +8,10 @@ export type AssignmentRule = {
   id: string;
   name: string;
   active: boolean;
-  /** Higher wins when several rules match. */
   priority: number;
   targetVersionId: string;
-  /** Chapter condition. Null = no chapter condition; such a rule must name a group. */
   when: Expr | null;
-  /** Only members of this group can match. Null/undefined = every student. */
   audienceGroupId?: string | null;
-  /** Inclusive start and exclusive end of the rule's effective window, as ISO dates or instants. Null = open-ended. */
   effectiveFrom?: string | null;
   effectiveUntil?: string | null;
 };
@@ -43,14 +27,11 @@ export type RuleIssue =
   | { ruleId: string; issue: "inactive_version"; versionId: string };
 
 export type EvaluationInput = {
-  /** Chapter ids the student has completed. */
   completed: readonly string[];
-  /** Ids of the groups the student belongs to. */
   groupIds?: readonly string[];
   chapters: readonly ChapterInfo[];
   versions: readonly CourseVersionInfo[];
   rules: readonly AssignmentRule[];
-  /** Explicit fallback course version, used only when no rule matches. */
   fallbackVersionId?: string | null;
   now: Date;
 };
@@ -60,9 +41,7 @@ export type EvaluationResult =
       outcome: "assigned";
       versionId: string;
       ruleId: string;
-      /** Every valid rule that matched, winner first. */
       matchedRuleIds: string[];
-      /** Matched rules that lost to the winner (same version or not). Shown so admins can see what is hidden. */
       shadowedRuleIds: string[];
       reason: string;
       issues: RuleIssue[];
@@ -70,7 +49,6 @@ export type EvaluationResult =
   | { outcome: "fallback"; versionId: string; reason: string; issues: RuleIssue[] }
   | { outcome: "unresolved"; reason: string; issues: RuleIssue[] };
 
-/** Limits so a malformed or hostile rule cannot cost unbounded work. Enforced again on save. */
 export const MAX_EXPR_DEPTH = 5;
 export const MAX_EXPR_NODES = 60;
 
@@ -81,7 +59,6 @@ export function exprChapters(expr: Expr | null): string[] {
   return kids.flatMap(exprChapters);
 }
 
-/** Structural check: non-empty groups, bounded depth and size. Returns a problem description, or null when fine. */
 export function exprProblem(expr: Expr): string | null {
   let nodes = 0;
   const walk = (e: Expr, depth: number): string | null => {
@@ -99,7 +76,6 @@ export function exprProblem(expr: Expr): string | null {
   return walk(expr, 1);
 }
 
-/** Whether an expression is true for the set of completed chapters. */
 export function evaluateExpr(expr: Expr, completed: ReadonlySet<string>): boolean {
   if ("chapter" in expr) return completed.has(expr.chapter);
   if ("all" in expr) return expr.all.every((e) => evaluateExpr(e, completed));
@@ -112,7 +88,6 @@ const inWindow = (r: AssignmentRule, now: Date) => {
   return now.getTime() >= from && now.getTime() < until;
 };
 
-/** Check one rule against the catalogue. Returns every problem found, so the admin sees them all at once. */
 export function validateRule(rule: AssignmentRule, input: Pick<EvaluationInput, "chapters" | "versions">): RuleIssue[] {
   const issues: RuleIssue[] = [];
   const problem = rule.when ? exprProblem(rule.when) : rule.audienceGroupId ? null : "a rule needs a chapter condition or a group";
@@ -137,7 +112,6 @@ export function evaluateAssignment(input: EvaluationInput): EvaluationResult {
   const issues: RuleIssue[] = [];
   const candidates: AssignmentRule[] = [];
 
-  // Stable order before anything else, so the outcome never depends on how the caller listed the rules.
   const rules = [...input.rules].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
   for (const rule of rules) {
     if (!rule.active || !inWindow(rule, input.now)) continue;
@@ -170,17 +144,12 @@ export function evaluateAssignment(input: EvaluationInput): EvaluationResult {
   };
 }
 
-/**
- * Find ties on priority among the matched rules, which an admin should resolve. Ties still resolve deterministically
- * (lower id wins), but the warning says the choice is arbitrary as far as the product is concerned.
- */
 export function priorityTies(rules: readonly AssignmentRule[]): string[][] {
   const byPriority = new Map<number, string[]>();
   for (const r of rules) byPriority.set(r.priority, [...(byPriority.get(r.priority) ?? []), r.id]);
   return [...byPriority.values()].filter((ids) => ids.length > 1);
 }
 
-/** A condition's canonical text, so two rules written in a different order still compare as the same condition. */
 export function canonicalExpr(expr: Expr | null): string {
   if (!expr) return "(any)";
   if ("chapter" in expr) return expr.chapter;
@@ -189,11 +158,6 @@ export function canonicalExpr(expr: Expr | null): string {
   return `${op}(${kids.join(",")})`;
 }
 
-/**
- * Problems an admin should see before a rule goes live. Shown beside the rule, never blocking a save of a draft.
- * - the same condition and group under two rules with different targets: a student can only get one of them, so one is hidden
- * - the same priority on rules that both match: resolved by rule id, which is arbitrary from the product's point of view
- */
 export function findConflicts(rules: readonly AssignmentRule[]): { kind: "same_condition" | "priority_tie"; ruleIds: string[] }[] {
   const live = rules.filter((r) => r.active);
   const out: { kind: "same_condition" | "priority_tie"; ruleIds: string[] }[] = [];
