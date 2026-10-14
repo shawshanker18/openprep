@@ -162,6 +162,13 @@
       "when": 1791787909990,
       "tag": "0022_cbse_course_assignment",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1791957732380,
+      "tag": "0023_chapter_courses",
+      "breakpoints": true
     }
   ]
 }

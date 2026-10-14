@@ -4,18 +4,34 @@ import path from "node:path";
 import matter from "gray-matter";
 import { SKILL_BY_ID } from "@/content/taxonomy";
 
+export type Lesson = { minutes: number | null; sections: { heading: string; md: string }[] };
+
+/** Split lesson markdown (without frontmatter) into its `##` sections. The "fast way" section is not shown in lessons. */
+export function lessonFromBody(content: string, minutes: number | null): Lesson {
+  const sections = content.split(/^## /m).slice(1).map((chunk) => {
+    const nl = chunk.indexOf("\n");
+    return { heading: chunk.slice(0, nl).trim(), md: chunk.slice(nl + 1).trim() };
+  });
+  return { minutes, sections: sections.filter(s => !/^The fast way/i.test(s.heading)) };
+}
+
 /** Lesson split into its `##` sections, or null if not written yet. Only known skill ids reach the filesystem. */
-export async function getLesson(skillId: string) {
+export async function getLesson(skillId: string): Promise<Lesson | null> {
   if (!SKILL_BY_ID[skillId]) return null;
   let raw: string;
   try { raw = await fs.readFile(path.join(process.cwd(), "content", "lessons", `${skillId}.md`), "utf8"); }
   catch { return null; }
   const { data, content } = matter(raw);
-  const sections = content.split(/^## /m).slice(1).map((chunk) => {
-    const nl = chunk.indexOf("\n");
-    return { heading: chunk.slice(0, nl).trim(), md: chunk.slice(nl + 1).trim() };
-  });
-  return { minutes: Number(data.minutes) || null, sections: sections.filter(s => !/^The fast way/i.test(s.heading)) };
+  return lessonFromBody(content, Number(data.minutes) || null);
+}
+
+/** The built-in lesson's raw `##` text and minutes, as the starting point when an admin customises a course version. */
+export async function getLessonSource(skillId: string): Promise<{ body: string; minutes: number | null } | null> {
+  if (!SKILL_BY_ID[skillId]) return null;
+  try {
+    const { data, content } = matter(await fs.readFile(path.join(process.cwd(), "content", "lessons", `${skillId}.md`), "utf8"));
+    return { body: content.trim(), minutes: Number(data.minutes) || null };
+  } catch { return null; }
 }
 
 export async function lessonExists(skillId: string) {

@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/server/admin";
-import { RULE_SLOTS, saveRule, saveVersion, setRuleStatus } from "@/server/assignment-admin";
+import { RULE_SLOTS, publishVersion, resetVersionLesson, saveRule, saveVersion, saveVersionLesson, setRuleStatus } from "@/server/assignment-admin";
 
 /** Every privileged action checks admin rights first, before reading its input, so a non-admin never reaches the database. */
 function ruleFromForm(form: FormData) {
@@ -48,4 +48,34 @@ export async function saveVersionAction(form: FormData) {
   revalidatePath("/admin/assignments", "layout");
   if (!r.ok) redirect(`/admin/assignments?error=${note(r.problems)}`);
   redirect(`/admin/assignments?saved=${encodeURIComponent(r.value.id)}`);
+}
+
+export async function saveVersionLessonAction(form: FormData) {
+  const { adminId } = await requireAdmin();
+  const versionId = String(form.get("versionId") ?? "");
+  const skillId = String(form.get("skillId") ?? "");
+  const r = await saveVersionLesson(adminId, { versionId, skillId, body: String(form.get("body") ?? ""), minutes: String(form.get("minutes") ?? "") });
+  revalidatePath("/admin/assignments", "layout");
+  const here = `/admin/assignments/versions/${encodeURIComponent(versionId)}`;
+  if (!r.ok) redirect(`${here}?error=${note(r.problems)}#${encodeURIComponent(skillId)}`);
+  redirect(`${here}?saved=${encodeURIComponent(skillId)}#${encodeURIComponent(skillId)}`);
+}
+
+export async function resetVersionLessonAction(form: FormData) {
+  const { adminId } = await requireAdmin();
+  const versionId = String(form.get("versionId") ?? "");
+  const skillId = String(form.get("skillId") ?? "");
+  await resetVersionLesson(adminId, versionId, skillId);
+  revalidatePath("/admin/assignments", "layout");
+  redirect(`/admin/assignments/versions/${encodeURIComponent(versionId)}?reset=${encodeURIComponent(skillId)}#${encodeURIComponent(skillId)}`);
+}
+
+export async function publishVersionAction(form: FormData) {
+  const { adminId } = await requireAdmin();
+  const versionId = String(form.get("versionId") ?? "");
+  const r = await publishVersion(adminId, versionId);
+  revalidatePath("/admin/assignments", "layout");
+  const here = `/admin/assignments/versions/${encodeURIComponent(versionId)}`;
+  if (!r.ok) redirect(`${here}?error=${note(r.problems)}`);
+  redirect(`${here}?${new URLSearchParams({ published: String(r.value.rules), checked: String(r.value.evaluated), changed: String(r.value.changed), ...(r.value.capped ? { capped: "1" } : {}) })}`);
 }

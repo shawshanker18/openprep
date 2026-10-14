@@ -2,7 +2,7 @@
 // this module loads the data, stores the outcome, and keeps history. It never writes lesson_progress: reassigning a
 // student changes which course version they are on, not what they have already finished.
 import "server-only";
-import { asc, eq, gt, sql } from "drizzle-orm";
+import { and, asc, eq, gt, sql } from "drizzle-orm";
 import { db, type Tx } from "@/db";
 import { assignmentHistory, assignmentRules, courseVersions, profiles, studentCourseAssignments } from "@/db/schema";
 import { CBSE_CHAPTERS } from "@/content/cbse-chapters";
@@ -32,13 +32,29 @@ export async function loadCatalogData(client: Pick<typeof db, "select"> = db) {
     client.select().from(courseVersions).orderBy(asc(courseVersions.id)),
   ]);
   const versions = versionRows.map(toVersion);
-  const fallback = versionRows.find((v) => v.isFallback && v.status === "published")?.id ?? null;
-  return { rules: ruleRows.map(toRule), versions, fallbackVersionId: fallback, versionRows, ruleRows };
+  const courseOfVersion = new Map(versionRows.map((v) => [v.id, v.courseId]));
+  const courses = [...new Set(versionRows.map((v) => v.courseId))].sort();
+  const fallbackByCourse = new Map(versionRows.filter((v) => v.isFallback && v.status === "published").map((v) => [v.courseId, v.id]));
+  return { rules: ruleRows.map(toRule), versions, courses, courseOfVersion, fallbackByCourse, versionRows, ruleRows };
 }
+type CatalogData = Awaited<ReturnType<typeof loadCatalogData>>;
 
-/** Pure decision for one student's chapters against loaded data. Used by evaluation, recalculation and previews alike. */
-export function decide(data: Awaited<ReturnType<typeof loadCatalogData>>, completed: readonly string[], now: Date, rules = data.rules): EvaluationResult {
-  return evaluateAssignment({ completed, chapters: chapterCatalog(), versions: data.versions, rules, fallbackVersionId: data.fallbackVersionId, now });
+/**
+ * Pure decision for one student's chapters against loaded data: one result per course, because a student has one version
+ * of every course. Rules and fallbacks only compete inside their own course. Used by evaluation, recalculation and previews.
+ */
+export function decide(data: CatalogData, completed: readonly string[], now: Date, rules = data.rules): Record<string, EvaluationResult> {
+  const out: Record<string, EvaluationResult> = {};
+  for (const courseId of data.courses) {
+    const inCourse = (versionId: string) => data.courseOfVersion.get(versionId) === courseId;
+    out[courseId] = evaluateAssignment({
+      completed, chapters: chapterCatalog(), now,
+      versions: data.versions.filter((v) => inCourse(v.id)),
+      rules: rules.filter((r) => inCourse(r.targetVersionId)),
+      fallbackVersionId: data.fallbackByCourse.get(courseId) ?? null,
+    });
+  }
+  return out;
 }
 
 const outcomeVersion = (r: EvaluationResult) => (r.outcome === "unresolved" ? null : r.versionId);
@@ -48,14 +64,15 @@ const outcomeRule = (r: EvaluationResult) => (r.outcome === "assigned" ? r.ruleI
  * Store a student's outcome. History gets a row only when the decision changed, so it reads as a list of decisions
  * rather than one row per re-check. Returns whether anything changed.
  */
-export async function persistOutcome(tx: Tx, userId: string, result: EvaluationResult, now: Date): Promise<boolean> {
-  const [current] = await tx.select().from(studentCourseAssignments).where(eq(studentCourseAssignments.userId, userId)).for("update");
+export async function persistOutcome(tx: Tx, userId: string, courseId: string, result: EvaluationResult, now: Date): Promise<boolean> {
+  const mine = and(eq(studentCourseAssignments.userId, userId), eq(studentCourseAssignments.courseId, courseId));
+  const [current] = await tx.select().from(studentCourseAssignments).where(mine).for("update");
   const version = outcomeVersion(result), rule = outcomeRule(result);
   const same = !!current && current.versionId === version && current.ruleId === rule && current.outcome === result.outcome;
   if (same) return false;
 
   await tx.insert(assignmentHistory).values({
-    userId, versionId: version, ruleId: rule, outcome: result.outcome, reason: result.reason,
+    userId, courseId, versionId: version, ruleId: rule, outcome: result.outcome, reason: result.reason,
     detail: {
       issues: result.issues,
       ...(result.outcome === "assigned" ? { matchedRuleIds: result.matchedRuleIds, shadowedRuleIds: result.shadowedRuleIds } : {}),
@@ -63,22 +80,31 @@ export async function persistOutcome(tx: Tx, userId: string, result: EvaluationR
     evaluatedAt: now,
   });
   if (version) {
-    await tx.insert(studentCourseAssignments).values({ userId, versionId: version, ruleId: rule, outcome: result.outcome, assignedAt: now, updatedAt: now })
-      .onConflictDoUpdate({ target: studentCourseAssignments.userId, set: { versionId: version, ruleId: rule, outcome: result.outcome, assignedAt: now, updatedAt: now } });
+    await tx.insert(studentCourseAssignments).values({ userId, courseId, versionId: version, ruleId: rule, outcome: result.outcome, assignedAt: now, updatedAt: now })
+      .onConflictDoUpdate({ target: [studentCourseAssignments.userId, studentCourseAssignments.courseId], set: { versionId: version, ruleId: rule, outcome: result.outcome, assignedAt: now, updatedAt: now } });
   } else if (current) {
-    await tx.delete(studentCourseAssignments).where(eq(studentCourseAssignments.userId, userId));
+    await tx.delete(studentCourseAssignments).where(mine);
   }
   return true;
 }
 
-/** Re-evaluate one student from their current chapters and store the result. Safe to call repeatedly. */
-export async function evaluateStudent(userId: string, now = new Date()): Promise<{ result: EvaluationResult; changed: boolean }> {
+/** Store a student's outcome for every course in one transaction. Returns whether any course changed. */
+async function persistAll(userId: string, results: Record<string, EvaluationResult>, now: Date): Promise<boolean> {
+  return db.transaction(async (tx) => {
+    let changed = false;
+    for (const [courseId, result] of Object.entries(results)) if (await persistOutcome(tx as unknown as Tx, userId, courseId, result, now)) changed = true;
+    return changed;
+  });
+}
+
+/** Re-evaluate one student from their current chapters and store the result for each course. Safe to call repeatedly. */
+export async function evaluateStudent(userId: string, now = new Date()): Promise<{ results: Record<string, EvaluationResult>; changed: boolean }> {
   const data = await loadCatalogData();
   const [profile] = await db.select({ chaptersDone: profiles.chaptersDone }).from(profiles).where(eq(profiles.id, userId));
   if (!profile) throw new Error("no profile for course assignment");
-  const result = decide(data, profile.chaptersDone, now);
-  const changed = await db.transaction((tx) => persistOutcome(tx as unknown as Tx, userId, result, now));
-  return { result, changed };
+  const results = decide(data, profile.chaptersDone, now);
+  const changed = await persistAll(userId, results, now);
+  return { results, changed };
 }
 
 /** Walk every student in id order, in batches, so memory stays bounded however many students there are. */
@@ -102,25 +128,25 @@ export async function recalculateAll(now = new Date(), limit = MAX_RECALC_STUDEN
   const data = await loadCatalogData();
   let evaluated = 0, changed = 0;
   for await (const s of students(db, limit)) {
-    const result = decide(data, s.chaptersDone, now);
-    if (await db.transaction((tx) => persistOutcome(tx as unknown as Tx, s.id, result, now))) changed++;
+    if (await persistAll(s.id, decide(data, s.chaptersDone, now), now)) changed++;
     evaluated++;
   }
   return { evaluated, changed, capped: evaluated >= limit };
 }
 
 /**
- * What would change if these rules were live: counts only, never student records. `proposed` is the complete rule set
- * as it would be after the change. Read-only.
+ * What would change if these rules were live, for one course: counts only, never student records. `proposed` is the
+ * complete rule set as it would be after the change. Read-only.
  */
-export async function previewImpact(proposed: AssignmentRule[], data?: Awaited<ReturnType<typeof loadCatalogData>>, now = new Date(), limit = MAX_RECALC_STUDENTS) {
+export async function previewImpact(proposed: AssignmentRule[], courseId: string, data?: CatalogData, now = new Date(), limit = MAX_RECALC_STUDENTS) {
   const base = data ?? (await loadCatalogData());
   const current = new Map((await db.select({ userId: studentCourseAssignments.userId, versionId: studentCourseAssignments.versionId })
-    .from(studentCourseAssignments)).map((r) => [r.userId, r.versionId]));
+    .from(studentCourseAssignments).where(eq(studentCourseAssignments.courseId, courseId))).map((r) => [r.userId, r.versionId]));
   const out = { students: 0, toNewVersion: 0, newlyAssigned: 0, becomesUnassigned: 0, unchanged: 0, capped: false };
   for await (const s of students(db, limit)) {
     out.students++;
-    const next = outcomeVersion(decide(base, s.chaptersDone, now, proposed));
+    const result = decide(base, s.chaptersDone, now, proposed)[courseId];
+    const next = result ? outcomeVersion(result) : null;
     const before = current.get(s.id) ?? null;
     if (next === before) out.unchanged++;
     else if (before === null) out.newlyAssigned++;
@@ -131,15 +157,16 @@ export async function previewImpact(proposed: AssignmentRule[], data?: Awaited<R
   return out;
 }
 
-/** The student's current course version and why, for the Start page. Null when nothing is assigned. */
-export async function studentAssignment(userId: string) {
-  const [row] = await db.select({ versionId: studentCourseAssignments.versionId, outcome: studentCourseAssignments.outcome, name: courseVersions.name, description: courseVersions.description, assignedAt: studentCourseAssignments.assignedAt })
+/** The student's current version of each course and why, for the Start page. Empty when nothing is assigned. */
+export async function studentAssignments(userId: string) {
+  const rows = await db.select({ courseId: studentCourseAssignments.courseId, versionId: studentCourseAssignments.versionId, outcome: studentCourseAssignments.outcome, name: courseVersions.name, description: courseVersions.description, assignedAt: studentCourseAssignments.assignedAt })
     .from(studentCourseAssignments).innerJoin(courseVersions, eq(courseVersions.id, studentCourseAssignments.versionId))
-    .where(eq(studentCourseAssignments.userId, userId));
-  if (!row) return null;
-  const [last] = await db.select({ reason: assignmentHistory.reason }).from(assignmentHistory)
-    .where(eq(assignmentHistory.userId, userId)).orderBy(sql`${assignmentHistory.evaluatedAt} desc`).limit(1);
-  return { ...row, reason: last?.reason ?? null };
+    .where(eq(studentCourseAssignments.userId, userId)).orderBy(asc(studentCourseAssignments.courseId));
+  return Promise.all(rows.map(async (row) => {
+    const [last] = await db.select({ reason: assignmentHistory.reason }).from(assignmentHistory)
+      .where(and(eq(assignmentHistory.userId, userId), eq(assignmentHistory.courseId, row.courseId))).orderBy(sql`${assignmentHistory.evaluatedAt} desc`).limit(1);
+    return { ...row, reason: last?.reason ?? null };
+  }));
 }
 
 /** Rule condition, in plain form, for the rule builder and previews. */

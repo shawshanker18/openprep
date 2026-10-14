@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { BrandBanner } from "@/components/brand";
 import { requireUser } from "@/server/auth";
 import { safely } from "@/lib/safely";
-import { studentAssignment } from "@/server/course-assignment";
+import { COURSE_BY_ID } from "@/content/chapter-courses";
+import { studentAssignments } from "@/server/course-assignment";
 import { GETTING_STARTED, scratchProgress } from "@/server/scratch";
 
 export const metadata = { title: "Start from scratch" };
@@ -16,7 +17,7 @@ const isGettingStarted = (group: string) => group === GETTING_STARTED;
 export default async function StartPage() {
   const { userId, profile } = await requireUser();
   const covered = likelyCoveredSkills(profile);
-  const [{ steps, next }, assigned] = await Promise.all([scratchProgress(userId), safely(() => studentAssignment(userId), null)]);
+  const [{ steps, next }, assigned] = await Promise.all([scratchProgress(userId), safely(() => studentAssignments(userId), [])]);
   const done = steps.filter((s) => s.status === "done").length;
   const skipped = steps.filter((s) => s.status === "skipped").length;
   const allGroups = [...new Set(steps.map((s) => s.group))];
@@ -77,11 +78,12 @@ export default async function StartPage() {
         </details>
       </div>
 
-      {assigned && (
-        <section aria-label="Your course version" className="rounded-xl border p-4 text-sm">
-          <p className="text-muted-foreground">Your course version</p>
-          <p className="font-medium">{assigned.name}</p>
-          {assigned.reason && <p className="mt-1 text-muted-foreground">{assigned.reason}</p>}
+      {assigned.length > 0 && (
+        <section aria-label="Your chapter routes" className="flex flex-col gap-2 rounded-xl border p-4 text-sm">
+          <p className="text-muted-foreground">Your routes through the Class 11 chapters</p>
+          <ul className="flex flex-col gap-1">
+            {assigned.map((a) => <li key={a.courseId}><span className="font-medium">{COURSE_BY_ID[a.courseId]?.title ?? a.courseId}</span>: {a.name}</li>)}
+          </ul>
         </section>
       )}
 

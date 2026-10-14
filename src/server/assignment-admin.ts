@@ -4,8 +4,9 @@ import "server-only";
 import { and, eq, ne } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db";
-import { assignmentRules, courseVersions } from "@/db/schema";
+import { assignmentRules, courseVersionLessons, courseVersions } from "@/db/schema";
 import { CBSE_CHAPTERS } from "@/content/cbse-chapters";
+import { COURSE_BY_ID } from "@/content/chapter-courses";
 import { audit } from "@/server/admin";
 import { exprProblem, validateRule, type AssignmentRule, type Expr } from "@/engine/assignment";
 import { chapterCatalog, loadCatalogData, previewImpact, recalculateAll, toRule } from "@/server/course-assignment";
@@ -152,11 +153,13 @@ export async function previewRuleImpact(id: string | null, form: unknown) {
     effectiveFrom: dateOrNull(input.effectiveFrom) instanceof Date ? (dateOrNull(input.effectiveFrom) as Date).toISOString() : null,
     effectiveUntil: dateOrNull(input.effectiveUntil) instanceof Date ? (dateOrNull(input.effectiveUntil) as Date).toISOString() : null,
   };
-  const impact = await previewImpact([...others, candidate], data);
+  const courseId = data.courseOfVersion.get(input.targetVersionId);
+  if (!courseId) return { ok: false as const, problems: [{ field: "targetVersionId", message: "That course version does not exist" }] };
+  const impact = await previewImpact([...others, candidate], courseId, data);
   return { ok: true as const, impact };
 }
 
-/** Create or edit a course version. Only one version can be the fallback, and only a published one can be. */
+/** Create or edit a course version. Each course has at most one fallback version, and only a published one can be. */
 export async function saveVersion(adminId: string, form: unknown): Promise<Ok<{ id: string }>> {
   const raw = form as Record<string, unknown>;
   const parsed = Version.safeParse({ ...raw, isFallback: raw.isFallback === "on" || raw.isFallback === true });
@@ -164,7 +167,7 @@ export async function saveVersion(adminId: string, form: unknown): Promise<Ok<{ 
   const v = parsed.data;
   if (v.isFallback && v.status !== "published") return { ok: false, problems: [{ field: "isFallback", message: "Only a published version can be the fallback" }] };
   await db.transaction(async (tx) => {
-    if (v.isFallback) await tx.update(courseVersions).set({ isFallback: false }).where(and(eq(courseVersions.isFallback, true), ne(courseVersions.id, v.id)));
+    if (v.isFallback) await tx.update(courseVersions).set({ isFallback: false }).where(and(eq(courseVersions.isFallback, true), eq(courseVersions.courseId, v.courseId), ne(courseVersions.id, v.id)));
     await tx.insert(courseVersions).values({ id: v.id, courseId: v.courseId, name: v.name, description: v.description, status: v.status, isFallback: v.isFallback })
       .onConflictDoUpdate({ target: courseVersions.id, set: { courseId: v.courseId, name: v.name, description: v.description, status: v.status, isFallback: v.isFallback, updatedAt: new Date() } });
   });
@@ -173,4 +176,65 @@ export async function saveVersion(adminId: string, form: unknown): Promise<Ok<{ 
   const run = await recalculateAll();
   await audit(adminId, "assignment.recalculate", v.id, { evaluated: run.evaluated, changed: run.changed, capped: run.capped });
   return { ok: true, value: { id: v.id } };
+}
+
+/** Lesson text for one skill of one version, as admins edit it: the `##` sections, with any pasted frontmatter removed. */
+const LessonText = z.object({
+  versionId: z.string().min(1),
+  skillId: z.string().min(1),
+  body: z.string().max(40_000, "Lesson is too long (40,000 characters at most)"),
+  minutes: z.union([z.literal(""), z.coerce.number().int().min(1).max(120)]).optional(),
+});
+
+export const stripFrontmatter = (md: string) => md.replace(/^\uFEFF?---\r?\n[\s\S]*?\r?\n---\r?\n?/, "").trim();
+
+/** Save the lesson a version teaches for one of its course's skills. Takes effect for students on that version at once. */
+export async function saveVersionLesson(adminId: string, form: unknown): Promise<Ok<{ versionId: string; skillId: string }>> {
+  const parsed = LessonText.safeParse(form);
+  if (!parsed.success) return { ok: false, problems: parsed.error.issues.map((i) => ({ field: String(i.path[0] ?? "form"), message: i.message })) };
+  const { versionId, skillId, minutes } = parsed.data;
+  const body = stripFrontmatter(parsed.data.body);
+  const [version] = await db.select().from(courseVersions).where(eq(courseVersions.id, versionId));
+  if (!version) return { ok: false, problems: [{ field: "versionId", message: "That course version does not exist" }] };
+  if (!COURSE_BY_ID[version.courseId]?.skills.includes(skillId)) return { ok: false, problems: [{ field: "skillId", message: "That skill is not part of this course" }] };
+  if (!/^## \S/m.test(body)) return { ok: false, problems: [{ field: "body", message: "Start each section with a \"## Heading\" line" }] };
+  const mins = typeof minutes === "number" ? minutes : null;
+  await db.insert(courseVersionLessons).values({ versionId, skillId, body, minutes: mins, updatedBy: adminId })
+    .onConflictDoUpdate({ target: [courseVersionLessons.versionId, courseVersionLessons.skillId], set: { body, minutes: mins, updatedBy: adminId, updatedAt: new Date() } });
+  await audit(adminId, "course_version.lesson_save", versionId, { skillId, chars: body.length });
+  return { ok: true, value: { versionId, skillId } };
+}
+
+/** Drop a version's own text for a skill, so it teaches the built-in lesson again. */
+export async function resetVersionLesson(adminId: string, versionId: string, skillId: string): Promise<Ok<{ removed: boolean }>> {
+  const gone = await db.delete(courseVersionLessons).where(and(eq(courseVersionLessons.versionId, versionId), eq(courseVersionLessons.skillId, skillId))).returning({ skillId: courseVersionLessons.skillId });
+  if (gone.length) await audit(adminId, "course_version.lesson_reset", versionId, { skillId });
+  return { ok: true, value: { removed: gone.length > 0 } };
+}
+
+/**
+ * Publish a course version and take its draft rules live in one step, then recalculate students once. This is the
+ * "go live" button for a chapter route: the version must be published before a rule may target it, so doing it by hand
+ * means two saves and two recalculations.
+ */
+export async function publishVersion(adminId: string, versionId: string): Promise<Ok<{ rules: number; evaluated: number; changed: number; capped: boolean }>> {
+  const [version] = await db.select().from(courseVersions).where(eq(courseVersions.id, versionId));
+  if (!version) return { ok: false, problems: [{ field: "id", message: "That course version does not exist" }] };
+  if (version.status === "retired") return { ok: false, problems: [{ field: "id", message: "A retired version cannot be published" }] };
+
+  // Check the draft rules as they would be once live, before anything is written.
+  const data = await loadCatalogData();
+  const versions = data.versions.map((v) => (v.id === versionId ? { ...v, published: true } : v));
+  const drafts = data.ruleRows.filter((r) => r.targetVersionId === versionId && r.status === "draft");
+  const problems = drafts.flatMap((r) => validateRule(toRule({ ...r, status: "live" }), { chapters: chapterCatalog(), versions }).map((i) => ({ field: "rule", message: `${r.name}: ${describeIssue(i)}` })));
+  if (problems.length) return { ok: false, problems };
+
+  await db.transaction(async (tx) => {
+    await tx.update(courseVersions).set({ status: "published", updatedAt: new Date() }).where(eq(courseVersions.id, versionId));
+    for (const r of drafts) await tx.update(assignmentRules).set({ status: "live", updatedBy: adminId, updatedAt: new Date() }).where(eq(assignmentRules.id, r.id));
+  });
+  await audit(adminId, "course_version.publish", versionId, { rules: drafts.length });
+  const run = await recalculateAll();
+  await audit(adminId, "assignment.recalculate", versionId, { evaluated: run.evaluated, changed: run.changed, capped: run.capped });
+  return { ok: true, value: { rules: drafts.length, ...run } };
 }

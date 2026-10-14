@@ -13,7 +13,8 @@ const db = drizzle(pg, { schema });
 vi.mock("@/db", () => ({ db }));
 vi.mock("@/server/admin", () => ({ audit: async () => {}, requireAdmin: async () => ({ adminId: ADMIN }) }));
 
-const { evaluateStudent, recalculateAll, studentAssignment } = await import("./course-assignment");
+const { evaluateStudent, recalculateAll, studentAssignments } = await import("./course-assignment");
+const studentAssignment = async (id: string) => (await studentAssignments(id)).find((a) => a.courseId === "math-start") ?? null;
 const { saveRule, setRuleStatus, saveVersion, previewRuleImpact } = await import("./assignment-admin");
 
 const ADMIN = "00000000-0000-4000-8000-00000000ad01";
@@ -66,7 +67,8 @@ describe("rules", () => {
 
   it("a draft does not change anyone's course until it is published", async () => {
     await saveRule(ADMIN, rule({ name: "Pending 9a", status: "draft", targetVersionId: "v2", chapters: ["cbse-9-polynomials"], priority: "50" }));
-    const { result } = await evaluateStudent(A);
+    const { results } = await evaluateStudent(A);
+    const result = results["math-start"]!;
     expect(result.outcome === "assigned" && result.versionId).not.toBe("v2");
   });
 });
@@ -84,7 +86,7 @@ describe("assignment and history", () => {
     const before = await historyCount(A);
     const first = await evaluateStudent(A);
     const second = await evaluateStudent(A);
-    expect(first.result).toEqual(second.result);
+    expect(first.results).toEqual(second.results);
     expect(second.changed).toBe(false);
     expect(await historyCount(A)).toBe(before);
   });

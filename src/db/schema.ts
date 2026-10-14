@@ -357,7 +357,25 @@ export const courseVersions = pgTable("course_versions", {
   updatedAt: ts("updated_at").notNull().defaultNow(),
 }, (t) => [
   check("course_versions_status_check", sql`${t.status} in ('draft', 'published', 'retired')`),
-  uniqueIndex("course_versions_one_fallback").on(t.isFallback).where(sql`${t.isFallback}`),
+  // One fallback per course (each chapter course has its own default version).
+  uniqueIndex("course_versions_one_fallback").on(t.courseId).where(sql`${t.isFallback}`),
+]).enableRLS();
+
+/**
+ * Lesson text a course version teaches in place of the built-in lesson file (content/lessons/<skill>.md). A version with
+ * no row for a skill teaches the built-in lesson, so a default version needs no rows until an admin customises one.
+ * `body` is the lesson's `##` sections, without frontmatter.
+ */
+export const courseVersionLessons = pgTable("course_version_lessons", {
+  versionId: text("version_id").notNull().references(() => courseVersions.id, { onDelete: "cascade" }),
+  skillId: text("skill_id").notNull(),
+  body: text("body").notNull(),
+  minutes: smallint("minutes"),
+  updatedBy: uuid("updated_by"),
+  updatedAt: ts("updated_at").notNull().defaultNow(),
+}, (t) => [
+  primaryKey({ columns: [t.versionId, t.skillId] }),
+  check("course_version_lessons_body_check", sql`length(${t.body}) between 1 and 40000`),
 ]).enableRLS();
 
 /**
@@ -388,6 +406,7 @@ export const assignmentRules = pgTable("assignment_rules", {
 export const assignmentHistory = pgTable("assignment_history", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: userRef(),
+  courseId: text("course_id").notNull(),
   versionId: text("version_id").references(() => courseVersions.id),
   ruleId: uuid("rule_id").references(() => assignmentRules.id, { onDelete: "set null" }),
   outcome: text("outcome").notNull(), // assigned | fallback | unresolved
@@ -399,13 +418,14 @@ export const assignmentHistory = pgTable("assignment_history", {
   index("assignment_history_user_time").on(t.userId, t.evaluatedAt),
 ]).enableRLS();
 
-/** The student's current course version: at most one row per student. Lesson progress is never touched by reassignment. */
+/** The student's current version of each course: at most one row per student per course. Lesson progress is never touched by reassignment. */
 export const studentCourseAssignments = pgTable("student_course_assignments", {
-  userId: userRef().primaryKey(),
+  userId: userRef(),
+  courseId: text("course_id").notNull(),
   versionId: text("version_id").notNull().references(() => courseVersions.id),
   ruleId: uuid("rule_id").references(() => assignmentRules.id, { onDelete: "set null" }),
   outcome: text("outcome").notNull(), // assigned | fallback
   assignedAt: ts("assigned_at").notNull().defaultNow(),
   updatedAt: ts("updated_at").notNull().defaultNow(),
-}).enableRLS();
+}, (t) => [primaryKey({ columns: [t.userId, t.courseId] })]).enableRLS();
 

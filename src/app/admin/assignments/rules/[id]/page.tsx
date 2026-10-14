@@ -42,9 +42,13 @@ export default async function EditRulePage({ params, searchParams }: PageProps<"
   const ruleAsLive = { ...toRule(row), active: true };
   const condition = row.condition as Expr;
   const ruleMatches = evaluateExpr(condition, new Set(sample));
+  // The sample run covers this rule's own course: versions, rules and the fallback of other courses never compete with it.
+  const courseId = data.courseOfVersion.get(row.targetVersionId);
+  const inCourse = (versionId: string) => data.courseOfVersion.get(versionId) === courseId;
   const overall = sp.sampleRun !== undefined ? evaluateAssignment({
-    completed: sample, chapters: chapterCatalog(), versions: data.versions,
-    rules: data.rules.map((r) => (r.id === id ? ruleAsLive : r)), fallbackVersionId: data.fallbackVersionId, now: new Date(),
+    completed: sample, chapters: chapterCatalog(), versions: data.versions.filter((v) => inCourse(v.id)),
+    rules: data.rules.filter((r) => inCourse(r.targetVersionId)).map((r) => (r.id === id ? ruleAsLive : r)),
+    fallbackVersionId: (courseId && data.fallbackByCourse.get(courseId)) || null, now: new Date(),
   }) : null;
   const versionName = (vid: string | null) => data.versionRows.find((v) => v.id === vid)?.name ?? vid ?? "none";
   const impact = sp.impact === "1" ? await previewRuleImpact(id, { ...values, status: "live", effectiveFrom: values.effectiveFrom, effectiveUntil: values.effectiveUntil }) : null;

@@ -3,6 +3,7 @@ import { count } from "drizzle-orm";
 import { db } from "@/db";
 import { studentCourseAssignments } from "@/db/schema";
 import { CBSE_CHAPTERS } from "@/content/cbse-chapters";
+import { COURSE_BY_ID } from "@/content/chapter-courses";
 import { findConflicts } from "@/engine/assignment";
 import { requireAdmin } from "@/server/admin";
 import { conditionChapters, loadCatalogData } from "@/server/course-assignment";
@@ -30,7 +31,7 @@ export default async function AssignmentsPage({ searchParams }: PageProps<"/admi
     <div className="flex flex-col gap-8">
       <header className="flex flex-col gap-2">
         <h1 className="text-xl font-semibold">Course assignment</h1>
-        <p className="text-sm text-muted-foreground">Rules decide which Math Start from Scratch version a student gets, from the CBSE chapters they have completed. Drafts do nothing until published. Publishing re-checks every student.</p>
+        <p className="text-sm text-muted-foreground">Each Class 11 chapter is its own course with a default version and a covered version. Rules decide which version of each course a student gets, from the CBSE chapters they have completed. Click a version to edit its lessons. Drafts do nothing until published. Publishing re-checks every student.</p>
       </header>
 
       {notice && <p role="status" className="rounded-md border p-3 text-sm">{notice}</p>}
@@ -46,7 +47,7 @@ export default async function AssignmentsPage({ searchParams }: PageProps<"/admi
               <tbody>
                 {data.versionRows.map((v) => (
                   <tr key={v.id} className="border-t">
-                    <td className="p-3"><span className="font-medium">{v.name}</span> <span className="text-xs text-muted-foreground">({v.id})</span></td>
+                    <td className="p-3"><Link href={`/admin/assignments/versions/${v.id}`} className="font-medium underline underline-offset-4">{v.name}</Link> <span className="text-xs text-muted-foreground">({v.id}{COURSE_BY_ID[v.courseId] ? `, ${COURSE_BY_ID[v.courseId]!.title}` : `, ${v.courseId}`})</span></td>
                     <td className="p-3">{v.status}</td>
                     <td className="p-3">{v.isFallback ? "Yes" : "No"}</td>
                     <td className="p-3 text-right tabular-nums">{perVersion.get(v.id) ?? 0}</td>
@@ -57,8 +58,8 @@ export default async function AssignmentsPage({ searchParams }: PageProps<"/admi
           </div>
         )}
         <form action={saveVersionAction} className="grid gap-3 rounded-xl border p-4 sm:grid-cols-2" aria-label="Add or update a course version">
-          <label className="flex flex-col gap-1 text-sm font-medium">Version id<input name="id" required pattern="[a-z0-9][a-z0-9-]{1,62}" placeholder="math-start-v2" className="min-h-11 rounded-md border bg-background px-3 text-sm font-normal" /></label>
-          <label className="flex flex-col gap-1 text-sm font-medium">Course id<input name="courseId" required defaultValue="math-start" className="min-h-11 rounded-md border bg-background px-3 text-sm font-normal" /></label>
+          <label className="flex flex-col gap-1 text-sm font-medium">Version id<input name="id" required pattern="[a-z0-9][a-z0-9-]{1,62}" placeholder="straight-lines-covered" className="min-h-11 rounded-md border bg-background px-3 text-sm font-normal" /></label>
+          <label className="flex flex-col gap-1 text-sm font-medium">Course id<input name="courseId" required defaultValue="straight-lines" className="min-h-11 rounded-md border bg-background px-3 text-sm font-normal" /></label>
           <label className="flex flex-col gap-1 text-sm font-medium">Name<input name="name" required maxLength={120} className="min-h-11 rounded-md border bg-background px-3 text-sm font-normal" /></label>
           <label className="flex flex-col gap-1 text-sm font-medium">Status
             <select name="status" defaultValue="draft" className="min-h-11 rounded-md border bg-background px-3 text-sm font-normal">

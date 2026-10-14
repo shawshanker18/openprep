@@ -8,6 +8,8 @@ import { LessonStudyView } from "@/components/lesson-study-view";
 import { Markdown } from "@/components/markdown";
 import { orientationBy } from "@/content/getting-started";
 import { requireUser } from "@/server/auth";
+import { getStudentLesson } from "@/server/course-lessons";
+import { safely } from "@/lib/safely";
 import { getLesson, listDesmosLessons } from "@/server/lessons";
 import { scratchPath, scratchProgress } from "@/server/scratch";
 import { stepAction } from "../actions";
@@ -26,7 +28,7 @@ export default async function StepPage({ params }: PageProps<"/start/[step]">) {
   const step = steps[i]!;
   const prev = steps[i - 1], following = steps[i + 1];
   const [lesson, desmos] = await Promise.all([
-    step.kind === "skill" ? getLesson(step.ref) : null,
+    step.kind === "skill" ? safely(() => getStudentLesson(userId, step.ref), null).then((own) => own ?? getLesson(step.ref)) : null,
     step.kind === "desmos" ? listDesmosLessons().then((all) => all.find((l) => l.slug === step.ref) ?? null) : null,
   ]);
 
