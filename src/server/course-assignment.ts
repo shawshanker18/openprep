@@ -14,8 +14,8 @@ import {
 export const MAX_RECALC_STUDENTS = 20_000;
 const BATCH = 500;
 
-/** Every CBSE chapter is active today. Deactivating one is a content change, so rules naming it are reported, not guessed. */
-export const chapterCatalog = (): ChapterInfo[] => CBSE_CHAPTERS.map((c) => ({ id: c.id, grade: c.grade, active: true }));
+/** Chapters come from content (cbse-chapters.ts). Deactivating one there is a content change; rules naming it are reported, not guessed. */
+export const chapterCatalog = (): ChapterInfo[] => CBSE_CHAPTERS.map((c) => ({ id: c.id, grade: c.grade, active: c.active !== false }));
 
 type RuleRow = typeof assignmentRules.$inferSelect;
 type VersionRow = typeof courseVersions.$inferSelect;

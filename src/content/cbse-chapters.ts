@@ -7,7 +7,8 @@
  * Skill ids are the ones in taxonomy.ts. A chapter with no SAT skill (calculus, vectors, sets…) is still listed so a
  * student can tick everything they have done; it simply maps to nothing.
  */
-export type CbseChapter = { id: string; grade: 9 | 10 | 11 | 12; title: string; skills: string[] };
+/** `active: false` retires a chapter: rules that name it become invalid and are reported, never guessed around. */
+export type CbseChapter = { id: string; grade: 9 | 10 | 11 | 12; title: string; skills: string[]; active?: boolean };
 
 const c = (grade: 9 | 10 | 11 | 12, slug: string, title: string, skills: string[] = []): CbseChapter => ({ id: `cbse-${grade}-${slug}`, grade, title, skills });
 

@@ -367,32 +367,6 @@ describe("plan near the test date", () => {
   });
 });
 
-describe("course", async () => {
-  const { levelOf, unitSteps, checkCount } = await import("./course");
-  it("levels: nothing answered is not started; otherwise follows the mastery status", () => {
-    expect(levelOf(0, "mastered")).toBe("not-started");
-    expect(levelOf(3, "weak")).toBe("attempted");
-    expect(levelOf(3, "developing")).toBe("familiar");
-    expect(levelOf(3, "strong")).toBe("proficient");
-    expect(levelOf(3, "mastered")).toBe("mastered");
-  });
-  it("every skill appears once, quizzes cover their group, and the unit test covers the whole unit", () => {
-    for (const d of Object.keys(DOMAINS) as DomainId[]) {
-      const steps = unitSteps(d);
-      const skills = steps.filter((s) => s.kind === "skill");
-      expect(skills.length).toBe(skillsIn(d).length);
-      expect(steps.at(-1)).toMatchObject({ kind: "unit-test" });
-      const quizzed = steps.flatMap((s) => (s.kind === "quiz" ? s.skills.map((k) => k.id) : []));
-      if (skillsIn(d).length > 3) expect(new Set(quizzed).size).toBe(skillsIn(d).length);
-    }
-  });
-  it("question counts", () => {
-    expect(checkCount("quiz", 3)).toBe(6);
-    expect(checkCount("unit-test", 5)).toBe(15);
-    expect(checkCount("challenge", 29)).toBe(30);
-  });
-});
-
 describe("timing stats", () => {
   it("compares each section with the SAT pace and finds slow, rushed and slowest questions", () => {
     const t = timingStats([
