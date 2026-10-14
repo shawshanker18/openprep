@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { CBSE_CHAPTERS, chaptersBelowGrade, completedChapters, skillsFromChapters } from "@/content/cbse-chapters";
+import { CBSE_CHAPTERS, askedChapters, chaptersBelowGrade, completedChapters, savedChapters, skillsFromChapters } from "@/content/cbse-chapters";
 import { SKILL_BY_ID } from "@/content/taxonomy";
 import { likelyCoveredSkills } from "./curriculum-coverage";
 
@@ -33,4 +33,21 @@ it("a student in class 11 is assumed to have finished every class 9 and 10 chapt
   expect(completedChapters(["cbse-11-sets"], 11)).toContain("cbse-11-sets");
   const covered = likelyCoveredSkills({ curriculum: "cbse", grade: 11, subjects: ["Mathematics"], topicsStudied: [], chaptersDone: [] });
   expect(covered.has("m-psda-prob")).toBe(true); // Class 10 Probability, assumed with nothing ticked
+});
+
+it("only Class 11 is asked, for its six course chapters; other classes store no chapters", () => {
+  expect(askedChapters(11).map((c) => c.id).sort()).toEqual([
+    "cbse-11-conic-sections", "cbse-11-linear-inequalities", "cbse-11-relations-functions",
+    "cbse-11-statistics", "cbse-11-straight-lines", "cbse-11-trigonometric-functions",
+  ]);
+  expect(askedChapters(9)).toEqual([]);
+  expect(askedChapters(10)).toEqual([]);
+  expect(askedChapters(12)).toEqual([]);
+  // Class 11 keeps the Class 9 and 10 assumption, but only course chapters can be ticked.
+  const saved = savedChapters(["cbse-11-statistics", "cbse-11-sets"], 11, "cbse");
+  expect(saved).toContain("cbse-11-statistics");
+  expect(saved).toContain("cbse-10-polynomials");
+  expect(saved).not.toContain("cbse-11-sets");
+  expect(savedChapters(["cbse-10-polynomials"], 10, "cbse")).toEqual([]);
+  expect(savedChapters(["cbse-11-statistics"], 11, "icse")).toEqual([]);
 });

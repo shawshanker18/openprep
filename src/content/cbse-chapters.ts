@@ -88,3 +88,22 @@ export const chaptersBelowGrade = (grade: number | null | undefined): string[] =
 /** What the student ticked plus everything from the classes below theirs. */
 export const completedChapters = (ticked: readonly string[], grade: number | null | undefined): string[] =>
   [...new Set([...chaptersBelowGrade(grade), ...ticked])];
+
+/** The Class 11 chapters that have a course of their own. Only Class 11 students are asked about chapters. */
+export const COURSE_CHAPTER_IDS: readonly string[] = [
+  "cbse-11-relations-functions", "cbse-11-trigonometric-functions", "cbse-11-straight-lines",
+  "cbse-11-linear-inequalities", "cbse-11-conic-sections", "cbse-11-statistics",
+];
+
+/** The chapters the student is asked about: Class 11 only, and only the course chapters. Other classes are not asked. */
+export const askedChapters = (grade: number | null | undefined): CbseChapter[] =>
+  grade === 11 ? CBSE_CHAPTERS.filter((ch) => COURSE_CHAPTER_IDS.includes(ch.id)) : [];
+
+/**
+ * What is stored for a student's chapters. Only CBSE Class 11 keeps chapter ticks (course chapters only, plus the
+ * assumption that Classes 9 and 10 are done). Every other class stores none, so they get the default courses.
+ */
+export const savedChapters = (ticked: readonly string[], grade: number | null | undefined, curriculum: string | null | undefined): string[] => {
+  if (curriculum !== "cbse" || grade !== 11) return [];
+  return completedChapters(ticked.filter((id) => COURSE_CHAPTER_IDS.includes(id)), grade);
+};

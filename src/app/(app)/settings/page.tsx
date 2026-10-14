@@ -95,9 +95,9 @@ export default async function SettingsPage({ searchParams }: PageProps<"/setting
             ))}
           </div>
         </fieldset>
-        {profile.curriculum === "cbse" && (
+        {profile.curriculum === "cbse" && profile.grade === 11 && (
           <fieldset className="flex flex-col gap-2 text-sm">
-            <legend className="mb-2">CBSE maths chapters you&apos;ve finished</legend>
+            <legend className="mb-2">Class 11 maths chapters you&apos;ve finished</legend>
             <CbseChapterPicker defaultChecked={profile.chaptersDone} grade={profile.grade ?? undefined} />
           </fieldset>
         )}
