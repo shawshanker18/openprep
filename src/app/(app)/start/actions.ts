@@ -29,7 +29,7 @@ export async function conceptPracticeAction(key: string, conceptId: string) {
   const { steps } = await scratchProgress(userId);
   const step = steps.find((s) => s.key === key);
   if (!step || step.kind !== "skill" || step.status !== "done" || !z.uuid().safeParse(conceptId).success) return;
-  const sessionId = await startConceptPractice(userId, conceptId);
+  const sessionId = await startConceptPractice(userId, conceptId, `/start/${step.key}`);
   if (sessionId) redirect(`/practice?session=${sessionId}`);
 }
 

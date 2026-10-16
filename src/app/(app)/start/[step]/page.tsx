@@ -78,7 +78,7 @@ export default async function StepPage({ params }: PageProps<"/start/[step]">) {
                       {c.explanationMd && <Markdown className="text-[1em] leading-relaxed">{c.explanationMd}</Markdown>}
                       <form action={conceptPracticeAction.bind(null, step.key, c.id)}>
                         <Button type="submit" variant="outline" disabled={c.questionCount === 0}>
-                          {c.questionCount ? `Practise this concept (${c.questionCount} question${c.questionCount === 1 ? "" : "s"})` : "No questions yet"}
+                          {c.questionCount ? "Try a question" : "No questions yet"}
                         </Button>
                       </form>
                     </div>
