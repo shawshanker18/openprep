@@ -27,6 +27,10 @@ Text Structure and Purpose questions ask **why** a text was written or **how** i
 
 Rule: **label each sentence with a two-word job** (e.g., "common view," "contrast," "example," "conclusion"). Then match choices against your labels.
 
+### The function of one part in the whole text
+
+Ask why the author includes this part. A sentence can introduce a view, supply evidence for a claim, raise an objection, or restate a conclusion. The best answer names that job and fits how the whole text is built.
+
 ## Worked example 1 (easy)
 
 > Most people think of moss as a plant that grows only in damp, shady forests. However, some mosses thrive on bare rock in deserts. These mosses dry out completely during the hot months and then revive within hours when rain falls.

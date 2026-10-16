@@ -26,6 +26,18 @@ A linear inequality is like a linear equation, but with $<$, $>$, $\le$, or $\ge
 
 Example translation: a rental costs \$40 plus \$0.65 per mile, and the budget is at most \$120. Then $40 + 0.65m \le 120$, so $m \le 123.07\ldots$, and the greatest whole number of miles is $123$.
 
+### Describing a solution set
+
+An equation can have one solution, no solution, or all real numbers. After simplifying, if the variable cancels and a false statement is left (like $3 = 5$), there is no solution. If a true statement is left (like $5 = 5$), every value works. An inequality is solved the same way, with the sign flip rule.
+
+### Graphs of inequalities in the $xy$-plane
+
+Draw the boundary line. Use a solid line for $\le$ or $\ge$ and a dashed line for $<$ or $>$. For $y > \ldots$, shade above the line; for $y < \ldots$, shade below. Check one point inside the shaded region to confirm.
+
+### Systems of inequalities in word problems
+
+Write one inequality for each condition: "at least" and "no less than" use $\ge$; "at most," "no more than," and "under" use $\le$ or $<$. Then test a candidate pair of numbers in every inequality. A solution must satisfy all of them.
+
 ## Worked example 1 (easy)
 
 Solve $5 - 3x < 17$.

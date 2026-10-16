@@ -31,6 +31,10 @@ $$P(A \mid B) = \frac{\text{number in both } A \text{ and } B}{\text{number in }
 
 Example: a box has $5$ red and $7$ white tiles. Drawing two red tiles without replacement has probability $\frac{5}{12} \cdot \frac{4}{11} = \frac{20}{132} = \frac{5}{33}$.
 
+### Filling in a two-way table
+
+Use the row and column totals. A missing cell equals its row total minus the other cells in that row (or the column total minus the others in that column). Fill in every missing cell before answering a question about it.
+
 ## Worked example 1 (easy)
 
 A jar has $6$ lemon, $9$ cherry, and $5$ grape candies. One is chosen at random. What is the probability it is **not** cherry?

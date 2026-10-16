@@ -26,6 +26,42 @@ Nonlinear functions are functions whose graphs are not straight lines. On the SA
 - If $a > 0$ the parabola opens up (minimum at the vertex); if $a < 0$ it opens down (maximum).
 - Exponential models: $A(1 + r)^t$ for percent growth, $A(1 - r)^t$ for percent decay, and $A \cdot 2^{t/d}$ for doubling every $d$ units (use $\left(\frac{1}{2}\right)^{t/d}$ for a half-life).
 
+### Composing functions
+
+To evaluate $f(g(a))$, first find $g(a)$, then use that result as the input to $f$. On a graph, read $g(a)$ from the graph of $g$, then read $f$ at that value.
+
+### Transformations
+
+$y = -f(x)$ flips the graph over the $x$-axis (every output is negated). $y = f(x) + k$ shifts the graph up $k$ units. $y = f(x - h)$ shifts it right $h$ units.
+
+### Zeros and where the graph crosses
+
+A factor $(x - c)$ crosses the $x$-axis at $c$. A squared factor $(x - c)^2$ touches the axis there without crossing. For $f(x) = (x + 5)^2 - 9$, the zeros come from $(x + 5)^2 = 9$, so $x = -2$ and $x = -8$.
+
+### Exponential change per period
+
+When a quantity drops by a fixed percent each period, multiply by the remaining fraction once per period. A drop of $80\%$ every $120$ seconds is a factor of $0.2$ each period, so after $360$ seconds (three periods) the height is multiplied by $0.2^3$.
+
+### Reading a point in context
+
+For $h(t) = 19.6 - 4.9t^2$, the point $(1, 14.7)$ means that $1$ second after the ball is dropped, it is $14.7$ meters high.
+
+### The remainder theorem
+
+When a polynomial $f(x)$ is divided by $x - c$, the remainder is $f(c)$. For $\ell(x) = x^4 + 20x^2 - 2000$ divided by $x + 6$, the remainder is $\ell(-6) = 1296 + 720 - 2000 = 16$.
+
+### Percent change per interval
+
+In $f(x) = a \cdot b^{x/k}$, each increase of $k$ multiplies the output by $b$. For $f(x) = 17(1.30)^{x/2}$, an increase of $x$ by $4$ multiplies the output by $(1.30)^2 = 1.69$, so $f$ increases by $69\%$.
+
+### Completing the square for a minimum
+
+$x^2 - 6x - 616 = (x - 3)^2 - 625$, so the minimum value is $-625$, at $x = 3$. Similarly, $x^2 - 6x + 2 = (x - 3)^2 - 7$, with minimum $-7$.
+
+### Comparing growth patterns
+
+A fixed amount added each year is linear growth. Multiplying by a fixed factor each year is exponential growth. Starting at $128$ and growing by $50\%$ a year gives $192$, then $288$, but adding $64$ each year gives $192$, then $256$. The two patterns separate quickly.
+
 ## Worked example 1 (easy)
 
 For $f(x) = -x^2 + 6x - 5$, find $f(-1)$ and the vertex of the graph.

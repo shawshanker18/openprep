@@ -26,6 +26,10 @@ Command of Evidence questions give you a claim and ask which piece of evidence r
 
 Rule: **turn the claim into a prediction** before reading choices: "If this is true, we should see ___."
 
+### Reading data
+
+Check each number in a choice against the table or graph. Change is the new value minus the old value. Percent change is that change divided by the old value, times $100$. A choice can be accurate and still be wrong if it compares the wrong things, so match the comparison to the claim.
+
 ## Worked example 1 (easy)
 
 > A biologist hypothesized that a species of desert beetle collects drinking water from morning fog, which condenses on the bumps of its shell.

@@ -27,6 +27,10 @@ Form, Structure, and Sense questions test grammar inside a sentence: making verb
 | Possessives | singular: city's · plural ending in s: cities' · irregular plural: children's | |
 | Dangling modifier | Opening phrase must describe the subject right after the comma | Walking home, **Ana** saw a fox. |
 
+### Parallel structure in comparisons
+
+In a comparison, both things compared must be the same kind of thing. "The coefficient of one country, compared with that of another" compares coefficients. "The coefficient, compared with another country" compares the wrong things and is not standard English.
+
 ## Worked example 1 (easy)
 
 > The set of instructions included with the new bookshelves ______ several diagrams that show how each panel fits together.

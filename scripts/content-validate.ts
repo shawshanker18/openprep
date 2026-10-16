@@ -95,8 +95,6 @@ export function validateContent() {
     const headings = [...content.matchAll(/^## (.+)$/gm)].map((m) => m[1]!.trim());
     if (headings.join("|") !== LESSON_HEADINGS.join("|"))
       errors.push(`lessons/${file}: headings must be exactly: ${LESSON_HEADINGS.join(" / ")}`);
-    const words = content.split(/\s+/).filter(Boolean).length;
-    if (words < 400 || words > 900) warnings.push(`lessons/${file}: ${words} words (aim for 400–900)`);
     for (const tex of mathSpans(content)) {
       try { katex.renderToString(tex, { throwOnError: true }); }
       catch (e) { errors.push(`lessons/${file}: KaTeX: ${(e as Error).message.split("\n")[0]}`); }

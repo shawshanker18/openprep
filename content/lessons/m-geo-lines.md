@@ -29,6 +29,38 @@ This skill is about angle facts and triangle relationships: angles formed by int
 - Similar triangles: $\frac{AB}{DE} = \frac{BC}{EF} = \frac{AC}{DF}$, listed in matching order.
 - Right triangle with altitude to the hypotenuse: the altitude $h$ splits the hypotenuse into $p$ and $q$ with $h^2 = pq$.
 
+### Midsegments
+
+A segment joining the midpoints of two sides of a triangle is parallel to the third side and half its length. If $D$ and $E$ are the midpoints of $\overline{AB}$ and $\overline{BC}$, then $AC = 2 \cdot DE$.
+
+### The triangle inequality
+
+The two shorter sides must add to more than the third side. For sides $9$ and $15$, the third side $x$ satisfies $6 < x < 24$.
+
+### Congruent triangles
+
+Two triangles are congruent when they match by SSS (three sides), SAS (two sides and the angle between them), ASA or AAS (two angles and a side), or HL (right triangles with a matching hypotenuse and leg). Two angles alone never prove congruence, because they only prove similarity.
+
+### Isosceles triangles
+
+The two equal sides are the legs. With perimeter $53$ and two sides of $17$, the third side is $53 - 34 = 19$.
+
+### Dilations
+
+A dilation multiplies every length by the scale factor, but leaves every angle the same size.
+
+### Corresponding parts of congruent triangles
+
+Once two triangles are congruent, every matching pair of sides and angles is equal. Use the stated correspondence (which vertex matches which) to find the matching side or angle.
+
+### Parallelograms
+
+Opposite sides are equal, opposite angles are equal, and adjacent angles add to $180^\circ$.
+
+### Perpendicular bisectors
+
+Every point on the perpendicular bisector of a segment is the same distance from the segment's two endpoints.
+
 ## Worked example 1 (easy)
 
 The angles of a triangle measure $(2x + 10)^\circ$, $(3x - 5)^\circ$, and $(x + 25)^\circ$. Find each angle.

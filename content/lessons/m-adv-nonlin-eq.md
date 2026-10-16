@@ -31,6 +31,42 @@ $$x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$$
 - Sum of solutions $= -\frac{b}{a}$; product of solutions $= \frac{c}{a}$.
 - Perfect squares: $(x + k)^2 = x^2 + 2kx + k^2$.
 
+### A line and a parabola
+
+Set the two expressions equal and solve the resulting quadratic. For $y = x^2$ and $y = 2x - 1$: $x^2 - 2x + 1 = 0$, so $(x - 1)^2 = 0$ and there is exactly one intersection point (the line just touches the parabola).
+
+### The discriminant as a condition
+
+"No real solutions" means $b^2 - 4ac < 0$. For $-9x^2 + bx - 16 = 0$: $b^2 - 4(-9)(-16) < 0$ gives $b^2 < 576$, so $|b| < 24$ and the largest positive integer value is $b = 23$.
+
+### Absolute value equations
+
+For $|A| = B$, solve two cases, $A = B$ and $A = -B$. If $B < 0$ there is no solution. For $|11 - x| = 4$: $11 - x = 4$ gives $x = 7$, and $11 - x = -4$ gives $x = 15$.
+
+### Radical and exponential equations
+
+A square root is never negative, so $\sqrt{x} = -5$ has no solution. For $4^{x/6} + 7 = 71$: $4^{x/6} = 64 = 4^3$, so $\dfrac{x}{6} = 3$ and $x = 18$.
+
+### Excluded values
+
+Any value that makes a denominator zero is not a solution, even if it looks like one. $\dfrac{1}{x - 8}$ is undefined at $x = 8$.
+
+### Rational equations
+
+Multiply by the least common denominator, solve, and throw out any value that makes a denominator zero. For $\dfrac{2w}{w+3} - \dfrac{6}{w} = 1$, multiply by $w(w+3)$ to get $w^2 - 9w - 18 = 0$. Neither $0$ nor $-3$ is a root, so the solutions add to $9$.
+
+### Radical equations and the sign of the other side
+
+After squaring, check that the side that was squared is not negative. For $\sqrt{6x+19} = x+2$, squaring gives $x^2 - 2x - 15 = 0$, so $x = 5$ or $x = -3$. Since $x + 2$ must be $\ge 0$, $x = -3$ is extraneous, and the only solution is $5$.
+
+### Literal equations with powers
+
+Undo powers with roots. $s = \sqrt[3]{\dfrac{6V}{\pi}}$ becomes $V = \dfrac{\pi s^3}{6}$, and $r = \sqrt[3]{x^3 + y^3}$ becomes $x = \sqrt[3]{r^3 - y^3}$.
+
+### Quadratics with a parameter
+
+For $kx^2 + 3x + 4 = 0$ to be quadratic, $k \ne 0$. Two distinct real solutions need a positive discriminant: $9 - 16k > 0$, so $k < \dfrac{9}{16}$ and $k \ne 0$.
+
 ## Worked example 1 (easy)
 
 Solve $x^2 - x - 12 = 0$.

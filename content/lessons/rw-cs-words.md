@@ -26,6 +26,10 @@ Words in Context questions give you a sentence or short text with a blank and as
 
 Rule: **fill the blank with your own word first**, even a rough one like "quiet" or "not lasting." Then find the choice that means that.
 
+### "As used in the text"
+
+These questions ask what a word means in this sentence, not what it means most often. Read the whole sentence, then substitute a simple word that fits the sentence's logic. The choice that fits the sentence is the answer, even if it is an unusual meaning of the word.
+
 ## Worked example 1 (easy)
 
 > Unlike the crowded downtown market, the farm stand on Route 9 was ______, with only a single table and a handwritten price list.

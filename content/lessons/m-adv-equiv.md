@@ -28,6 +28,39 @@ Two expressions are **equivalent** if they give the same value for every allowed
 - $a^2 - b^2 = (a + b)(a - b)$.
 - Factoring by splitting: $2x^2 + 7x + 3$ has $ac = 6$; use $6$ and $1$: $2x^2 + 6x + x + 3 = (2x + 1)(x + 3)$.
 - Exponent example: $\frac{x^2 \cdot \sqrt[3]{x}}{\sqrt{x^3}} = x^{2 + \frac{1}{3} - \frac{3}{2}} = x^{5/6}$.
+- **Splitting a fraction whose top is not a multiple of the bottom:** divide the top by the bottom as you would numbers. Ask "what times $x + 2$ gives the top's $x$-term?" Here that is $3$: $3(x + 2) = 3x + 6$. The leftover is the remainder, so $3x - 4 = 3(x + 2) + (-10)$, and $\frac{3x - 4}{x + 2} = 3 + \frac{-10}{x + 2}$. The remainder is the constant $A = -10$. This form is how SAT questions reveal a hidden constant.
+
+### Complex fractions
+
+A fraction inside a fraction: multiply the top and bottom by the least common denominator of every inner fraction. For $\dfrac{q/r + 3}{r/q + 2}$, multiply top and bottom by $rq$: the top becomes $q^2 + 3rq$ and the bottom becomes $r^2 + 2rq$, so the result is $\dfrac{q(q + 3r)}{r(r + 2q)}$.
+
+### Subtracting polynomials
+
+Subtracting a group flips the sign of every term inside it. $(7t^4 - 2t^2 + 5t - 8) - (3t^4 - 5t^3 + 4t^2 - 8) = 4t^4 + 5t^3 - 6t^2 + 5t$.
+
+### Rearranging a formula
+
+Undo operations to isolate the letter you want, treating the other letters as numbers. From $ak = \dfrac{b}{6}(7 + m)$: multiply by $\dfrac{6}{b}$ to get $\dfrac{6ak}{b} = 7 + m$, so $m = \dfrac{6ak}{b} - 7$.
+
+### Exponents with the same base
+
+If $b^x = b^y$ with $b \ne 1$, then $x = y$. Write both sides as powers of one base first: $\sqrt[7]{2^3} = 2^{3/7}$, so $2^a = 2^{3/7}$ gives $a = \dfrac{3}{7}$.
+
+### Factors
+
+$x + m$ is a factor of an expression exactly when substituting $x = -m$ makes the expression equal $0$.
+
+### Adding rational expressions
+
+Factor each denominator, find the least common denominator, then combine. For $\dfrac{2}{x^2-4} + \dfrac{1}{x^2+6x+8}$, the denominators are $(x-2)(x+2)$ and $(x+2)(x+4)$, so the sum is $\dfrac{2(x+4) + (x-2)}{(x-2)(x+2)(x+4)} = \dfrac{3(x+2)}{(x-2)(x+2)(x+4)} = \dfrac{3}{(x-2)(x+4)}$.
+
+### Simplifying radicals
+
+Combine like terms under the root first, then pull out perfect squares or cubes. $\sqrt{36h^2 + 64h^2} = \sqrt{100h^2} = 10h$ for $h \ge 0$. Never split a sum under a root: $\sqrt{a+b} \ne \sqrt{a} + \sqrt{b}$. Cube roots work the same way: $\sqrt[3]{40v^6w^7} = 2v^2w^2\sqrt[3]{5w}$.
+
+### Variable exponents
+
+Factor the base into primes first. Since $675 = 3^3 \cdot 5^2$, we get $675^{mn} = 3^{3mn} \cdot 5^{2mn} = (3^m)^{3n} (5^n)^{2m} = x^{3n} y^{2m}$.
 
 ## Worked example 1 (easy)
 

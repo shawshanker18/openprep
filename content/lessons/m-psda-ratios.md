@@ -28,6 +28,18 @@ $$\text{distance} = \text{rate} \times \text{time} \qquad \text{amount} = \text{
 
 - Area scales by the square of a length scale; $1$ m$^2 = 10{,}000$ cm$^2$, not $100$ cm$^2$.
 
+### Unit price
+
+To compare prices, divide each cost by its amount. A $64$-ounce jug for $7.68$ dollars costs $0.12$ per ounce, and a $96$-ounce jug for $9.60$ dollars costs $0.10$ per ounce. Buying the larger jug saves $0.02$ per ounce, or $2.00$ dollars per $100$ ounces.
+
+### Direct and inverse proportion
+
+In $y = \dfrac{x}{k}$ (direct), multiplying $x$ by $4$ multiplies $y$ by $4$. In $y = \dfrac{k}{x}$ (inverse), multiplying $x$ by $4$ divides $y$ by $4$. Read which kind of relationship the equation shows before you answer.
+
+### Rates across units of time
+
+Convert before you multiply. A rate in months becomes a rate in years by multiplying by $12$. For $54$ centimeters every $m$ months, the growth every $k$ years is $\dfrac{54 \cdot 12k}{m}$ centimeters.
+
 ## Worked example 1 (easy)
 
 Five notebooks cost \$8.75. At the same price per notebook, how much do $12$ notebooks cost?

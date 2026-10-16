@@ -28,6 +28,10 @@ Two-variable data pairs each $x$-value with a $y$-value, usually shown in a **sc
 
 Example: $x = 0, 1, 2, 3$ with $y = 5, 15, 45, 135$. The differences grow ($10, 30, 90$) but each ratio is $3$, so the model is $y = 5 \cdot 3^x$.
 
+### Comparing trends
+
+Compare slopes to compare how fast two quantities change, and remember the slope is the predicted change per one unit of $x$. The $y$-intercept is the predicted value when $x = 0$. Check whether a table grows by equal differences (linear) or equal ratios (exponential) before choosing a model.
+
 ## Worked example 1 (easy)
 
 A café finds that the line of best fit for daily hot-drink sales $y$ against the outdoor temperature $x$, in degrees, is $y = -2.5x + 140$. Predict sales on a $30$-degree day and interpret $-2.5$.

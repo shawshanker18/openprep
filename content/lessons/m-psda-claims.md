@@ -26,6 +26,14 @@ These questions describe a study and ask which conclusion it supports. Two desig
 
 Comparing groups: subtract the percents or rates, and report the result in **percentage points** when the question asks for the difference between two percents.
 
+### Who the results describe
+
+A random sample describes the population it was drawn from, and nobody else. A poll of Denver adults ages $30$ to $45$ describes Denver adults in that age group, not all adults in Colorado.
+
+### Confounding variables
+
+An association can have a third cause. If students who join a club also get better grades, the club may not be the reason, because the students who join may already be stronger. Only random assignment rules out such third causes.
+
 ## Worked example 1 (easy)
 
 A researcher randomly selected $300$ members of a grocery chain's loyalty program and found that 62% prefer evening hours. To which group can this result be generalized?

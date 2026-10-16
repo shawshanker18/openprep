@@ -47,7 +47,7 @@ async function loadPage({ searchParams }: PageProps<"/practice">) {
   const mode = sp.mode === "review" ? "review" : sp.mode === "set" ? "set" : sp.mode === "list" ? "list" : skillId ? "skill" : "smart";
 
   // Where to go when the set is finished: the course or the question bank (only these paths are accepted).
-  const back = typeof sp.from === "string" && /^\/(start(\/[a-z-]+)?|course(\/[a-z-]+)?|question-bank(\?[\w=&%.,-]*)?|bookmarks(\?page=\d+)?|analysis)$/.test(sp.from) ? sp.from : undefined;
+  const back = typeof sp.from === "string" && /^\/(start(\/[a-z0-9-]+)?|course(\/[a-z0-9-]+)?|question-bank(\?[\w=&%.,-]*)?|bookmarks(\?page=\d+)?|analysis)$/.test(sp.from) ? sp.from : undefined;
 
   if (mode === "list") {
     const ids = list(sp.ids).filter((id) => /^[\w-]{22}$/.test(id)).slice(0, MAX_QUESTIONS_PER_SET);

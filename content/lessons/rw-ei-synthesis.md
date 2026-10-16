@@ -28,6 +28,20 @@ Rhetorical Synthesis questions show a bulleted list of a student's research note
 
 Rule: **turn the goal into a checklist**, then check each choice against it.
 
+### More goals
+
+- **Refute a claim:** the correct sentence must present information that contradicts the claim.
+- **Generalize:** it must make a statement about the whole group and support it with a specific example from the notes.
+- **Describe a format:** it must name the form and say what it does, such as its length or rhythm.
+- **Specify:** it must give concrete details, like a date, a place, or a number, from the notes.
+
+### Goals that ask for a specific kind of detail
+
+- **Indicate or identify:** list the specific items from the notes that answer the question, such as particular regions.
+- **Provide an overview:** briefly describe the whole program or topic and its main parts.
+- **Place in context:** say when or where something happened, relative to a person's life or a larger event.
+- **Give a specific example:** choose one concrete case, not a general statement.
+
 ## Worked example 1 (easy)
 
 > - The Kessler Bridge crosses the Tamar River.

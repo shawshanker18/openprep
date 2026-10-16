@@ -103,9 +103,13 @@ export async function selectPracticeQuestion(userId: string, profile: Profile, i
   const forced = input.difficulty === "mixed" ? undefined : input.difficulty;
 
   if (input.mode === "list") {
-    // A hand-picked list (question bank): the first one not answered yet in this session, in the given order.
-    const nextId = (input.ids ?? []).find((id) => !exclude.includes(id));
-    if (nextId) q = (await db.select().from(questions).where(and(eq(questions.id, nextId), eq(questions.status, "active"), availableQuestion(userId))))[0] ?? null;
+    // A hand-picked list (question bank or checkpoint): the first one in the given order that is still available. An
+    // unavailable question (say, one in another open set) is skipped, not treated as the end of the list.
+    const pending = (input.ids ?? []).filter((id) => !exclude.includes(id));
+    if (pending.length) {
+      const open = await db.select().from(questions).where(and(inArray(questions.id, pending), eq(questions.status, "active"), availableQuestion(userId)));
+      q = pending.map((id) => open.find((row) => row.id === id)).find((row) => !!row) ?? null;
+    }
   } else if (input.mode === "review") {
     q = await dueReview(userId, now, exclude, input.skillId);
   } else if (input.mode === "set") {

@@ -96,3 +96,11 @@ it("plan blocks are done only from real work today (a click can't tick them)", a
   expect(after.map((b) => b.done)).toEqual([true, false, false, true, false]);
   expect(after[1]!.progress).toEqual({ n: 1, target: 3 }); // 4 answers: 3 finish the first block, 1 left for the check-in
 });
+
+it('a list set skips a question that is in another open set and serves the next one', async()=>{
+ const [a,b]=ids;
+ const [other]=await db.insert(schema.practiceSessions).values({userId:USER,config:{mode:'list',ids:[],count:1},title:'other open set',status:'active'}).returning({id:schema.practiceSessions.id});
+ await db.insert(schema.practiceSessionItems).values({sessionId:other!.id,position:0,questionId:a!,servedAt:new Date()});
+ const r=await P.nextQuestion(USER,{} as schema.Profile,{mode:'list',ids:[a!,b!],exclude:[]});
+ expect(r?.question.id).toBe(Q.publicId(b!,USER));
+});

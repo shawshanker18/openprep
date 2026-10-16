@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireUser } from "@/server/auth";
-import { startConceptPractice } from "@/server/concepts";
+import { startCheckpoint, startConceptPractice } from "@/server/concepts";
 import { nextAfter, scratchProgress, setStep } from "@/server/scratch";
 
 /** Finish or skip one step, then open the next step still to do (or the overview at the end of the path). */
@@ -30,5 +30,15 @@ export async function conceptPracticeAction(key: string, conceptId: string) {
   const step = steps.find((s) => s.key === key);
   if (!step || step.kind !== "skill" || step.status !== "done" || !z.uuid().safeParse(conceptId).success) return;
   const sessionId = await startConceptPractice(userId, conceptId);
+  if (sessionId) redirect(`/practice?session=${sessionId}`);
+}
+
+/** A checkpoint on one skill: concept questions first, then skill questions. Returns to this lesson when the set ends. */
+export async function checkpointAction(key: string) {
+  const { userId } = await requireUser();
+  const { steps } = await scratchProgress(userId);
+  const step = steps.find((s) => s.key === key);
+  if (!step || step.kind !== "skill" || !/^[a-z0-9-]+$/.test(step.key)) return;
+  const sessionId = await startCheckpoint(userId, step.ref, `Checkpoint: ${step.title}`, `/start/${step.key}`);
   if (sessionId) redirect(`/practice?session=${sessionId}`);
 }

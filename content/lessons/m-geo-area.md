@@ -30,6 +30,34 @@ This skill covers the **area** of flat shapes, the **volume** and **surface area
 - Similar solids with surface areas in ratio $4 : 9$ have lengths in ratio $2 : 3$ and volumes in ratio $8 : 27$.
 - $1$ liter $= 1{,}000$ cm$^3$.
 
+### Solving for an unknown dimension
+
+Put the known values into the formula, then solve. A triangle with area $408$ whose base is $10$ more than its height: $\dfrac{1}{2}(h + 10)h = 408$, so $h^2 + 10h - 816 = 0$, which factors as $(h + 34)(h - 24) = 0$. The height is $24$ (the base is $34$, and $\dfrac{1}{2} \cdot 34 \cdot 24 = 408$).
+
+### Fractions of a full volume
+
+A tank $15 \times 8 \times 10$ cm filled to $\dfrac{1}{25}$ holds $\dfrac{1}{25}(1200) = 48$ cubic centimeters. Find the full volume first, then take the fraction.
+
+### Composite and prism solids
+
+A prism's volume is the area of its base times its height, $V = Bh$. For a triangular base, $B = \dfrac{1}{2}bh$. A triangular prism with volume $351$ and height $13$ has base area $B = \dfrac{351}{13} = 27$. For a solid built from pieces, add or subtract the piece volumes.
+
+### Working backward from circumference or volume
+
+From circumference, $r = \dfrac{C}{2\pi}$. From a cylinder's volume and height, $\pi r^2 h = V$, so $r = \sqrt{\dfrac{V}{\pi h}}$. For $V = 80\pi$ and $h = 5$, $r^2 = 16$ and $r = 4$.
+
+### Cylinder surface area
+
+The total surface area of a cylinder is $2\pi r^2 + 2\pi rh$. With $r = 4$ and $h = 5$, that is $32\pi + 40\pi = 72\pi$.
+
+### Cube roots and cubes
+
+To find an edge from a volume, take a cube root. A cube with volume $3375$ has edge $\sqrt[3]{3375} = 15$, so its surface area is $6 \cdot 15^2 = 1350$.
+
+### Units before formulas
+
+Convert every length to the same unit before you use a formula. A trough width of $80$ centimeters is $0.8$ meters when the volume is in cubic meters.
+
 ## Worked example 1 (easy)
 
 A closed box is $8$ cm long, $5$ cm wide, and $3$ cm tall. Find its volume and surface area.

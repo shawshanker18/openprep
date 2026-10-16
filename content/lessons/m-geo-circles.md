@@ -27,6 +27,38 @@ $$C = 2\pi r \qquad A = \pi r^2 \qquad (x - h)^2 + (y - k)^2 = r^2$$
 - Inscribed angle $= \frac{1}{2} \times$ intercepted arc.
 - Completing the square: $x^2 + 10x = (x + 5)^2 - 25$. Take half the coefficient, square it.
 
+### The radius from two points
+
+The radius is the distance from the center to any point on the circle. For center $(-4, 1)$ and point $(8, 6)$: $r = \sqrt{12^2 + 5^2} = 13$, so the equation is $(x + 4)^2 + (y - 1)^2 = 169$.
+
+### A diameter given by its endpoints
+
+The center is the midpoint of the endpoints, and the radius is half the distance between them. For endpoints $(-29, 47)$ and $(19, -17)$: the midpoint is $(-5, 15)$ and the distance is $\sqrt{48^2 + 64^2} = 80$, so $r = 40$ and the equation is $(x + 5)^2 + (y - 15)^2 = 1600$.
+
+### Translating a circle
+
+Shifting a circle right by $h$ replaces $x$ with $x - h$ in its equation. Circle $(x + 2)^2 + (y - 8)^2 = 9$ moved right $6$ units becomes $(x - 4)^2 + (y - 8)^2 = 9$.
+
+### A leading coefficient other than 1
+
+Divide the whole equation by the coefficient of $x^2$ before completing the square. For $16x^2 + 16y^2 - 8x - 24y - 15 = 0$, divide by $16$ to get $x^2 + y^2 - \dfrac{1}{2}x - \dfrac{3}{2}y = \dfrac{15}{16}$. The center is $\left(\dfrac{1}{4}, \dfrac{3}{4}\right)$ and $r^2 = \dfrac{25}{16}$, so $r = \dfrac{5}{4}$.
+
+### Tangent lines
+
+A tangent line is perpendicular to the radius at the point of tangency. Find the slope of the radius from the center to that point, then use the negative reciprocal. For center $(-4, 3)$ and point $(2, -5)$, the radius has slope $\dfrac{-5 - 3}{2 + 4} = -\dfrac{4}{3}$, so the tangent has slope $\dfrac{3}{4}$.
+
+### Working backward from arc length or sector area
+
+An arc of length $L$ with central angle $\theta$ (in degrees) satisfies $L = \dfrac{\theta}{360} \cdot 2\pi r$, so $r = \dfrac{360L}{2\pi\theta}$. Sector area works the same way.
+
+### Shaded regions
+
+Shaded areas are usually a sector minus a triangle, or a circle minus a sector. Find each piece, then subtract.
+
+### General form to radius
+
+$x^2 + y^2 + 8x - 14y + 49 = 0$ becomes $(x + 4)^2 + (y - 7)^2 = 16$, so the radius is $4$.
+
 ## Worked example 1 (easy)
 
 A circle has radius $9$. Find the length of the arc and the area of the sector cut off by an $80^\circ$ central angle.

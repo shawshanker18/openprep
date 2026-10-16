@@ -14,6 +14,8 @@ A linear equation in one variable has a single unknown, usually $x$, that is nev
 - **Clear fractions early** by multiplying every term on both sides by the least common denominator. Decimals work the same way: multiply by $10$ or $100$.
 - In word problems, a one-time amount is a constant and a per-unit amount multiplies the variable: "a \$20 fee plus \$8 per hour" becomes $20 + 8h$.
 - After simplifying, every linear equation looks like $ax + b = cx + d$. Comparing the coefficients tells you how many solutions there are.
+- **A letter can be a constant.** In $(4 + k)x$, the letter $k$ is just a number you do not know yet. So $4 + k$ is one coefficient, and you can solve for $k$ like any other unknown.
+- **To make an equation have no solution or infinitely many, match the $x$-coefficients first**, then check the constants. The SAT asks for $k$ this way.
 
 ## Formulas and rules
 
@@ -24,7 +26,45 @@ A linear equation in one variable has a single unknown, usually $x$, that is nev
 | $a = c$ and $b = d$ | infinitely many (e.g. $5 = 5$) |
 
 - Distributing a negative flips every sign inside: $-2(x - 3) = -2x + 6$.
+- **Finding a missing constant $k$:** write each side as (coefficient)$\cdot x$ + constant. For *no solution*, set the coefficients equal and make sure the constants are not. For *infinitely many*, set both equal. Each condition is a small equation in $k$, so solve it like any other.
 - To clear $\frac{x}{4}$ and $\frac{x}{6}$, multiply by $12$, not by $24$ (either works, but the smaller number keeps the arithmetic easy).
+
+### Solving for a missing constant
+
+Some equations contain a letter such as $k$ that is not the variable. Write each side as (coefficient)$\cdot x$ + constant, and treat $k$ as a number you do not know yet, so $4 + k$ is one coefficient.
+
+Why this works: $mx + p$ and $nx + q$ are equal for *every* $x$ only when $m = n$ and $p = q$. If $m = n$ but $p \ne q$, the sides differ by the same gap for every $x$, so no $x$ can make them equal.
+
+1. Set the $x$-coefficients equal and solve that short equation in $k$.
+2. Check the constants: they must differ (no solution) or match (infinitely many).
+
+Example: $3x + k = 3x + 5$ has no solution when $k \ne 5$ and infinitely many when $k = 5$.
+
+### Mixtures and multiplied amounts
+
+In a mixture, the amount of the pure ingredient adds up. A $15\%$ and a $30\%$ acid solution combine to make a $25\%$ solution: $0.15x + 0.30y = 0.25(x + y)$.
+
+"One-third as long as" means a multiplier. If Rina practiced one-third as long as Mara and practiced $25$ minutes, then Mara practiced $3 \cdot 25 = 75$ minutes.
+
+### Absolute value equations
+
+$|A| = B$ has two cases, $A = B$ and $A = -B$. For $|11 - x| = 4$: $11 - x = 4$ gives $x = 7$, and $11 - x = -4$ gives $x = 15$. Both are solutions.
+
+### Modelling with tax
+
+Multiply by $1.08$ for an $8\%$ tax on a charge. For $28$ dollars per day plus $8\%$ tax and a $12$ dollar fee, the total is $28d(1.08) + 12$.
+
+### A shared numerator
+
+If $\dfrac{x+9}{4} = \dfrac{x+9}{11}$, cross-multiplying gives $11(x+9) = 4(x+9)$, so $7(x+9) = 0$ and $x + 9 = 0$.
+
+### The $x$-intercept of a fraction
+
+A fraction equals zero when its numerator is zero and its denominator is not. For $y = \dfrac{52 - x}{ax + b}$, the $x$-intercept is $x = 52$.
+
+### Rearranging a formula
+
+Undo the operations in reverse order. From $R = \dfrac{0.29\,l}{A}$, multiply by $A$ and divide by $0.29$ to get $l = \dfrac{RA}{0.29}$.
 
 ## Worked example 1 (easy)
 

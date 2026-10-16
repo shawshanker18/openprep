@@ -116,3 +116,37 @@ export async function deleteConcept(adminId: string, id: string): Promise<Ok<{ r
   if (gone.length) await audit(adminId, "concept.delete", id);
   return { ok: true, value: { removed: gone.length > 0 } };
 }
+
+/**
+ * The questions for a skill checkpoint: up to 3 of the skill's concept questions, then skill questions to make `size`.
+ * Study pool only, active only, in that order.
+ */
+export async function checkpointQuestions(skillId: string, size = 5) {
+  const fromConcepts = await db.select({ id: questions.id, skillId: questions.skillId }).from(conceptQuestions)
+    .innerJoin(skillConcepts, eq(skillConcepts.id, conceptQuestions.conceptId))
+    .innerJoin(questions, eq(questions.id, conceptQuestions.questionId))
+    .where(and(eq(skillConcepts.skillId, skillId), eq(questions.status, "active"), eq(questions.pool, "study")))
+    .orderBy(sql`random()`).limit(Math.min(3, size));
+  // A question can sit in more than one concept, so drop repeats before counting.
+  const unique = [...new Map(fromConcepts.map((q) => [q.id, q])).values()];
+  const taken = new Set(unique.map((q) => q.id));
+  const need = size - unique.length;
+  const picks = [...unique];
+  if (need > 0) {
+    const candidates = await db.select({ id: questions.id, skillId: questions.skillId }).from(questions)
+      .where(and(eq(questions.skillId, skillId), eq(questions.status, "active"), eq(questions.pool, "study")))
+      .orderBy(sql`random()`).limit(need + taken.size);
+    for (const q of candidates) if (!taken.has(q.id) && picks.length < size) picks.push(q);
+  }
+  return picks;
+}
+
+/** Start a checkpoint set for a skill. Questions are recorded as given, through the same ledger as any practice. */
+export async function startCheckpoint(userId: string, skillId: string, title: string, back?: string): Promise<string | null> {
+  const picks = await checkpointQuestions(skillId);
+  if (!picks.length) return null;
+  const context = await deliveryContext();
+  await db.transaction((tx) => exposeQuestions(tx, userId, picks, context));
+  const ids = picks.map((q) => publicId(q.id, userId));
+  return createPracticeSession(userId, { mode: "list", ids, count: ids.length }, title, back);
+}

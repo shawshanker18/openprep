@@ -29,6 +29,22 @@ $$\text{mean} = \frac{\text{sum of values}}{\text{number of values}} \qquad \tex
 - Combined mean of two groups: $\frac{n_1 \bar{x}_1 + n_2 \bar{x}_2}{n_1 + n_2}$. For $12$ students averaging $70$ and $18$ averaging $80$: $\frac{840 + 1440}{30} = 76$.
 - Median position in a sorted list of $n$ values: the $\frac{n + 1}{2}$th value.
 
+### Changing one value
+
+Removing an outlier that is above the mean lowers the mean. Adding a value equal to the current mean leaves the mean unchanged. The median and standard deviation respond differently, so check which measure the question asks about.
+
+### Finding a missing value
+
+Use totals. If the mean of $n$ values is $m$, the total is $nm$, and a missing value is the total minus the known values. The same method finds a missing frequency in a table.
+
+### Reading a graph in context
+
+A highest point is a maximum. A flat segment means no change. A dotted reference line marks a fixed level. A single point is one input paired with one output, and it has a meaning in context. Name what each axis measures before you interpret.
+
+### Mean versus median
+
+A high outlier pulls the mean up but barely moves the median. If the mean is greater than the median, the data have a long tail on the high side.
+
 ## Worked example 1 (easy)
 
 Find the mean and median of $3, 8, 5, 12, 5, 9$.

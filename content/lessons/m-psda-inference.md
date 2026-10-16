@@ -27,6 +27,14 @@ $$\text{population estimate} = \frac{\text{count in sample}}{\text{sample size}}
 
 - To estimate how many do **not** have a trait, use the complement: $1 - \text{sample proportion}$.
 
+### Reading a margin of error
+
+An estimate of $86\%$ with a margin of error of $4\%$ means the true percent is plausibly between $82\%$ and $90\%$. A conclusion has to stay inside that range. If a second estimate's interval starts above $90\%$, the difference is convincing.
+
+### Comparing two estimates with margins
+
+Build each interval as estimate $\pm$ margin. A mean of $6.4 \pm 1.5$ gives $4.9$ to $7.9$, and $7.6 \pm 0.9$ gives $6.7$ to $8.5$. The intervals overlap, so the data do not clearly show which mean is larger.
+
 ## Worked example 1 (easy)
 
 An inspector tests a random sample of $250$ phones from a shipment of $15{,}000$ and finds $9$ defective. Estimate the number of defective phones in the shipment.

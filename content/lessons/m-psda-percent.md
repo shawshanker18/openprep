@@ -26,6 +26,14 @@ $$\text{part} = \frac{p}{100} \times \text{whole} \qquad \text{percent change} =
 | decrease by $p$ percent | $1 - \frac{p}{100}$ |
 | $a$ is $p$ percent greater than $b$ | $a = \left(1 + \frac{p}{100}\right)b$ |
 
+### Percent of a part
+
+Find the part first, then the percent of it. If $35\%$ of day students and $20\%$ of evening students ride the bus, and day students are $58\%$ of the population, then the overall share is $0.58(0.35) + 0.42(0.20) = 0.287$, so $28.7\%$ of all students ride the bus. Do not average the two rates.
+
+### Percents above 100%
+
+A percent over $100\%$ means more than the whole. $1{,}350\%$ of a number is $13.5$ times that number.
+
 ## Worked example 1 (easy)
 
 What percent of $72$ is $18$? Then: a \$80 item increases in price by 15%. What is the new price?

@@ -14,7 +14,7 @@ import { getStudentLesson } from "@/server/course-lessons";
 import { safely } from "@/lib/safely";
 import { getLesson, listDesmosLessons } from "@/server/lessons";
 import { scratchPath, scratchProgress } from "@/server/scratch";
-import { conceptPracticeAction, stepAction } from "../actions";
+import { checkpointAction, conceptPracticeAction, stepAction } from "../actions";
 
 export async function generateMetadata({ params }: PageProps<"/start/[step]">) {
   const { step } = await params;
@@ -63,27 +63,30 @@ export default async function StepPage({ params }: PageProps<"/start/[step]">) {
         <LessonTextSize>
           <article className="flex max-w-3xl flex-col gap-6">
             {lesson.minutes && <p className="text-sm text-muted-foreground">About {lesson.minutes} minutes</p>}
-            <LessonStudyView sections={lesson.sections} skillId={step.ref} curriculum={profile.curriculum} grade={profile.grade} subjects={profile.subjects}
-              practiceHref={`/practice?mode=set&skills=${step.ref}&difficulty=3&count=2&from=/start/${step.key}`} />
-
+            <LessonStudyView sections={lesson.sections} skillId={step.ref} curriculum={profile.curriculum} grade={profile.grade} subjects={profile.subjects} />
             {concepts.length > 0 && (step.status === "done" ? (
               <section aria-labelledby="concepts" className="flex flex-col gap-4">
                 <h2 id="concepts" className="text-xl font-semibold">Concepts in this skill</h2>
                 <p className="text-sm text-muted-foreground">Each concept has its own explanation and questions.</p>
-                {concepts.map((c) => (
-                  <article key={c.id} className="flex flex-col gap-3 rounded-2xl border bg-background p-5 shadow-sm">
-                    <h3 className="text-lg font-semibold">{c.title}</h3>
-                    {c.explanationMd && <Markdown className="text-[1em] leading-relaxed">{c.explanationMd}</Markdown>}
-                    <form action={conceptPracticeAction.bind(null, step.key, c.id)}>
-                      <Button type="submit" variant="outline" disabled={c.questionCount === 0}>
-                        {c.questionCount ? `Practise this concept (${c.questionCount} question${c.questionCount === 1 ? "" : "s"})` : "No questions yet"}
-                      </Button>
-                    </form>
-                  </article>
+                {concepts.map((c, i) => (
+                  <details key={c.id} className="group min-w-0 overflow-hidden rounded-xl border">
+                    <summary className="flex cursor-pointer list-none items-center gap-3 p-4 hover:bg-muted [&::-webkit-details-marker]:hidden">
+                      <span className="min-w-0 flex-1 text-sm font-semibold">Concept {i + 1}: {c.title}</span>
+                      <ChevronRight className="size-4 shrink-0 transition-transform group-open:rotate-90" />
+                    </summary>
+                    <div className="flex flex-col gap-3 border-t p-4">
+                      {c.explanationMd && <Markdown className="text-[1em] leading-relaxed">{c.explanationMd}</Markdown>}
+                      <form action={conceptPracticeAction.bind(null, step.key, c.id)}>
+                        <Button type="submit" variant="outline" disabled={c.questionCount === 0}>
+                          {c.questionCount ? `Practise this concept (${c.questionCount} question${c.questionCount === 1 ? "" : "s"})` : "No questions yet"}
+                        </Button>
+                      </form>
+                    </div>
+                  </details>
                 ))}
               </section>
             ) : (
-              <p className="rounded-xl border p-4 text-sm text-muted-foreground">Finish this topic to unlock its {concepts.length} concept{concepts.length === 1 ? "" : "s"}.</p>
+              <p className="text-sm text-muted-foreground">Finish this topic to unlock its {concepts.length} concept{concepts.length === 1 ? "" : "s"}.</p>
             ))}
           </article>
         </LessonTextSize>
@@ -92,7 +95,8 @@ export default async function StepPage({ params }: PageProps<"/start/[step]">) {
       <div className="sticky bottom-[calc(4rem+env(safe-area-inset-bottom))] z-10 flex flex-wrap items-center gap-2 rounded-xl border bg-background p-3 lg:bottom-4">
         <form action={stepAction.bind(null, step.key, "done")}><Button type="submit">{step.status === "done" ? "Next topic" : "Done, next topic"}</Button></form>
         {step.status !== "done" && <form action={stepAction.bind(null, step.key, "skip")}><Button type="submit" variant="outline">Skip this topic</Button></form>}
-        <span className="ml-auto flex gap-1">
+        <span className="ml-auto flex flex-wrap items-center gap-1">
+          {step.kind === "skill" && lesson && <form action={checkpointAction.bind(null, step.key)}><Button type="submit" variant="outline" size="sm">Checkpoint: 5 questions</Button></form>}
           {prev && <Button variant="ghost" size="sm" render={<Link href={`/start/${prev.key}`} aria-label={`Previous: ${prev.title}`} />}><ChevronLeft className="size-4" />Back</Button>}
           {following && <Button variant="ghost" size="sm" render={<Link href={`/start/${following.key}`} aria-label={`Next: ${following.title}`} />}>Next<ChevronRight className="size-4" /></Button>}
         </span>

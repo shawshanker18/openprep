@@ -26,6 +26,18 @@ Central Ideas and Details questions ask what a short text is mostly about, or wh
 
 Rule: **summarize the text in your own words in about ten words before reading the choices**. Then pick the choice closest to your summary.
 
+### Main idea versus main topic
+
+The main topic is what the text is about (a painter, a plant, a play). The main idea is what the author says about that topic. Choices that name only the topic are usually too narrow or too vague.
+
+### What the text suggests
+
+"Most strongly suggests" asks for a conclusion the text supports even though it is not stated. Find the evidence the text gives, then choose the choice that the evidence most directly supports, without going beyond it.
+
+### Tone and word choice
+
+What a narrator says about a place or a person is shown by the words chosen: vivid detail, loaded adjectives, or a calm, factual tone. For a question about the narrator's characterization, choose the answer that matches those words, not the plot.
+
 ## Worked example 1 (easy)
 
 > Many people assume that ancient bridges were built by trial and error. However, records from one Roman province show that engineers tested small model arches before building full-sized ones. They recorded which shapes held the most weight and used those results to plan their bridges.

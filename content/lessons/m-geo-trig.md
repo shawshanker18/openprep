@@ -28,6 +28,22 @@ $$a^2 + b^2 = c^2 \qquad \sin\theta = \frac{\text{opp}}{\text{hyp}} \quad \cos\t
 - Degrees to radians: multiply by $\frac{\pi}{180}$. So $60^\circ = \frac{\pi}{3}$ and $300^\circ = \frac{5\pi}{3}$.
 - Unit circle: a point at angle $\theta$ is $(\cos\theta, \sin\theta)$. Sine is negative below the $x$-axis; cosine is negative left of the $y$-axis. Example: $\frac{5\pi}{3}$ is $300^\circ$, with reference angle $60^\circ$ in the fourth quadrant, so $\sin\frac{5\pi}{3} = -\frac{\sqrt{3}}{2}$.
 
+### Special angles
+
+Memorize $\sin$, $\cos$, and $\tan$ at $30^\circ$, $45^\circ$, and $60^\circ$ from the special triangles above. A $30^\circ$-$60^\circ$-$90^\circ$ triangle with hypotenuse $2x$ has short leg $x$, so $\sin 30^\circ = \dfrac{1}{2}$ and $\cos 30^\circ = \dfrac{\sqrt{3}}{2}$.
+
+### Equilateral triangles
+
+An equilateral triangle with side $s$ has height $\dfrac{s\sqrt{3}}{2}$. For height $29\sqrt{3}$, the side is $\dfrac{2 \cdot 29\sqrt{3}}{\sqrt{3}} = 58$.
+
+### Angles beyond one turn
+
+Angles repeat every $2\pi$ radians (or $360^\circ$). $11\pi$ radians is $11 \cdot 180^\circ = 1980^\circ$. Also $\tan(2\pi) = \dfrac{\sin 2\pi}{\cos 2\pi} = \dfrac{0}{1} = 0$.
+
+### Values at multiples of $\pi$
+
+On the unit circle, $\cos\theta$ is the $x$-coordinate and $\sin\theta$ is the $y$-coordinate. At $\theta = \pi$ the point is $(-1, 0)$, so $\cos\pi = -1$, and $3\pi$ lands on the same point, so $\cos 3\pi = -1$. For $\dfrac{7\pi}{4}$, the reference angle is $\dfrac{\pi}{4}$ in quadrant IV, so $\cos\dfrac{7\pi}{4} = \dfrac{\sqrt{2}}{2}$.
+
 ## Worked example 1 (easy)
 
 A right triangle has legs $7$ and $24$. Find the hypotenuse, and find $\sin\theta$, $\cos\theta$, and $\tan\theta$ for the angle $\theta$ opposite the side of length $7$.

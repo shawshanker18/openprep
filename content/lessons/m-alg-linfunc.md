@@ -27,6 +27,30 @@ $$m = \frac{y_2 - y_1}{x_2 - x_1}$$
 - The $x$-intercept is where $f(x) = 0$: solve $mx + b = 0$ to get $x = -\frac{b}{m}$.
 - A line through $(a, 0)$ and $(0, c)$ has slope $\frac{c - 0}{0 - a} = -\frac{c}{a}$.
 
+### Reading the slope from standard form
+
+Solve for $y$ before reading the slope. $7y + 14x = 4$ becomes $y = -2x + \dfrac{4}{7}$, so the slope is $-2$. Lines in the same direction (parallel) share a slope.
+
+### Interpreting a rate
+
+In $T(x) = 55 - 6x$, the slope $-6$ is the change in temperature per hour, and $55$ is the value at $x = 0$. For each unit increase in $x$, the output changes by the slope.
+
+### Two points that the function passes through
+
+If you know two points, the slope is the change in output divided by the change in input, and you can write the function from there.
+
+### Vertical and horizontal lines
+
+A vertical line $x = c$ has no slope. Lines perpendicular to it are horizontal, with slope $0$. The equation $x + 2.5 = 0$ is the vertical line $x = -2.5$, so a line through $(-6, 1.5)$ perpendicular to it is $y = 1.5$.
+
+### Rates over several units
+
+"Increases by $9$ every $4$ seconds" is a rate of $\dfrac{9}{4}$ per second. If the speed starts at $6$ feet per second, then $v(t) = 6 + \dfrac{9}{4}t$.
+
+### Parallel lines through a point
+
+For $2x - 3y = 9$, the slope is $\dfrac{2}{3}$. The line through $(-6, 1)$ with that slope is $y - 1 = \dfrac{2}{3}(x + 6)$.
+
 ## Worked example 1 (easy)
 
 The function $f$ is defined by $f(x) = 7 - 2x$. Find $f(-3)$, and find the value of $x$ for which $f(x) = -5$.

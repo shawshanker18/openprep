@@ -27,6 +27,28 @@ For $a_1x + b_1y = c_1$ and $a_2x + b_2y = c_2$:
 
 In plain words: no solution means same slope, different intercept. Infinitely many means one equation is a multiple of the other.
 
+**Finding a missing constant when one equation is a multiple of the other:** compare one pair of matching coefficients to find the multiplier, then apply that multiplier to the other terms. For $6x - 9y = 15$ and $4x + ky = c$: $4 = 6 \cdot \frac{2}{3}$, so the multiplier is $\frac{2}{3}$. Then $k = -9 \cdot \frac{2}{3} = -6$ and $c = 15 \cdot \frac{2}{3} = 10$. Check it by multiplying the first equation by the multiplier and confirming you get the second.
+
+### Clearing fractions and decimals first
+
+Multiply each equation by the least common denominator to clear fractions, or by $10$ or $100$ to clear decimals, before you substitute or eliminate.
+
+### Equations with the same left side
+
+For $\dfrac{x}{5} + 6(y - 4) = 33$ and $\dfrac{x}{5} - 6(y - 4) = 17$, add the equations: $\dfrac{2x}{5} = 50$, so $x = 125$. The $y$-part cancels, so you never need to find $y$.
+
+### Rearrange before comparing
+
+Put both equations in the form $ax + by = c$ before you compare them, because the equations may arrive in another arrangement. $30x = 900y - 1500$ becomes $30x - 900y = -1500$.
+
+### Find a constant from a known solution
+
+Substitute the known value (such as $x = 1$) into both equations, solve for the constant from one of them, then check it in the other.
+
+### Distance problems with different start times
+
+Lucía starts at $7{:}50$ at $18$ mph, and Marco starts at $8{:}00$ at $22$ mph. When Marco has ridden $t$ hours, Lucía has ridden $t + \tfrac{1}{6}$ hours. They meet when $18\left(t + \tfrac{1}{6}\right) = 22t$, so $t = 0.75$ and Marco has ridden $22(0.75) = 16.5$ miles.
+
 ## Worked example 1 (easy)
 
 Solve the system $4x + 3y = 26$ and $2x - 3y = 4$.

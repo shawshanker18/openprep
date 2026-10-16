@@ -27,6 +27,10 @@ Cross-Text Connections questions give you two short texts on the same topic, lab
 
 Rule: **summarize each text in one sentence, then write one sentence connecting them** before reading choices.
 
+### What the two authors disagree about
+
+Each text answers a question, and the two authors may answer different questions. Name the question each text answers (for example, "does the trial show the policy works?" or "does the result apply to shift-based jobs?"). Then the authors disagree only where their answers to the same question differ.
+
 ## Worked example 1 (easy)
 
 > **Text 1**

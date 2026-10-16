@@ -17,7 +17,7 @@ vi.mock("@/server/practice-sessions", () => ({
   createPracticeSession: async (_user: string, config: unknown) => { started.push(config); return "00000000-0000-4000-8000-0000000000aa"; },
 }));
 
-const { conceptsForSkill, deleteConcept, saveConcept, startConceptPractice } = await import("./concepts");
+const { checkpointQuestions, conceptsForSkill, deleteConcept, saveConcept, startConceptPractice } = await import("./concepts");
 
 const ADMIN = "00000000-0000-4000-8000-00000000ad01";
 const USER = "00000000-0000-4000-8000-00000000c001";
@@ -104,5 +104,18 @@ describe("deleting a concept", () => {
     expect(await deleteConcept(ADMIN, id)).toMatchObject({ ok: true, value: { removed: true } });
     expect(await db.select().from(schema.conceptQuestions).where(eq(schema.conceptQuestions.conceptId, id))).toHaveLength(0);
     expect(await db.select().from(schema.questions).where(eq(schema.questions.id, "q-active-1"))).toHaveLength(1);
+  });
+});
+
+describe("checkpoints", () => {
+  it("starts with a concept question, uses only active study questions, and never repeats one", async () => {
+    await saveConcept(ADMIN, { ...base, title: "Checkpoint concept", questionIds: ["q-active-2"] });
+    const picks = await checkpointQuestions(SKILL);
+    expect(picks[0]?.id).toBe("q-active-2");
+    const ids = picks.map((q) => q.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    expect(ids).not.toContain("q-retired");
+    expect(ids).not.toContain("q-test-pool");
+    expect(ids.length).toBeLessThanOrEqual(5);
   });
 });

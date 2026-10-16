@@ -25,6 +25,18 @@ A linear equation in two variables, such as $y = 2x - 4$ or $3x + 5y = 30$, desc
 - Point-slope form: $y - y_1 = m(x - x_1)$.
 - Perpendicular slopes multiply to $-1$: slope $\frac{2}{5}$ pairs with $-\frac{5}{2}$.
 
+### Points on a line
+
+Any two points on a line have the same slope. For $(-1, -45)$, $(3, 15)$, and $(v, 0)$: the slope from the first two points is $\dfrac{15 + 45}{3 + 1} = 15$. The slope from $(-1, -45)$ to $(v, 0)$ must also be $15$, so $\dfrac{45}{v + 1} = 15$ and $v = 2$.
+
+### Intercept form
+
+$\dfrac{x}{a} + \dfrac{y}{b} = 1$ has $x$-intercept $a$ and $y$-intercept $b$. For $\dfrac{x}{3.4} - \dfrac{y}{5.1} = 1$, the $x$-intercept is $3.4$ and the $y$-intercept is $-5.1$, so the slope is $\dfrac{5.1}{3.4} = 1.5$.
+
+### From a table
+
+If the table's $x$-steps are equal and its $y$-values change by the same amount each step, the relationship is linear. Use two rows to find the slope, then use one row to find the intercept.
+
 ## Worked example 1 (easy)
 
 Find the slope and both intercepts of $6x - 3y = 12$.
