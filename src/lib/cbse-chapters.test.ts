@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { CBSE_CHAPTERS, askedChapters, chaptersBelowGrade, completedChapters, savedChapters, skillsFromChapters } from "@/content/cbse-chapters";
+import { CBSE_CHAPTERS, asksChapters, asksSubjects, askedChapters, chaptersBelowGrade, completedChapters, savedChapters, skillsFromChapters } from "@/content/cbse-chapters";
 import { SKILL_BY_ID } from "@/content/taxonomy";
 import { likelyCoveredSkills } from "./curriculum-coverage";
 
@@ -44,10 +44,21 @@ it("only Class 11 is asked, for its six course chapters; other classes store no 
   expect(askedChapters(10)).toEqual([]);
   expect(askedChapters(12)).toEqual([]);
   // Class 11 keeps the Class 9 and 10 assumption, but only course chapters can be ticked.
-  const saved = savedChapters(["cbse-11-statistics", "cbse-11-sets"], 11, "cbse");
+  const saved = savedChapters(["cbse-11-statistics", "cbse-11-sets"], 11, "cbse", ["Mathematics"]);
   expect(saved).toContain("cbse-11-statistics");
   expect(saved).toContain("cbse-10-polynomials");
   expect(saved).not.toContain("cbse-11-sets");
-  expect(savedChapters(["cbse-10-polynomials"], 10, "cbse")).toEqual([]);
-  expect(savedChapters(["cbse-11-statistics"], 11, "icse")).toEqual([]);
+  expect(savedChapters(["cbse-10-polynomials"], 10, "cbse", ["Mathematics"])).toEqual([]);
+  expect(savedChapters(["cbse-11-statistics"], 11, "icse", ["Mathematics"])).toEqual([]);
+  // Chapters are asked only when Mathematics is studied.
+  expect(asksChapters("cbse", 11, ["Physics"])).toBe(false);
+  expect(savedChapters(["cbse-11-statistics"], 11, "cbse", ["Physics"])).toEqual([]);
+  expect(asksChapters("cbse", 11, ["Mathematics", "Physics"])).toBe(true);
+});
+
+it("CBSE classes 9 and 10 are not asked which subjects they study", () => {
+  expect(asksSubjects("cbse", 9)).toBe(false);
+  expect(asksSubjects("cbse", 10)).toBe(false);
+  expect(asksSubjects("cbse", 11)).toBe(true);
+  expect(asksSubjects("icse", 9)).toBe(true);
 });

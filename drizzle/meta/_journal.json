@@ -176,6 +176,13 @@
       "when": 1791964157515,
       "tag": "0024_groups_and_courses",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1792143239523,
+      "tag": "0025_concepts",
+      "breakpoints": true
     }
   ]
 }

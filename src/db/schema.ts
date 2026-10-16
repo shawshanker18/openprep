@@ -471,3 +471,31 @@ export const studentCourseAssignments = pgTable("student_course_assignments", {
   updatedAt: ts("updated_at").notNull().defaultNow(),
 }, (t) => [primaryKey({ columns: [t.userId, t.courseId] })]).enableRLS();
 
+
+/* ───────── concepts: conceptual practice after a skill's lesson ───────── */
+/** A concept inside one SAT skill. Admins write its explanation and choose its questions in /admin/concepts. */
+export const skillConcepts = pgTable("skill_concepts", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  skillId: text("skill_id").notNull(),
+  title: text("title").notNull(),
+  explanationMd: text("explanation_md").notNull().default(""),
+  sort: smallint("sort").notNull().default(0),
+  createdBy: uuid("created_by"),
+  updatedBy: uuid("updated_by"),
+  createdAt: ts("created_at").notNull().defaultNow(),
+  updatedAt: ts("updated_at").notNull().defaultNow(),
+}, (t) => [
+  check("skill_concepts_title_check", sql`length(${t.title}) between 1 and 120`),
+  index("skill_concepts_skill_sort_idx").on(t.skillId, t.sort),
+]).enableRLS();
+
+/** The questions a concept practices. Only active questions of the concept's own skill are allowed (checked on save). */
+export const conceptQuestions = pgTable("concept_questions", {
+  conceptId: uuid("concept_id").notNull().references(() => skillConcepts.id, { onDelete: "cascade" }),
+  questionId: text("question_id").notNull().references(() => questions.id, { onDelete: "cascade" }),
+  addedBy: uuid("added_by"),
+  addedAt: ts("added_at").notNull().defaultNow(),
+}, (t) => [
+  primaryKey({ columns: [t.conceptId, t.questionId] }),
+  index("concept_questions_question_idx").on(t.questionId),
+]).enableRLS();

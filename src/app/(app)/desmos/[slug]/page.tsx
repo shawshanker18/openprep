@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { db } from "@/db";
 import { lessonProgress } from "@/db/schema";
 import { DesmosCalculator } from "@/components/desmos-panel";
+import { LessonTextSize } from "@/components/lesson-text-size";
 import { LessonWorkspace } from "@/components/lesson-workspace";
 import { Markdown } from "@/components/markdown";
 import { requireUser } from "@/server/auth";
@@ -25,13 +26,15 @@ export default async function DesmosLessonPage({ params }: PageProps<"/desmos/[s
   await db.insert(lessonProgress).values({ userId, skillId: `desmos:${slug}` })
     .onConflictDoUpdate({ target: [lessonProgress.userId, lessonProgress.skillId], set: { completedAt: new Date() } });
   return (
-    <LessonWorkspace title={lesson.title} slug={slug} calculator={<DesmosCalculator expressions={lesson.expressions} className="h-[calc(100dvh-7.5rem)] min-h-[320px]" />}>
-      <Markdown className="text-[15px]">{lesson.md}</Markdown>
+    <LessonWorkspace title={lesson.title} slug={slug} calculator={<DesmosCalculator expressions={lesson.expressions} className="h-[min(calc(100dvh-7.5rem),52rem)] min-h-[26rem]" />}>
+      <LessonTextSize>
+      <Markdown className="text-[1em] leading-relaxed">{lesson.md}</Markdown>
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t pt-4">
         {index > 0 ? <Button variant="outline" render={<Link href={`/desmos/${lessons[index - 1]!.slug}`} />}>Previous lesson</Button> : <span />}
         <Button variant="outline" render={<Link href="/practice?mode=smart" />}>Practice math now</Button>
         {index >= 0 && index < lessons.length - 1 ? <Button render={<Link href={`/desmos/${lessons[index + 1]!.slug}`} />}>Next lesson</Button> : <span />}
       </div>
+      </LessonTextSize>
     </LessonWorkspace>
   );
 }

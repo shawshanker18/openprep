@@ -5,14 +5,16 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DesmosCalculator } from "@/components/desmos-panel";
 import { LessonStudyView } from "@/components/lesson-study-view";
+import { LessonTextSize } from "@/components/lesson-text-size";
 import { Markdown } from "@/components/markdown";
 import { orientationBy } from "@/content/getting-started";
 import { requireUser } from "@/server/auth";
+import { conceptsForSkill } from "@/server/concepts";
 import { getStudentLesson } from "@/server/course-lessons";
 import { safely } from "@/lib/safely";
 import { getLesson, listDesmosLessons } from "@/server/lessons";
 import { scratchPath, scratchProgress } from "@/server/scratch";
-import { stepAction } from "../actions";
+import { conceptPracticeAction, stepAction } from "../actions";
 
 export async function generateMetadata({ params }: PageProps<"/start/[step]">) {
   const { step } = await params;
@@ -27,9 +29,10 @@ export default async function StepPage({ params }: PageProps<"/start/[step]">) {
   if (i < 0) notFound();
   const step = steps[i]!;
   const prev = steps[i - 1], following = steps[i + 1];
-  const [lesson, desmos] = await Promise.all([
+  const [lesson, desmos, concepts] = await Promise.all([
     step.kind === "skill" ? safely(() => getStudentLesson(userId, step.ref), null).then((own) => own ?? getLesson(step.ref)) : null,
     step.kind === "desmos" ? listDesmosLessons().then((all) => all.find((l) => l.slug === step.ref) ?? null) : null,
+    step.kind === "skill" ? safely(() => conceptsForSkill(step.ref), []) : [],
   ]);
 
   return (
@@ -46,24 +49,44 @@ export default async function StepPage({ params }: PageProps<"/start/[step]">) {
       {step.kind === "intro" && <article className="max-w-2xl"><Markdown>{orientationBy(step.key)?.md ?? ""}</Markdown></article>}
 
       {step.kind === "desmos" && (desmos ? (
-        <div className="grid gap-6 lg:grid-cols-2">
-          <Markdown className="text-[15px]">{desmos.md}</Markdown>
-          <DesmosCalculator expressions={desmos.expressions} className="h-[28rem]" />
-        </div>
+        <LessonTextSize>
+          <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)]">
+            <Markdown className="text-[1em] leading-relaxed">{desmos.md}</Markdown>
+            <div className="lg:sticky lg:top-4">
+              <DesmosCalculator expressions={desmos.expressions} className="h-[min(78dvh,52rem)] min-h-[26rem]" />
+            </div>
+          </div>
+        </LessonTextSize>
       ) : <p className="text-muted-foreground">This lesson is not available right now. Please pick another step.</p>)}
 
       {step.kind === "skill" && (lesson ? (
-        <article className="flex max-w-3xl flex-col gap-6">
-          {lesson.minutes && <p className="text-sm text-muted-foreground">About {lesson.minutes} minutes</p>}
-          <LessonStudyView sections={lesson.sections} skillId={step.ref} curriculum={profile.curriculum} grade={profile.grade} subjects={profile.subjects} />
-          <section className="flex flex-col gap-3 rounded-xl border p-5 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="font-medium">Try it yourself</p>
-              <p className="text-sm text-muted-foreground">Five introductory SAT practice questions. Start with the lower SAT difficulty, then build up in Adaptive Practice.</p>
-            </div>
-            <Button variant="outline" render={<Link href={`/practice?mode=set&skills=${step.ref}&difficulty=1&count=5&from=/start/${step.key}`} />}>Practice 5 questions</Button>
-          </section>
-        </article>
+        <LessonTextSize>
+          <article className="flex max-w-3xl flex-col gap-6">
+            {lesson.minutes && <p className="text-sm text-muted-foreground">About {lesson.minutes} minutes</p>}
+            <LessonStudyView sections={lesson.sections} skillId={step.ref} curriculum={profile.curriculum} grade={profile.grade} subjects={profile.subjects}
+              practiceHref={`/practice?mode=set&skills=${step.ref}&difficulty=3&count=2&from=/start/${step.key}`} />
+
+            {concepts.length > 0 && (step.status === "done" ? (
+              <section aria-labelledby="concepts" className="flex flex-col gap-4">
+                <h2 id="concepts" className="text-xl font-semibold">Concepts in this skill</h2>
+                <p className="text-sm text-muted-foreground">Each concept has its own explanation and questions.</p>
+                {concepts.map((c) => (
+                  <article key={c.id} className="flex flex-col gap-3 rounded-2xl border bg-background p-5 shadow-sm">
+                    <h3 className="text-lg font-semibold">{c.title}</h3>
+                    {c.explanationMd && <Markdown className="text-[1em] leading-relaxed">{c.explanationMd}</Markdown>}
+                    <form action={conceptPracticeAction.bind(null, step.key, c.id)}>
+                      <Button type="submit" variant="outline" disabled={c.questionCount === 0}>
+                        {c.questionCount ? `Practise this concept (${c.questionCount} question${c.questionCount === 1 ? "" : "s"})` : "No questions yet"}
+                      </Button>
+                    </form>
+                  </article>
+                ))}
+              </section>
+            ) : (
+              <p className="rounded-xl border p-4 text-sm text-muted-foreground">Finish this topic to unlock its {concepts.length} concept{concepts.length === 1 ? "" : "s"}.</p>
+            ))}
+          </article>
+        </LessonTextSize>
       ) : <p className="text-muted-foreground">This lesson is not available right now. Please pick another topic.</p>)}
 
       <div className="sticky bottom-[calc(4rem+env(safe-area-inset-bottom))] z-10 flex flex-wrap items-center gap-2 rounded-xl border bg-background p-3 lg:bottom-4">

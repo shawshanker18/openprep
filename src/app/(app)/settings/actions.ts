@@ -9,7 +9,7 @@ import { db } from "@/db";
 import { profiles, satAttempts, testSessions } from "@/db/schema";
 import { createClient } from "@/lib/supabase/server";
 import { SUBJECTS, TOPICS } from "@/content/taxonomy";
-import { CBSE_CHAPTER_IDS, savedChapters } from "@/content/cbse-chapters";
+import { CBSE_CHAPTER_IDS, asksSubjects, savedChapters } from "@/content/cbse-chapters";
 import { requireUser, type ActionResult } from "@/server/auth";
 import { PushSubscriptionInput, removeSubscription, saveSubscription, sendTest } from "@/server/push";
 import { startDiagnostic } from "@/server/diagnostic";
@@ -56,7 +56,7 @@ export async function updateProfile(form: FormData) {
   });
   if (!p.success) redirect("/settings?error=profile");
   // Chapters only apply to CBSE; switching board clears them so nothing stale marks lessons as covered.
-  await db.update(profiles).set({ ...p.data, chaptersDone: savedChapters(p.data.chaptersDone, p.data.grade, p.data.curriculum) }).where(eq(profiles.id, userId));
+  await db.update(profiles).set({ ...p.data, chaptersDone: savedChapters(p.data.chaptersDone, p.data.grade, p.data.curriculum, p.data.subjects), subjects: asksSubjects(p.data.curriculum, p.data.grade) ? p.data.subjects : [] }).where(eq(profiles.id, userId));
   await refreshCourseAssignment(userId);
   revalidatePath("/settings");
   redirect("/settings?saved=1");

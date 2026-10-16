@@ -8,7 +8,7 @@ import { db } from "@/db";
 import { profiles, satAttempts, skillState } from "@/db/schema";
 import { SKILLS, TOPICS, boardTopics } from "@/content/taxonomy";
 import { priorTheta } from "@/engine/prior";
-import { savedChapters, skillsFromChapters } from "@/content/cbse-chapters";
+import { asksSubjects, savedChapters, skillsFromChapters } from "@/content/cbse-chapters";
 import { requireUser, type ActionResult } from "@/server/auth";
 
 import { Survey } from "@/lib/onboarding";
@@ -21,12 +21,12 @@ export async function submitSurvey(input: z.input<typeof Survey>): Promise<Actio
   const s = parsed.data;
   await db.transaction(async (tx) => {
     await tx.update(profiles).set({
-      grade: s.grade, curriculum: s.curriculum, topicsStudied: s.topicsStudied, chaptersDone: savedChapters(s.chaptersDone, s.grade, s.curriculum), subjects: s.subjects, englishBackground: s.englishBackground,
+      grade: s.grade, curriculum: s.curriculum, topicsStudied: s.topicsStudied, chaptersDone: savedChapters(s.chaptersDone, s.grade, s.curriculum, s.subjects), subjects: asksSubjects(s.curriculum, s.grade) ? s.subjects : [], englishBackground: s.englishBackground,
       priorMath: s.prior?.math ?? null, priorRw: s.prior?.rw ?? null, targetScore: s.targetScore, testDate: s.testDate,
       minutesPerDay: s.minutesPerDay, daysPerWeek: s.daysPerWeek, timezone: s.timezone, onboardingStep: "diagnostic_skipped",
     }).where(eq(profiles.id, userId));
     if (s.prior) await tx.insert(satAttempts).values({ userId, takenOn: s.prior.takenOn, math: s.prior.math, rw: s.prior.rw });
-    const studied = new Set([...TOPICS.filter((t) => s.topicsStudied.includes(t.id)).flatMap((t) => t.skills), ...skillsFromChapters(savedChapters(s.chaptersDone, s.grade, s.curriculum))]);
+    const studied = new Set([...TOPICS.filter((t) => s.topicsStudied.includes(t.id)).flatMap((t) => t.skills), ...skillsFromChapters(savedChapters(s.chaptersDone, s.grade, s.curriculum, s.subjects))]);
     const implied = new Set(TOPICS.filter((t) => boardTopics(s.curriculum, s.grade).includes(t.id)).flatMap((t) => t.skills));
     await tx.insert(skillState).values(SKILLS.map((skill) => {
       const selfRating = s.ratings[skill.id] ?? null;

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { db } from "@/db";
 import { satAttempts } from "@/db/schema";
 import { SUBJECTS, TOPICS } from "@/content/taxonomy";
+import { asksChapters, asksSubjects } from "@/content/cbse-chapters";
 import { requireUser } from "@/server/auth";
 import { signOut } from "@/app/auth/actions";
 import { ThemeSelect } from "@/components/theme";
@@ -75,16 +76,18 @@ export default async function SettingsPage({ searchParams }: PageProps<"/setting
           <label className="flex flex-col gap-1 text-sm">English is my…
             <Choice name="englishBackground" defaultValue={profile.englishBackground ?? "fluent"} options={[{ value: "first_language", label: "First language" }, { value: "fluent", label: "Fluent second language" }, { value: "learning", label: "Still learning" }]} /></label>
         </div>
-        <fieldset className="flex flex-col gap-2 text-sm">
-          <legend className="mb-2">Subjects you&apos;re studying now</legend>
-          <div className="flex flex-wrap gap-x-4 gap-y-2">
-            {SUBJECTS.map((s) => (
-              <label key={s} className="flex items-center gap-2">
-                <input type="checkbox" name="subjects" value={s} defaultChecked={profile.subjects.includes(s)} /> {s}
-              </label>
-            ))}
-          </div>
-        </fieldset>
+        {asksSubjects(profile.curriculum, profile.grade) && (
+          <fieldset className="flex flex-col gap-2 text-sm">
+            <legend className="mb-2">Subjects you&apos;re studying now</legend>
+            <div className="flex flex-wrap gap-x-4 gap-y-2">
+              {SUBJECTS.map((s) => (
+                <label key={s} className="flex items-center gap-2">
+                  <input type="checkbox" name="subjects" value={s} defaultChecked={profile.subjects.includes(s)} /> {s}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        )}
         <fieldset className="flex flex-col gap-2 text-sm">
           <legend className="mb-2">Math chapters you&apos;ve studied</legend>
           <div className="grid gap-2 sm:grid-cols-2">
@@ -95,7 +98,7 @@ export default async function SettingsPage({ searchParams }: PageProps<"/setting
             ))}
           </div>
         </fieldset>
-        {profile.curriculum === "cbse" && profile.grade === 11 && (
+        {asksChapters(profile.curriculum, profile.grade, profile.subjects) && (
           <fieldset className="flex flex-col gap-2 text-sm">
             <legend className="mb-2">Class 11 maths chapters you&apos;ve finished</legend>
             <CbseChapterPicker defaultChecked={profile.chaptersDone} grade={profile.grade ?? undefined} />

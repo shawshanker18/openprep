@@ -8,6 +8,7 @@ import { SUBJECTS } from "@/content/taxonomy";
 import { submitSurvey } from "./actions";
 import { Choice } from "@/components/ui/choice";
 import { CbseChapterPicker } from "@/components/cbse-chapter-picker";
+import { asksChapters, asksSubjects } from "@/content/cbse-chapters";
 import { DateField } from "@/components/ui/date-field";
 import { SatDateField } from "@/components/sat-date-field";
 import { Survey } from "@/lib/onboarding";
@@ -30,6 +31,7 @@ export function SurveyForm() {
   const [curriculum, setCurriculum] = useState("cbse");
   const [grade, setGrade] = useState("11");
   const [chapters, setChapters] = useState<string[]>([]);
+  const [subjects, setSubjects] = useState<string[]>([]);
   const [tookSat, setTookSat] = useState(false);
   const [target, setTarget] = useState(1400);
   const [unsureDate, setUnsureDate] = useState(false);
@@ -95,7 +97,7 @@ export function SurveyForm() {
         </label>
       </div>
 
-      {curriculum === "cbse" && grade === "11" && (
+      {asksChapters(curriculum, Number(grade), subjects) && (
         <fieldset className="flex flex-col gap-2 text-sm">
           <legend className="mb-1">Class 11 maths chapters you have finished</legend>
           <p className="mb-2 text-muted-foreground">Tick any of these you have done at school. We use it to mark SAT topics you probably know, and nothing is ever hidden from you.</p>
@@ -103,12 +105,14 @@ export function SurveyForm() {
         </fieldset>
       )}
 
-      <fieldset className="flex flex-col gap-2 text-sm">
-        <legend className="mb-2">Subjects you&apos;re studying now</legend>
-        <div className="flex flex-wrap gap-x-4 gap-y-2">
-          {SUBJECTS.map((s) => <label key={s} className="flex items-center gap-2"><input type="checkbox" name="subjects" value={s} /> {s}</label>)}
-        </div>
-      </fieldset>
+      {asksSubjects(curriculum, Number(grade)) && (
+        <fieldset className="flex flex-col gap-2 text-sm">
+          <legend className="mb-2">Subjects you&apos;re studying now</legend>
+          <div className="flex flex-wrap gap-x-4 gap-y-2">
+            {SUBJECTS.map((s) => <label key={s} className="flex items-center gap-2"><input type="checkbox" name="subjects" value={s} checked={subjects.includes(s)} onChange={(e) => setSubjects(e.target.checked ? [...subjects, s] : subjects.filter((x) => x !== s))} /> {s}</label>)}
+          </div>
+        </fieldset>
+      )}
 
       </div></div>
       <div hidden={step !== 1}><div className="flex flex-col gap-6">

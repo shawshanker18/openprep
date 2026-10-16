@@ -103,7 +103,15 @@ export const askedChapters = (grade: number | null | undefined): CbseChapter[] =
  * What is stored for a student's chapters. Only CBSE Class 11 keeps chapter ticks (course chapters only, plus the
  * assumption that Classes 9 and 10 are done). Every other class stores none, so they get the default courses.
  */
-export const savedChapters = (ticked: readonly string[], grade: number | null | undefined, curriculum: string | null | undefined): string[] => {
-  if (curriculum !== "cbse" || grade !== 11) return [];
+export const savedChapters = (ticked: readonly string[], grade: number | null | undefined, curriculum: string | null | undefined, subjects: readonly string[]): string[] => {
+  if (!asksChapters(curriculum, grade, subjects)) return [];
   return completedChapters(ticked.filter((id) => COURSE_CHAPTER_IDS.includes(id)), grade);
 };
+
+/** Chapters are asked only of CBSE Class 11 students who study Mathematics. */
+export const asksChapters = (curriculum: string | null | undefined, grade: number | null | undefined, subjects: readonly string[]): boolean =>
+  curriculum === "cbse" && grade === 11 && subjects.includes("Mathematics");
+
+/** CBSE Classes 9 and 10 are not asked which subjects they study. Everyone else is. */
+export const asksSubjects = (curriculum: string | null | undefined, grade: number | null | undefined): boolean =>
+  !(curriculum === "cbse" && (grade === 9 || grade === 10));
