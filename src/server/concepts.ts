@@ -34,16 +34,13 @@ export async function conceptsForSkill(skillId: string) {
  * Start a practice set on one concept. Only the concept's active questions are used, and their ids are the student's own
  * opaque ids, so the set behaves like any other practice set. Returns the session id.
  */
-/** A "Try a question" set for one concept: three of its study questions, picked at random. */
-export const CONCEPT_SET_SIZE = 3;
-
 export async function startConceptPractice(userId: string, conceptId: string, back?: string): Promise<string | null> {
   const [concept] = await db.select().from(skillConcepts).where(eq(skillConcepts.id, conceptId));
   if (!concept) return null;
   const active = await db.select({ id: questions.id }).from(conceptQuestions)
     .innerJoin(questions, eq(questions.id, conceptQuestions.questionId))
     .where(and(eq(conceptQuestions.conceptId, conceptId), eq(questions.status, "active"), eq(questions.pool, "study")))
-    .orderBy(sql`random()`).limit(CONCEPT_SET_SIZE);
+    .orderBy(asc(questions.id)).limit(MAX_QUESTIONS_PER_SET);
   if (!active.length) return null;
   // Practice only accepts questions the student has been given, so record these as delivered first, through the same
   // ledger every other practice set uses (rate limits and exposure counts included).
