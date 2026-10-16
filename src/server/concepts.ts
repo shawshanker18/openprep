@@ -150,3 +150,28 @@ export async function startCheckpoint(userId: string, skillId: string, title: st
   const ids = picks.map((q) => publicId(q.id, userId));
   return createPracticeSession(userId, { mode: "list", ids, count: ids.length }, title, back);
 }
+
+/** Questions in a "Try a question" set. */
+export const TRY_SET_SIZE = 3;
+
+/**
+ * Three study questions for one lesson concept. Uses the admin concept with the same title when there is one, and the
+ * skill's own study questions otherwise. Questions are recorded as given, like any practice set.
+ */
+export async function startLessonTry(userId: string, skillId: string, conceptTitle: string, back?: string): Promise<string | null> {
+  const [match] = await db.select({ id: skillConcepts.id }).from(skillConcepts)
+    .where(and(eq(skillConcepts.skillId, skillId), eq(skillConcepts.title, conceptTitle))).limit(1);
+  const picks = match
+    ? await db.select({ id: questions.id, skillId: questions.skillId }).from(conceptQuestions)
+        .innerJoin(questions, eq(questions.id, conceptQuestions.questionId))
+        .where(and(eq(conceptQuestions.conceptId, match.id), eq(questions.status, "active"), eq(questions.pool, "study")))
+        .orderBy(sql`random()`).limit(TRY_SET_SIZE)
+    : await db.select({ id: questions.id, skillId: questions.skillId }).from(questions)
+        .where(and(eq(questions.skillId, skillId), eq(questions.status, "active"), eq(questions.pool, "study")))
+        .orderBy(sql`random()`).limit(TRY_SET_SIZE);
+  if (!picks.length) return null;
+  const context = await deliveryContext();
+  await db.transaction((tx) => exposeQuestions(tx, userId, picks, context));
+  const ids = picks.map((q) => publicId(q.id, userId));
+  return createPracticeSession(userId, { mode: "list", ids, count: ids.length }, `Try: ${conceptTitle}`, back);
+}

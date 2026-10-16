@@ -17,7 +17,7 @@ vi.mock("@/server/practice-sessions", () => ({
   createPracticeSession: async (_user: string, config: unknown) => { started.push(config); return "00000000-0000-4000-8000-0000000000aa"; },
 }));
 
-const { checkpointQuestions, conceptsForSkill, deleteConcept, saveConcept, startConceptPractice } = await import("./concepts");
+const { checkpointQuestions, conceptsForSkill, deleteConcept, saveConcept, startConceptPractice, startLessonTry } = await import("./concepts");
 
 const ADMIN = "00000000-0000-4000-8000-00000000ad01";
 const USER = "00000000-0000-4000-8000-00000000c001";
@@ -117,5 +117,18 @@ describe("checkpoints", () => {
     expect(ids).not.toContain("q-retired");
     expect(ids).not.toContain("q-test-pool");
     expect(ids.length).toBeLessThanOrEqual(5);
+  });
+});
+
+describe("try a question, from a lesson concept", () => {
+  it("uses the admin concept with the same title, and the skill's questions when there is none", async () => {
+    await saveConcept(ADMIN, { ...base, title: "Matching title", questionIds: ["q-active-1"] });
+    started.length = 0;
+    expect(await startLessonTry(USER, SKILL, "Matching title")).toBeTruthy();
+    expect((started[0] as { ids: string[] }).ids).toHaveLength(1);
+    started.length = 0;
+    expect(await startLessonTry(USER, SKILL, "No such concept")).toBeTruthy();
+    expect((started[0] as { ids: string[] }).ids.length).toBeGreaterThan(0);
+    expect((started[0] as { ids: string[] }).ids.length).toBeLessThanOrEqual(3);
   });
 });

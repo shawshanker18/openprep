@@ -63,7 +63,7 @@ export default async function StepPage({ params }: PageProps<"/start/[step]">) {
         <LessonTextSize>
           <article className="flex max-w-3xl flex-col gap-6">
             {lesson.minutes && <p className="text-sm text-muted-foreground">About {lesson.minutes} minutes</p>}
-            <LessonStudyView sections={lesson.sections} skillId={step.ref} curriculum={profile.curriculum} grade={profile.grade} subjects={profile.subjects} />
+            <LessonStudyView sections={lesson.sections} skillId={step.ref} stepKey={step.key} curriculum={profile.curriculum} grade={profile.grade} subjects={profile.subjects} />
             {concepts.length > 0 && (step.status === "done" ? (
               <section aria-labelledby="concepts" className="flex flex-col gap-4">
                 <h2 id="concepts" className="text-xl font-semibold">Concepts in this skill</h2>

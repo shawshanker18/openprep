@@ -4,24 +4,29 @@ import { useState } from "react";
 import { Markdown } from "@/components/markdown";
 import { likelyCoveredSkills } from "@/lib/curriculum-coverage";
 import { ChevronRight } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 type Section = { heading: string; md: string };
 
 /** A box like the Start page cards: the label shows in bold, and the body opens on click. Used for concepts and worked examples. */
-function Reveal({ label, md }: { label: string; md: string }) {
+function Reveal({ label, md, tryHref }: { label: string; md: string; tryHref?: string }) {
   return (
     <details className="group lesson-reveal min-w-0 overflow-hidden rounded-xl border">
       <summary className="flex cursor-pointer list-none items-center gap-3 p-4 hover:bg-muted [&::-webkit-details-marker]:hidden">
         <span className="min-w-0 flex-1 text-sm font-semibold">{label}</span>
         <ChevronRight className="size-4 shrink-0 transition-transform group-open:rotate-90" />
       </summary>
-      <div className="border-t p-4"><Markdown className="text-[1em] leading-relaxed">{md}</Markdown></div>
+      <div className="flex flex-col gap-3 border-t p-4">
+        <Markdown className="text-[1em] leading-relaxed">{md}</Markdown>
+        {tryHref && <Button variant="outline" size="sm" className="self-start" render={<Link href={tryHref} />}>Try a question</Button>}
+      </div>
     </details>
   );
 }
 
-export function LessonStudyView({ sections, skillId, curriculum, grade, subjects }: {
-  sections: Section[]; skillId: string; curriculum: string | null; grade: number | null; subjects: string[];
+export function LessonStudyView({ sections, skillId, stepKey, curriculum, grade, subjects }: {
+  sections: Section[]; skillId: string; stepKey?: string; curriculum: string | null; grade: number | null; subjects: string[];
 }) {
   const eligible = curriculum === "cbse" && (grade === 11 || grade === 12);
   const [revision, setRevision] = useState(false);
@@ -45,7 +50,7 @@ export function LessonStudyView({ sections, skillId, curriculum, grade, subjects
       <section key={sec.heading} className="flex min-w-0 flex-col gap-2">
         <h2 className="text-lg font-semibold">{sec.heading.replace(/\((easy|medium|hard)\)/gi, "").trim()}</h2>
         <Markdown className="text-[1em] leading-relaxed">{core.trim()}</Markdown>
-        {concepts.length > 0 && <div className="mt-2 flex flex-col gap-3">{concepts.map((c, i) => <Reveal key={c.title} label={`Concept ${i + 1}: ${c.title.replace(/\$/g, "")}`} md={c.md} />)}</div>}
+        {concepts.length > 0 && <div className="mt-2 flex flex-col gap-3">{concepts.map((c, i) => { const title = c.title.replace(/\$/g, ""); return <Reveal key={c.title} label={`Concept ${i + 1}: ${title}`} md={c.md} tryHref={stepKey ? `/start/${stepKey}/try?concept=${encodeURIComponent(title)}` : undefined} />; })}</div>}
       </section>
     );
   });
