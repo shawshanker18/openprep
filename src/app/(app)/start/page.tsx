@@ -77,6 +77,13 @@ export default async function StartPage() {
         </details>
       </div>
 
+      {profile.curriculum === "cbse" && (
+        <Link href="/cbse-math" className="flex items-center justify-between gap-3 rounded-xl border p-4 text-sm hover:bg-muted">
+          <span>New to SAT maths after CBSE? <span className="font-medium">Read how the maths test works first.</span></span>
+          <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
+        </Link>
+      )}
+
       {assigned.length > 0 && (
         <section aria-label="Your chapter routes" className="flex flex-col gap-2 rounded-xl border p-4 text-sm">
           <p className="text-muted-foreground">Your routes through the Class 11 chapters</p>
