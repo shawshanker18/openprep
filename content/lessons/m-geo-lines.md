@@ -7,6 +7,12 @@ tags: [angle-relationships, parallel-lines, triangle-angles, isosceles, similar-
 
 This skill is about angle facts and triangle relationships: angles formed by intersecting lines, angles formed when a transversal cuts **parallel lines**, the **angle sum** of a triangle, **isosceles** triangles, and **similar triangles**, whose sides are proportional. Most questions combine one or two facts with a short algebra step.
 
+> **Build the proportion first.** The SAT shows a diagram and asks about a length or angle, so write the relationship from the diagram before solving.
+>
+> 1. Mark the angles and sides you know.
+> 2. Write the ratio: a segment parallel to a side gives $\frac{ST}{QR} = \frac{PS}{PQ}$.
+> 3. Solve only after the ratio is written.
+
 ## Key ideas
 
 - Angles that form a straight line add to $180^\circ$. **Vertical angles** (opposite each other where two lines cross) are equal.
@@ -33,33 +39,71 @@ This skill is about angle facts and triangle relationships: angles formed by int
 
 A segment joining the midpoints of two sides of a triangle is parallel to the third side and half its length. If $D$ and $E$ are the midpoints of $\overline{AB}$ and $\overline{BC}$, then $AC = 2 \cdot DE$.
 
+**Desmos way:** plot $A(0, 0)$, $B(4, 6)$, $C(8, 0)$, and the midpoints $D(2, 3)$ and $E(6, 3)$. Desmos shows $DE = 4$ and $AC = 8$, so $AC = 2 \cdot DE$.
+
+```desmos
+(0,0)
+(4,6)
+(8,0)
+(2,3)
+(6,3)
+```
+
 ### The triangle inequality
 
 The two shorter sides must add to more than the third side. For sides $9$ and $15$, the third side $x$ satisfies $6 < x < 24$.
+
+**Desmos way:** type $15 + 9$ and $15 - 9$. Desmos shows $24$ and $6$, the two bounds on the third side.
 
 ### Congruent triangles
 
 Two triangles are congruent when they match by SSS (three sides), SAS (two sides and the angle between them), ASA or AAS (two angles and a side), or HL (right triangles with a matching hypotenuse and leg). Two angles alone never prove congruence, because they only prove similarity.
 
+**Desmos way:** Desmos cannot prove congruence, but it can measure. Type the side lengths of both triangles. Three equal pairs confirm SSS.
+
 ### Isosceles triangles
 
 The two equal sides are the legs. With perimeter $53$ and two sides of $17$, the third side is $53 - 34 = 19$.
+
+**Desmos way:** type $53 - 2 \cdot 17$. Desmos shows $19$.
 
 ### Dilations
 
 A dilation multiplies every length by the scale factor, but leaves every angle the same size.
 
+**Desmos way:** plot $(0, 0)$, $(3, 0)$, $(0, 4)$ and then $(0, 0)$, $(6, 0)$, $(0, 8)$. The second triangle is the first doubled, and its slopes match.
+
+```desmos
+(0,0)
+(3,0)
+(0,4)
+(6,0)
+(0,8)
+```
+
 ### Corresponding parts of congruent triangles
 
 Once two triangles are congruent, every matching pair of sides and angles is equal. Use the stated correspondence (which vertex matches which) to find the matching side or angle.
+
+**Desmos way:** plot both triangles with the stated vertex order. Matching sides should have the same length, which you can check by typing each distance.
 
 ### Parallelograms
 
 Opposite sides are equal, opposite angles are equal, and adjacent angles add to $180^\circ$.
 
+**Desmos way:** Desmos does not check angles directly. Type the side lengths and use the distance formula to test the parallelogram's opposite sides.
+
 ### Perpendicular bisectors
 
 Every point on the perpendicular bisector of a segment is the same distance from the segment's two endpoints.
+
+**Desmos way:** plot the endpoints $(-2, 0)$ and $(4, 0)$ and the bisector $x = 1$. Any point on $x = 1$ is equally far from both endpoints.
+
+```desmos
+(-2,0)
+(4,0)
+x=1
+```
 
 ## Worked example 1 (easy)
 
@@ -69,6 +113,13 @@ The angles of a triangle measure $(2x + 10)^\circ$, $(3x - 5)^\circ$, and $(x + 
 2. The angles are $2(25) + 10 = 60^\circ$, $3(25) - 5 = 70^\circ$, and $25 + 25 = 50^\circ$.
 
 Check: $60 + 70 + 50 = 180$. Correct.
+
+**Desmos method:** graph $y = 6x + 30$ and $y = 180$. They cross at $x = 25$, so the angles are $60^\circ$, $70^\circ$, and $50^\circ$.
+
+```desmos
+y=6x+30
+y=180
+```
 
 ## Worked example 2 (SAT-level)
 
@@ -80,6 +131,8 @@ Check: $60 + 70 + 50 = 180$. Correct.
 4. Cross-multiply: $6 \cdot QR = 90$, so $QR = 15$.
 
 Check: the scale factor from the small triangle to the large one is $\frac{10}{6} = \frac{5}{3}$, and $9 \cdot \frac{5}{3} = 15$. Correct.
+
+**Desmos method:** type $9 \cdot \dfrac{10}{6}$. Desmos shows $15$, which is $QR$, because the small triangle is $\tfrac{6}{10}$ of the large one.
 
 ## Common traps
 

@@ -23,6 +23,10 @@ describe("imported question formatting", () => {
     expect(normalizeMarkdown(String.raw`$\text{Data set $A$}: 1, 2, 3$`)).toBe("$\\text{Data set A}: 1, 2, 3$");
     expect(normalizeMarkdown("$4.6 billion and $2 million")).toBe("\\$4.6 billion and \\$2 million");
   });
+  it("leaves ```desmos blocks untouched so their equations keep their exponents", () => {
+    const block = "```desmos\ny=x^2-3\ny=2^x\n```";
+    expect(normalizeMarkdown(`Graph it:\n\n${block}`)).toBe(`Graph it:\n\n${block}`);
+  });
 });
 
 describe("official SAT dates", () => {

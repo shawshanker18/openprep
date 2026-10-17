@@ -7,6 +7,12 @@ tags: [population-estimates, sampling, margin-of-error, confidence-intervals]
 
 Inference means using a **sample** to say something about a whole **population**. The SAT asks you to scale a sample result up to a population estimate, to read and compare **margins of error** and **confidence intervals**, and to judge which sampling method gives trustworthy results. Most questions need careful reading more than calculation.
 
+> **Build the estimate first.** The SAT gives you a sample and asks about a population, so write the estimate from the sample before any arithmetic.
+>
+> 1. Name the sample count, the sample size, and the population size.
+> 2. Write the estimate: 9 defective out of 250 from 15,000 gives $\frac{9}{250} \times 15{,}000$.
+> 3. Compute only after the expression is written.
+
 ## Key ideas
 
 - A **random sample** represents the population it was drawn from. That is what lets you scale its results up.
@@ -31,9 +37,13 @@ $$\text{population estimate} = \frac{\text{count in sample}}{\text{sample size}}
 
 An estimate of $86\%$ with a margin of error of $4\%$ means the true percent is plausibly between $82\%$ and $90\%$. A conclusion has to stay inside that range. If a second estimate's interval starts above $90\%$, the difference is convincing.
 
+**Desmos way:** type $86 - 4$ and $86 + 4$. Desmos shows $82$ and $90$, the plausible range. Compare the second estimate's lower bound against $90$.
+
 ### Comparing two estimates with margins
 
 Build each interval as estimate $\pm$ margin. A mean of $6.4 \pm 1.5$ gives $4.9$ to $7.9$, and $7.6 \pm 0.9$ gives $6.7$ to $8.5$. The intervals overlap, so the data do not clearly show which mean is larger.
+
+**Desmos way:** type $6.4 - 1.5$, $6.4 + 1.5$, $7.6 - 0.9$, and $7.6 + 0.9$. Desmos shows $4.9$, $7.9$, $6.7$, and $8.5$, and the first interval overlaps the second.
 
 ## Worked example 1 (easy)
 
@@ -43,6 +53,8 @@ An inspector tests a random sample of $250$ phones from a shipment of $15{,}000$
 2. Scale up: $0.036 \times 15{,}000 = 540$.
 
 Check with a proportion: $\frac{9}{250} = \frac{x}{15{,}000}$ gives $x = 9 \times 60 = 540$. Correct.
+
+**Desmos method:** type $\dfrac{9}{250} \cdot 15000$. Desmos shows $540$, the population estimate.
 
 ## Worked example 2 (SAT-level)
 
@@ -54,6 +66,8 @@ Check with a proportion: $\frac{9}{250} = \frac{x}{15{,}000}$ gives $x = 9 \time
 4. The intervals do not overlap (A tops out at 46.8%), so there is convincing evidence that a greater percent of households in Town B own an electric bike.
 
 If Town B's margin had been $3$ points, its interval would start at 46%, overlapping Town A's, and no clear conclusion could be drawn.
+
+**Desmos method:** type $\dfrac{41.2 + 46.8}{2}$, which shows $44$, and $\dfrac{46.8 - 41.2}{2}$, which shows $2.8$. Town B's interval is $49 \pm 2$, so its lower bound is $47$, above Town A's upper bound of $46.8$.
 
 ## Common traps
 

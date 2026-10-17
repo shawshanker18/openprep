@@ -7,6 +7,12 @@ tags: [proportions, rates, unit-conversion, scale]
 
 Ratios compare quantities, rates compare quantities with different units (miles per hour, dollars per pound), and proportions say two ratios are equal. The SAT tests setting up proportions, working with rates, converting units (often through several steps), reading map or model scales, and combining rates when two things work together.
 
+> **Build the conversion chain first.** The SAT gives rates in one set of units and asks for another, so write the chain before multiplying.
+>
+> 1. Name the starting units and the target units.
+> 2. Write the chain: 6 mL every 15 seconds becomes $\frac{6}{15} \cdot 60 \cdot 60 \cdot 24 \div 1000$ liters a day.
+> 3. Multiply only after every unit cancels.
+
 ## Key ideas
 
 - A proportion $\frac{a}{b} = \frac{c}{d}$ only works if both ratios compare the same things in the same order.
@@ -32,13 +38,24 @@ $$\text{distance} = \text{rate} \times \text{time} \qquad \text{amount} = \text{
 
 To compare prices, divide each cost by its amount. A $64$-ounce jug for $7.68$ dollars costs $0.12$ per ounce, and a $96$-ounce jug for $9.60$ dollars costs $0.10$ per ounce. Buying the larger jug saves $0.02$ per ounce, or $2.00$ dollars per $100$ ounces.
 
+**Desmos way:** type $\dfrac{7.68}{64}$ and $\dfrac{9.60}{96}$. Desmos shows $0.12$ and $0.10$, the per-ounce prices.
+
 ### Direct and inverse proportion
 
 In $y = \dfrac{x}{k}$ (direct), multiplying $x$ by $4$ multiplies $y$ by $4$. In $y = \dfrac{k}{x}$ (inverse), multiplying $x$ by $4$ divides $y$ by $4$. Read which kind of relationship the equation shows before you answer.
 
+**Desmos way:** graph $y = 2x$ (direct) and $y = \dfrac{2}{x}$ (inverse). The first rises as $x$ grows, and the second falls. That shape tells you the relationship.
+
+```desmos
+y=2x
+y=\frac{2}{x}
+```
+
 ### Rates across units of time
 
 Convert before you multiply. A rate in months becomes a rate in years by multiplying by $12$. For $54$ centimeters every $m$ months, the growth every $k$ years is $\dfrac{54 \cdot 12k}{m}$ centimeters.
+
+**Desmos way:** type $\dfrac{54 \cdot 12k}{m}$ with $k = 1$ and $m = 6$. Desmos shows $108$, the growth per year for that rate.
 
 ## Worked example 1 (easy)
 
@@ -48,6 +65,8 @@ Five notebooks cost \$8.75. At the same price per notebook, how much do $12$ not
 2. Multiply: $12 \times 1.75 = 21$. The cost is \$21.
 
 Check with a proportion: $\frac{8.75}{5} = \frac{x}{12}$ gives $5x = 105$, so $x = 21$. Correct.
+
+**Desmos method:** type $\dfrac{8.75}{5}$, which shows $1.75$, then $12 \cdot 1.75$, which shows $21$.
 
 ## Worked example 2 (SAT-level)
 
@@ -59,6 +78,12 @@ $$\frac{6 \text{ mL}}{15 \text{ s}} \times \frac{60 \text{ s}}{1 \text{ min}} \t
 3. Convert: $34{,}560 \div 1{,}000 = 34.56$ liters.
 
 Check: a day has $86{,}400$ seconds, and $0.4 \times 86{,}400 = 34{,}560$ mL. Correct.
+
+**Desmos method:** type the whole chain on one line. It shows $34.56$ liters, with no rounding along the way.
+
+```desmos
+\frac{6}{15} \cdot 60 \cdot 60 \cdot 24 \div 1000
+```
 
 ## Common traps
 

@@ -7,6 +7,12 @@ tags: [square-roots, factoring, discriminant, radical-equations, vertex-form, no
 
 Nonlinear equations are equations where the variable is squared, under a root, in a denominator, or otherwise not just multiplied by a number. On the SAT this mostly means **quadratic equations** (with an $x^2$ term), **radical equations** (with $\sqrt{\ }$), and **nonlinear systems**, where a line meets a curve. You will be asked for solutions, for the number of solutions, or for a constant that makes something true.
 
+> **Build the equation first.** The SAT gives you a situation and asks about it, so the equation has to come from the words before any solving starts.
+>
+> 1. Name the unknown and what it measures.
+> 2. Write the equation from the story: a ball at height $h$ after $t$ seconds gives $h = -16t^2 + 48t$.
+> 3. Solve only if the question asks for a value.
+
 ## Key ideas
 
 - A quadratic equation can have zero, one, or two real solutions. Graphically, these are the places where the parabola crosses the $x$-axis.
@@ -35,37 +41,94 @@ $$x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$$
 
 Set the two expressions equal and solve the resulting quadratic. For $y = x^2$ and $y = 2x - 1$: $x^2 - 2x + 1 = 0$, so $(x - 1)^2 = 0$ and there is exactly one intersection point (the line just touches the parabola).
 
+**Desmos way:** graph $y = x^2$ and $y = 2x - 1$. The line touches the parabola at one point, $x = 1$, which is the single solution.
+
+```desmos
+y=x^2
+y=2x-1
+```
+
 ### The discriminant as a condition
 
 "No real solutions" means $b^2 - 4ac < 0$. For $-9x^2 + bx - 16 = 0$: $b^2 - 4(-9)(-16) < 0$ gives $b^2 < 576$, so $|b| < 24$ and the largest positive integer value is $b = 23$.
+
+**Desmos way:** graph $y = -9x^2 + bx - 16$ with $b$ as a slider. Drag $b$ until the parabola stops crossing the $x$-axis. At $b = 23$ it misses the axis, which matches $|b| < 24$.
+
+```desmos
+y=-9x^2+bx-16
+b=23
+```
 
 ### Absolute value equations
 
 For $|A| = B$, solve two cases, $A = B$ and $A = -B$. If $B < 0$ there is no solution. For $|11 - x| = 4$: $11 - x = 4$ gives $x = 7$, and $11 - x = -4$ gives $x = 15$.
 
+**Desmos way:** graph $y = |11 - x|$ and $y = 4$, then click the two crossings at $x = 7$ and $x = 15$.
+
+```desmos
+y=|11-x|
+y=4
+```
+
 ### Radical and exponential equations
 
 A square root is never negative, so $\sqrt{x} = -5$ has no solution. For $4^{x/6} + 7 = 71$: $4^{x/6} = 64 = 4^3$, so $\dfrac{x}{6} = 3$ and $x = 18$.
+
+**Desmos way:** graph $y = 4^{x/6} + 7$ and $y = 71$, then click the crossing at $x = 18$.
+
+```desmos
+y=4^{x/6}+7
+y=71
+```
 
 ### Excluded values
 
 Any value that makes a denominator zero is not a solution, even if it looks like one. $\dfrac{1}{x - 8}$ is undefined at $x = 8$.
 
+**Desmos way:** graph $y = \dfrac{1}{x - 8}$. The curve has a gap at $x = 8$, so that value cannot be a solution.
+
+```desmos
+y=\frac{1}{x-8}
+```
+
 ### Rational equations
 
 Multiply by the least common denominator, solve, and throw out any value that makes a denominator zero. For $\dfrac{2w}{w+3} - \dfrac{6}{w} = 1$, multiply by $w(w+3)$ to get $w^2 - 9w - 18 = 0$. Neither $0$ nor $-3$ is a root, so the solutions add to $9$.
+
+**Desmos way:** graph $y = \dfrac{2x}{x + 3} - \dfrac{6}{x}$ and $y = 1$. Click the two crossings, near $10.68$ and $-1.68$. They add to $9$.
+
+```desmos
+y=\frac{2x}{x+3}-\frac{6}{x}
+y=1
+```
 
 ### Radical equations and the sign of the other side
 
 After squaring, check that the side that was squared is not negative. For $\sqrt{6x+19} = x+2$, squaring gives $x^2 - 2x - 15 = 0$, so $x = 5$ or $x = -3$. Since $x + 2$ must be $\ge 0$, $x = -3$ is extraneous, and the only solution is $5$.
 
+**Desmos way:** graph $y = \sqrt{6x + 19}$ and $y = x + 2$. They cross only at $x = 5$. The $x = -3$ answer never meets the root curve, which is why it is extraneous.
+
+```desmos
+y=\sqrt{6x+19}
+y=x+2
+```
+
 ### Literal equations with powers
 
 Undo powers with roots. $s = \sqrt[3]{\dfrac{6V}{\pi}}$ becomes $V = \dfrac{\pi s^3}{6}$, and $r = \sqrt[3]{x^3 + y^3}$ becomes $x = \sqrt[3]{r^3 - y^3}$.
 
+**Desmos way:** Desmos does not isolate letters, but it can check. Pick $y = 1$ and $r = 2$, so $x = \sqrt[3]{7}$. Type $\sqrt[3]{2^3 - 1^3}$ and it shows the same value, about $1.913$.
+
 ### Quadratics with a parameter
 
 For $kx^2 + 3x + 4 = 0$ to be quadratic, $k \ne 0$. Two distinct real solutions need a positive discriminant: $9 - 16k > 0$, so $k < \dfrac{9}{16}$ and $k \ne 0$.
+
+**Desmos way:** graph $y = kx^2 + 3x + 4$ with $k$ as a slider. At $k = 0.1$ the parabola crosses the $x$-axis twice. Drag $k$ up toward $0.5625$ and watch the two crossings merge into one.
+
+```desmos
+y=kx^2+3x+4
+k=0.1
+```
 
 ## Worked example 1 (easy)
 
@@ -77,6 +140,12 @@ Solve $x^2 - x - 12 = 0$.
 
 Check one: $16 - 4 - 12 = 0$. Correct.
 
+**Desmos method:** graph $y = x^2 - x - 12$ and click the two $x$-intercepts, $x = 4$ and $x = -3$.
+
+```desmos
+y=x^2-x-12
+```
+
 ## Worked example 2 (SAT-level)
 
 *For what positive value of $k$ does $x^2 - kx + 16 = 0$ have exactly one real solution?*
@@ -86,6 +155,13 @@ Check one: $16 - 4 - 12 = 0$. Correct.
 3. The question asks for the positive value: $k = 8$.
 
 Check: $x^2 - 8x + 16 = (x - 4)^2$, which is zero only at $x = 4$. One solution, as required.
+
+**Desmos method:** graph $y = x^2 - kx + 16$ with $k$ as a slider. Drag $k$ until the parabola touches the $x$-axis at exactly one point. That happens at $k = 8$, the positive value the question asks for.
+
+```desmos
+y=x^2-kx+16
+k=1
+```
 
 ## Common traps
 

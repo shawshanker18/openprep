@@ -7,6 +7,12 @@ tags: [solving-inequalities, modeling, systems-of-inequalities]
 
 A linear inequality is like a linear equation, but with $<$, $>$, $\le$, or $\ge$ instead of $=$. Its solution is a range of values, not a single number. On the SAT you will solve one-variable inequalities (including compound ones), translate words like "at most" into symbols, and work with **systems of inequalities**, whose solutions are shaded regions in the $xy$-plane.
 
+> **Build the inequality first.** The SAT gives you conditions in words, and you must turn each one into an inequality before solving.
+>
+> 1. Name the unknown.
+> 2. Write one inequality per condition: a rental of \$40 plus \$0.65 per mile, at most \$120, gives $40 + 0.65m \le 120$.
+> 3. Solve only if the question asks for a value.
+
 ## Key ideas
 
 - Solve exactly as you would an equation, with one extra rule: **multiplying or dividing by a negative number flips the inequality sign.**
@@ -30,13 +36,33 @@ Example translation: a rental costs \$40 plus \$0.65 per mile, and the budget is
 
 An equation can have one solution, no solution, or all real numbers. After simplifying, if the variable cancels and a false statement is left (like $3 = 5$), there is no solution. If a true statement is left (like $5 = 5$), every value works. An inequality is solved the same way, with the sign flip rule.
 
+**Desmos way:** graph the two sides as lines. Parallel lines mean no solution, and one line on top of the other means every value works. The same test works for inequalities: the shaded region shows which side wins.
+
+```desmos
+y=3x+2
+y=3x+5
+```
+
 ### Graphs of inequalities in the $xy$-plane
 
 Draw the boundary line. Use a solid line for $\le$ or $\ge$ and a dashed line for $<$ or $>$. For $y > \ldots$, shade above the line; for $y < \ldots$, shade below. Check one point inside the shaded region to confirm.
 
+**Desmos way:** type the inequality directly, such as $y > \frac{1}{2}x + 1$. Desmos shades the solution region for you, with a dashed boundary for $>$.
+
+```desmos
+y>\frac{1}{2}x+1
+```
+
 ### Systems of inequalities in word problems
 
 Write one inequality for each condition: "at least" and "no less than" use $\ge$; "at most," "no more than," and "under" use $\le$ or $<$. Then test a candidate pair of numbers in every inequality. A solution must satisfy all of them.
+
+**Desmos way:** type each condition as an inequality. The overlap is the solution region, and clicking a corner gives its coordinates. The block below uses $x + y \le 10$ and $y \ge x$ as an example.
+
+```desmos
+x+y\le 10
+y\ge x
+```
 
 ## Worked example 1 (easy)
 
@@ -47,6 +73,13 @@ Solve $5 - 3x < 17$.
 
 Check with a value in the range, $x = 0$: $5 < 17$, true. Check one outside it, $x = -5$: $5 + 15 = 20 < 17$ is false. Correct.
 
+**Desmos method:** graph $y = 5 - 3x$ and $y = 17$. The solution is where the first line is below the second, which is $x > -4$. Click where they cross to see the boundary.
+
+```desmos
+y=5-3x
+y=17
+```
+
 ## Worked example 2 (SAT-level)
 
 *The point $(a, 4)$ is a solution to the system $y \ge x - 3$ and $y < -2x + 16$. If $a$ is an integer, what is the greatest possible value of $a$?*
@@ -56,6 +89,14 @@ Check with a value in the range, $x = 0$: $5 < 17$, true. Check one outside it, 
 3. Both must hold, so $a < 6$. The greatest integer is $a = 5$.
 
 Check: $a = 5$ gives $4 \ge 2$ and $4 < 6$, both true. $a = 6$ gives $4 < 4$, which is false. So $5$ is the answer.
+
+**Desmos method:** graph $y \ge x - 3$, $y < -2x + 16$, and the horizontal line $y = 4$. The part of $y = 4$ inside the overlap ends where it meets the dashed boundary at $x = 6$. Since $a < 6$, the greatest integer is $a = 5$.
+
+```desmos
+y\ge x-3
+y<-2x+16
+y=4
+```
 
 ## Common traps
 

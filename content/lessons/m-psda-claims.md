@@ -7,6 +7,12 @@ tags: [generalization, causation, experimental-design, sampling-bias]
 
 These questions describe a study and ask which conclusion it supports. Two design features decide almost everything: **how the participants were selected** (which controls **generalization**) and **whether treatments were randomly assigned** (which controls **causation**). You also need to spot **sampling bias** and compare results between groups.
 
+> **State the claim first.** The SAT describes a study and asks what it supports, so write the claim from the study's design before reading the choices.
+>
+> 1. Say who was studied and how they were chosen.
+> 2. Ask whether treatments were randomly assigned.
+> 3. Pick the choice that the claim supports, and no more.
+
 ## Key ideas
 
 - **Random selection** from a population lets you generalize the results to that population, and only that one.
@@ -30,9 +36,13 @@ Comparing groups: subtract the percents or rates, and report the result in **per
 
 A random sample describes the population it was drawn from, and nobody else. A poll of Denver adults ages $30$ to $45$ describes Denver adults in that age group, not all adults in Colorado.
 
+**Desmos way:** Desmos does not help with this concept, because it is about who the sample describes, not a number. Use the two-question checklist in the fast-way section instead.
+
 ### Confounding variables
 
 An association can have a third cause. If students who join a club also get better grades, the club may not be the reason, because the students who join may already be stronger. Only random assignment rules out such third causes.
+
+**Desmos way:** Desmos does not help here. Ask whether treatments were randomly assigned. If not, the third cause is still possible.
 
 ## Worked example 1 (easy)
 
@@ -40,6 +50,8 @@ A researcher randomly selected $300$ members of a grocery chain's loyalty progra
 
 1. The sample was chosen at random, so it represents the group it was drawn from.
 2. That group is the **loyalty program members** of this chain. Not all shoppers, and not all residents of the area.
+
+**Desmos method:** none is needed for the choice. Two questions decide it: the sample was random, so the result describes loyalty-program members of this chain.
 
 ## Worked example 2 (SAT-level)
 
@@ -50,6 +62,12 @@ A researcher randomly selected $300$ members of a grocery chain's loyalty progra
 3. The participants were **volunteers**, not a random sample, so the result cannot be generalized to all employees or all office workers.
 
 The best choice says that standing desks likely reduce back pain for people similar to those in the study. A choice claiming the effect for "all office workers" overreaches.
+
+**Desmos method:** type $\frac{26}{40} - \frac{18}{40}$. Desmos shows $0.2$, which is $20$ percentage points.
+
+```desmos
+\frac{26}{40}-\frac{18}{40}
+```
 
 ## Common traps
 

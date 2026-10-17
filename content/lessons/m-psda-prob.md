@@ -7,6 +7,12 @@ tags: [simple-probability, two-way-tables, conditional-probability, compound-eve
 
 Probability measures how likely an event is, as a number from $0$ (impossible) to $1$ (certain). The SAT tests **simple probability** from counts, reading **two-way tables**, **conditional probability** ("given that…"), and **compound events** (two spins, two draws, "at least one").
 
+> **Build the probability expression first.** The SAT describes a situation with counts, so write the fraction from the description before simplifying.
+>
+> 1. Name the favorable outcomes and the total outcomes.
+> 2. Write the expression: two tiles drawn without replacement from 5 red and 7 white gives $\frac{5}{12} \cdot \frac{4}{11}$.
+> 3. Simplify only after the expression is written.
+
 ## Key ideas
 
 - When outcomes are equally likely, probability is a fraction: favorable outcomes over total outcomes.
@@ -35,6 +41,8 @@ Example: a box has $5$ red and $7$ white tiles. Drawing two red tiles without re
 
 Use the row and column totals. A missing cell equals its row total minus the other cells in that row (or the column total minus the others in that column). Fill in every missing cell before answering a question about it.
 
+**Desmos way:** type the row total minus the known cells. For a row total of $80$ with $48$ known, type $80 - 48$, which shows $32$.
+
 ## Worked example 1 (easy)
 
 A jar has $6$ lemon, $9$ cherry, and $5$ grape candies. One is chosen at random. What is the probability it is **not** cherry?
@@ -44,6 +52,8 @@ A jar has $6$ lemon, $9$ cherry, and $5$ grape candies. One is chosen at random.
 3. Probability: $\frac{11}{20}$.
 
 Check: $P(\text{cherry}) = \frac{9}{20}$, and $1 - \frac{9}{20} = \frac{11}{20}$. Correct.
+
+**Desmos method:** type $6 + 5$, which shows $11$, then $\dfrac{11}{20}$, which shows $0.55$.
 
 ## Worked example 2 (SAT-level)
 
@@ -62,6 +72,13 @@ Check: $P(\text{cherry}) = \frac{9}{20}$, and $1 - \frac{9}{20} = \frac{11}{20}$
 3. Probability: $\frac{48}{75} = \frac{16}{25} = 0.64$.
 
 Compare: the probability that a customer under 30 shops online is $\frac{48}{80} = 0.6$. Same cell, different denominator. That is a favorite SAT trap.
+
+**Desmos method:** type $\dfrac{48}{75}$, which shows $0.64$, and $\dfrac{48}{80}$, which shows $0.6$. The same cell gives two answers because the denominator changes.
+
+```desmos
+\frac{48}{75}
+\frac{48}{80}
+```
 
 ## Common traps
 

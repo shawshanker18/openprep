@@ -7,6 +7,12 @@ tags: [scatterplots, line-of-best-fit, slope-interpretation, model-types]
 
 Two-variable data pairs each $x$-value with a $y$-value, usually shown in a **scatterplot** or a table. The SAT asks you to describe the association, use a **line of best fit** to make predictions, **interpret the slope** and intercept in context, compute **residuals**, and decide whether a **linear or exponential model** fits the data better.
 
+> **Build the model first.** The SAT gives you data points and asks for a prediction or residual, so write the line or curve from the points before using it.
+>
+> 1. Name the two variables and the points you have.
+> 2. Write the model: a line through $(4, 18)$ and $(10, 33)$ gives $y = 2.5x + 8$.
+> 3. Predict or find residuals only with the model written.
+
 ## Key ideas
 
 - **Direction:** points rising left to right show a positive association; falling shows a negative association.
@@ -32,12 +38,29 @@ Example: $x = 0, 1, 2, 3$ with $y = 5, 15, 45, 135$. The differences grow ($10, 
 
 Compare slopes to compare how fast two quantities change, and remember the slope is the predicted change per one unit of $x$. The $y$-intercept is the predicted value when $x = 0$. Check whether a table grows by equal differences (linear) or equal ratios (exponential) before choosing a model.
 
+**Desmos way:** graph $y = 5 \cdot 3^x$ with the points $(0, 5)$, $(1, 15)$, $(2, 45)$, and $(3, 135)$. All four lie on the curve, so the model is exponential.
+
+```desmos
+y=5\cdot 3^x
+(0,5)
+(1,15)
+(2,45)
+(3,135)
+```
+
 ## Worked example 1 (easy)
 
 A café finds that the line of best fit for daily hot-drink sales $y$ against the outdoor temperature $x$, in degrees, is $y = -2.5x + 140$. Predict sales on a $30$-degree day and interpret $-2.5$.
 
 1. Predict: $y = -2.5(30) + 140 = -75 + 140 = 65$ drinks.
 2. Interpret: for each $1$-degree increase in temperature, predicted sales **decrease** by $2.5$ drinks.
+
+**Desmos method:** graph $y = -2.5x + 140$ and the point $(30, 65)$. The point is on the line, so the prediction is $65$ drinks.
+
+```desmos
+y=-2.5x+140
+(30,65)
+```
 
 ## Worked example 2 (SAT-level)
 
@@ -49,6 +72,15 @@ A café finds that the line of best fit for daily hot-drink sales $y$ against th
 4. Residual: $44.5 - 48 = -3.5$.
 
 Check: the line also gives $2.5(10) + 8 = 33$ at $x = 10$. The negative residual means the actual point lies $3.5$ units below the line.
+
+**Desmos method:** graph $y = 2.5x + 8$ with the three points $(4, 18)$, $(10, 33)$, and $(16, 44.5)$. The third point sits below the line, so its residual is negative.
+
+```desmos
+y=2.5x+8
+(4,18)
+(10,33)
+(16,44.5)
+```
 
 ## Common traps
 

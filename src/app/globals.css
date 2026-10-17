@@ -220,6 +220,9 @@ body.lesson-focus-mode main { max-width: none; padding-top: 1rem; }
 .prose-op th, .prose-op td { border: 1px solid var(--border); padding: 0.25rem 0.5rem; }
 .prose-op code { font-family: var(--font-mono); font-size: 0.9em; }
 .prose-op img { max-width: 100%; }
+/* Callouts: a blockquote in lesson text reads as a step to act on, not as a quote. */
+.prose-op blockquote { border-left: 4px solid var(--foreground); background: var(--muted); border-radius: 0.5rem; padding: 0.9rem 1.1rem; font-size: 1.02em; }
+.prose-op blockquote > p:first-child strong { font-size: 1.05em; }
 .prose-op .katex-display { overflow-x: auto; overflow-y: hidden; }
 
 /* Give scripts a little breathing room while keeping KaTeX vertical metrics intact. */

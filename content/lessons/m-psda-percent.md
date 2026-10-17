@@ -7,6 +7,12 @@ tags: [percent-of, percent-change, reverse-percent, successive-percent]
 
 Percent means "per hundred." The SAT tests four kinds of percent questions: finding a **percent of** a number, computing a **percent change**, working **backward** from a changed value to the original, and applying **successive** changes one after another (a markup followed by a discount, two years of growth, and so on).
 
+> **Build the chain of multipliers first.** The SAT describes a series of changes, so write the equation from the story before solving.
+>
+> 1. Name the starting value and the value at the end.
+> 2. Write the chain: a jacket marked up 60% and then cut 25%, selling for \$54, gives $\text{cost} \times 1.60 \times 0.75 = 54$.
+> 3. Solve for the unknown only at the end.
+
 ## Key ideas
 
 - Convert a percent to a decimal by dividing by $100$: 35% is $0.35$.
@@ -28,11 +34,15 @@ $$\text{part} = \frac{p}{100} \times \text{whole} \qquad \text{percent change} =
 
 ### Percent of a part
 
-Find the part first, then the percent of it. If $35\%$ of day students and $20\%$ of evening students ride the bus, and day students are $58\%$ of the population, then the overall share is $0.58(0.35) + 0.42(0.20) = 0.287$, so $28.7\%$ of all students ride the bus. Do not average the two rates.
+Find the part first, then the percent of it. If $35\%$ of day students and $20\%$ of evening students ride the bus, and day students are $58\%$ of the population, then the overall share is $0.58(0.35) + 0.42(0.20) = 0.287$, so $28.7\%$ of all students ride the bus.
+
+**Desmos way:** type $0.58(0.35) + 0.42(0.20)$. Desmos shows $0.287$, so the overall share is $28.7\%$. Do not average $35\%$ and $20\%$. Do not average the two rates.
 
 ### Percents above 100%
 
 A percent over $100\%$ means more than the whole. $1{,}350\%$ of a number is $13.5$ times that number.
+
+**Desmos way:** type $\dfrac{1350}{100}$. Desmos shows $13.5$.
 
 ## Worked example 1 (easy)
 
@@ -43,6 +53,8 @@ What percent of $72$ is $18$? Then: a \$80 item increases in price by 15%. What 
 
 Check: 15% of $80$ is $12$, and $80 + 12 = 92$. Correct.
 
+**Desmos method:** type $\dfrac{18}{72}$, which shows $0.25$, and $80 \cdot 1.15$, which shows $92$.
+
 ## Worked example 2 (SAT-level)
 
 *A store marks up the wholesale cost of a jacket by 60%. Later, it sells the jacket at 25% off the marked price, for \$54. What was the wholesale cost?*
@@ -51,6 +63,13 @@ Check: 15% of $80$ is $12$, and $80 + 12 = 92$. Correct.
 2. Work backward: cost $= 54 \div 1.20 = 45$. The wholesale cost was \$45.
 
 Check forward: $45 \times 1.6 = 72$ (marked price), and $72 \times 0.75 = 54$. Correct.
+
+**Desmos method:** graph $y = 1.6 \cdot 0.75x$ and $y = 54$, then click the crossing at $x = 45$, the wholesale cost.
+
+```desmos
+y=1.6\cdot 0.75x
+y=54
+```
 
 ## Common traps
 

@@ -140,6 +140,19 @@ export function DesmosCalculator({ expressions = EMPTY_EXPRESSIONS, className = 
   );
 }
 
+/** A graph inside a lesson step, from a ```desmos block (one equation per line). Opens on click, so the page stays light. */
+export function DesmosInline({ expressions }: { expressions: string[] }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="flex min-w-0 flex-col gap-2">
+      <Button variant="outline" size="sm" className="self-start" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
+        <Calculator /> {open ? "Hide graph" : "Show graph in Desmos"}
+      </Button>
+      {open && <DesmosCalculator expressions={expressions} className="h-[22rem] min-h-[18rem]" />}
+    </div>
+  );
+}
+
 /** Toggleable calculator for practice and test modules; starts empty so it doesn't give the method away. */
 export function DesmosToggle({ className = "h-[65dvh] min-h-[20rem]" }: { className?: string }) {
   const [open, setOpen] = useState(false);

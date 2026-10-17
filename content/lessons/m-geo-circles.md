@@ -7,6 +7,12 @@ tags: [circle-measurements, arcs-sectors, angles-in-circles, circle-equations, r
 
 Circle questions ask for **circumference and area**, the length of an **arc** or the area of a **sector**, the measures of **angles in circles** (central and inscribed), and the **equation of a circle** in the $xy$-plane. Angles may be given in degrees or in **radians**.
 
+> **Build the equation of the circle first.** The SAT gives you facts about a circle, and the equation has to come from them before any algebra.
+>
+> 1. Find the center and the radius from the given facts.
+> 2. Write the equation: center $(-4, 1)$ through $(8, 6)$ gives $r = 13$, so $(x + 4)^2 + (y - 1)^2 = 169$.
+> 3. Solve only if the question asks for a value.
+
 ## Key ideas
 
 - Everything about a circle comes from its radius. If you are given a diameter, area, or circumference, find $r$ first.
@@ -31,33 +37,78 @@ $$C = 2\pi r \qquad A = \pi r^2 \qquad (x - h)^2 + (y - k)^2 = r^2$$
 
 The radius is the distance from the center to any point on the circle. For center $(-4, 1)$ and point $(8, 6)$: $r = \sqrt{12^2 + 5^2} = 13$, so the equation is $(x + 4)^2 + (y - 1)^2 = 169$.
 
+**Desmos way:** type the circle $(x + 4)^2 + (y - 1)^2 = 169$ and the point $(8, 6)$. The point sits on the curve.
+
+```desmos
+(x+4)^2+(y-1)^2=169
+(8,6)
+```
+
 ### A diameter given by its endpoints
 
 The center is the midpoint of the endpoints, and the radius is half the distance between them. For endpoints $(-29, 47)$ and $(19, -17)$: the midpoint is $(-5, 15)$ and the distance is $\sqrt{48^2 + 64^2} = 80$, so $r = 40$ and the equation is $(x + 5)^2 + (y - 15)^2 = 1600$.
+
+**Desmos way:** type the circle and the two endpoints, $(-29, 47)$ and $(19, -17)$. Both endpoints lie on the curve, and the center sits halfway between them.
+
+```desmos
+(x+5)^2+(y-15)^2=1600
+(-29,47)
+(19,-17)
+```
 
 ### Translating a circle
 
 Shifting a circle right by $h$ replaces $x$ with $x - h$ in its equation. Circle $(x + 2)^2 + (y - 8)^2 = 9$ moved right $6$ units becomes $(x - 4)^2 + (y - 8)^2 = 9$.
 
+**Desmos way:** graph the original circle and the moved one together. The second is the first shifted $6$ units right.
+
+```desmos
+(x+2)^2+(y-8)^2=9
+(x-4)^2+(y-8)^2=9
+```
+
 ### A leading coefficient other than 1
 
 Divide the whole equation by the coefficient of $x^2$ before completing the square. For $16x^2 + 16y^2 - 8x - 24y - 15 = 0$, divide by $16$ to get $x^2 + y^2 - \dfrac{1}{2}x - \dfrac{3}{2}y = \dfrac{15}{16}$. The center is $\left(\dfrac{1}{4}, \dfrac{3}{4}\right)$ and $r^2 = \dfrac{25}{16}$, so $r = \dfrac{5}{4}$.
+
+**Desmos way:** type $16x^2 + 16y^2 - 8x - 24y - 15 = 0$ exactly as given. Desmos draws the circle, and its center is at $\left(\tfrac{1}{4}, \tfrac{3}{4}\right)$.
+
+```desmos
+16x^2+16y^2-8x-24y-15=0
+```
 
 ### Tangent lines
 
 A tangent line is perpendicular to the radius at the point of tangency. Find the slope of the radius from the center to that point, then use the negative reciprocal. For center $(-4, 3)$ and point $(2, -5)$, the radius has slope $\dfrac{-5 - 3}{2 + 4} = -\dfrac{4}{3}$, so the tangent has slope $\dfrac{3}{4}$.
 
+**Desmos way:** graph the circle and the tangent line through $(2, -5)$ with slope $\tfrac{3}{4}$. The line touches the circle at that point.
+
+```desmos
+(x+4)^2+(y-3)^2=100
+y+5=\frac{3}{4}(x-2)
+```
+
 ### Working backward from arc length or sector area
 
 An arc of length $L$ with central angle $\theta$ (in degrees) satisfies $L = \dfrac{\theta}{360} \cdot 2\pi r$, so $r = \dfrac{360L}{2\pi\theta}$. Sector area works the same way.
+
+**Desmos way:** type $\dfrac{360L}{2\pi\theta}$ with your known values. Desmos does the division and shows $r$.
 
 ### Shaded regions
 
 Shaded areas are usually a sector minus a triangle, or a circle minus a sector. Find each piece, then subtract.
 
+**Desmos way:** graph the circle and the sector's boundary lines to see the shaded region. Type each piece's area as a number and subtract.
+
 ### General form to radius
 
 $x^2 + y^2 + 8x - 14y + 49 = 0$ becomes $(x + 4)^2 + (y - 7)^2 = 16$, so the radius is $4$.
+
+**Desmos way:** type $x^2 + y^2 + 8x - 14y + 49 = 0$ as given. The graph is a circle of radius $4$ centered at $(-4, 7)$.
+
+```desmos
+x^2+y^2+8x-14y+49=0
+```
 
 ## Worked example 1 (easy)
 
@@ -69,6 +120,8 @@ A circle has radius $9$. Find the length of the arc and the area of the sector c
 
 Check with radians: $80^\circ = \frac{4\pi}{9}$, and $r\theta = 9 \cdot \frac{4\pi}{9} = 4\pi$. Correct.
 
+**Desmos method:** type $\dfrac{80}{360} \cdot 2\pi \cdot 9$, which shows $4\pi$, and $\dfrac{80}{360} \cdot \pi \cdot 9^2$, which shows $18\pi$.
+
 ## Worked example 2 (SAT-level)
 
 *A circle in the $xy$-plane has equation $x^2 + y^2 + 10x - 4y = 7$. What are its center and radius?*
@@ -79,6 +132,13 @@ Check with radians: $80^\circ = \frac{4\pi}{9}$, and $r\theta = 9 \cdot \frac{4\
 4. The center is $(-5, 2)$ and the radius is $\sqrt{36} = 6$.
 
 Check: the point $(1, 2)$ is $6$ units right of the center, so it should be on the circle: $1 + 4 + 10 - 8 = 7$. Correct.
+
+**Desmos method:** type $x^2 + y^2 + 10x - 4y = 7$ as given, then zoom in to read the center $(-5, 2)$ and radius $6$. The point $(1, 2)$ sits on the curve.
+
+```desmos
+x^2+y^2+10x-4y=7
+(1,2)
+```
 
 ## Common traps
 

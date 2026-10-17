@@ -7,6 +7,12 @@ tags: [mean-median, frequency-tables, outliers, spread]
 
 One-variable data is a list of values of a single quantity: test scores, heights, numbers of pets. The SAT asks you to find the **center** (mean and median), to read data from **frequency tables** and dot plots, to predict how **outliers** affect each measure, and to compare **spread** (range and standard deviation) without heavy calculation.
 
+> **Build the total first.** The SAT gives you a mean and asks about a missing value, so write the total from the mean before finding anything.
+>
+> 1. Name the count and the mean.
+> 2. Write the total: 6 scores with mean 15 gives $6 \times 15 = 90$.
+> 3. Subtract the known values only after the total is written.
+
 ## Key ideas
 
 - The **mean** is the total divided by the count. Many questions are easier if you think in totals: $\text{total} = \text{mean} \times \text{count}$.
@@ -33,17 +39,25 @@ $$\text{mean} = \frac{\text{sum of values}}{\text{number of values}} \qquad \tex
 
 Removing an outlier that is above the mean lowers the mean. Adding a value equal to the current mean leaves the mean unchanged. The median and standard deviation respond differently, so check which measure the question asks about.
 
+**Desmos way:** type the list with and without the outlier, then compare $\operatorname{mean}(L)$ and $\operatorname{median}(L)$ before and after. Only the mean moves much.
+
 ### Finding a missing value
 
-Use totals. If the mean of $n$ values is $m$, the total is $nm$, and a missing value is the total minus the known values. The same method finds a missing frequency in a table.
+Use totals. If the mean of $n$ values is $m$, the total is $nm$, and a missing value is the total minus the known values.
+
+**Desmos way:** type the known values as a list and compare the mean with and without the missing value. Desmos shows how the mean shifts when a value is added or removed. The same method finds a missing frequency in a table.
 
 ### Reading a graph in context
 
 A highest point is a maximum. A flat segment means no change. A dotted reference line marks a fixed level. A single point is one input paired with one output, and it has a meaning in context. Name what each axis measures before you interpret.
 
+**Desmos way:** type each point as $(x, y)$, with the axes named in the question. Desmos plots them, and the highest point is the maximum.
+
 ### Mean versus median
 
 A high outlier pulls the mean up but barely moves the median. If the mean is greater than the median, the data have a long tail on the high side.
+
+**Desmos way:** type the list, then $\operatorname{mean}(L)$ and $\operatorname{median}(L)$. A high outlier makes the mean larger, while the median stays close.
 
 ## Worked example 1 (easy)
 
@@ -53,6 +67,14 @@ Find the mean and median of $3, 8, 5, 12, 5, 9$.
 2. Median: sort to get $3, 5, 5, 8, 9, 12$. The middle two values are $5$ and $8$, so the median is $\frac{5 + 8}{2} = 6.5$.
 
 Check: the mean is a little above the median because $12$ stretches the upper end.
+
+**Desmos method:** type the list, then $\operatorname{mean}(L)$ and $\operatorname{median}(L)$.
+
+```desmos
+L=[3,8,5,12,5,9]
+mean(L)
+median(L)
+```
 
 ## Worked example 2 (SAT-level)
 
@@ -71,6 +93,16 @@ Check: the mean is a little above the median because $12$ stretches the upper en
 3. Median: with $20$ values, average the $10$th and $11$th. The first $4$ values are $0$; values $5$ through $11$ are $1$. Both middle values are $1$, so the median is $1$.
 
 Check: the frequencies add to $4 + 7 + 5 + 3 + 1 = 20$. The mean exceeds the median, which fits the long tail toward $3$ and $4$ books.
+
+**Desmos method:** type the frequency lists $V = [0,1,2,3,4]$ and $F = [4,7,5,3,1]$, then $\operatorname{total}(V \cdot F) / \operatorname{total}(F)$, which shows $1.5$. For the median, type the expanded list and find its median.
+
+```desmos
+V=[0,1,2,3,4]
+F=[4,7,5,3,1]
+total(V \cdot F)/total(F)
+L=[0,0,0,0,1,1,1,1,1,1,1,2,2,2,2,2,3,3,3,4]
+median(L)
+```
 
 ## Common traps
 

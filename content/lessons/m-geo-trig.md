@@ -7,6 +7,12 @@ tags: [pythagorean-theorem, trig-ratios, special-right-triangles, complementary-
 
 This skill covers right triangles and the basics of trigonometry: the **Pythagorean theorem**, the **trig ratios** sine, cosine, and tangent, the **special right triangles** ($45$-$45$-$90$ and $30$-$60$-$90$), the link between sine and cosine of **complementary angles**, and angles measured in **radians** on the **unit circle**.
 
+> **Build the ratio first.** The SAT gives you a triangle and asks for a side or angle, so write the trig relationship before computing.
+>
+> 1. Name the side or angle you know, and the one you want.
+> 2. Write the ratio: a $12$-foot ramp at $30^\circ$ rises $12\sin 30^\circ$.
+> 3. Evaluate only after the ratio is written.
+
 ## Key ideas
 
 - In a right triangle, the hypotenuse is the longest side and sits opposite the right angle.
@@ -32,17 +38,30 @@ $$a^2 + b^2 = c^2 \qquad \sin\theta = \frac{\text{opp}}{\text{hyp}} \quad \cos\t
 
 Memorize $\sin$, $\cos$, and $\tan$ at $30^\circ$, $45^\circ$, and $60^\circ$ from the special triangles above. A $30^\circ$-$60^\circ$-$90^\circ$ triangle with hypotenuse $2x$ has short leg $x$, so $\sin 30^\circ = \dfrac{1}{2}$ and $\cos 30^\circ = \dfrac{\sqrt{3}}{2}$.
 
+**Desmos way:** type $\sin(30)$ in degree mode. Desmos shows $0.5$, which matches the special triangle. Check the other two the same way.
+
 ### Equilateral triangles
 
 An equilateral triangle with side $s$ has height $\dfrac{s\sqrt{3}}{2}$. For height $29\sqrt{3}$, the side is $\dfrac{2 \cdot 29\sqrt{3}}{\sqrt{3}} = 58$.
+
+**Desmos way:** type $\dfrac{2 \cdot 29\sqrt{3}}{\sqrt{3}}$. Desmos shows $58$.
 
 ### Angles beyond one turn
 
 Angles repeat every $2\pi$ radians (or $360^\circ$). $11\pi$ radians is $11 \cdot 180^\circ = 1980^\circ$. Also $\tan(2\pi) = \dfrac{\sin 2\pi}{\cos 2\pi} = \dfrac{0}{1} = 0$.
 
+**Desmos way:** in radian mode, type $\tan(2\pi)$. Desmos shows $0$, the same answer as the ratio.
+
 ### Values at multiples of $\pi$
 
 On the unit circle, $\cos\theta$ is the $x$-coordinate and $\sin\theta$ is the $y$-coordinate. At $\theta = \pi$ the point is $(-1, 0)$, so $\cos\pi = -1$, and $3\pi$ lands on the same point, so $\cos 3\pi = -1$. For $\dfrac{7\pi}{4}$, the reference angle is $\dfrac{\pi}{4}$ in quadrant IV, so $\cos\dfrac{7\pi}{4} = \dfrac{\sqrt{2}}{2}$.
+
+**Desmos way:** graph the unit circle $x^2 + y^2 = 1$ with the point at $\dfrac{7\pi}{4}$. The point is in quadrant IV, with $x \approx 0.71$, so cosine is positive there.
+
+```desmos
+x^2+y^2=1
+(\cos(\frac{7\pi}{4}),\sin(\frac{7\pi}{4}))
+```
 
 ## Worked example 1 (easy)
 
@@ -53,6 +72,13 @@ A right triangle has legs $7$ and $24$. Find the hypotenuse, and find $\sin\thet
 
 Check: $\left(\frac{7}{25}\right)^2 + \left(\frac{24}{25}\right)^2 = \frac{49 + 576}{625} = 1$. Correct.
 
+**Desmos method:** in degree mode, type $\sqrt{7^2 + 24^2}$, which shows $25$, and $\dfrac{7}{25}$, which shows $0.28$. These match the hand work.
+
+```desmos
+\sqrt{7^2+24^2}
+\frac{7}{25}
+```
+
 ## Worked example 2 (SAT-level)
 
 *In right triangle $JKL$, angle $K$ is the right angle and $\tan J = \frac{8}{15}$. What is $\cos L$?*
@@ -62,6 +88,8 @@ Check: $\left(\frac{7}{25}\right)^2 + \left(\frac{24}{25}\right)^2 = \frac{49 + 
 3. Relative to $L$, the adjacent leg is $KL = 8$. So $\cos L = \frac{8}{17}$.
 
 Check: $J$ and $L$ are complementary, so $\cos L = \sin J = \frac{8}{17}$. Correct.
+
+**Desmos method:** type $\sqrt{8^2 + 15^2}$, which shows $17$, then $\dfrac{8}{17}$, which shows $\approx 0.47$. In degree mode, $\arctan\left(\dfrac{8}{15}\right) \approx 28.07^\circ$, and $\cos(90 - 28.07)^\circ$ matches $\dfrac{8}{17}$.
 
 ## Common traps
 

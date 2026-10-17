@@ -7,6 +7,12 @@ tags: [substitution, elimination, modeling, solution-count]
 
 A system of two linear equations is a pair of equations that must be true at the same time. Its solution is the point $(x, y)$ where the two lines cross. The SAT asks you to solve systems, to build them from word problems (two unknowns, two facts), and to decide when a system has **no solution** or **infinitely many solutions**.
 
+> **Build the system first.** The SAT gives you two facts in words, and each becomes one equation before you solve anything.
+>
+> 1. Name the two unknowns.
+> 2. Write one equation per fact: 150 tickets bringing in \$1400 at \$12 and \$7 gives $a + c = 150$ and $12a + 7c = 1400$.
+> 3. Solve only what the question asks.
+
 ## Key ideas
 
 - **Substitution** works best when one equation already says $y = \ldots$ or $x = \ldots$.
@@ -33,21 +39,41 @@ In plain words: no solution means same slope, different intercept. Infinitely ma
 
 Multiply each equation by the least common denominator to clear fractions, or by $10$ or $100$ to clear decimals, before you substitute or eliminate.
 
+**Desmos way:** you do not need to clear anything. Type the equations with their fractions and decimals as written, and Desmos draws them. Click the crossing point for the solution.
+
 ### Equations with the same left side
 
 For $\dfrac{x}{5} + 6(y - 4) = 33$ and $\dfrac{x}{5} - 6(y - 4) = 17$, add the equations: $\dfrac{2x}{5} = 50$, so $x = 125$. The $y$-part cancels, so you never need to find $y$.
+
+**Desmos way:** graph $\dfrac{x}{5} + 6(y - 4) = 33$ and $\dfrac{x}{5} - 6(y - 4) = 17$ as two lines and click where they cross. The point is $\left(125, \tfrac{16}{3}\right)$, and its $x$-coordinate is the answer.
+
+```desmos
+\frac{x}{5}+6(y-4)=33
+\frac{x}{5}-6(y-4)=17
+```
 
 ### Rearrange before comparing
 
 Put both equations in the form $ax + by = c$ before you compare them, because the equations may arrive in another arrangement. $30x = 900y - 1500$ becomes $30x - 900y = -1500$.
 
+**Desmos way:** Desmos reads both forms the same way, so type $30x = 900y - 1500$ exactly as given. Rearrange only when you want to read the slope and intercept by eye.
+
 ### Find a constant from a known solution
 
 Substitute the known value (such as $x = 1$) into both equations, solve for the constant from one of them, then check it in the other.
 
+**Desmos way:** type the system with the constant as a letter, such as $k$. The line $k = 1$ makes Desmos add a slider. Drag the slider until the line passes through the known point.
+
 ### Distance problems with different start times
 
 Lucía starts at $7{:}50$ at $18$ mph, and Marco starts at $8{:}00$ at $22$ mph. When Marco has ridden $t$ hours, Lucía has ridden $t + \tfrac{1}{6}$ hours. They meet when $18\left(t + \tfrac{1}{6}\right) = 22t$, so $t = 0.75$ and Marco has ridden $22(0.75) = 16.5$ miles.
+
+**Desmos way:** graph distance against time: $y = 18\left(x + \tfrac{1}{6}\right)$ for Lucía and $y = 22x$ for Marco. The lines cross at $x = 0.75$ hours, where $y = 16.5$ miles.
+
+```desmos
+y=18(x+\frac{1}{6})
+y=22x
+```
 
 ## Worked example 1 (easy)
 
@@ -57,6 +83,8 @@ Solve the system $4x + 3y = 26$ and $2x - 3y = 4$.
 2. Substitute into the first: $20 + 3y = 26$, so $3y = 6$ and $y = 2$.
 
 Check in the second: $2(5) - 3(2) = 10 - 6 = 4$. Correct. The solution is $(5, 2)$.
+
+**Desmos method:** type $4x + 3y = 26$ and $2x - 3y = 4$ exactly as written, then click where they cross. The point is $(5, 2)$.
 
 ## Worked example 2 (SAT-level)
 
@@ -68,6 +96,15 @@ Check in the second: $2(5) - 3(2) = 10 - 6 = 4$. Correct. The solution is $(5, 2
 4. So $k + c = -6 + 10 = 4$.
 
 Check: $\frac{2}{3}(6x - 9y) = 4x - 6y$ and $\frac{2}{3}(15) = 10$, so the second equation is $4x - 6y = 10$. That's the same line, so it checks out.
+
+**Desmos method:** type $6x - 9y = 15$ and $4x + ky = c$, with $k$ and $c$ as sliders. Drag them until the second line lies exactly on the first. That happens at $k = -6$ and $c = 10$, so $k + c = 4$.
+
+```desmos
+6x-9y=15
+4x+ky=c
+k=1
+c=1
+```
 
 ## Common traps
 
