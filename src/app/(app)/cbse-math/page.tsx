@@ -7,6 +7,7 @@ import { requireUser } from "@/server/auth";
 
 export const metadata = { title: "Maths for CBSE students" };
 
+// Only the maths domains: Reading and Writing has its own section on the Start page.
 const MATH_DOMAINS = (Object.keys(DOMAINS) as DomainId[]).filter((d) => DOMAINS[d].section === "math");
 const MATH_SKILL_COUNT = SKILLS.filter((s) => s.section === "math").length;
 
