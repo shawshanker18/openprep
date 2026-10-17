@@ -1,6 +1,6 @@
 # OpenPrep: project summary
 
-Last updated 16 October 2026. This is a working summary for the team: what the product is, how the code is laid out,
+Last updated 17 October 2026. This is a working summary for the team: what the product is, how the code is laid out,
 what has been built, the commands we use, and what is still open. Credentials and keys are never written here.
 
 ## 1. What it is
@@ -160,7 +160,10 @@ Windows notes: the shell is Git Bash. Files are CRLF in the working copy, and Gi
 
 ## 10. Conventions
 
-- **Commits:** author is the project owner (Shashanksaraswat123939, GitHub no-reply email). No co-author lines.
+- **Commits:** author and committer are the project owner, `Shashanksaraswat123939 <135144898+Shashanksaraswat123939@users.noreply.github.com>`,
+  the identity of every commit on `main` before 16 October 2026. Commit with that identity, for example
+  `git -c user.name=Shashanksaraswat123939 -c user.email=135144898+Shashanksaraswat123939@users.noreply.github.com commit`,
+  and leave the local git config alone. No co-author lines.
 - **Autocommit and push (default):** after each finished change, commit to `main` and push to `origin/main`. Do not
   stop to ask first. Stop doing this only when the owner says so explicitly, for example "don't push" or "don't
   commit". The project owner set this rule on 16 October 2026.
@@ -189,6 +192,10 @@ Windows notes: the shell is Git Bash. Files are CRLF in the working copy, and Gi
 - **Oct 16:** conceptual practice (migration 0025: concepts and their questions), lesson concepts and worked examples
   in boxes, the checkpoint button, a fix that stopped list sets from ending early when a question was unavailable, and
   "Try a question" on each lesson concept (three questions, with "Save and leave" returning to the lesson).
+- **Oct 17:** Desmos inside lessons (a ```desmos block renders a graph on click), Desmos ways and Desmos methods in all
+  19 maths lessons, a "Build the equation first" callout at the top of each maths lesson, and the CBSE maths guide at
+  `/cbse-math` (linked from Start for CBSE students). Commits `bcf8bde` and `96b40d6` were pushed under the Fionoz
+  identity by mistake and are left as they are; later commits use the owner's identity.
 
 ## 12. Known gaps and open decisions
 
