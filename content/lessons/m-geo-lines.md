@@ -13,16 +13,45 @@ This skill is about angle facts and triangle relationships: angles formed by int
 > 2. Write the ratio: a segment parallel to a side gives $\frac{ST}{QR} = \frac{PS}{PQ}$.
 > 3. Solve only after the ratio is written.
 
-## Key ideas
+## Learn the idea
 
-- Angles that form a straight line add to $180^\circ$. **Vertical angles** (opposite each other where two lines cross) are equal.
-- When a transversal crosses parallel lines, every acute angle is equal and every obtuse angle is equal, and any acute angle plus any obtuse angle is $180^\circ$.
-- The angles of a triangle add to $180^\circ$. An **exterior angle** equals the sum of the two interior angles that are not next to it.
-- In an **isosceles** triangle, the angles opposite the equal sides are equal.
-- Two triangles are **similar** if two pairs of angles match (AA). Then all corresponding sides share one ratio.
-- A segment drawn parallel to one side of a triangle cuts off a smaller triangle similar to the whole.
+**Try this first.** Two angles of a triangle are $50^\circ$ and $60^\circ$. How big is the third angle? Then say why you know.
+
+**Let's work it out.**
+
+1. Why do the angles of a triangle add to $180^\circ$? Picture a straight line. The three corners of a triangle fit together along one straight edge, and a straight line is $180^\circ$.
+2. So the third angle is what is left over: $180^\circ - 50^\circ - 60^\circ$.
+3. Compute: $180 - 110 = 70^\circ$.
+4. Check the reasoning: adding all three should give $180$. $50 + 60 + 70 = 180$.
+5. This one fact is used everywhere. Whenever two angles are known, the third follows immediately.
+
+**Your turn.** A triangle has angles $90^\circ$ and $35^\circ$. Find the third angle, and explain why it is the one left over.
+
+**Answer:** $180 - 90 - 35 = 55^\circ$. Because the triangle has a right angle, the two other angles must share the remaining $90^\circ$, so $35 + 55 = 90$.
 
 ## Formulas and rules
+
+**Key formulas and rules**
+
+| Rule | What it says |
+|---|---|
+| Triangle angle sum | The angles of a triangle add to $180^\circ$. |
+| Exterior angle | An exterior angle equals the sum of the two non-adjacent interior angles. |
+| Similar triangles | Corresponding sides are in the same ratio. |
+| Midsegment | A segment joining two midpoints is parallel to the third side and half its length. |
+
+**Desmos check for a midsegment, step by step:**
+
+1. Plot the triangle's corners $(0, 0)$, $(8, 0)$ and $(2, 5)$.
+2. Plot the midpoints $(1, 2.5)$ of one side and $(5, 2.5)$ of another. The segment between them is $4$ long, which is half of the base, $8$.
+
+```desmos-open
+(0,0)
+(8,0)
+(2,5)
+(1,2.5)
+(5,2.5)
+```
 
 | Angle pair (parallel lines) | Relationship |
 |---|---|

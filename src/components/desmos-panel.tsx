@@ -141,8 +141,8 @@ export function DesmosCalculator({ expressions = EMPTY_EXPRESSIONS, className = 
 }
 
 /** A graph inside a lesson step, from a ```desmos block (one equation per line). Opens on click, so the page stays light. */
-export function DesmosInline({ expressions }: { expressions: string[] }) {
-  const [open, setOpen] = useState(false);
+export function DesmosInline({ expressions, defaultOpen = false }: { expressions: string[]; defaultOpen?: boolean }) {
+  const [open, setOpen] = useState(defaultOpen);
   return (
     <div className="flex min-w-0 flex-col gap-2">
       <Button variant="outline" size="sm" className="self-start" onClick={() => setOpen((o) => !o)} aria-expanded={open}>

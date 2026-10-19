@@ -7,15 +7,31 @@ tags: [subject-verb-agreement, intervening-phrase, inverted-sentence, verb-tense
 
 Form, Structure, and Sense questions test grammar inside a sentence: making verbs agree with subjects, choosing the right tense or verb form, matching pronouns to the nouns they replace, forming possessives and plurals, and placing modifiers next to what they describe. The stem is "Which choice completes the text so that it conforms to the conventions of Standard English?"
 
-## Key ideas
+## Learn the idea
 
-- **Find the true subject.** Prepositional phrases ("of rare maps," "in the library") sit between the subject and the verb but never contain the subject.
-- In an **inverted sentence** ("Among the fossils *were* two teeth"), the subject comes *after* the verb.
-- **Tense follows time clues.** Dates and words like "in 1969," "currently," "by next year" set the tense.
-- A **pronoun** must match its antecedent in number: a singular noun like "the company" takes "it/its," not "they/their."
-- A **modifier** at the start of a sentence ("After studying the ruins, ...") must be followed immediately by the person or thing doing that action.
+**Try this first.** "The collection of rare maps is kept in the library." Is the verb *is* or *are*? Find the subject before you choose.
+
+**Let's work it out.**
+
+1. Find the subject by removing the extra phrase. "Of rare maps" describes the collection, but it is not the subject. Why remove it? Phrases between the subject and the verb can make a plural noun look like the subject.
+2. Strip the phrase: "The collection ... is kept." Now the subject is clearly "collection."
+3. Decide the number. "Collection" is one thing, so it is singular, and the singular verb is *is*.
+4. Check it with a simpler sentence: "The collection is kept." It reads correctly, so the verb matches the subject.
+
+**Your turn.** "The boxes of old letters ___ in the attic." Is it *was* or *were*?
+
+**Answer:** *Were*. Find the subject first: "boxes" is plural, and the phrase "of old letters" describes the boxes without changing their number.
 
 ## Formulas and rules
+
+**Key rules**
+
+| Rule | What it says |
+|---|---|
+| True subject | Phrases between the subject and verb never contain the subject. |
+| Tense and time | Dates and time words set the tense. |
+| Pronoun agreement | A pronoun must match its noun in number. |
+| Modifier placement | A sentence-opening modifier must be followed by the thing it describes. |
 
 | Topic | Rule | Example |
 |---|---|---|

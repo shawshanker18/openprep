@@ -13,15 +13,41 @@ Ratios compare quantities, rates compare quantities with different units (miles 
 > 2. Write the chain: 6 mL every 15 seconds becomes $\frac{6}{15} \cdot 60 \cdot 60 \cdot 24 \div 1000$ liters a day.
 > 3. Multiply only after every unit cancels.
 
-## Key ideas
+## Learn the idea
 
-- A proportion $\frac{a}{b} = \frac{c}{d}$ only works if both ratios compare the same things in the same order.
-- A **unit rate** (the amount for one unit) turns most rate problems into a single multiplication.
-- In a ratio of $5 : 3$, the quantities are $5k$ and $3k$ for some number $k$. The total is $8k$.
-- Unit conversion is multiplying by fractions equal to $1$, such as $\frac{60 \text{ min}}{1 \text{ hr}}$. Arrange each fraction so unwanted units cancel.
-- When two machines or workers act together, **rates add** (bottles per hour); times do not.
+**Try this first.** Three pens cost \$6. How much do seven pens cost? Try to reason it out before reading on.
+
+**Let's work it out.**
+
+1. Ask what one pen costs. The \$6 is shared across $3$ pens, so divide: $6 \div 3 = 2$, which is \$2 each. Why divide? A unit rate answers "how much for one," and dividing spreads the total evenly.
+2. Now scale to seven pens. Each pen is \$2, so seven pens cost $7 \cdot 2$ dollars.
+3. Compute: $7 \cdot 2 = 14$, so the cost is \$14.
+4. Check the proportion: $\dfrac{3}{6} = \dfrac{7}{14}$. Both reduce to $\dfrac{1}{2}$, so the two ratios match.
+
+**Your turn.** Five kilograms of rice cost \$12.50. What do eight kilograms cost?
+
+**Answer:** The unit rate is $12.50 \div 5 = 2.50$ per kg. Then $8 \cdot 2.50 = 20$, so eight kilograms cost \$20.
 
 ## Formulas and rules
+
+**Key formulas and rules**
+
+| Rule | What it says |
+|---|---|
+| Unit rate | Divide the total by the count, or the amount by the units. |
+| Proportion | $\dfrac{a}{b} = \dfrac{c}{d}$ when both ratios compare the same things in the same order. |
+| Distance | $d = rt$ |
+| Working together | Rates add: $r_1 + r_2$. Times do not add. |
+
+**Desmos check for a proportion, step by step:**
+
+1. Type $y = 2x$. Each pen costs $2$, so the line is the total cost for $x$ pens.
+2. Type the point $(7, 14)$. It sits on the line, so seven pens cost $14$.
+
+```desmos-open
+y=2x
+(7,14)
+```
 
 $$\text{distance} = \text{rate} \times \text{time} \qquad \text{amount} = \text{rate} \times \text{time}$$
 

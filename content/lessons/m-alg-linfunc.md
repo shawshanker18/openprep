@@ -13,15 +13,42 @@ A linear function changes by the same amount every time its input goes up by $1$
 > 2. Write the function from the story: a gym charging \$32 plus \$5 per session gives $C(n) = 5n + 32$.
 > 3. Evaluate only what the question asks.
 
-## Key ideas
+## Learn the idea
 
-- $f(x) = mx + b$: $m$ is the slope (rate of change) and $b$ is $f(0)$, the $y$-intercept.
-- $f(4)$ means "put $4$ in for $x$." The question "for what $x$ is $f(x) = 4$?" is different: set the expression equal to $4$ and solve.
-- Slope is $\frac{\text{change in output}}{\text{change in input}}$. Any two points on the line give the same slope.
-- If $f(x + 1) = f(x) + 3$, the slope is $3$. If $f(x + 5) = f(x) + 10$, the slope is $\frac{10}{5} = 2$.
-- In a model, the slope is the **rate** (per minute, per mile, per item), and the intercept is the **starting value** when the input is $0$.
+**Try this first.** A plant is $4$ cm tall on day $0$ and grows $3$ cm each day. How tall is it on day $5$? Work it out before you read on.
+
+**Let's work it out.**
+
+1. Start with what we know. Day $0$: $4$ cm. Day $1$: $4 + 3 = 7$ cm. Day $2$: $7 + 3 = 10$ cm.
+2. Look for the pattern. Each day adds $3$. After $d$ days there have been $d$ additions of $3$, so the growth is $3d$. Why multiply? Because the same amount is added every day, and repeated addition is multiplication.
+3. Add the starting height, $4$. The rule is $h(d) = 3d + 4$.
+4. Check the rule against the table: $h(2) = 3(2) + 4 = 10$, which matches day $2$.
+5. Now evaluate day $5$: $h(5) = 3(5) + 4 = 19$ cm.
+
+**Your turn.** A car starts with $10$ gallons and uses $2$ gallons each hour. Write the rule $g(h)$ and find $g(4)$.
+
+**Answer:** The starting value is $10$ and the rate is $-2$, so $g(h) = 10 - 2h$. Then $g(4) = 10 - 8 = 2$ gallons. The rate is negative because the fuel decreases.
 
 ## Formulas and rules
+
+**Key formulas and rules**
+
+| Rule | What it says |
+|---|---|
+| Slope formula | $m = \dfrac{y_2 - y_1}{x_2 - x_1}$ |
+| Linear function | $f(x) = mx + b$, with $m$ the rate and $b = f(0)$ |
+| Constant change | If $f(x + 1) - f(x) = m$ for every $x$, then $f$ is linear with slope $m$ |
+
+**Desmos check for a rate, step by step:**
+
+1. Type $f(x) = 3x + 4$, the plant from the lesson.
+2. Type $f(5)$. Desmos shows $19$. Then type $f(6) - f(5)$, which shows $3$, the constant change.
+
+```desmos-open
+f(x)=3x+4
+f(5)
+f(6)-f(5)
+```
 
 $$m = \frac{y_2 - y_1}{x_2 - x_1}$$
 

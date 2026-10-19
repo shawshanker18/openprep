@@ -13,15 +13,42 @@ This skill covers right triangles and the basics of trigonometry: the **Pythagor
 > 2. Write the ratio: a $12$-foot ramp at $30^\circ$ rises $12\sin 30^\circ$.
 > 3. Evaluate only after the ratio is written.
 
-## Key ideas
+## Learn the idea
 
-- In a right triangle, the hypotenuse is the longest side and sits opposite the right angle.
-- Each trig ratio compares two sides **relative to a chosen acute angle**: opposite, adjacent, and hypotenuse change when you switch angles.
-- The two acute angles of a right triangle are complementary (they add to $90^\circ$), so the side opposite one is adjacent to the other. That is why $\sin x^\circ = \cos(90 - x)^\circ$.
-- If you know one trig ratio, sketch a triangle with those side lengths, find the third side with the Pythagorean theorem, and read off any other ratio.
-- Radians measure angles by arc length on a circle of radius $1$: $\pi$ radians $= 180^\circ$.
+**Try this first.** In a right triangle with legs $3$ and $4$, what is $\sin$ of the angle opposite the $3$? Use the sides, not a calculator.
+
+**Let's work it out.**
+
+1. Sine compares the side opposite the angle with the longest side, the hypotenuse. Why the hypotenuse? It is the side opposite the right angle, and every ratio is measured against it, so ratios stay the same for similar triangles.
+2. Find the hypotenuse with Pythagoras: $\sqrt{3^2 + 4^2} = \sqrt{25} = 5$.
+3. Label the sides for the angle we chose. The side opposite it is $3$.
+4. So $\sin = \dfrac{\text{opposite}}{\text{hypotenuse}} = \dfrac{3}{5}$.
+5. Notice the step we did not skip: choosing the angle first. The same triangle gives a different sine if you pick the other acute angle, because the opposite side changes.
+
+**Your turn.** A right triangle has legs $5$ and $12$. Find $\cos$ of the angle adjacent to the $5$.
+
+**Answer:** The hypotenuse is $\sqrt{5^2 + 12^2} = 13$. Cosine is adjacent over hypotenuse, so $\cos = \dfrac{5}{13}$.
 
 ## Formulas and rules
+
+**Key formulas and rules**
+
+| Rule | What it says |
+|---|---|
+| Sine, cosine, tangent | $\sin = \dfrac{\text{opp}}{\text{hyp}}$, $\cos = \dfrac{\text{adj}}{\text{hyp}}$, $\tan = \dfrac{\text{opp}}{\text{adj}}$ |
+| Pythagoras | $a^2 + b^2 = c^2$ |
+| Complementary angles | $\sin x^\circ = \cos(90 - x)^\circ$ |
+| Special values | $\sin 30^\circ = \dfrac{1}{2}$, $\cos 60^\circ = \dfrac{1}{2}$ |
+
+**Desmos check on the unit circle, step by step:**
+
+1. Type $x^2 + y^2 = 1$. This is the unit circle.
+2. Type the point $(\cos(\tfrac{\pi}{3}), \sin(\tfrac{\pi}{3}))$. It sits at $(0.5, 0.87)$, which matches $\cos 60^\circ = \tfrac{1}{2}$.
+
+```desmos-open
+x^2+y^2=1
+(\cos(\frac{\pi}{3}),\sin(\frac{\pi}{3}))
+```
 
 $$a^2 + b^2 = c^2 \qquad \sin\theta = \frac{\text{opp}}{\text{hyp}} \quad \cos\theta = \frac{\text{adj}}{\text{hyp}} \quad \tan\theta = \frac{\text{opp}}{\text{adj}}$$
 

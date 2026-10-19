@@ -7,15 +7,30 @@ tags: [rhetorical-goal, emphasize, explain, compare, introduce, audience]
 
 Rhetorical Synthesis questions show a bulleted list of a student's research notes, then state a goal: "The student wants to emphasize..." or "...to introduce X to an audience unfamiliar with it." You pick the sentence that "most effectively uses relevant information from the notes to accomplish this goal." Every choice is accurate to the notes. Only one does what the goal asks.
 
-## Key ideas
+## Learn the idea
 
-- **The goal is everything.** The notes are just a pool of facts; the goal tells you which facts matter.
-- Read the goal **before** the notes. Often you can answer without reading the notes closely.
-- All four choices are usually true. Don't eliminate for accuracy. Eliminate for **not meeting the goal**.
-- Watch each part of a multi-part goal: "explain how they differ *while also noting* what they have in common" needs both a difference and a similarity.
-- **Audience** matters. For an audience unfamiliar with a topic, the sentence should say what the thing *is*. For an audience that already knows it, a definition is unnecessary.
+**Try this first.** The goal is to explain how the two cities differ, while also noting one thing they share. Notes: City A has a river. City B has a river. City B is larger. What should the answer include?
+
+**Let's work it out.**
+
+1. Read the goal first. It asks for two things: a difference and a similarity. Why read the goal first? The notes are a pile of facts, and the goal decides which facts you use.
+2. Find the difference in the notes. Only one fact separates the cities: City B is larger. A river does not separate them, since both have one.
+3. Find the similarity. Both cities have a river. That fact fits the goal's second part.
+4. Combine the two. A correct answer names the difference and the shared feature together. An answer with only the river, or only the size, misses part of the goal.
+
+**Your turn.** Goal: compare the two plans' monthly costs. Notes: Plan A costs \$20 a month. Plan B costs \$15 a month plus a \$5 setup fee. Which facts does the goal need?
+
+**Answer:** The goal needs the two monthly costs: \$20 for Plan A and \$15 for Plan B. The setup fee is a one-time cost, so it doesn't belong in a monthly comparison unless the goal asks for it.
 
 ## Formulas and rules
+
+**Key rules**
+
+| Rule | What it says |
+|---|---|
+| Goal first | Read the goal before the notes. |
+| Eliminate on the goal | Most choices are accurate, so eliminate the ones that miss the goal. |
+| Multi-part goals | Each part of the goal needs its own support in the answer. |
 
 | Goal word | The correct sentence must... |
 |---|---|

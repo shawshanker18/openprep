@@ -13,15 +13,41 @@ A system of two linear equations is a pair of equations that must be true at the
 > 2. Write one equation per fact: 150 tickets bringing in \$1400 at \$12 and \$7 gives $a + c = 150$ and $12a + 7c = 1400$.
 > 3. Solve only what the question asks.
 
-## Key ideas
+## Learn the idea
 
-- **Substitution** works best when one equation already says $y = \ldots$ or $x = \ldots$.
-- **Elimination** works best when the coefficients line up: add or subtract the equations so one variable cancels. Multiply an equation first if needed.
-- A word problem with a count and a total usually gives one "how many" equation and one "how much" equation: $a + c = 150$ and $12a + 7c = 1400$.
-- If a question asks for $x + y$ or $3x - y$, look for a way to get it directly by adding or subtracting the equations.
-- Two lines meet once, never (parallel), or everywhere (the same line).
+**Try this first.** Solve $x + y = 10$ and $x - y = 4$. Look at the two equations before you do anything. Is there a shortcut?
+
+**Let's work it out.**
+
+1. Notice the $y$ terms. One is $+y$ and the other is $-y$. They are opposites, so if we add the equations, they cancel. Why is adding allowed? Adding the same things to both sides of an equation keeps it true, so adding two true equations gives a true equation.
+2. Add the left sides and the right sides: $(x + y) + (x - y) = 10 + 4$, so $2x = 14$ and $x = 7$.
+3. Now find $y$. Substitute $x = 7$ into the first equation: $7 + y = 10$, so $y = 3$.
+4. Check in the second equation, which we have not used yet: $7 - 3 = 4$. It works, so $(7, 3)$ is the solution.
+5. Picture it: the two lines cross at $(7, 3)$, the one point both equations share.
+
+**Your turn.** Solve $y = 2x$ and $x + y = 9$. Here one equation already tells you what $y$ is, so substitute.
+
+**Answer:** Replace $y$ with $2x$: $x + 2x = 9$, so $3x = 9$ and $x = 3$. Then $y = 2(3) = 6$. The solution is $(3, 6)$.
 
 ## Formulas and rules
+
+**Key formulas and rules**
+
+| Rule | What it says |
+|---|---|
+| Substitution | Replace one variable with an expression for it from the other equation. |
+| Elimination | Add or subtract equations so one variable cancels. |
+| Solution count | Compare $\dfrac{a_1}{a_2}$, $\dfrac{b_1}{b_2}$ and $\dfrac{c_1}{c_2}$: unequal first two ratios give one solution, equal first two but not third give none, all equal give infinitely many. |
+
+**Desmos check for a solution, step by step:**
+
+1. Type $x + y = 10$ and $x - y = 4$ as two lines.
+2. Click where they cross. The point is $(7, 3)$, which satisfies both equations.
+
+```desmos-open
+x+y=10
+x-y=4
+```
 
 For $a_1x + b_1y = c_1$ and $a_2x + b_2y = c_2$:
 

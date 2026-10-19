@@ -7,15 +7,31 @@ tags: [author-response, qualify-claim, shared-view, science, social-studies, hum
 
 Cross-Text Connections questions give you two short texts on the same topic, labeled **Text 1** and **Text 2**. You are asked how the author of one would respond to the other ("Based on the texts, how would the author of Text 2 most likely respond to...?"), or what both authors would agree on. You are comparing *viewpoints*, not just facts.
 
-## Key ideas
+## Learn the idea
 
-- Usually, Text 1 presents a claim, finding, or recommendation, and Text 2 reacts to it.
-- Text 2's reaction is rarely total rejection. Most often it **qualifies** the claim: "true, but incomplete," "true here, but not everywhere," or "another factor matters too."
-- Answer from **Text 2's** point of view when asked how Text 2 would respond. Use only what Text 2 says or clearly implies.
-- For "both would agree" questions, the answer must fit **both** texts. Anything only one text supports is wrong.
-- Pin down exactly *what* in Text 1 is being responded to: the evidence, the conclusion, or the recommendation.
+**Try this first.** Text 1 says: "Solar panels cut household bills." Text 2 says: "Solar panels cut bills, but only where sunlight is strong." Does Text 2 agree with Text 1, reject it, or add to it?
+
+**Let's work it out.**
+
+1. Separate what each text says. Text 1 makes one claim: panels save money. Text 2 starts by agreeing: "Solar panels cut bills" is the same point.
+2. Find what Text 2 adds. The words "but only where" add a limit. The saving depends on sunlight.
+3. Ask how Text 2 responds to Text 1. It is not rejecting the claim, since it accepts that panels save money. It qualifies it by saying when the claim holds.
+4. Why does this matter for the test? Answers that say Text 2 "disagrees completely" are usually wrong. Look for words like "but," "only," or "unless," because those signal a qualification.
+
+**Your turn.** Text 1 says: "Homework helps students learn." Text 2 says: "Homework helps only when students do it themselves." How does Text 2 respond?
+
+**Answer:** Text 2 qualifies the claim. It accepts that homework can help, but adds the condition "only when students do it themselves."
 
 ## Formulas and rules
+
+**Key rules**
+
+| Rule | What it says |
+|---|---|
+| Qualify, do not reject | Text 2 usually adds a condition to Text 1's claim. |
+| Watch the signal words | "but," "only," and "unless" mark a qualification. |
+| Answer from one text | For "how does Text 2 respond," use only Text 2. |
+| Both agree | For "would both agree," the answer must fit both texts. |
 
 | Text 2's relationship to Text 1 | Typical wording in Text 2 | Typical correct answer |
 |---|---|---|

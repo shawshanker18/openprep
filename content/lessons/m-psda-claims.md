@@ -13,15 +13,40 @@ These questions describe a study and ask which conclusion it supports. Two desig
 > 2. Ask whether treatments were randomly assigned.
 > 3. Pick the choice that the claim supports, and no more.
 
-## Key ideas
+## Learn the idea
 
-- **Random selection** from a population lets you generalize the results to that population, and only that one.
-- **Random assignment** of treatments in an experiment lets you conclude cause and effect.
-- An **observational study** (no assigned treatment) can show an association, never causation. People who choose a behavior may differ in other ways.
-- **Sampling bias** happens when the method favors certain people: volunteers, people who visit one website, customers at one store, or only those easy to reach.
-- The strongest claims on the SAT are usually the most modest ones. Wording like "proves," "all," or "will" is a red flag.
+**Try this first.** A survey of volunteers at one gym finds that its members sleep more. Can the study show that running causes better sleep? Make a decision before reading on.
+
+**Let's work it out.**
+
+1. Ask the first question: who was studied, and how were they chosen? These were volunteers at one gym. Volunteers are not a random sample, so the results describe those gym members, not everyone.
+2. Ask the second question: did the researchers assign anything? No one was given a treatment. People chose whether to run.
+3. Why does that matter? People who choose to run may differ in other ways, such as being more active or less stressed. Those other differences could explain the sleep. Only random assignment rules out such third causes.
+4. So the honest claim is an association, for gym members. The study cannot claim running causes better sleep.
+
+**Your turn.** A school randomly selects $50$ students and randomly assigns half to extra tutoring. The tutored group scores higher. What can the study claim?
+
+**Answer:** Random assignment supports a cause-and-effect claim: tutoring likely improves scores for these students. Because the $50$ students were randomly selected from the school, the result can also be generalised to the school's students.
 
 ## Formulas and rules
+
+**Key formulas and rules**
+
+| Rule | What it says |
+|---|---|
+| Random selection | Results generalise to the population sampled, and only that population. |
+| Random assignment | Differences between treatment groups can be attributed to the treatment. |
+| No random assignment | The result is only an association. |
+| Comparing groups | Subtract the two percents to get the difference in percentage points. |
+
+**Desmos check for a comparison, step by step:**
+
+1. Type $\dfrac{26}{40} - \dfrac{18}{40}$. Desmos shows $0.2$, which is $20$ percentage points.
+2. For the design question, Desmos cannot judge the study, so run the checklist: who was selected, and was treatment assigned?
+
+```desmos-open
+\frac{26}{40}-\frac{18}{40}
+```
 
 | Random selection? | Random assignment? | What you can conclude |
 |---|---|---|

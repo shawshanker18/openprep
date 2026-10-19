@@ -7,15 +7,30 @@ tags: [main-purpose, overall-structure, sentence-function, informational-text, l
 
 Text Structure and Purpose questions ask **why** a text was written or **how** it is built, not what it says. You will see three question types: **main purpose** ("Which choice best states the main purpose of the text?"), **overall structure** ("Which choice best describes the overall structure of the text?"), and **sentence function** ("Which choice best describes the function of the third sentence in the overall structure of the text?").
 
-## Key ideas
+## Learn the idea
 
-- Purpose answers start with a verb: *to explain, to argue, to describe, to challenge, to show*. Pick the verb that fits what the author is doing.
-- An informational text that says "many people believe X... however, Y" has the purpose of correcting or qualifying X.
-- A literary text's purpose is usually to reveal something about a character or a relationship through a scene.
-- Structure answers describe the text in order, step by step. **Every** step must match, in the same order.
-- Sentence function is about the sentence's **job** in relation to the others: introducing a claim, giving an example, offering evidence, presenting a contrast, stating a conclusion.
+**Try this first.** "Many people think libraries are outdated. However, they remain vital community spaces." What job does the second sentence do?
+
+**Let's work it out.**
+
+1. Look at the connecting word. "However" tells you the sentence turns against what came before. Why does that matter? A word like this shows the author's move, so it is the first clue to the sentence's function.
+2. Compare the two sentences. The first reports what people think. The second states what the author believes.
+3. So the second sentence contrasts with the first and corrects it. Name its job as the author would: to counter the common view.
+4. Check the answer by asking "what would the paragraph lose without it?" Without it, the reader would think the author agrees that libraries are outdated.
+
+**Your turn.** "Some scientists doubt the result. Others, however, accept it." What is the job of the second sentence?
+
+**Answer:** It presents a contrast. The word "however" turns from one group's doubt to another group's acceptance, showing the disagreement.
 
 ## Formulas and rules
+
+**Key rules**
+
+| Rule | What it says |
+|---|---|
+| Purpose verb | Purpose answers start with *to explain*, *to argue*, *to describe*, or *to challenge*. |
+| Sentence function | A sentence's job is to introduce, give an example, offer evidence, contrast, or conclude. |
+| Order matters | Structure answers must match every step, in order. |
 
 | Common sentence job | Signals |
 |---|---|

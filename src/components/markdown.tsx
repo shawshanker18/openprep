@@ -21,7 +21,9 @@ export function Markdown({ children, className }: { children: string; className?
           const code = node?.children[0];
           if (code?.type === "element" && String(code.properties.className ?? "").includes("language-desmos")) {
             const text = code.children.map((c) => (c.type === "text" ? c.value : "")).join("");
-            return <DesmosInline expressions={text.split("\n").map((line) => line.trim()).filter(Boolean)} />;
+            // ```desmos-open shows the graph straight away; ```desmos waits for the student to click.
+            const open = String(code.properties.className ?? "").includes("language-desmos-open");
+            return <DesmosInline expressions={text.split("\n").map((line) => line.trim()).filter(Boolean)} defaultOpen={open} />;
           }
           return <pre>{children}</pre>;
         },

@@ -61,6 +61,6 @@ export function toRow(skillId: string, q: ContentQuestion) {
 }
 
 export const LESSON_HEADINGS = [
-  "What this skill is", "Key ideas", "Formulas and rules", "Worked example 1 (easy)",
+  "What this skill is", "Learn the idea", "Formulas and rules", "Worked example 1 (easy)",
   "Worked example 2 (SAT-level)", "Common traps", "The fast way (and when to use Desmos)",
 ] as const;

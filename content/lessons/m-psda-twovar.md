@@ -13,16 +13,41 @@ Two-variable data pairs each $x$-value with a $y$-value, usually shown in a **sc
 > 2. Write the model: a line through $(4, 18)$ and $(10, 33)$ gives $y = 2.5x + 8$.
 > 3. Predict or find residuals only with the model written.
 
-## Key ideas
+## Learn the idea
 
-- **Direction:** points rising left to right show a positive association; falling shows a negative association.
-- **Strength:** points close to a line show a strong association; a loose cloud shows a weak one.
-- A line of best fit gives **predicted** values, not exact ones. Plug the $x$-value into the equation to predict $y$.
-- The slope is the **predicted change in $y$ for each increase of $1$ in $x$**. The $y$-intercept is the predicted $y$ when $x = 0$, which may not make sense in context.
-- A **residual** is $\text{actual} - \text{predicted}$. A positive residual means the point lies above the line.
-- **Linear** data changes by a constant **difference**; **exponential** data changes by a constant **ratio**.
+**Try this first.** The line $y = 2x + 5$ predicts a value at $x = 4$. The actual value is $15$. Is the point above or below the line?
+
+**Let's work it out.**
+
+1. Find the predicted value: put $x = 4$ into the line. $2(4) + 5 = 13$. The line says $13$ at this $x$.
+2. Compare with the actual value, $15$. The point is higher than the line, so it lies above it.
+3. The residual is actual minus predicted: $15 - 13 = 2$. Why this order? A positive residual means the data beat the prediction, and the sign tells you which side of the line the point is on.
+4. Check the direction: if the actual value had been $11$, the residual would be $-2$, below the line. The sign always answers "above or below?"
+
+**Your turn.** The line is $y = 3x - 1$. At $x = 2$ the actual value is $4$. Find the residual and say whether the point is above or below the line.
+
+**Answer:** The predicted value is $3(2) - 1 = 5$. The residual is $4 - 5 = -1$, so the point is below the line.
 
 ## Formulas and rules
+
+**Key formulas and rules**
+
+| Rule | What it says |
+|---|---|
+| Line of best fit | $\hat{y} = mx + b$ predicts $y$ from $x$. |
+| Slope meaning | $m$ is the predicted change in $y$ for each increase of $1$ in $x$. |
+| Residual | $\text{residual} = \text{actual} - \text{predicted}$ |
+| Exponential model | $y = a \cdot b^x$ when the data have a constant ratio |
+
+**Desmos check for a residual, step by step:**
+
+1. Type $y = 2.5x + 8$, the line of best fit from the lesson.
+2. Type the point $(16, 44.5)$. It sits below the line, so its residual is negative: $44.5 - 48 = -3.5$.
+
+```desmos-open
+y=2.5x+8
+(16,44.5)
+```
 
 | Model | Pattern in a table | Equation |
 |---|---|---|

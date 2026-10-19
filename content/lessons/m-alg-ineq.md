@@ -13,15 +13,40 @@ A linear inequality is like a linear equation, but with $<$, $>$, $\le$, or $\ge
 > 2. Write one inequality per condition: a rental of \$40 plus \$0.65 per mile, at most \$120, gives $40 + 0.65m \le 120$.
 > 3. Solve only if the question asks for a value.
 
-## Key ideas
+## Learn the idea
 
-- Solve exactly as you would an equation, with one extra rule: **multiplying or dividing by a negative number flips the inequality sign.**
-- A compound inequality such as $-5 < 1 - 3x \le 10$ is solved by doing the same step to all three parts at once.
-- In context, the answer is often a whole number. "Greatest number of boxes" means round **down**; "least number of trips" means round **up**.
-- A point is a solution to a system of inequalities only if it satisfies **every** inequality in the system.
-- On a graph, $y > mx + b$ is the region above the line; $y < mx + b$ is below. A dashed line means the boundary is not included.
+**Try this first.** Is $x = -5$ a solution to $5 - 3x < 17$? Then test $x = 0$. Check your answers before reading on.
+
+**Let's work it out.**
+
+1. Test $x = -5$: $5 - 3(-5) = 20$, and $20 < 17$ is false. So $-5$ is not a solution. Test $x = 0$: $5 < 17$ is true. The solutions are on one side of some boundary, and we need to find the boundary.
+2. Solve it like an equation. Subtract $5$: $-3x < 12$.
+3. Now divide by $-3$. Why does the sign flip? Multiplying or dividing by a negative reverses the order of numbers. Check with $-1 < 2$: multiply both sides by $-1$ and you get $1 > -2$. The smaller number became the larger one.
+4. So $x > -4$. Test again: $x = -5$ is not greater than $-4$, and it failed the test. $x = 0$ is greater than $-4$, and it passed. The test agrees.
+
+**Your turn.** Solve $-2x \ge 6$. Remember the sign rule.
+
+**Answer:** Divide by $-2$ and flip: $x \le -3$. Check with $x = -4$: $-2(-4) = 8 \ge 6$, which is true.
 
 ## Formulas and rules
+
+**Key formulas and rules**
+
+| Rule | What it says |
+|---|---|
+| Flip rule | Multiplying or dividing both sides by a negative number reverses the inequality sign. |
+| Compound inequality | Do the same step to all three parts of $a < \text{expression} < b$. |
+| Test point | A point is a solution to a system only if it satisfies every inequality. |
+
+**Desmos check for a system, step by step:**
+
+1. Type $y \ge x - 3$. Desmos shades the region above a solid line.
+2. Type $y < -2x + 16$. The shaded overlap is the solution region, and its dashed boundary is excluded.
+
+```desmos-open
+y\ge x-3
+y<-2x+16
+```
 
 | Words | Symbol |
 |---|---|

@@ -13,15 +13,42 @@ One-variable data is a list of values of a single quantity: test scores, heights
 > 2. Write the total: 6 scores with mean 15 gives $6 \times 15 = 90$.
 > 3. Subtract the known values only after the total is written.
 
-## Key ideas
+## Learn the idea
 
-- The **mean** is the total divided by the count. Many questions are easier if you think in totals: $\text{total} = \text{mean} \times \text{count}$.
-- The **median** is the middle value after sorting. With an even count, it is the average of the two middle values.
-- A frequency table is a compressed list: the row "value $3$, frequency $4$" means $3, 3, 3, 3$.
-- An **outlier** pulls the mean toward it a lot but barely moves the median. A data set with a high outlier usually has mean greater than median.
-- **Standard deviation** measures how far values typically are from the mean. Tightly clustered data has a small standard deviation; widely spread data has a large one. Adding the same number to every value does not change the spread.
+**Try this first.** The list is $2, 4, 4, 10$. Do you think the mean or the median is bigger? Why?
+
+**Let's work it out.**
+
+1. The mean is the total divided by the count. Why? It is the value every item would have if the total were shared out evenly. Add the values: $2 + 4 + 4 + 10 = 20$, and $20 \div 4 = 5$.
+2. The median is the middle value after sorting. The list is already sorted, and the middle two values are $4$ and $4$. The median is $4$.
+3. Compare: the mean $5$ is bigger than the median $4$. Why? The value $10$ is far above the others. It pulls the total up, so the mean moves toward it. The median only counts positions, so one large value barely moves it.
+4. This is how to read a skewed list: when the mean is above the median, the data have a long tail on the high side.
+
+**Your turn.** Find the mean and median of $1, 3, 5, 7, 100$. Which measure does the $100$ affect more?
+
+**Answer:** The mean is $116 \div 5 = 23.2$, and the median is $5$. The $100$ pulls the mean far up but leaves the median at the middle value, $5$.
 
 ## Formulas and rules
+
+**Key formulas and rules**
+
+| Rule | What it says |
+|---|---|
+| Mean | $\bar{x} = \dfrac{\text{sum of values}}{\text{count}}$ |
+| Total from mean | $\text{total} = \text{mean} \times \text{count}$ |
+| Combined mean | $\dfrac{n_1 \bar{x}_1 + n_2 \bar{x}_2}{n_1 + n_2}$ |
+| Median position | In a sorted list of $n$ values, the median is the $\dfrac{n + 1}{2}$th value. |
+
+**Desmos check for the mean and median, step by step:**
+
+1. Type $L = [2, 4, 4, 10]$ to store the list.
+2. Type $\operatorname{mean}(L)$, which shows $5$, and $\operatorname{median}(L)$, which shows $4$.
+
+```desmos-open
+L=[2,4,4,10]
+mean(L)
+median(L)
+```
 
 $$\text{mean} = \frac{\text{sum of values}}{\text{number of values}} \qquad \text{mean from a table} = \frac{\sum (\text{value} \times \text{frequency})}{\sum \text{frequency}}$$
 

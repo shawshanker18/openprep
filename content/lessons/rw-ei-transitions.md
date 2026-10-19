@@ -7,15 +7,30 @@ tags: [contrast, concession, cause-effect, addition, elaboration, restatement, a
 
 Transitions questions give you a short text with a blank at the start of a sentence (or clause) and ask, "Which choice completes the text with the most logical transition?" You choose the word or phrase that shows how the sentence relates to the one before it: contrast, cause and effect, an example, an addition, and so on.
 
-## Key ideas
+## Learn the idea
 
-- The question is about **logic**, not grammar. Every choice is grammatically fine.
-- Read the sentence **before** the blank and the sentence **with** the blank, then decide how they relate *before* looking at the choices.
-- Transitions sort into categories. If two choices are in the same category (e.g., "However" and "Nevertheless"), and only one answer can be right, the answer is probably in a different category.
-- Some relationships are subtle: **concession** ("yes, but...") differs from plain **contrast**, and **restatement** ("in other words") differs from **example** ("for instance").
-- Sometimes you need the sentence *two* back to see the real relationship.
+**Try this first.** "The road was flooded. ___, the bus still arrived on time." Which transition fits: "Therefore," "Nevertheless," or "For example"? Decide before reading on.
+
+**Let's work it out.**
+
+1. Read the sentence before the blank. A flood usually makes a bus late. Why stop there? The relationship depends on what the second sentence does with that expectation.
+2. Read the sentence after the blank. The bus arrived on time, which goes against what the flood predicts.
+3. Name the relationship in your own words: the second sentence contrasts with what we would expect. That is a contrast, not a cause ("Therefore" would be wrong) and not an example ("For example" would be wrong).
+4. So the transition is "Nevertheless." Check it: "Nevertheless" marks a result that goes against expectation, which is exactly what happened.
+
+**Your turn.** "The team had planned to finish by June. ___, they finished in April." Which transition fits best?
+
+**Answer:** "Instead." The second sentence contrasts with the plan, and "instead" signals that the outcome replaced what was planned. Finishing early is the opposite of the expected June finish.
 
 ## Formulas and rules
+
+**Key rules**
+
+| Rule | What it says |
+|---|---|
+| Decide the relationship first | Name it in your own words: contrast, example, cause, or conclusion. |
+| Contrast is not concession | "Yes, but" differs from plain contrast. |
+| Look two sentences back | Sometimes the real relationship is with an earlier sentence. |
 
 | Relationship | Transitions | Test |
 |---|---|---|

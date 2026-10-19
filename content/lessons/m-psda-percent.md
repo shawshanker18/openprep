@@ -13,16 +13,41 @@ Percent means "per hundred." The SAT tests four kinds of percent questions: find
 > 2. Write the chain: a jacket marked up 60% and then cut 25%, selling for \$54, gives $\text{cost} \times 1.60 \times 0.75 = 54$.
 > 3. Solve for the unknown only at the end.
 
-## Key ideas
+## Learn the idea
 
-- Convert a percent to a decimal by dividing by $100$: 35% is $0.35$.
-- Increasing by 20% is multiplying by $1.20$. Decreasing by 20% is multiplying by $0.80$. Think in **multipliers**, not in "add the percent."
-- Successive changes multiply: a 20% increase then a 25% decrease is $1.20 \times 0.75 = 0.90$, a 10% net decrease, not a 5% decrease.
-- Percent change always uses the **original** value as the base.
-- To undo a change, **divide** by the multiplier. If a price after a 15% discount is \$68, the original is $68 \div 0.85 = 80$, so \$80.
-- In mixture questions, the amount of the ingredient (salt, juice) stays fixed when only water is added.
+**Try this first.** A shirt costs \$40. It goes up $10\%$, then down $10\%$. Is the final price \$40? Guess before you calculate.
+
+**Let's work it out.**
+
+1. Step one, up $10\%$. Why is it $40 \cdot 1.10$ and not $40 + 10$? A percent is a share of the current amount, so $10\%$ of $40$ is $4$, and $40 + 4 = 44$. Multiplying by $1.10$ does both steps at once.
+2. Step two, down $10\%$. The second $10\%$ is taken from the new price, $44$, not from the original \$40. So $44 \cdot 0.90 = 39.60$.
+3. Compare: \$39.60 is less than \$40. Why? The down $10\%$ removes $10\%$ of a bigger number ($44$) than the first increase added to. The two changes are not undoing each other exactly.
+4. Lesson: successive percent changes multiply. You never add the percentages.
+
+**Your turn.** A \$60 jacket is reduced by $25\%$, then by another $10\%$ at the till. What does it cost?
+
+**Answer:** $60 \cdot 0.75 = 45$, then $45 \cdot 0.90 = 40.50$. The jacket costs \$40.50. Adding the two percentages would wrongly give $35\%$ off, which is \$39.
 
 ## Formulas and rules
+
+**Key formulas and rules**
+
+| Rule | What it says |
+|---|---|
+| Part of a whole | $\text{part} = \dfrac{p}{100} \times \text{whole}$ |
+| Percent change | $\dfrac{\text{new} - \text{old}}{\text{old}} \times 100$ |
+| Multipliers | Increase by $p\%$ multiplies by $1 + \dfrac{p}{100}$. Decrease multiplies by $1 - \dfrac{p}{100}$. |
+| Successive changes | Multiply the multipliers. Do not add the percentages. |
+
+**Desmos check for successive changes, step by step:**
+
+1. Type $40(1.10)(0.90)$ on one line. Desmos shows $39.6$, the final price from the lesson.
+2. Now type the wrong shortcut, $40(1 + 0.10 - 0.10)$, which adds the percentages. It shows $40$, not $39.6$, so adding percentages gives the wrong answer.
+
+```desmos-open
+y=40(1.1)(0.9)
+y=40(1+0.1-0.1)
+```
 
 $$\text{part} = \frac{p}{100} \times \text{whole} \qquad \text{percent change} = \frac{\text{new} - \text{old}}{\text{old}} \times 100$$
 

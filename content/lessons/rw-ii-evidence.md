@@ -7,15 +7,30 @@ tags: [textual-evidence, support-claim, weaken-claim, quantitative-evidence, tab
 
 Command of Evidence questions give you a claim and ask which piece of evidence relates to it. There are two flavors. **Textual evidence** asks which finding would support or weaken a hypothesis, or which quotation best illustrates a claim about a character. **Quantitative evidence** gives a table or graph and asks which choice uses the data to support a claim or complete a sentence.
 
-## Key ideas
+## Learn the idea
 
-- Everything hinges on the **exact claim**. Find it first (often "the researchers hypothesized that..." or "the narrator portrays X as...") and underline its key parts mentally.
-- Supporting evidence shows the claim's specific prediction coming true. Weakening evidence shows that prediction failing, or offers another explanation.
-- A quotation must illustrate **every** part of the claim. If the claim is "generous but proud," the quote needs both.
-- With data, a choice can be **accurate but irrelevant**. Each statement must be true according to the table *and* connect to the claim.
-- If the claim compares two things, the evidence must compare the same two things.
+**Try this first.** The claim is "the new fertiliser increases yield." A study finds the fertilised plots yielded $12\%$ more than the others. Does this support the claim, weaken it, or not affect it?
+
+**Let's work it out.**
+
+1. Find the exact claim. It predicts something specific: if the fertiliser is used, the yield goes up. Why is the prediction the key? Evidence can only be judged against what the claim predicts.
+2. Check what the evidence shows. The fertilised plots yielded more, which is what the claim predicts.
+3. Decide the direction. When the predicted result happens, the evidence supports the claim. When it fails, the evidence weakens it.
+4. Check for distractors. Does the evidence compare the same things the claim does? Yes: fertilised and non-fertilised plots. So the evidence is relevant.
+
+**Your turn.** The claim is "the museum attracts more visitors on weekends." The evidence is "weekend attendance rose $30\%$ above weekday attendance."
+
+**Answer:** It supports the claim. The claim predicts that weekends have more visitors, and the evidence shows exactly that.
 
 ## Formulas and rules
+
+**Key rules**
+
+| Rule | What it says |
+|---|---|
+| Exact claim first | Find the claim and the prediction it makes. |
+| Support or weaken | Evidence supports when the prediction happens, and weakens when it fails. |
+| Match the comparison | If the claim compares two things, the evidence must compare the same two things. |
 
 | Question asks | Correct answer must |
 |---|---|

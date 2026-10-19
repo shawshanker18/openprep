@@ -7,15 +7,30 @@ tags: [main-idea, detail, informational-text, literary-text]
 
 Central Ideas and Details questions ask what a short text is mostly about, or what it says about one specific point. You will see two kinds of question: **main idea** ("Which choice best states the main idea of the text?") and **detail** ("According to the text, what does Marisol do...?" or "Based on the text, how do X differ from Y?"). Passages can be informational (science, history, the arts) or literary (a short excerpt from a story).
 
-## Key ideas
+## Learn the idea
 
-- The main idea is the point the **whole** text supports. Every sentence should fit under it.
-- In informational texts, the main idea is often stated near the end, after a "however," "but," or "in fact" turns the text toward its real point.
-- In literary texts, the main idea is usually about a character: what they feel, want, or realize. Look at what the character *does* and what the narrator lingers on.
-- A detail answer must be **directly stated** (or a very close paraphrase). If you have to guess, it is wrong.
-- The right answer is often plain and slightly boring. Wrong answers are often more dramatic.
+**Try this first.** "Birds migrate for food. Yet researchers now think many migrate mainly to find safer places to breed." What is the main idea of this passage?
+
+**Let's work it out.**
+
+1. Find the turn. The word "Yet" signals that the author is about to shift away from the first idea. The main idea usually comes after such a turn.
+2. Compare the two claims. The first is the common view, that birds migrate for food. The second is what researchers now think, and the author presents it as the real point.
+3. Ask whether every sentence fits the second claim. The passage is short, and its focus is the newer explanation, so the main idea is the breeding claim.
+4. Why not choose the first claim? A main idea must be the point the text emphasises. The first claim is what the author moves away from.
+
+**Your turn.** "Many assume that museums mainly store objects. In fact, their most important work is education, and storage is only a means to it." What is the main idea?
+
+**Answer:** Museums' most important work is education. "In fact" turns from the assumption to the real point, and storage is described as a means to that purpose.
 
 ## Formulas and rules
+
+**Key rules**
+
+| Rule | What it says |
+|---|---|
+| The whole text | The main idea must be supported by every sentence. |
+| Turns signal the point | "However," "but," and "in fact" often introduce the real point. |
+| Details are stated | A detail answer must be directly stated or a close paraphrase. |
 
 | Wrong-answer type | What it looks like | Test |
 |---|---|---|

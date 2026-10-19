@@ -13,15 +13,40 @@ A linear equation in two variables, such as $y = 2x - 4$ or $3x + 5y = 30$, desc
 > 2. Write the equation from the story: adult tickets at \$8 and child tickets at \$5, \$200 total, gives $8a + 5c = 200$.
 > 3. Graph or solve only what the question asks.
 
-## Key ideas
+## Learn the idea
 
-- A point $(p, q)$ is on a line exactly when substituting $x = p$ and $y = q$ makes the equation true.
-- In $y = mx + b$, you can read the slope and $y$-intercept directly.
-- In $Ax + By = C$, the intercepts are quick: set $x = 0$ to get the $y$-intercept and $y = 0$ to get the $x$-intercept.
-- In a model like $8a + 5c = 200$ (adult tickets at \$8, child tickets at \$5, \$200 total), each coefficient is a price per item and the constant is the total. An intercept means "all of one kind": $a = 25$ when $c = 0$.
-- Parallel lines have equal slopes. Perpendicular lines have slopes that are **negative reciprocals**.
+**Try this first.** Where does the line $3x + 2y = 12$ cross the $y$-axis? Think about what is true of every point on that axis.
+
+**Let's work it out.**
+
+1. Every point on the $y$-axis has $x = 0$. That is what makes it the $y$-axis. So to find where the line crosses it, set $x = 0$.
+2. Substitute: $3(0) + 2y = 12$, so $2y = 12$ and $y = 6$. The crossing point is $(0, 6)$. That is the $y$-intercept.
+3. Repeat the reasoning for the $x$-axis. Every point there has $y = 0$, so set $y = 0$: $3x = 12$, giving $x = 4$. The $x$-intercept is $(4, 0)$.
+4. Why is this quicker than rewriting in $y = mx + b$? Each intercept takes one substitution, and you don't have to divide by a coefficient first.
+
+**Your turn.** Find both intercepts of $2x - 5y = 10$.
+
+**Answer:** Set $x = 0$: $-5y = 10$, so $y = -2$, giving $(0, -2)$. Set $y = 0$: $2x = 10$, so $x = 5$, giving $(5, 0)$.
 
 ## Formulas and rules
+
+**Key formulas and rules**
+
+| Rule | What it says |
+|---|---|
+| Slope of $Ax + By = C$ | $-\dfrac{A}{B}$ |
+| Intercepts | $y$-intercept: set $x = 0$. $x$-intercept: set $y = 0$. |
+| Perpendicular slopes | Multiply to $-1$, so $m_2 = -\dfrac{1}{m_1}$ |
+| Point-slope form | $y - y_1 = m(x - x_1)$ |
+
+**Desmos check for intercepts, step by step:**
+
+1. Type $2x + 5y = 20$ exactly as written. Desmos draws the line without rearranging it.
+2. Click where it crosses the $y$-axis, at $(0, 4)$, and the $x$-axis, at $(10, 0)$. Those are the intercepts.
+
+```desmos-open
+2x+5y=20
+```
 
 | Form | Slope | $y$-intercept | $x$-intercept |
 |---|---|---|---|

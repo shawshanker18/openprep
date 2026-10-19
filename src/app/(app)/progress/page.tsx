@@ -3,8 +3,6 @@ import { DOMAINS, type DomainId } from "@/content/taxonomy";
 import { formatDate } from "@/lib/dates";
 import { Button } from "@/components/ui/button";
 import { MasteryBar } from "@/components/mastery-bar";
-import { ActivityHeatmap } from "@/components/activity-heatmap";
-import { getActivity } from "@/server/activity";
 import { requireUser } from "@/server/auth";
 import { guarded } from "@/server/guard";
 import { getProgress, getSkillSummary } from "@/server/analytics";
@@ -59,7 +57,7 @@ function ScoreChart({ points, target, timeZone }: { points: Point[]; target: num
 
 export default async function ProgressPage() {
   const { userId, profile } = await requireUser();
-  const [p, { skills }, activity] = await guarded(Promise.all([getProgress(userId, profile.timezone), getSkillSummary(userId), getActivity(userId, profile.timezone)]));
+  const [p, { skills }] = await guarded(Promise.all([getProgress(userId, profile.timezone), getSkillSummary(userId)]));
   const points: Point[] = [
     ...p.snapshots.map((s) => ({ t: s.takenAt.getTime(), total: s.rw + s.math, half: s.halfWidth, source: s.source })),
     ...p.official.map((o) => ({ t: new Date(o.takenOn).getTime(), total: o.math + o.rw, half: 0, source: "official" })),
@@ -68,8 +66,6 @@ export default async function ProgressPage() {
   return (
     <div className="flex flex-col gap-10">
       <h1 className="text-2xl font-semibold">Progress</h1>
-      <ActivityHeatmap activity={activity} />
-
       <section className="flex flex-col gap-3">
         <h2 className="font-medium">Estimated score over time</h2>
         <ScoreChart points={points} target={profile.targetScore} timeZone={profile.timezone} />

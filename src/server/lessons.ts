@@ -8,7 +8,8 @@ export type Lesson = { minutes: number | null; sections: { heading: string; md: 
 
 /** Split lesson markdown (without frontmatter) into its `##` sections. The "fast way" section is not shown in lessons. */
 export function lessonFromBody(content: string, minutes: number | null): Lesson {
-  const sections = content.split(/^## /m).slice(1).map((chunk) => {
+  // Files are CRLF on Windows; the splitting below expects LF, so normalise before splitting.
+  const sections = content.replace(/\r\n/g, "\n").split(/^## /m).slice(1).map((chunk) => {
     const nl = chunk.indexOf("\n");
     return { heading: chunk.slice(0, nl).trim(), md: chunk.slice(nl + 1).trim() };
   });

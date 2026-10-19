@@ -13,15 +13,40 @@ Nonlinear functions are functions whose graphs are not straight lines. On the SA
 > 2. Write the function from the story: a machine worth \$45,000 that loses 20% a year gives $V(t) = 45{,}000(0.8)^t$.
 > 3. Evaluate or solve only what the question asks.
 
-## Key ideas
+## Learn the idea
 
-- A quadratic can be written three ways, and each form shows something different (see the table below). Pick the form that answers the question.
-- The vertex of a parabola lies exactly halfway between its two zeros.
-- An exponential function multiplies by the same factor over equal intervals. Growth of $r$ percent per period means a factor of $1 + r$; decay of $r$ percent means $1 - r$ (with $r$ as a decimal).
-- In $f(t) = a \cdot b^t$, $a$ is the starting value $f(0)$ and $b$ is the factor per unit of $t$.
-- For a polynomial $p$, if $p(c) = 0$, then $c$ is an $x$-intercept and $(x - c)$ is a factor.
+**Try this first.** Let $f(x) = x^2 - 4x$. What is $f(3)$?
+
+**Let's work it out.**
+
+1. Think of $f$ as a machine. You feed in a number, and the machine uses that number in every place the rule has an $x$. So you replace each $x$ with $3$: $f(3) = (3)^2 - 4(3)$.
+2. Why square before subtracting? Because the rule says to square the input and then subtract $4$ times the input. Operations follow the usual order.
+3. Compute: $(3)^2 = 9$ and $4(3) = 12$, so $f(3) = 9 - 12 = -3$.
+4. So the point $(3, -3)$ is on the graph of $f$. Every input gives exactly one output, which is what makes it a function.
+
+**Your turn.** Let $h(x) = x^2 + 1$. Find $h(-2)$. Watch the sign: is $(-2)^2$ the same as $-2^2$?
+
+**Answer:** $h(-2) = (-2)^2 + 1 = 4 + 1 = 5$. Squaring a negative makes it positive, and $-2^2$ would be $-4$, so the brackets matter.
 
 ## Formulas and rules
+
+**Key formulas and rules**
+
+| Rule | What it says |
+|---|---|
+| Vertex of a quadratic | $x = -\dfrac{b}{2a}$ for $ax^2 + bx + c$ |
+| Exponential growth | An amount $A$ growing by $r$ each period becomes $A(1 + r)^t$ |
+| Composition | $f(g(a))$: find $g(a)$ first, then use it as the input to $f$ |
+| Remainder theorem | Dividing $p(x)$ by $x - c$ leaves remainder $p(c)$ |
+
+**Desmos check for a vertex, step by step:**
+
+1. Type $y = -x^2 + 6x - 5$. The curve is an upside-down parabola.
+2. Click the highest point. It is the vertex, at $(3, 4)$, which matches $x = -\dfrac{6}{2(-1)} = 3$.
+
+```desmos-open
+y=-x^2+6x-5
+```
 
 | Quadratic form | Shows you |
 |---|---|

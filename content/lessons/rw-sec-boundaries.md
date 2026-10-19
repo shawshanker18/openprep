@@ -7,15 +7,30 @@ tags: [sentence-joining, semicolon, colon, list, end-punctuation, nonessential-e
 
 Boundaries questions ask you to choose the punctuation that correctly connects (or separates) parts of a sentence. The stem is always "Which choice completes the text so that it conforms to the conventions of Standard English?" The choices are usually the same words with different punctuation: commas, semicolons, colons, dashes, periods, or nothing at all.
 
-## Key ideas
+## Learn the idea
 
-- An **independent clause** (IC) has a subject and verb and can stand alone as a sentence: "The museum opened in 1890."
-- A **dependent clause** cannot stand alone: "because the museum opened," "which the museum displays."
-- Two independent clauses can't be joined with just a comma (a *comma splice*) or with nothing (a *run-on*).
-- A **nonessential element** (extra information) must be set off with matching marks on both sides: two commas, two dashes, or two parentheses.
-- Don't put punctuation between a subject and its verb, between a verb and its object, or before a list that the sentence's grammar leads straight into.
+**Try this first.** "The museum opened in 1890 and it displays maps." Is the punctuation correct? Read the sentence aloud and listen for where it pauses.
+
+**Let's work it out.**
+
+1. Identify the clauses. "The museum opened in 1890" has a subject and a verb, so it can stand alone. "It displays maps" also has a subject and a verb. Two complete clauses are joined here.
+2. Why is this a problem? Two complete clauses need a stronger break than a plain space. The word "and" alone does not separate them, because a joining word needs a comma before it when it connects two full clauses.
+3. Correct it: "The museum opened in 1890, and it displays maps." The comma and "and" together join the two clauses correctly.
+4. The test: could each part stand as its own sentence? If yes, you need a period, a semicolon, or a comma with a joining word.
+
+**Your turn.** "The sun set early, the air grew cold." Is this correct? If not, how do you fix it?
+
+**Answer:** It is a comma splice: two complete clauses joined by only a comma. Fix it with a semicolon ("The sun set early; the air grew cold") or a period, or add "and" after the comma.
 
 ## Formulas and rules
+
+**Key rules**
+
+| Rule | What it says |
+|---|---|
+| Two clauses | Two independent clauses need a period, a semicolon, or a comma with a joining word. |
+| Comma splice | Two independent clauses joined only by a comma is an error. |
+| Matching marks | Non-essential information needs a matching pair: two commas, dashes, or parentheses. |
 
 | Joining... | Correct | Incorrect |
 |---|---|---|

@@ -13,16 +13,41 @@ Inference means using a **sample** to say something about a whole **population**
 > 2. Write the estimate: 9 defective out of 250 from 15,000 gives $\frac{9}{250} \times 15{,}000$.
 > 3. Compute only after the expression is written.
 
-## Key ideas
+## Learn the idea
 
-- A **random sample** represents the population it was drawn from. That is what lets you scale its results up.
-- To estimate a count in the population, multiply the sample proportion by the population size.
-- A sample result is an **estimate**. The **margin of error** gives a range of plausible values: estimate $\pm$ margin of error.
-- **Larger random samples** give smaller margins of error. Sample size does not fix bias, though. A large biased sample is still biased.
-- A confidence interval is about a **population parameter** (such as the mean or the percent), not about individual members.
-- If two intervals overlap, the data do not clearly show which population value is larger. If they do not overlap, there is convincing evidence of a difference.
+**Try this first.** $60$ of $200$ randomly sampled students own a bike. The school has $1{,}000$ students. About how many own a bike? Guess before you work it out.
+
+**Let's work it out.**
+
+1. Find the share in the sample: $\dfrac{60}{200} = 0.30$, or $30\%$.
+2. Why can we use it for the whole school? Because the sample was random, it represents the school. A random sample gives every student the same chance of being picked, so the sample's share is our best estimate of the school's share.
+3. Scale up: $0.30 \cdot 1000 = 300$ students. The estimate is $300$.
+4. Check the reasoning, not just the arithmetic: the estimate is a best guess, not an exact count. A different random sample would give a slightly different number.
+
+**Your turn.** A random sample of $150$ students has $18$ who are left-handed. The school has $900$ students. Estimate the number of left-handed students.
+
+**Answer:** The share is $\dfrac{18}{150} = 0.12$. Then $0.12 \cdot 900 = 108$ students.
 
 ## Formulas and rules
+
+**Key formulas and rules**
+
+| Rule | What it says |
+|---|---|
+| Population estimate | $\dfrac{\text{count in sample}}{\text{sample size}} \times \text{population size}$ |
+| Interval | Estimate $\pm$ margin of error |
+| Estimate from an interval | Estimate $= \dfrac{L + U}{2}$, margin $= \dfrac{U - L}{2}$ |
+| Complement | The share without a trait is $1 - \text{sample proportion}$. |
+
+**Desmos check for a scaled estimate, step by step:**
+
+1. Type $y = \dfrac{9}{250}x$. The slope is the sample proportion.
+2. Type the point $(15000, 540)$. It lies on the line, so the scaled estimate for a population of $15{,}000$ is $540$.
+
+```desmos-open
+y=\frac{9}{250}x
+(15000,540)
+```
 
 $$\text{population estimate} = \frac{\text{count in sample}}{\text{sample size}} \times \text{population size}$$
 

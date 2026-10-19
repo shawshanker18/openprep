@@ -13,15 +13,41 @@ Nonlinear equations are equations where the variable is squared, under a root, i
 > 2. Write the equation from the story: a ball at height $h$ after $t$ seconds gives $h = -16t^2 + 48t$.
 > 3. Solve only if the question asks for a value.
 
-## Key ideas
+## Learn the idea
 
-- A quadratic equation can have zero, one, or two real solutions. Graphically, these are the places where the parabola crosses the $x$-axis.
-- If a product equals zero, at least one factor equals zero. This is why factoring works: $(x - a)(x - b) = 0$ means $x = a$ or $x = b$.
-- The **discriminant** $b^2 - 4ac$ tells you how many real solutions there are without solving.
-- Squaring both sides of an equation can create **extraneous solutions**: values that solve the squared equation but not the original. Always check them.
-- Solving a system of a line and a parabola means setting the two expressions equal. The number of intersection points equals the number of solutions.
+**Try this first.** Solve $x^2 - x - 12 = 0$. What two numbers could make it zero?
+
+**Let's work it out.**
+
+1. The goal is to find $x$ values that make the expression zero. Why does factoring help? Because a product is zero only when one of its factors is zero. Test it: $3 \cdot 4 = 12$ is not zero, but $(x - 4)(x + 3)$ becomes zero whenever $x - 4 = 0$ or $x + 3 = 0$.
+2. So we need two brackets whose product is $x^2 - x - 12$. Their constant terms multiply to $-12$, and their middle terms add to $-1$. List the pairs that multiply to $-12$: $(1, -12)$, $(2, -6)$, $(3, -4)$, and their reverses. Only $-4$ and $3$ add to $-1$.
+3. Write the factors: $(x - 4)(x + 3) = 0$. Check by expanding: $x^2 + 3x - 4x - 12 = x^2 - x - 12$. It matches.
+4. Set each factor to zero. $x - 4 = 0$ gives $x = 4$, and $x + 3 = 0$ gives $x = -3$. Both values make the original expression zero.
+
+**Your turn.** Solve $x^2 - 5x + 6 = 0$. Which pair multiplies to $6$ and adds to $-5$?
+
+**Answer:** The pair is $-2$ and $-3$, so $(x - 2)(x - 3) = 0$, and $x = 2$ or $x = 3$.
 
 ## Formulas and rules
+
+**Key formulas and rules**
+
+| Rule | What it says |
+|---|---|
+| Quadratic formula | For $ax^2 + bx + c = 0$, $x = \dfrac{-b \pm \sqrt{b^2 - 4ac}}{2a}$ |
+| Discriminant | $b^2 - 4ac > 0$: two solutions. $= 0$: one. $< 0$: none. |
+| Sum and product of roots | Sum $= -\dfrac{b}{a}$, product $= \dfrac{c}{a}$ |
+| Radical check | Squaring can add false answers, so check every root in the original |
+
+**Desmos check for the number of solutions, step by step:**
+
+1. Type $y = x^2 - x - 12$. Click the two places it crosses the $x$-axis: $x = 4$ and $x = -3$, so two solutions.
+2. Replace it with $y = x^2 + 4$. The curve sits above the axis and never touches it, so there are no real solutions.
+
+```desmos-open
+y=x^2-x-12
+y=x^2+4
+```
 
 For $ax^2 + bx + c = 0$:
 

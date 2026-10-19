@@ -13,15 +13,44 @@ Two expressions are **equivalent** if they give the same value for every allowed
 > 2. Write its expression from the words: a rectangle with sides $x + 3$ and $x - 2$ has area $(x + 3)(x - 2)$.
 > 3. Expand or factor only if a choice needs that form.
 
-## Key ideas
+## Learn the idea
 
-- Expanding means multiplying every term in one factor by every term in the other, then combining like terms.
-- Factoring is expanding in reverse. For $ax^2 + bx + c$, find two numbers that multiply to $ac$ and add to $b$, then split the middle term.
-- If two polynomials are equal for all $x$, their matching coefficients are equal. This lets you solve for unknown constants.
-- Radicals are fractional exponents: $\sqrt[n]{x^m} = x^{m/n}$. Convert, then use exponent rules.
-- To simplify a rational expression, factor top and bottom and cancel common **factors**. Never cancel individual terms.
+**Try this first.** Are $(x + 3)(x - 2)$ and $x^2 + x - 6$ the same expression? Make a guess, then keep reading to check it.
+
+**Let's work it out.**
+
+1. A product of two brackets means every term in the first bracket multiplies every term in the second. Why every pair? Each term carries its own sign and size, so each pair contributes to the answer. Here there are four pairs.
+2. Multiply the pairs one at a time: $x \cdot x = x^2$, then $x \cdot (-2) = -2x$, then $3 \cdot x = 3x$, then $3 \cdot (-2) = -6$.
+3. Put the four pieces together: $x^2 - 2x + 3x - 6$. The two middle terms are *like terms*, both multiples of $x$, so they can be added: $-2x + 3x = x$.
+4. The result is $x^2 + x - 6$. Now test it. At $x = 1$ the first form gives $4 \cdot (-1) = -4$, and the second gives $1 + 1 - 6 = -4$. The two forms agree, so they are equivalent.
+
+**Your turn.** Are $(2x - 1)(x + 4)$ and $2x^2 + 7x - 4$ equivalent? Test $x = 1$ first.
+
+**Answer:** Expanding gives $2x^2 + 8x - x - 4 = 2x^2 + 7x - 4$, so they are equivalent. The test at $x = 1$ agrees too: both give $5$.
 
 ## Formulas and rules
+
+**Key formulas and rules**
+
+| Rule | What it says |
+|---|---|
+| Product of powers | $x^a \cdot x^b = x^{a+b}$ |
+| Power of a power | $(x^a)^b = x^{ab}$ |
+| Negative exponent | $x^{-a} = \dfrac{1}{x^a}$ |
+| Square of a sum | $(a + b)^2 = a^2 + 2ab + b^2$ |
+| Difference of squares | $a^2 - b^2 = (a + b)(a - b)$ |
+
+**Desmos check for equivalence, step by step:**
+
+1. Type $y = (x + 3)(x - 2)$ as the first line.
+2. Type $y = x^2 + x - 6$ as the second line. The two curves lie exactly on top of each other, so the forms are equivalent.
+3. Change the second line to $y = x^2 + 6$. Now the curves separate, so that form is not equivalent.
+
+```desmos-open
+y=(x+3)(x-2)
+y=x^2+x-6
+y=x^2+6
+```
 
 | Rule | Example |
 |---|---|

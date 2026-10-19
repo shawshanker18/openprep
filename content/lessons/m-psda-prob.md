@@ -13,17 +13,41 @@ Probability measures how likely an event is, as a number from $0$ (impossible) t
 > 2. Write the expression: two tiles drawn without replacement from 5 red and 7 white gives $\frac{5}{12} \cdot \frac{4}{11}$.
 > 3. Simplify only after the expression is written.
 
-## Key ideas
+## Learn the idea
 
-- When outcomes are equally likely, probability is a fraction: favorable outcomes over total outcomes.
-- **"Given that"** shrinks the group you choose from. The denominator becomes the size of the given group, not the grand total.
-- In a two-way table, identify the denominator first: the whole table, one row, or one column.
-- For **independent** events (spins, coin flips, draws *with* replacement), multiply the probabilities.
-- **Without replacement**, the second probability changes because one item is gone.
-- "At least one" is usually easiest as $1 - P(\text{none})$.
-- When the data are given as percents, imagine a convenient total (such as $1{,}000$ people) and convert to counts.
+**Try this first.** A bag has $3$ red and $2$ blue marbles. You draw two without putting the first back. What is the chance both are red?
+
+**Let's work it out.**
+
+1. First draw: $3$ red out of $5$ total, so the chance is $\dfrac{3}{5}$.
+2. Second draw: the first marble is gone, and if it was red, only $2$ red remain out of $4$. Why does the second chance change? Because we are not replacing the marble, the bag is smaller, and the first result affects the second. The chance is $\dfrac{2}{4}$.
+3. Both must happen, so multiply: $\dfrac{3}{5} \cdot \dfrac{2}{4} = \dfrac{6}{20} = \dfrac{3}{10}$. Why multiply? Each step restricts the next, so the combined chance is a fraction of a fraction.
+4. Check the sense: $\dfrac{3}{10}$ is less than $\dfrac{1}{2}$, which makes sense for two reds in a row.
+
+**Your turn.** A bag has $4$ red and $4$ blue marbles. Two are drawn without replacement. What is the chance both are blue?
+
+**Answer:** First blue: $\dfrac{4}{8}$. Second blue, with one blue gone: $\dfrac{3}{7}$. Multiply: $\dfrac{4}{8} \cdot \dfrac{3}{7} = \dfrac{12}{56} = \dfrac{3}{14}$.
 
 ## Formulas and rules
+
+**Key formulas and rules**
+
+| Rule | What it says |
+|---|---|
+| Probability | $P(A) = \dfrac{\text{favourable outcomes}}{\text{total outcomes}}$ |
+| Complement | $P(\text{not } A) = 1 - P(A)$ |
+| Independent events | $P(A \text{ and } B) = P(A) \cdot P(B)$ |
+| Conditional probability | $P(A \mid B) = \dfrac{\text{number in both } A \text{ and } B}{\text{number in } B}$ |
+
+**Desmos check for two draws, step by step:**
+
+1. Type $\dfrac{3}{5} \cdot \dfrac{2}{4}$. Desmos shows $0.3$, which is $\dfrac{3}{10}$.
+2. Type $1 - \dfrac{1}{2} \cdot \dfrac{1}{2}$ for the at-least-one case with two coins. It shows $0.75$.
+
+```desmos-open
+\frac{3}{5}\cdot\frac{2}{4}
+1-\frac{1}{2}\cdot\frac{1}{2}
+```
 
 $$P(A) = \frac{\text{favorable outcomes}}{\text{total outcomes}} \qquad P(\text{not } A) = 1 - P(A)$$
 

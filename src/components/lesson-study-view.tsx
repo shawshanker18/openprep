@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Markdown } from "@/components/markdown";
 import { likelyCoveredSkills } from "@/lib/curriculum-coverage";
 import { ChevronRight } from "lucide-react";
@@ -19,7 +19,63 @@ function Reveal({ label, md, tryHref }: { label: string; md: string; tryHref?: s
       </summary>
       <div className="flex flex-col gap-3 border-t p-4">
         <Markdown className="text-[1em] leading-relaxed">{md}</Markdown>
-        {tryHref && <Button variant="outline" size="sm" className="self-start" render={<Link href={tryHref} />}>Try a question</Button>}
+        {tryHref && <Button variant="outline" className="min-h-11 self-start px-4 text-base" render={<Link href={tryHref} />}>Try a question</Button>}
+      </div>
+    </details>
+  );
+}
+
+/** Teaching text: plain paragraphs render as normal, and a paragraph that starts with "**Answer:**" waits behind a Show answer button. */
+function LearnBody({ md }: { md: string }) {
+  const parts = md.split(/\n\n+/);
+  const out: ReactNode[] = [];
+  let buffer: string[] = [];
+  const flush = (key: string) => {
+    if (buffer.length) out.push(<Markdown key={key} className="text-[1em] leading-relaxed">{buffer.join("\n\n")}</Markdown>);
+    buffer = [];
+  };
+  parts.forEach((part, i) => {
+    if (/^\*\*Answer:?\*\*/.test(part)) {
+      flush(`text${i}`);
+      out.push(
+        <details key={`answer${i}`} className="group/answer min-w-0">
+          <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-md border px-4 text-sm font-medium hover:bg-muted [&::-webkit-details-marker]:hidden">
+            <span className="group-open/answer:hidden">Show answer</span>
+            <span className="hidden group-open/answer:inline">Hide answer</span>
+          </summary>
+          <div className="mt-3"><Markdown className="text-[1em] leading-relaxed">{part}</Markdown></div>
+        </details>,
+      );
+    } else buffer.push(part);
+  });
+  flush("text-end");
+  return <>{out}</>;
+}
+
+/** A worked example: the problem shows when the box opens, and the steps stay hidden until the student asks for them. */
+function WorkedExample({ label, md }: { label: string; md: string }) {
+  const [problem = "", ...steps] = md.split(/\n\n+/);
+  const solution = steps.join("\n\n");
+  return (
+    <details className="group lesson-reveal min-w-0 overflow-hidden rounded-xl border">
+      <summary className="flex cursor-pointer list-none items-center gap-3 p-4 hover:bg-muted [&::-webkit-details-marker]:hidden">
+        <span className="min-w-0 flex-1 text-sm font-semibold">{label}</span>
+        <ChevronRight className="size-4 shrink-0 transition-transform group-open:rotate-90" />
+      </summary>
+      <div className="flex flex-col gap-3 border-t p-4">
+        <Markdown className="text-[1em] leading-relaxed">{problem}</Markdown>
+        {solution && (
+          <details className="group/solution min-w-0">
+            <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-md border px-4 text-sm font-medium hover:bg-muted [&::-webkit-details-marker]:hidden">
+              <span className="group-open/solution:hidden">Show solution</span>
+              <span className="hidden group-open/solution:inline">Hide solution</span>
+              <ChevronRight className="size-4 shrink-0 transition-transform group-open/solution:rotate-90" />
+            </summary>
+            <div className="mt-3 flex flex-col gap-3">
+              <Markdown className="text-[1em] leading-relaxed">{solution}</Markdown>
+            </div>
+          </details>
+        )}
       </div>
     </details>
   );
@@ -32,13 +88,19 @@ export function LessonStudyView({ sections, skillId, stepKey, curriculum, grade,
   const [revision, setRevision] = useState(false);
   const [schoolGrade, setSchoolGrade] = useState<11 | 12>(grade === 12 ? 12 : 11);
   const covered = likelyCoveredSkills({ curriculum, grade: schoolGrade, subjects, topicsStudied: [] }).has(skillId);
-  const basics = sections.filter(s => /^(What this skill|Key ideas|Formulas|Worked example 1)/i.test(s.heading));
+  const basics = sections.filter(s => /^(What this skill|Learn the idea|Formulas|Worked example 1)/i.test(s.heading));
   const sat = sections.filter(s => !basics.includes(s));
   // Formulas stay in plain text, each `###` concept under them opens on click, and each worked example opens on click.
   const render = (items: Section[]) => items.map(sec => {
+    if (/^Learn the idea/i.test(sec.heading)) {
+      return <section key={sec.heading} className="flex min-w-0 flex-col gap-2">
+        <h2 className="text-lg font-semibold">{sec.heading}</h2>
+        <LearnBody md={sec.md} />
+      </section>;
+    }
     if (/^Worked example/i.test(sec.heading)) {
       return <section key={sec.heading} className="flex min-w-0 flex-col gap-3">
-        <Reveal label={sec.heading.replace(/\((easy|medium|hard)\)/gi, "").trim()} md={sec.md} />
+        <WorkedExample label={sec.heading.replace(/\((easy|medium|hard)\)/gi, "").trim()} md={sec.md} />
       </section>;
     }
     const [core = "", ...rest] = /^Formulas/i.test(sec.heading) ? sec.md.split(/^### /m) : [sec.md];

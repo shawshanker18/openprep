@@ -13,15 +13,42 @@ Circle questions ask for **circumference and area**, the length of an **arc** or
 > 2. Write the equation: center $(-4, 1)$ through $(8, 6)$ gives $r = 13$, so $(x + 4)^2 + (y - 1)^2 = 169$.
 > 3. Solve only if the question asks for a value.
 
-## Key ideas
+## Learn the idea
 
-- Everything about a circle comes from its radius. If you are given a diameter, area, or circumference, find $r$ first.
-- An arc or sector is a **fraction** of the whole circle: the central angle over $360^\circ$ (or over $2\pi$ radians).
-- A **central angle** equals the measure of its arc. An **inscribed angle** (vertex on the circle) is **half** its intercepted arc.
-- A radius drawn to a point of tangency is perpendicular to the tangent line.
-- The equation $(x - h)^2 + (y - k)^2 = r^2$ describes a circle with center $(h, k)$ and radius $r$. If the equation is expanded, **complete the square** to get back to this form.
+**Try this first.** A circle has radius $4$. What is the area of a $90^\circ$ sector, the slice that a $90^\circ$ angle cuts out of the centre?
+
+**Let's work it out.**
+
+1. The whole circle goes round $360^\circ$. A $90^\circ$ slice is what fraction of that? $\dfrac{90}{360} = \dfrac{1}{4}$, a quarter. Why do we compare to $360^\circ$? Because the angle at the centre measures how much of the turn the slice covers.
+2. Find the full circle's area first: $\pi r^2 = \pi (4)^2 = 16\pi$.
+3. Take the same fraction of it: $\dfrac{1}{4} \cdot 16\pi = 4\pi$.
+4. The sector is a quarter of the circle, so its area is a quarter of the area. That's the logic behind every sector question: find the fraction, then apply it to the whole.
+
+**Your turn.** A sector of a circle with radius $6$ has a central angle of $120^\circ$. What is its area?
+
+**Answer:** The fraction is $\dfrac{120}{360} = \dfrac{1}{3}$. The full area is $36\pi$, so the sector is $\dfrac{1}{3} \cdot 36\pi = 12\pi$.
 
 ## Formulas and rules
+
+**Key formulas and rules**
+
+| Rule | What it says |
+|---|---|
+| Circumference | $C = 2\pi r$ |
+| Area | $A = \pi r^2$ |
+| Arc length | $\dfrac{\theta}{360} \cdot 2\pi r$ for a central angle $\theta$ in degrees |
+| Sector area | $\dfrac{\theta}{360} \cdot \pi r^2$ |
+| Standard equation | $(x - h)^2 + (y - k)^2 = r^2$, centre $(h, k)$ |
+
+**Desmos check for a circle equation, step by step:**
+
+1. Type $(x + 4)^2 + (y - 1)^2 = 169$. Desmos draws a circle centred at $(-4, 1)$.
+2. Type the point $(8, 6)$. It sits on the circle, so the radius $13$ is correct.
+
+```desmos-open
+(x+4)^2+(y-1)^2=169
+(8,6)
+```
 
 $$C = 2\pi r \qquad A = \pi r^2 \qquad (x - h)^2 + (y - k)^2 = r^2$$
 

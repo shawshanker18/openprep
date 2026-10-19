@@ -7,15 +7,30 @@ tags: [context-clues, contrast-clue, precise-meaning]
 
 Words in Context questions give you a sentence or short text with a blank and ask, "Which choice completes the text with the most logical and precise word or phrase?" You choose the word that fits the meaning the rest of the text sets up. The words range from everyday ("reserved," "withstand") to harder vocabulary ("ephemeral," "derivative").
 
-## Key ideas
+## Learn the idea
 
-- The text always contains a **clue** that tells you what the blank must mean. Your job is to find it.
-- **Definition or restatement clues:** a colon, a dash, or "that is" often explains the blank right after it.
-- **Contrast clues:** "unlike," "although," "but," "rather than," "instead of" tell you the blank means the *opposite* of something nearby.
-- **Cause-effect clues:** "because," "so," "as a result" tell you the blank must logically cause or result from something.
-- "Precise" matters: two choices may be in the right direction, but only one fits the exact degree and situation.
+**Try this first.** "The guide's instructions were so lucid that even beginners followed them easily." What does *lucid* mean? Use the sentence, not a memory of the word.
+
+**Let's work it out.**
+
+1. Find the clue. The sentence says that even beginners followed the instructions easily. Why is that a clue? Because the result, easy following, tells you what kind of instructions they were.
+2. Predict a meaning from the clue before looking at any choice. Instructions that beginners can follow easily are clear.
+3. Test the prediction against the answer choices. "Clear" fits. "Complicated" contradicts the clue, and "hidden" has nothing to do with it.
+4. Why is the check important? Many words have more than one meaning, and the clue picks the one this text uses.
+
+**Your turn.** "After the long climb, the hikers were ravenous." What does *ravenous* mean, and what clue gives it away?
+
+**Answer:** It means very hungry. The clue is "after the long climb," which makes hunger the likely result of effort.
 
 ## Formulas and rules
+
+**Key rules**
+
+| Rule | What it says |
+|---|---|
+| Find the clue | Definition, contrast, or cause and effect in the sentence decides the meaning. |
+| Predict first | Form a meaning from the clue before reading the choices. |
+| Check the degree | Two choices can point the right way, but only one fits the exact strength. |
 
 | Clue word or mark | Blank should... |
 |---|---|

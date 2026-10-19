@@ -13,16 +13,42 @@ This skill covers the **area** of flat shapes, the **volume** and **surface area
 > 2. Write the equation: a cylinder recast as a cone with the same radius gives $\pi r^2 h_1 = \frac{1}{3}\pi r^2 h_2$.
 > 3. Solve for the unknown only at the end.
 
-## Key ideas
+## Learn the idea
 
-- Area is measured in square units; volume in cubic units. Keep track of which one the question wants.
-- **Composite figures:** split into familiar pieces (rectangles, triangles, semicircles), then add or subtract.
-- **Cones and pyramids** hold exactly $\frac{1}{3}$ of the matching cylinder or prism.
-- Surface area is the total area of all faces. A cube with edge $s$ has $6$ square faces, so its surface area is $6s^2$.
-- If every length is multiplied by $k$, areas are multiplied by $k^2$ and volumes by $k^3$.
-- When only some dimensions change (for example, the radius doubles and the height is cut in half), substitute into the formula rather than using one scale factor.
+**Try this first.** A box is $2$ cm by $3$ cm by $4$ cm. If every edge doubles, does the volume double? Guess first.
+
+**Let's work it out.**
+
+1. Start with the volume: $2 \cdot 3 \cdot 4 = 24$ cm$^3$.
+2. Now double each edge: $4$ by $6$ by $8$. Why multiply? Volume is length times width times height, so each dimension contributes one factor.
+3. Compute the new volume: $4 \cdot 6 \cdot 8 = 192$ cm$^3$.
+4. Compare: $192 \div 24 = 8$. The volume is eight times larger, not two times. Why eight? Each of the three dimensions doubled, so the factors multiply: $2 \cdot 2 \cdot 2 = 8$.
+5. This is why volume scales with the cube of the length factor. Doubling lengths gives $2^3$.
+
+**Your turn.** A cube has edge $3$ cm. If its edge becomes $6$ cm, how many times larger is the volume?
+
+**Answer:** The length factor is $6 \div 3 = 2$, so the volume factor is $2^3 = 8$. The volume goes from $27$ cm$^3$ to $216$ cm$^3$.
 
 ## Formulas and rules
+
+**Key formulas and rules**
+
+| Shape | Formula |
+|---|---|
+| Cylinder volume | $V = \pi r^2 h$ |
+| Cone volume | $V = \dfrac{1}{3}\pi r^2 h$, one third of the matching cylinder |
+| Sphere volume | $V = \dfrac{4}{3}\pi r^3$ |
+| Scaling | Length factor $k$: areas multiply by $k^2$, volumes by $k^3$ |
+
+**Desmos check for cone and cylinder, step by step:**
+
+1. Type $y = 9\pi x^2$. This is the volume of a cylinder with height $9$, as the radius $x$ changes.
+2. Type $y = 3\pi x^2$. This is the cone with the same radius and height. It is one third of the cylinder.
+
+```desmos-open
+y=9\pi x^2
+y=3\pi x^2
+```
 
 | Shape | Area or volume |
 |---|---|

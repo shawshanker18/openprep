@@ -7,15 +7,30 @@ tags: [logical-completion, science, social-studies, humanities]
 
 Inference questions give you a short text that ends with a blank and ask, "Which choice most logically completes the text?" The text lays out facts, a study, or an argument, and you have to supply the conclusion those facts lead to. The topics range across science, social studies, and the humanities, but no outside knowledge is needed.
 
-## Key ideas
+## Learn the idea
 
-- The answer follows **directly** from the information given. It is the next step in the reasoning, not a leap.
-- Read the sentence with the blank carefully. Words like "therefore," "suggests," "unless," or "because" tell you what kind of conclusion is needed.
-- Good inferences are usually **modest**: "may," "likely," "suggests." Strong words ("proves," "all," "never") are rarely justified by a short text.
-- Pay attention to what a study **did not** test. If researchers only looked at one region, the conclusion should be limited to that region.
-- If a text presents a puzzle (an unexpected result), the answer usually explains the puzzle.
+**Try this first.** "Every sample from Lake X contained the algae, and no sample from Lake Y did." What can you infer about Lake X? Separate what the text reports from what it implies.
+
+**Let's work it out.**
+
+1. Start with what the text reports. Every Lake X sample had algae. Why is that the starting point? An inference must build on the facts the text gives, not on outside knowledge.
+2. Take one reasoning step. If every sample has algae, the lake likely contains algae. The step is small and direct.
+3. Watch the strength of the word. "Likely" is the right size for this step. "Proves" would go too far, because samples are a small look at a lake.
+4. Check what is not said. The text does not say how much algae there is, so any answer about quantity is a leap.
+
+**Your turn.** "Every student who studied two hours passed the test. Maria studied two hours." What can be inferred?
+
+**Answer:** Maria likely passed. The text supports this by stating that every two-hour student passed. It does not guarantee it, so "likely" fits better than "certainly."
 
 ## Formulas and rules
+
+**Key rules**
+
+| Rule | What it says |
+|---|---|
+| One step | An inference is the next step the text clearly supports. |
+| Modest words | "Likely" and "suggests" fit; "proves" and "always" rarely do. |
+| Limits from design | What a study did not test limits what it can conclude. |
 
 | Wrong-answer type | Why it fails |
 |---|---|

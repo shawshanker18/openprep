@@ -77,25 +77,6 @@ export function DashboardView({profile,user,d,summary,home,savedPractice}: {
       </BrandBanner>
 
 
-      <section className="rounded-xl border p-5">
-        <h2 className="font-semibold">Today&apos;s plan</h2>
-        <p className="mt-1 text-sm text-muted-foreground">A study plan based on your schedule and skills.</p>
-        <ul className="mt-4 flex flex-col divide-y overflow-hidden rounded-lg border">{d.blocks.map((block,i) => {
-          const skill = 'skillId' in block ? SKILL_BY_ID[block.skillId] : null;
-          const href = block.kind==='learn' ? `/skills/${block.skillId}` : block.kind==='desmos' ? `/desmos/${block.lessonSlug}` : block.kind==='review' ? `/practice?mode=review&block=${i}` : `/practice?skill=${block.skillId}&block=${i}`;
-          const label = block.kind==='learn' ? 'Learn' : block.kind==='desmos' ? 'Desmos' : block.kind==='review' ? 'Review' : 'Practice';
-          const title = skill ? shortSkillName(skill.name) : block.kind==='review' ? 'Mistakes due' : 'Calculator lesson';
-          return <li key={i}><Link prefetch={false} href={href} className="flex min-h-12 items-center gap-3 px-3 py-2.5 text-sm transition-colors hover:bg-muted">
-            <span className="w-[4.5rem] shrink-0 text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</span>
-            <span className={`min-w-0 flex-1 break-words font-medium ${block.done ? 'text-muted-foreground' : ''}`}>{title}</span>
-            <span className="shrink-0 text-xs tabular-nums text-muted-foreground">{block.done ? '✓ Done' : `${block.minutes} min`}</span>
-          </Link></li>;
-        })}</ul>
-        <div className="mt-4 flex flex-wrap gap-2">
-          <Button size="sm" variant="outline" render={<Link href="/question-bank" />}>Choose your own questions</Button>
-          <Button size="sm" variant="outline" render={<Link href="/start" />}>Start from scratch</Button>
-        </div>      </section>
-
       <div className="grid min-w-0 items-start gap-4 lg:grid-cols-2">
         <Card title="Where you left off">
           {resume.length ? resume.map((r) => <Resume key={r.href} {...r} />) : (
