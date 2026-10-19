@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DOMAINS, SKILLS, SKILL_BY_ID } from "@/content/taxonomy";
-import { getLesson, getMasteryLesson, listDesmosLessons } from "@/server/lessons";
+import { getLesson, listDesmosLessons } from "@/server/lessons";
 import { DesmosCalculator } from "@/components/desmos-panel";
-import { LessonLevels } from "@/components/lesson-levels";
+import { LessonStudyView } from "@/components/lesson-study-view";
 import { LessonTextSize } from "@/components/lesson-text-size";
 import { LessonWorkspace } from "@/components/lesson-workspace";
 import { Markdown } from "@/components/markdown";
@@ -29,7 +29,6 @@ export default async function GuestSection({ params }: { params: Promise<{ path:
     const skill = SKILL_BY_ID[id];
     if (!skill) notFound();
     const lesson = await getLesson(id);
-    const mastery = await getMasteryLesson(id);
     return (
       <div className="flex w-full max-w-4xl flex-col gap-6">
         <Link href="/guest/start" className="text-sm text-muted-foreground hover:text-foreground">← Start from scratch</Link>
@@ -39,7 +38,7 @@ export default async function GuestSection({ params }: { params: Promise<{ path:
         </div>
         {lesson ? (
           <LessonTextSize>
-            <LessonLevels skillId={id} foundation={lesson} mastery={mastery} />
+            <LessonStudyView sections={lesson.sections} skillId={id} curriculum={null} grade={null} subjects={[]} />
           </LessonTextSize>
         ) : <p className="text-muted-foreground">This lesson is not available right now.</p>}
         <Link href="/guest/practice" className="underline">Try questions as a guest</Link>

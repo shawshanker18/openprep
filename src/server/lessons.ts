@@ -26,16 +26,6 @@ export async function getLesson(skillId: string): Promise<Lesson | null> {
   return lessonFromBody(content, Number(data.minutes) || null);
 }
 
-/** The Mastery level of a skill, from content/mastery, or null if it has not been written. Only known skill ids reach the filesystem. */
-export async function getMasteryLesson(skillId: string): Promise<Lesson | null> {
-  if (!SKILL_BY_ID[skillId]) return null;
-  let raw: string;
-  try { raw = await fs.readFile(path.join(process.cwd(), "content", "mastery", `${skillId}.md`), "utf8"); }
-  catch { return null; }
-  const { data, content } = matter(raw);
-  return lessonFromBody(content, Number(data.minutes) || null);
-}
-
 /** The built-in lesson's raw `##` text and minutes, as the starting point when an admin customises a course version. */
 export async function getLessonSource(skillId: string): Promise<{ body: string; minutes: number | null } | null> {
   if (!SKILL_BY_ID[skillId]) return null;
