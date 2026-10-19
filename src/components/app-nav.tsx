@@ -46,26 +46,37 @@ export const MOBILE_TABS = [
   { href: "/tests", label: "Tests", icon: ClipboardList },
 ] as const;
 
-export function CurrentSection() {
+/** Where a nav item points. The guest site mounts the same menu under /guest, and its home is /guest rather than /guest/dashboard. */
+export function hrefFor(base: string, href: string) {
+  return base && href === "/dashboard" ? base : `${base}${href}`;
+}
+
+export function CurrentSection({ base = "" }: { base?: string }) {
   const path = usePathname();
-  const item = NAV_GROUPS.flatMap(group => [...group.items]).sort((a, b) => b.href.length - a.href.length).find(item => path === item.href || path.startsWith(`${item.href}/`));
-  return <span className="mr-auto text-sm font-medium" aria-label="Current section">{item?.label ?? (path.startsWith("/settings") ? "Settings" : "OpenPrep")}</span>;
+  const item = NAV_GROUPS.flatMap(group => [...group.items]).sort((a, b) => b.href.length - a.href.length).find(item => {
+    const target = hrefFor(base, item.href);
+    return item.href === "/dashboard" ? path === target : path === target || path.startsWith(`${target}/`);
+  });
+  return <span className="mr-auto text-sm font-medium" aria-label="Current section">{item?.label ?? (path.startsWith(`${base}/settings`) ? "Settings" : "OpenPrep")}</span>;
 }
 
 /**
  * Exact match, or a sub-page. Links with a query (practice presets) match on the query too, and plain
  * /practice stays inactive while a preset or a question-bank list is running there.
  */
-function isActive(path: string, search: URLSearchParams, href: string) {
+function isActive(path: string, search: URLSearchParams, href: string, base = "") {
+  const target = hrefFor(base, href);
   if (href.includes("?")) {
-    const [p, q] = href.split("?");
+    const [p, q] = target.split("?");
     return path === p && [...new URLSearchParams(q)].every(([k, v]) => search.get(k) === v);
   }
-  if (href === "/practice") return path === href && !search.has("preset") && search.get("mode") !== "list";
-  return path === href || path.startsWith(`${href}/`);
+  if (href === "/practice") return path === target && !search.has("preset") && search.get("mode") !== "list";
+  if (href === "/dashboard") return path === target;
+  return path === target || path.startsWith(`${target}/`);
 }
 
-export function NavLinks({ signOut, onNavigate }: { signOut: () => Promise<void>; onNavigate?: () => void }) {
+/** Guest mode: the same menu under /guest, with Sign in where Sign out would be. */
+export function NavLinks({ signOut, onNavigate, base = "", guest = false }: { signOut?: () => Promise<void>; onNavigate?: () => void; base?: string; guest?: boolean }) {
   const path = usePathname();
   const search = useSearchParams();
   return (
@@ -74,7 +85,7 @@ export function NavLinks({ signOut, onNavigate }: { signOut: () => Promise<void>
         <div key={g.label ?? "main"} className="flex flex-col gap-0.5">
           {g.label && <p className="px-2 pb-1 text-xs font-medium text-muted-foreground">{g.label}</p>}
           {g.items.map(({ href, label, icon: Icon }) => (
-            <Link key={href} href={href} onClick={onNavigate} aria-current={isActive(path, search, href) ? "page" : undefined}
+            <Link key={href} href={hrefFor(base, href)} onClick={onNavigate} aria-current={isActive(path, search, href, base) ? "page" : undefined}
               className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm side:h-[clamp(1.375rem,5.6dvh,2.125rem)] side:py-0 hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:font-medium">
               <Icon className="size-4" />{label}
             </Link>
@@ -84,28 +95,32 @@ export function NavLinks({ signOut, onNavigate }: { signOut: () => Promise<void>
       {/* The menu ends with just two things: feedback and sign out. Settings and Admin live in the top bar. */}
       <div className="mt-auto flex flex-col gap-0.5">
         <FeedbackDialog />
-        <form action={signOut}>
-          <button type="submit" className={`${ROW} w-full text-left text-muted-foreground hover:text-foreground`}><LogOut className="size-4" />Sign out</button>
-        </form>
+        {guest ? (
+          <Link href="/login" className={`${ROW} text-muted-foreground hover:text-foreground`}><LogOut className="size-4 rotate-180" />Sign in</Link>
+        ) : signOut ? (
+          <form action={signOut}>
+            <button type="submit" className={`${ROW} w-full text-left text-muted-foreground hover:text-foreground`}><LogOut className="size-4" />Sign out</button>
+          </form>
+        ) : null}
       </div>
     </div>
   );
 }
 
 /** Settings (and Admin, for the one account that has it) as icons beside the notification bell. */
-export function AccountLinks({ isAdmin, user }: { isAdmin: boolean; user: string }) {
+export function AccountLinks({ isAdmin, user, base = "" }: { isAdmin: boolean; user: string; base?: string }) {
   const path = usePathname();
   const icon = "rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground aria-[current=page]:bg-muted aria-[current=page]:text-foreground";
   return (
     <div className="flex items-center">
       {isAdmin && <Link href="/admin" aria-label="Admin" title="Admin" aria-current={path.startsWith("/admin") ? "page" : undefined} className={icon}><ShieldCheck className="size-5" /></Link>}
-      <Link href="/settings" aria-label="Settings" title={`Settings · ${user}`} aria-current={path.startsWith("/settings") ? "page" : undefined} className={icon}><Settings className="size-5" /></Link>
+      <Link href={`${base}/settings`} aria-label="Settings" title={`Settings · ${user}`} aria-current={path.startsWith(`${base}/settings`) ? "page" : undefined} className={icon}><Settings className="size-5" /></Link>
     </div>
   );
 }
 
 /** Phone/tablet: hamburger that opens the full sidebar as a sheet. */
-export function MobileMenu(props: { signOut: () => Promise<void> }) {
+export function MobileMenu(props: { signOut?: () => Promise<void>; base?: string; guest?: boolean }) {
   const [open, setOpen] = useState(false);
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -118,13 +133,13 @@ export function MobileMenu(props: { signOut: () => Promise<void> }) {
   );
 }
 
-export function MobileTabs() {
+export function MobileTabs({ base = "" }: { base?: string }) {
   const path = usePathname();
   const search = useSearchParams();
   return (
     <nav className="bottom-nav fixed inset-x-0 bottom-0 z-10 flex justify-around border-t bg-background pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] desk:hidden">
       {MOBILE_TABS.map(({ href, label, icon: Icon }) => (
-        <Link key={href} href={href} aria-current={isActive(path, search, href) ? "page" : undefined}
+        <Link key={href} href={hrefFor(base, href)} aria-current={isActive(path, search, href, base) ? "page" : undefined}
           className="flex min-w-0 flex-1 flex-col items-center gap-0.5 py-2 text-xs text-muted-foreground aria-[current=page]:text-foreground">
           <Icon className="size-5" />{label}
         </Link>

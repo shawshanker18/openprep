@@ -1,5 +1,0 @@
-"use client";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { NAV_GROUPS } from "@/components/app-nav";
-export function GuestNavigation(){const path=usePathname();return <aside className="min-w-0 border-b lg:fixed lg:inset-y-0 lg:left-0 lg:z-10 lg:bg-background lg:h-dvh lg:w-56 lg:shrink-0 lg:overflow-y-auto lg:border-b-0 lg:border-r"><Link href="/guest" className="hidden p-4 text-lg font-semibold lg:block">OpenPrep</Link><nav aria-label="App navigation" className="flex gap-2 overflow-x-auto p-3 lg:flex-col">{NAV_GROUPS.flatMap(g=>[...g.items]).map(({href,label,icon:Icon})=>{const target=href==='/dashboard'?'/guest':`/guest${href}`;const active=path===target||(target!=='/guest'&&path.startsWith(`${target}/`));return <Link key={href} href={target} aria-current={active?'page':undefined} className={`flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm ${active?'bg-muted font-medium':'hover:bg-muted'}`}><Icon className="size-4 shrink-0"/>{label}</Link>})}<Link href="/guest/settings" className="rounded-lg px-3 py-2 text-sm">Settings</Link></nav></aside>}
