@@ -24,7 +24,9 @@ A linear equation in one variable says that two linear expressions are equal. So
 
 **Answer:** Expand to $2x + 2 + k = 2x + 9$. The $x$ terms already match, so the constants must match too: $2 + k = 9$, so $k = 7$.
 
-## Key formulas and rules
+## Formulas and rules
+
+**Key formulas and rules**
 
 | Rule | What it says |
 |---|---|
@@ -44,8 +46,6 @@ y=2(x+1)+7
 y=2x+9
 y=2(x+1)+5
 ```
-
-## Formulas and rules
 
 | After simplifying $ax + b = cx + d$ | Number of solutions |
 |---|---|
