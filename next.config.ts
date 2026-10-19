@@ -41,6 +41,7 @@ const nextConfig: NextConfig = {
       // One site: the old vercel.app address sends people to the real domain (path and query are kept). The database
       // timer job still calls /api/cron/tick on this host, so that one path must keep answering directly.
       { source: "/:path((?!api/cron/).*)", has: [{ type: "host", value: "openprep-opal.vercel.app" }], destination: "https://www.openprep.site/:path", permanent: true },
+      { source: "/progress", destination: "/dashboard", permanent: false },
       { source: "/course", destination: "/start", permanent: false },
       { source: "/course/:path*", destination: "/start", permanent: false },
     ];

@@ -108,7 +108,6 @@ export function DashboardView({profile,user,d,summary,home,savedPractice}: {
               );
             })}
           </div>
-          <Link className="self-start text-sm underline" href="/progress">All your progress</Link>
         </Card>
 
         <Card title="Skills to work on" className="order-2">

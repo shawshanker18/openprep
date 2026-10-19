@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import {
-  Activity, BarChart3, Bookmark, BookOpen, Calculator, ClipboardList, GraduationCap, Home, Library, LogOut, Menu, Settings, ShieldCheck, Sparkles,
+  Activity, Bookmark, BookOpen, Calculator, ClipboardList, GraduationCap, Home, Library, LogOut, Menu, Settings, ShieldCheck, Sparkles,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
@@ -16,7 +16,6 @@ export const NAV_GROUPS = [
     label: null,
     items: [
       { href: "/dashboard", label: "Dashboard", icon: Home },
-      { href: "/progress", label: "Progress", icon: BarChart3 },
       { href: "/analysis", label: "Analysis", icon: Activity },
       { href: "/bookmarks", label: "Saved questions", icon: Bookmark },
     ],
@@ -45,7 +44,6 @@ export const MOBILE_TABS = [
   { href: "/practice", label: "Practice", icon: Sparkles },
   { href: "/start", label: "Learn", icon: GraduationCap },
   { href: "/tests", label: "Tests", icon: ClipboardList },
-  { href: "/progress", label: "Progress", icon: BarChart3 },
 ] as const;
 
 export function CurrentSection() {
