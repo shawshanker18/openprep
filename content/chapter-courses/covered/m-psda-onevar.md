@@ -1,6 +1,6 @@
 ---
 skill: m-psda-onevar
-minutes: 9
+minutes: 11
 ---
 ## What school covered
 
@@ -8,13 +8,19 @@ Class 11 Statistics covered range, standard deviation as a measure of spread, an
 
 ## What school leaves out
 
-Grouped-data drill is not what the SAT tests. The SAT hands you a picture of the data and asks you to read it and to reason about how the summary statistics respond to change, so this lesson is about displays and reasoning, not computation.
+Grouped-data drill is not what the SAT tests. The SAT hands you a picture of the data and asks you to read it and to reason about how the summary statistics respond to change, so this lesson is about displays and reasoning, not computation. These are the applications the syllabus never establishes.
 
-- **Read the displays CBSE never used.** Dot plots, histograms and box plots. In a histogram the bar height is a frequency, a count of values, not a value itself. A box plot hands you the five-number summary: minimum, first quartile, median, third quartile, maximum, with the box holding the middle half of the data.
-- **Estimate from a display.** The mean from a histogram is the balance point: multiply each bin's midpoint by its frequency, add, divide. The median is where the cumulative frequency passes half the total. These are estimates, and the answer choices account for that.
-- **Outliers move the mean more than the median.** One huge salary in a list drags the mean up and leaves the median nearly untouched. When a question says the highest value was removed, expect the mean to shift and the median to barely move, and vice versa for counts of data added at the low end.
-- **Reason about changed data.** Every value doubles: the mean, median and range double, and the standard deviation doubles too. Every value increases by 5: the mean and median shift by 5, and the spread measures do not move at all. Learn these as rules so a question cannot make you recompute a list.
-- **Compare, do not just compute.** Two classes with the same mean can have wildly different spreads. "Which class had more consistent scores?" is a standard-deviation question, and smaller means more consistent.
+**Read the displays CBSE never used.** Dot plots, histograms and box plots. In a histogram the bar height is a frequency, a count of values, not a value itself. A box plot hands you the five-number summary: minimum, first quartile, median, third quartile, maximum, with the box holding the middle half of the data and each whisker a quarter.
+
+**Estimate from a display.** The mean from a histogram is the balance point: multiply each bin's midpoint by its frequency, add, divide by the total count. The median is where the cumulative frequency passes half the total. These are estimates, and the answer choices account for that.
+
+**Outliers move the mean more than the median.** One huge salary in a list drags the mean up and leaves the median nearly untouched. When a question says the largest value was removed, expect the mean to shift and the median to barely move; when a value is added far from the middle, the same reasoning applies in reverse.
+
+**Reason about changed data.** Every value doubles: mean, median and range double, and the standard deviation doubles too. Every value increases by 5: the mean and median shift by 5, and the spread measures do not move at all. Adding a constant slides the data; multiplying stretches it. Learn these as rules so a question cannot make you recompute a list.
+
+**Compare, do not just compute.** Two classes with the same mean can have wildly different spreads. "Which class was more consistent?" is a standard-deviation question, and smaller means more consistent. "Which had the higher typical value?" is a median or mean question: read which statistic the choices use.
+
+**Standard deviation as distance, not formula.** No SAT question needs the grouped-data formula. What it wants: the typical distance of values from the mean, and how a change moves it. Adding a value far from the mean increases the spread; adding a value at the mean leaves it almost unchanged.
 
 ## Worked example
 
@@ -26,6 +32,10 @@ Another: a data set has mean 50 and median 48. A value of 120, the largest, is r
 
 The mean falls, since the biggest single value was deleted. The median barely moves: with one value gone the middle position shifts by one, so the median either stays or slips slightly. A question asking "which statistic decreases more" is answered: the mean.
 
+A changed-data rule: the temperatures for a week are recorded, then each is converted from Celsius to Fahrenheit with $F = 1.8C + 32$. What happens to the mean and the standard deviation?
+
+The mean becomes $1.8(\text{old mean}) + 32$. The standard deviation becomes $1.8$ times the old one: adding 32 does not affect spread, multiplying by 1.8 stretches it.
+
 ## Common traps
 
 - Reading a histogram's bar height as a data value instead of a count of values.
@@ -36,4 +46,4 @@ The mean falls, since the biggest single value was deleted. The median barely mo
 
 ## Shortcuts and calculator checks
 
-For changed-data questions, test the rule with a tiny list: for "add 3 to every value", take 1, 2, 3 and watch the mean move to 5 while the spread stays 1. One tiny example settles the rule faster than re-deriving it, and the calculator is only needed for the bin-midpoint arithmetic in histogram questions.
+For changed-data questions, test the rule with a tiny list: for "add 3 to every value", take 1, 2, 3 and watch the mean move to 5 while the spread stays 1. One tiny example settles the rule faster than re-deriving it. For histograms, the only arithmetic is bin-midpoint times frequency, and a calculator handles it in seconds.
