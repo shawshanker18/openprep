@@ -35,8 +35,8 @@ export default async function GuestSection({ params }: { params: Promise<{ path:
         <Link href="/guest/start" className="text-sm text-muted-foreground hover:text-foreground">← Start from scratch</Link>
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl font-semibold">{skill.name}</h1>
-          {lesson?.minutes && <p className="text-sm text-muted-foreground">About {lesson.minutes} minutes</p>}
         </div>
+        {/* The minutes show inside LessonLevels, next to the level tabs, so the title stays tight. */}
         {lesson ? (
           <LessonTextSize>
             <LessonLevels skillId={id} foundation={lesson} mastery={mastery} />
