@@ -56,7 +56,14 @@ export async function updateProfile(form: FormData) {
   });
   if (!p.success) redirect("/settings?error=profile");
   // Chapters only apply to CBSE; switching board clears them so nothing stale marks lessons as covered.
-  await db.update(profiles).set({ ...p.data, chaptersDone: savedChapters(p.data.chaptersDone, p.data.grade, p.data.curriculum, p.data.subjects), subjects: asksSubjects(p.data.curriculum, p.data.grade) ? p.data.subjects : [] }).where(eq(profiles.id, userId));
+  // The CBSE-specific review checkbox is only sent when it was shown, so it is left untouched (its default: on) otherwise.
+  const cbseReviewShown = form.get("cbseReviewShown") !== null;
+  await db.update(profiles).set({
+    ...p.data,
+    chaptersDone: savedChapters(p.data.chaptersDone, p.data.grade, p.data.curriculum, p.data.subjects),
+    subjects: asksSubjects(p.data.curriculum, p.data.grade) ? p.data.subjects : [],
+    ...(cbseReviewShown ? { cbseReview: form.get("cbseReview") !== null } : {}),
+  }).where(eq(profiles.id, userId));
   await refreshCourseAssignment(userId);
   revalidatePath("/settings");
   redirect("/settings?saved=1");

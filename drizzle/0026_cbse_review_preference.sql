@@ -1,0 +1,1 @@
+ALTER TABLE "profiles" ADD COLUMN "cbse_review" boolean DEFAULT true NOT NULL;

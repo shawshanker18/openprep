@@ -1,34 +1,39 @@
 ---
 skill: m-alg-lin2
-minutes: 8
+minutes: 9
 ---
-## Quick recap
+## What school covered
 
-From school you can write a line in slope-intercept form and standard form and find where it crosses the axes. This route assumes that and focuses on the moves the SAT likes: reading slope straight from standard form, parallel and perpendicular lines, and systems with a missing constant.
+You can write a line from a point and a slope, from two points, in intercept form, and in general form $Ax + By + C = 0$. You know parallel lines share a slope and perpendicular slopes multiply to $-1$. That machinery is assumed from here on.
 
-## What the SAT adds
+## What school leaves out
 
-- **Slope from standard form.** For $Ax + By = C$ the slope is $-\dfrac{A}{B}$. You do not need to solve for $y$.
-- **Parallel lines** have equal slopes. **Perpendicular lines** have slopes whose product is $-1$.
-- **Systems with an unknown constant.** Two lines have no solution when they are parallel but not the same line, and infinitely many when they are the same line.
-- **Story setups.** "Adult tickets cost \$8 and child tickets \$5, total \$200" becomes $8a + 5c = 200$. Intercepts then mean "all adults" or "all children".
+The SAT asks you to work with a line as a model with an unknown constant in it, and to jump fluently between equivalent forms, which school drill does not practise.
+
+- **Slope out of standard form.** $4x + 2y = 7$ becomes $y = -2x + 3.5$. The slope is $-\dfrac{A}{B}$, and the intercept is $\dfrac{C}{B}$. Practise the rearrangement until it is one mental step, because the SAT often presents lines in standard form.
+- **Unknown constants.** "The line $y = kx - 4$ passes through $(3, 11)$. What is $k$?" Substitute: $11 = 3k - 4$, so $k = 5$. The line itself is old news; solving for a letter inside it is the new skill.
+- **Parallel and perpendicular with letters.** A line parallel to $y = kx + 1$ through $(2, 5)$ has slope $k$, so $5 = 2k + 1$ and $k = 2$. For perpendicular, flip the slope and change the sign first, then solve.
+- **A point on a line is a fact about the equation.** "The graph of $y = mx + b$ passes through $(1, 4)$ and $(3, 10)$" is a system about $m$ and $b$: two substitutions, two equations.
+- **Interpret a coefficient in a story.** In $y = 25x + 100$ for a taxi fare, the $100$ is the fixed charge and the $25$ is the rate. Expect to say what a number means, not just compute it.
 
 ## Worked example
 
-Line $\ell$ is $6x + 4y = 20$. A line parallel to $\ell$ passes through $(2, 1)$. What is its equation?
+Line $\ell$ has equation $3x - 2y = 12$. What is its slope, and does $(2, -3)$ lie on it?
 
-The slope of $\ell$ is $-\dfrac{6}{4} = -\dfrac{3}{2}$, so the new line has that slope too. Use point-slope form: $y - 1 = -\dfrac{3}{2}(x - 2)$.
+Move the $x$ term: $-2y = -3x + 12$, so $y = 1.5x - 6$. The slope is $1.5$. Test the point: $1.5(2) - 6 = -3$. Yes, the point is on the line.
 
-Now a system: for what value of $k$ does $3x + ky = 12$ and $9x + 6y = 40$ have no solution?
+Another: for what value of $k$ is the line $y = (k - 1)x + 7$ parallel to $y = -3x + 2$?
 
-Multiply the first equation by $3$ to line up the $x$ terms: $9x + 3ky = 36$. The $y$ terms must match, so $3k = 6$ and $k = 2$. Then the left sides are identical but $36 \ne 40$, so the lines are parallel and distinct. No solution, as required.
+Parallel means equal slopes: $k - 1 = -3$, so $k = -2$. Note that the $7$ never mattered. Parallel lines do not need equal intercepts.
 
 ## Common traps
 
-- Forgetting the minus sign in $-\dfrac{A}{B}$.
-- Using the same slope for a perpendicular line instead of the negative reciprocal.
-- Stopping once the left sides match. For "no solution" the constants must also fail to match. If they match too, you have infinitely many solutions.
+- Sign slips converting standard form. $3x - 2y = 12$ has slope $+\dfrac{3}{2}$, not negative, because the $y$ term was negative.
+- Perpendicular slope is the negative reciprocal $\dfrac{2}{3}$ to $-\dfrac{3}{2}$, not just the reciprocal.
+- Solving for $k$ but reporting $k - 1$. Answer the question that was asked.
+- Testing a point by plugging into the wrong side or mixing up $(x, y)$ order.
+- Reading the intercept off a table as the first listed output instead of the value at $x = 0$.
 
 ## Shortcuts and calculator checks
 
-Type both equations into Desmos and add a slider for $k$. Drag it until the lines stop crossing. Desmos also shows intersection points when you click them, which is a fast check on a solved system.
+For "does the point lie on the line", substitute instead of re-deriving anything. In Desmos, type the line and the point; the graph answers instantly, and for two-point questions you can type `y_1 ~ mx_1 + b` with the table filled in to get the equation directly.

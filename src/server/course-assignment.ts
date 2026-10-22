@@ -14,6 +14,13 @@ import {
 export const MAX_RECALC_STUDENTS = 20_000;
 const BATCH = 500;
 
+/**
+ * The chapters that count for course assignment. A student who turned CBSE-specific review off goes back to the standard
+ * (default) versions, which is exactly what evaluating no completed chapters does: no chapter rule matches, the fallback wins.
+ */
+export const effectiveChapters = (chaptersDone: readonly string[], cbseReview: boolean): readonly string[] =>
+  (cbseReview ? chaptersDone : []);
+
 /** Chapters come from content (cbse-chapters.ts). Deactivating one there is a content change; rules naming it are reported, not guessed. */
 export const chapterCatalog = (): ChapterInfo[] => CBSE_CHAPTERS.map((c) => ({ id: c.id, grade: c.grade, active: c.active !== false }));
 
@@ -100,10 +107,10 @@ async function persistAll(userId: string, results: Record<string, EvaluationResu
 /** Re-evaluate one student from their current chapters and store the result for each course. Safe to call repeatedly. */
 export async function evaluateStudent(userId: string, now = new Date()): Promise<{ results: Record<string, EvaluationResult>; changed: boolean }> {
   const data = await loadCatalogData();
-  const [profile] = await db.select({ chaptersDone: profiles.chaptersDone }).from(profiles).where(eq(profiles.id, userId));
+  const [profile] = await db.select({ chaptersDone: profiles.chaptersDone, cbseReview: profiles.cbseReview }).from(profiles).where(eq(profiles.id, userId));
   if (!profile) throw new Error("no profile for course assignment");
   const groupIds = (await db.select({ id: userGroupMembers.groupId }).from(userGroupMembers).where(eq(userGroupMembers.userId, userId))).map((g) => g.id);
-  const results = decide(data, { completed: profile.chaptersDone, groupIds }, now);
+  const results = decide(data, { completed: effectiveChapters(profile.chaptersDone, profile.cbseReview), groupIds }, now);
   const changed = await persistAll(userId, results, now);
   return { results, changed };
 }
@@ -112,7 +119,7 @@ export async function evaluateStudent(userId: string, now = new Date()): Promise
 async function* students(client: Pick<typeof db, "select">, limit: number) {
   let after = "00000000-0000-0000-0000-000000000000", seen = 0;
   while (seen < limit) {
-    const rows = await client.select({ id: profiles.id, chaptersDone: profiles.chaptersDone }).from(profiles)
+    const rows = await client.select({ id: profiles.id, chaptersDone: profiles.chaptersDone, cbseReview: profiles.cbseReview }).from(profiles)
       .where(gt(profiles.id, after)).orderBy(asc(profiles.id)).limit(Math.min(BATCH, limit - seen));
     if (!rows.length) return;
     const memberships = await client.select({ userId: userGroupMembers.userId, groupId: userGroupMembers.groupId }).from(userGroupMembers)
@@ -133,7 +140,7 @@ export async function recalculateAll(now = new Date(), limit = MAX_RECALC_STUDEN
   const data = await loadCatalogData();
   let evaluated = 0, changed = 0;
   for await (const s of students(db, limit)) {
-    if (await persistAll(s.id, decide(data, { completed: s.chaptersDone, groupIds: s.groupIds }, now), now)) changed++;
+    if (await persistAll(s.id, decide(data, { completed: effectiveChapters(s.chaptersDone, s.cbseReview), groupIds: s.groupIds }, now), now)) changed++;
     evaluated++;
   }
   return { evaluated, changed, capped: evaluated >= limit };
@@ -150,7 +157,7 @@ export async function previewImpact(proposed: AssignmentRule[], courseId: string
   const out = { students: 0, toNewVersion: 0, newlyAssigned: 0, becomesUnassigned: 0, unchanged: 0, capped: false };
   for await (const s of students(db, limit)) {
     out.students++;
-    const result = decide(base, { completed: s.chaptersDone, groupIds: s.groupIds }, now, proposed)[courseId];
+    const result = decide(base, { completed: effectiveChapters(s.chaptersDone, s.cbseReview), groupIds: s.groupIds }, now, proposed)[courseId];
     const next = result ? outcomeVersion(result) : null;
     const before = current.get(s.id) ?? null;
     if (next === before) out.unchanged++;

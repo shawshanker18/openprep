@@ -115,13 +115,23 @@ describe("publishing a covered route", () => {
     await evaluateStudent(NONE);
     expect(await routeOf(NONE, "straight-lines")).toBe("straight-lines-default");
   });
+
+  it("turning CBSE-specific review off sends a student back to the default route, even with the chapter done", async () => {
+    expect(await routeOf(LINES, "straight-lines")).toBe("straight-lines-covered"); // cbse_review defaults to on
+    await db.update(schema.profiles).set({ cbseReview: false }).where(eq(schema.profiles.id, LINES));
+    await evaluateStudent(LINES);
+    expect(await routeOf(LINES, "straight-lines")).toBe("straight-lines-default");
+    await db.update(schema.profiles).set({ cbseReview: true }).where(eq(schema.profiles.id, LINES));
+    await evaluateStudent(LINES);
+    expect(await routeOf(LINES, "straight-lines")).toBe("straight-lines-covered");
+  });
 });
 
 describe("the lesson a student reads", () => {
   it("is the covered-route text for a student on the covered version", async () => {
     const lesson = await getStudentLesson(LINES, "m-alg-lin2");
     expect(lesson?.versionId).toBe("straight-lines-covered");
-    expect(lesson?.sections.map((s) => s.heading)).toContain("What the SAT adds");
+    expect(lesson?.sections.map((s) => s.heading)).toContain("What school leaves out");
   });
 
   it("falls back to the built-in lesson for a student on the default version, and for skills outside every course", async () => {

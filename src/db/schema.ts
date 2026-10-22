@@ -19,6 +19,9 @@ export const profiles = pgTable("profiles", {
   topicsStudied: jsonb("topics_studied").$type<string[]>().notNull().default([]),
   // CBSE maths chapters the student has finished (ids from content/cbse-chapters.ts); they mark SAT skills as likely covered.
   chaptersDone: jsonb("chapters_done").$type<string[]>().notNull().default([]),
+  // Whether finished chapters route the student to the CBSE-specific review versions. On by default; turning it off
+  // sends them back to the standard (default) versions of every chapter course.
+  cbseReview: boolean("cbse_review").notNull().default(true),
   subjects: jsonb("subjects").$type<string[]>().notNull().default([]),
   englishBackground: text("english_background"),
   priorMath: smallint("prior_math"),
