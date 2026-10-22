@@ -13,18 +13,20 @@ export function LessonLevels({ skillId, foundation, mastery, stepKey, curriculum
   const [level, setLevel] = useState<"foundation" | "mastery">("foundation");
   const current = level === "mastery" && mastery ? mastery : foundation;
   return (
-    <div className="flex min-w-0 flex-col gap-6">
-      {mastery && (
-        <div role="group" aria-label="Lesson level" className="flex w-fit gap-1 rounded-lg border p-1">
-          {(["foundation", "mastery"] as const).map((l) => (
-            <button key={l} type="button" aria-pressed={level === l} onClick={() => setLevel(l)}
-              className={`min-h-9 rounded-md px-3 text-sm capitalize ${level === l ? "bg-muted font-medium" : "text-muted-foreground hover:text-foreground"}`}>
-              {l}
-            </button>
-          ))}
+    <div className="flex min-w-0 flex-col gap-4">
+      {mastery ? (
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <div role="group" aria-label="Lesson level" className="flex w-fit gap-1 rounded-lg border p-1">
+            {(["foundation", "mastery"] as const).map((l) => (
+              <button key={l} type="button" aria-pressed={level === l} onClick={() => setLevel(l)}
+                className={`min-h-9 rounded-md px-3 text-sm capitalize ${level === l ? "bg-muted font-medium" : "text-muted-foreground hover:text-foreground"}`}>
+                {l}
+              </button>
+            ))}
+          </div>
+          {current.minutes && <p className="text-sm text-muted-foreground">About {current.minutes} minutes · {level === "mastery" ? "Mastery" : "Foundation"}</p>}
         </div>
-      )}
-      {current.minutes && <p className="text-sm text-muted-foreground">About {current.minutes} minutes · {level === "mastery" && mastery ? "Mastery" : "Foundation"}</p>}
+      ) : current.minutes && <p className="text-sm text-muted-foreground">About {current.minutes} minutes</p>}
       <LessonStudyView sections={current.sections} skillId={skillId} stepKey={stepKey} curriculum={curriculum} grade={grade} subjects={subjects} chaptersDone={chaptersDone} />
     </div>
   );
