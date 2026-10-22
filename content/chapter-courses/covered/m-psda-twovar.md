@@ -1,34 +1,39 @@
 ---
 skill: m-psda-twovar
-minutes: 8
+minutes: 9
 ---
-## Quick recap
+## What school covered
 
-School has given you scatterplots, correlation and regression lines. This route covers how the SAT asks you to use them: interpret the slope, make predictions, compute residuals, and choose between a linear and an exponential model.
+Almost nothing here, and that is the point. CBSE Statistics is about one variable at a time; scatterplots, fitted lines and data models are not in the syllabus. Your functions work gives you the algebra you need, so this lesson teaches the statistics itself from the ground up.
 
-## What the SAT adds
+## What two-variable data is
 
-- **Interpret the slope in context.** In a fitted line $\hat{y} = 2.4x + 15$ with $x$ in hours studied and $y$ the predicted score, the slope means each extra hour is associated with a $2.4$ point higher predicted score.
-- **Residual = actual $-$ predicted.** A positive residual means the point sits above the line.
-- **Interpolate with care, extrapolate with caution.** Predictions inside the data range are reasonable; far outside they are guesses.
-- **Linear or exponential?** If the output changes by the same **amount** each step, think linear. If it is multiplied by the same **factor** each step, think exponential.
+Instead of summarizing one list, you look at how two measured quantities travel together: hours studied and quiz score, age and resale value. Each observation is a point $(x, y)$, and the whole set is a scatterplot.
+
+- **Read a scatterplot's direction and strength.** Up-and-to-the-right is a positive association; down-and-to-the-right is negative. Tight around an imaginary line is a strong association; a wide cloud is weak. Strength is about the cloud, not about the slope.
+- **A line of best fit summarizes the trend.** The SAT usually gives you the fitted line, like $y = 0.8x + 12$ for score against hours studied. Its slope says the score rises by $0.8$ per extra hour, and it reads with units, exactly like the linear functions you know.
+- **Predict with the line.** To estimate the score after 10 hours, substitute $x = 10$: $y = 8 + 12 = 20$. Predictions within the range of the observed data are what the fit supports. Predicting far outside that range is extrapolation, and a question's correct answer is often that the model does not support it.
+- **Residuals.** The residual is the actual value minus the predicted value: how far the point sits above or below the line. A point at $x = 10$ with actual value 23 against prediction 20 has residual $+3$. If residuals are not random, a line is the wrong model.
+- **Linear or exponential?** Check equal steps in the data: if equal input steps add roughly a constant amount, fit a line. If they multiply by a constant factor, an exponential model like $y = a(b)^x$ is right. Growth questions on the SAT live on exactly this choice.
 
 ## Worked example
 
-Using $\hat{y} = 2.4x + 15$, a student who studied $5$ hours scored $30$. What is the residual?
+A fitted line for a car's resale value is $y = 9{,}000 - 700x$, where $x$ is years since purchase. What does each number mean, and what value does the model give after 7 years?
 
-The predicted score is $2.4 \times 5 + 15 = 27$. The residual is $30 - 27 = 3$.
+The $9{,}000$ is the value at year zero, the new-car value. The $-700$ says the value drops by \$700 per year. At $x = 7$: $y = 9{,}000 - 4{,}900 = 4{,}100$ dollars.
 
-Which model fits the table with $y$-values $2, 6, 18, 54$ at $x = 0, 1, 2, 3$?
+Another: a table shows a savings balance after each year: 100, 120, 144, 172.8. Which model fits?
 
-Each value is $3$ times the previous one, so it is exponential, $y = 2 \cdot 3^x$. A linear model would need equal differences, and here the differences are $4, 12, 36$.
+Equal time steps, and each value is the previous one times $1.2$: a constant ratio, so exponential, $y = 100(1.2)^x$. The growth rate is $20$ percent per year. A linear reader sees the differences, 20, 24, 28.8, growing, and that growth in the differences is the tell that a line is wrong.
 
 ## Common traps
 
-- Reversing the residual and getting the wrong sign.
-- Saying the line shows that one thing causes the other. Association is not causation.
-- Describing the slope without the units of both variables.
+- Calling a steep line a strong association. Strength is the scatter around the line, and slope and strength answer different questions.
+- Predicting outside the data's range without a second thought. The fit only speaks for the range it was built on.
+- Reading the slope without its units. It is 700 dollars per year, not 700.
+- Choosing a linear model for data whose differences keep growing, or an exponential model for data with constant differences.
+- Computing a residual as predicted minus actual and getting the sign backwards. Actual minus predicted.
 
 ## Shortcuts and calculator checks
 
-In Desmos, enter the data as a table and type `y_1 ~ mx_1 + b` for a line or `y_1 ~ ab^{x_1}` for an exponential. The residual plot option helps you see which model fits better.
+Enter the table in Desmos and try both fits: `y_1 ~ mx_1 + b` and `y_1 ~ a \cdot b^{x_1}`. The one with the residuals scattered tightly around zero wins. On the SAT the model choice usually can be made by eye from the table: check the differences, then check the ratios, and stop as soon as one is constant.

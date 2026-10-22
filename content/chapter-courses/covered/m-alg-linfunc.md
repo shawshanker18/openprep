@@ -1,35 +1,40 @@
 ---
 skill: m-alg-linfunc
-minutes: 7
+minutes: 9
 ---
-## Quick recap
+## What school covered
 
-You already know slope, intercepts and the forms of a line from school. This route skips the theory and goes straight to how the SAT uses it: a linear function is a rule $f(x) = mx + b$ where $m$ is the rate of change and $b$ is the starting value.
+The Straight Lines chapter taught you slope as $\dfrac{y_2 - y_1}{x_2 - x_1}$, the slope as a rate of change, the $y$-intercept as a starting value, and every equation form of a line. You also met arithmetic progressions, which are linear patterns. Treat all of that as done: no lesson time on finding slopes or drawing lines.
 
-## What the SAT adds
+## What school leaves out
 
-- **Meaning in context.** In $C(n) = 32 + 5n$, the $5$ is the cost per item and the $32$ is the cost when $n = 0$. Say the unit: "dollars per item", "centimetres per week".
-- **Function notation as a question.** $f(5) = 20$ means "input $5$ gives output $20$". It is not $f$ times $5$.
-- **Equal steps give equal changes.** If the input goes up by the same amount each row of a table, a linear function's output goes up by one fixed amount too. That fixed amount per step is what you scale.
-- **Two points are enough.** Slope is $\dfrac{y_2 - y_1}{x_2 - x_1}$, then use either point to find $b$.
+The SAT rarely hands you an equation. It hands you a situation, and the skill is building and reading the linear function the situation describes.
+
+- **Build the function from the words.** A gym charges \$32 to join plus \$5 per session. That is $C(n) = 5n + 32$: the rate goes with the input, the flat amount is the starting value. Name the input and the output before you write anything.
+- **Read a parameter as a sentence.** In $h(t) = 12 + 1.5t$, the $1.5$ means the height grows by $1.5$ cm for each extra hour. Expect questions like "what does the $12$ mean?" The answer names the quantity when $t = 0$: the starting height.
+- **Function notation is a question, not multiplication.** $f(5) = 20$ says input $5$ gives output $20$. Never read it as $f$ times $5$.
+- **Tables hide the slope.** If the input steps by a constant amount, the output steps by the slope times that step. A table where $x$ goes $2, 5, 8$ and $f(x)$ goes $9, 21, 33$ has slope $\dfrac{12}{3} = 4$ per step of $1$.
+- **Constraints are part of the model.** A question may ask for the smallest whole $x$ with $f(x)$ over a limit. The algebra is the part you know; the checking against the situation is the part to practise.
+- **Sequences are linear functions in disguise.** $a_n = a_1 + (n-1)d$ is a line through the points $(n, a_n)$. The common difference is the slope.
 
 ## Worked example
 
-A plant is $12$ cm tall and grows $1.5$ cm each week, so $h(w) = 12 + 1.5w$. In which week is it $30$ cm tall?
+A delivery service charges \$8 plus \$3 per kilometre, so $C(k) = 3k + 8$. A trip costs \$35. How far was it?
 
-Set $30 = 12 + 1.5w$. Subtract $12$ to get $18 = 1.5w$, so $w = 12$.
+Set $3k + 8 = 35$. Subtract $8$ to get $3k = 27$, so $k = 9$ kilometres. Say the unit in the answer.
 
 A harder one: $f$ is linear, $f(3) = 11$ and $f(7) = 27$. Find $f(10)$.
 
-The input moves $4$ and the output moves $16$, so the slope is $4$. From $x = 7$ to $x = 10$ is $3$ more steps of $4$, so $f(10) = 27 + 12 = 39$. Check with the rule $f(x) = 4x - 1$: $f(3) = 11$ and $f(7) = 27$ both hold.
+The input moved $4$ and the output moved $16$, so the slope is $4$. From $x = 7$ to $x = 10$ is $3$ more steps of $4$, so $f(10) = 27 + 12 = 39$. Check with the rule $f(x) = 4x - 1$: it fits both given values.
 
 ## Common traps
 
-- Reading the slope as the final value instead of the rate. The slope is the change per one unit of input.
-- Dropping units or swapping them. If $x$ is weeks, the slope is "per week", not "per centimetre".
+- Reading the slope as the final value. The slope is the change per one unit of input, so it always carries a "per" unit.
+- Swapping the units of the rate. If $x$ is weeks, the slope is per week, not per centimetre.
 - Treating $f(5) = 20$ as $5f = 20$.
-- Using $\dfrac{x_2 - x_1}{y_2 - y_1}$ for slope. Rise goes on top.
+- Inverting the slope formula. Rise goes on top: $y$-values in the numerator.
+- Missing that the starting value is the output at input zero, not the first value listed in a table.
 
 ## Shortcuts and calculator checks
 
-Skip finding the full equation when the question only asks for one more value: count steps and multiply by the rate. To check a line from a table, enter the table in Desmos and type `y_1 ~ mx_1 + b`. It gives the slope and intercept, and if the points really are linear the fit is exact.
+When a question asks for one more value, skip the full equation: count the steps and multiply by the rate. To check a line from a table, enter the table in Desmos and type `y_1 ~ mx_1 + b`. If the points really are linear the fit is exact, and Desmos hands you the slope and intercept.

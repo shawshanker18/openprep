@@ -26,7 +26,7 @@ export async function ensureCourse(db: Db, spec: CourseSpec) {
     { id: defaultVersionId(spec.id), courseId: spec.id, name: `${spec.title}: from the basics`, status: "published", isFallback: true,
       description: `For students who have not covered ${spec.title} at school. Teaches the built-in lessons unless an admin customises them.` },
     { id: covered, courseId: spec.id, name: `${spec.title}: covered at school`, status: "draft",
-      description: `For students who have finished ${spec.title} at school. Skips the theory and teaches the SAT applications.` },
+      description: `For students who have finished ${spec.title} at school. Quick-revises what CBSE taught and teaches the SAT material school leaves out.` },
   ]).onConflictDoNothing().returning({ id: courseVersions.id })).length;
 
   if (spec.chapterId) {

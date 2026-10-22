@@ -1,34 +1,39 @@
 ---
 skill: m-psda-onevar
-minutes: 7
+minutes: 9
 ---
-## Quick recap
+## What school covered
 
-You have computed mean, median and standard deviation in the Statistics chapter. This route goes straight to the SAT questions: predicting what an outlier does, comparing spread without calculating, and recovering a missing value from the mean.
+Class 11 Statistics covered range, standard deviation as a measure of spread, and comparing variability, and Classes 9 and 10 covered mean, median, mode and grouped data. The arithmetic of averages is assumed.
 
-## What the SAT adds
+## What school leaves out
 
-- **Outliers move the mean far and the median little.** One very large value drags the mean toward it; the median only shifts by one position.
-- **Comparing spread.** The set whose values sit farther from the center has the larger standard deviation. You usually do not need to compute it.
-- **Frequency tables.** Weight each value by its frequency before finding the mean. The median is the middle of the full list, not the middle row.
-- **Missing value.** Total = mean $\times$ count, so subtract the known values from that total.
+Grouped-data drill is not what the SAT tests. The SAT hands you a picture of the data and asks you to read it and to reason about how the summary statistics respond to change, so this lesson is about displays and reasoning, not computation.
+
+- **Read the displays CBSE never used.** Dot plots, histograms and box plots. In a histogram the bar height is a frequency, a count of values, not a value itself. A box plot hands you the five-number summary: minimum, first quartile, median, third quartile, maximum, with the box holding the middle half of the data.
+- **Estimate from a display.** The mean from a histogram is the balance point: multiply each bin's midpoint by its frequency, add, divide. The median is where the cumulative frequency passes half the total. These are estimates, and the answer choices account for that.
+- **Outliers move the mean more than the median.** One huge salary in a list drags the mean up and leaves the median nearly untouched. When a question says the highest value was removed, expect the mean to shift and the median to barely move, and vice versa for counts of data added at the low end.
+- **Reason about changed data.** Every value doubles: the mean, median and range double, and the standard deviation doubles too. Every value increases by 5: the mean and median shift by 5, and the spread measures do not move at all. Learn these as rules so a question cannot make you recompute a list.
+- **Compare, do not just compute.** Two classes with the same mean can have wildly different spreads. "Which class had more consistent scores?" is a standard-deviation question, and smaller means more consistent.
 
 ## Worked example
 
-Five numbers have a mean of $14$. Four of them are $10$, $12$, $15$ and $18$. What is the fifth?
+A histogram shows exam scores in bins of width 10, with frequencies 3, 5, 8, 4 from the 50s bin to the 80s bin. Estimate the median.
 
-The total is $14 \times 5 = 70$. The known four add to $55$, so the fifth is $15$.
+Total values: $3 + 5 + 8 + 4 = 20$, so the median is between the 10th and 11th values. Cumulative: 3 after the 50s, 8 after the 60s, so the 10th and 11th values fall in the 70s bin. The median is somewhere in the 70s. If the choices are a single number, take the bin's midpoint, 75, as the estimate.
 
-The set $\{4, 5, 6, 7, 8\}$ has mean and median $6$. What happens if $100$ is added?
+Another: a data set has mean 50 and median 48. A value of 120, the largest, is removed. What happens?
 
-The total becomes $30 + 100 = 130$ over $6$ values, so the mean is about $21.7$. The median becomes the average of $6$ and $7$, which is $6.5$. The mean changed a lot and the median barely moved.
+The mean falls, since the biggest single value was deleted. The median barely moves: with one value gone the middle position shifts by one, so the median either stays or slips slightly. A question asking "which statistic decreases more" is answered: the mean.
 
 ## Common traps
 
-- Finding the median of a frequency table by looking at the middle row.
-- Assuming a bigger range always means a bigger standard deviation. Check where most values sit.
-- Forgetting that adding a value changes the count in the mean.
+- Reading a histogram's bar height as a data value instead of a count of values.
+- Confusing the range with the standard deviation. Range is two endpoints; standard deviation is a typical distance from the mean.
+- Assuming the mean is always the middle. A right-skewed list has its mean above its median.
+- Adding a constant and doubling the spread in your head. Adding shifts everything; only multiplying scales the spread.
+- Mixing up quartiles with percentages of the data in a box plot. The box holds the middle 50 percent, always.
 
 ## Shortcuts and calculator checks
 
-Desmos has `mean([...])`, `median([...])` and `stdev([...])`. Type the list in once and edit it to see how each measure responds to an outlier.
+For changed-data questions, test the rule with a tiny list: for "add 3 to every value", take 1, 2, 3 and watch the mean move to 5 while the spread stays 1. One tiny example settles the rule faster than re-deriving it, and the calculator is only needed for the bin-midpoint arithmetic in histogram questions.
