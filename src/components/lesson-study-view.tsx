@@ -82,8 +82,8 @@ function WorkedExample({ label, md }: { label: string; md: string }) {
   );
 }
 
-export function LessonStudyView({ sections, skillId, stepKey, curriculum, grade, subjects, chaptersDone = [] }: {
-  sections: Section[]; skillId: string; stepKey?: string; curriculum: string | null; grade: number | null; subjects: string[]; chaptersDone?: string[];
+export function LessonStudyView({ sections, skillId, stepKey, curriculum, grade, subjects, chaptersDone = [], cbseLevel }: {
+  sections: Section[]; skillId: string; stepKey?: string; curriculum: string | null; grade: number | null; subjects: string[]; chaptersDone?: string[]; cbseLevel?: "foundation" | "mastery";
 }) {
   const cov = CBSE_SKILL_COVERAGE[skillId];
   const eligible = curriculum === "cbse" && !!cov;
@@ -119,7 +119,15 @@ export function LessonStudyView({ sections, skillId, stepKey, curriculum, grade,
   });
   return <div className="flex min-w-0 flex-col gap-6">
     {eligible && <div className="flex flex-col gap-3 rounded-xl border p-4">
-      {cov.school === "none" ? (
+      {cbseLevel === "mastery" ? (
+        <p className="text-sm text-muted-foreground">{
+          cov.school === "none"
+            ? "School doesn't teach this topic. The Foundation level teaches it from the ground up; this Mastery level is the SAT depth every student needs."
+            : cov.school === "partial"
+              ? `School covers only part of this topic. This Mastery level includes what school leaves out and the SAT asks most: ${cov.satAdds.slice(0, 3).join(", ")}.`
+              : `School teaches the core of this topic. Mastery is the SAT edge on top of it: ${cov.satAdds.slice(0, 3).join(", ")}.`
+        }</p>
+      ) : cov.school === "none" ? (
         <p className="text-sm text-muted-foreground">CBSE doesn&apos;t teach this topic, so nothing here is school revision. Learn it in full: the SAT asks it directly, and the lesson below covers it from the ground up.</p>
       ) : (<>
         <label className="flex items-center gap-2 text-sm"><input type="checkbox" role="switch" checked={revision} onChange={e=>setRevision(e.target.checked)}/>CBSE revision view</label>
@@ -132,6 +140,6 @@ export function LessonStudyView({ sections, skillId, stepKey, curriculum, grade,
         } All lesson content remains available.</p>}
       </>)}
     </div>}
-    {revision && cov?.school !== "none" ? <><section className="flex flex-col gap-3"><h2 className="text-xl font-semibold">School revision</h2><p className="text-sm text-muted-foreground">Review the key ideas and formulas before trying the examples.</p><details className="rounded-xl border p-4"><summary className="cursor-pointer font-medium">Review fundamentals</summary><div className="mt-4 flex flex-col gap-6">{render(basics)}</div></details></section><section className="flex flex-col gap-6"><h2 className="text-xl font-semibold">SAT application</h2>{render(sat)}</section></> : render(sections)}
+    {revision && cbseLevel !== "mastery" && cov?.school !== "none" ? <><section className="flex flex-col gap-3"><h2 className="text-xl font-semibold">School revision</h2><p className="text-sm text-muted-foreground">Review the key ideas and formulas before trying the examples.</p><details className="rounded-xl border p-4"><summary className="cursor-pointer font-medium">Review fundamentals</summary><div className="mt-4 flex flex-col gap-6">{render(basics)}</div></details></section><section className="flex flex-col gap-6"><h2 className="text-xl font-semibold">SAT application</h2>{render(sat)}</section></> : render(sections)}
   </div>;
 }

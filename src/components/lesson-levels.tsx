@@ -27,7 +27,8 @@ export function LessonLevels({ skillId, foundation, mastery, stepKey, curriculum
           {current.minutes && <p className="text-sm text-muted-foreground">About {current.minutes} minutes · {level === "mastery" ? "Mastery" : "Foundation"}</p>}
         </div>
       ) : current.minutes && <p className="text-sm text-muted-foreground">About {current.minutes} minutes</p>}
-      <LessonStudyView sections={current.sections} skillId={skillId} stepKey={stepKey} curriculum={curriculum} grade={grade} subjects={subjects} chaptersDone={chaptersDone} />
+      <LessonStudyView sections={current.sections} skillId={skillId} stepKey={stepKey} curriculum={curriculum} grade={grade} subjects={subjects} chaptersDone={chaptersDone}
+        cbseLevel={curriculum === "cbse" ? level : undefined} />
     </div>
   );
 }
