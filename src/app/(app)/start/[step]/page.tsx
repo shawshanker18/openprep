@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DesmosCalculator } from "@/components/desmos-panel";
-import { LessonStudyView } from "@/components/lesson-study-view";
+import { LessonLevels } from "@/components/lesson-levels";
 import { LessonTextSize } from "@/components/lesson-text-size";
 import { Markdown } from "@/components/markdown";
 import { orientationBy } from "@/content/getting-started";
@@ -12,7 +12,7 @@ import { requireUser } from "@/server/auth";
 import { conceptsForSkill } from "@/server/concepts";
 import { getStudentLesson } from "@/server/course-lessons";
 import { safely } from "@/lib/safely";
-import { getLesson, listDesmosLessons } from "@/server/lessons";
+import { getLesson, getMasteryLesson, listDesmosLessons } from "@/server/lessons";
 import { scratchPath, scratchProgress } from "@/server/scratch";
 import { checkpointAction, conceptPracticeAction, stepAction } from "../actions";
 
@@ -29,11 +29,15 @@ export default async function StepPage({ params }: PageProps<"/start/[step]">) {
   if (i < 0) notFound();
   const step = steps[i]!;
   const prev = steps[i - 1], following = steps[i + 1];
-  const [lesson, desmos, concepts] = await Promise.all([
+  const [lesson, mastery, desmos, concepts] = await Promise.all([
     step.kind === "skill" ? safely(() => getStudentLesson(userId, step.ref), null).then((own) => own ?? getLesson(step.ref)) : null,
+    step.kind === "skill" ? safely(() => getMasteryLesson(step.ref), null) : null,
     step.kind === "desmos" ? listDesmosLessons().then((all) => all.find((l) => l.slug === step.ref) ?? null) : null,
     step.kind === "skill" ? safely(() => conceptsForSkill(step.ref), []) : [],
   ]);
+  // A lesson from a course version is already the student's own route (for example the CBSE-specific review), so the
+  // generic in-lesson CBSE revision split would only repeat it. It stays on the built-in lessons.
+  const onCourseVersion = !!(lesson as { versionId?: string } | null)?.versionId;
 
   return (
     <div className="flex flex-col gap-6">
@@ -62,8 +66,10 @@ export default async function StepPage({ params }: PageProps<"/start/[step]">) {
       {step.kind === "skill" && (lesson ? (
         <LessonTextSize>
           <article className="flex max-w-3xl flex-col gap-6">
-            {lesson.minutes && <p className="text-sm text-muted-foreground">About {lesson.minutes} minutes</p>}
-            <LessonStudyView sections={lesson.sections} skillId={step.ref} stepKey={step.key} curriculum={profile.curriculum} grade={profile.grade} subjects={profile.subjects} />
+            <LessonLevels
+              skillId={step.ref} foundation={lesson} mastery={mastery} stepKey={step.key}
+              curriculum={onCourseVersion ? null : profile.curriculum} grade={profile.grade} subjects={profile.subjects} chaptersDone={profile.chaptersDone}
+            />
             {concepts.length > 0 && (step.status === "done" ? (
               <section aria-labelledby="concepts" className="flex flex-col gap-4">
                 <h2 id="concepts" className="text-xl font-semibold">Concepts in this skill</h2>

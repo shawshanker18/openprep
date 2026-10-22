@@ -35,25 +35,25 @@ it("a student in class 11 is assumed to have finished every class 9 and 10 chapt
   expect(covered.has("m-psda-prob")).toBe(true); // Class 10 Probability, assumed with nothing ticked
 });
 
-it("only Class 11 is asked, for its six course chapters; other classes store no chapters", () => {
-  expect(askedChapters(11).map((c) => c.id).sort()).toEqual([
+it("the course chapters are asked of every CBSE maths student, whatever their class; ticks come from the profile", () => {
+  expect(askedChapters().map((c) => c.id).sort()).toEqual([
     "cbse-11-conic-sections", "cbse-11-linear-inequalities", "cbse-11-relations-functions",
     "cbse-11-statistics", "cbse-11-straight-lines", "cbse-11-trigonometric-functions",
   ]);
-  expect(askedChapters(9)).toEqual([]);
-  expect(askedChapters(10)).toEqual([]);
-  expect(askedChapters(12)).toEqual([]);
-  // Class 11 keeps the Class 9 and 10 assumption, but only course chapters can be ticked.
+  expect(askedChapters().every((c) => c.grade === 11)).toBe(true);
+  // Only course chapters can be ticked; the below-class assumption comes from the profile grade.
   const saved = savedChapters(["cbse-11-statistics", "cbse-11-sets"], 11, "cbse", ["Mathematics"]);
   expect(saved).toContain("cbse-11-statistics");
   expect(saved).toContain("cbse-10-polynomials");
   expect(saved).not.toContain("cbse-11-sets");
-  expect(savedChapters(["cbse-10-polynomials"], 10, "cbse", ["Mathematics"])).toEqual([]);
+  expect(savedChapters(["cbse-11-statistics"], 12, "cbse", ["Mathematics"])).toContain("cbse-11-statistics");
+  // A non-course tick is ignored, but the below-class assumption still applies.
+  expect(savedChapters(["cbse-10-polynomials"], 10, "cbse", ["Mathematics"])).toEqual(chaptersBelowGrade(10));
   expect(savedChapters(["cbse-11-statistics"], 11, "icse", ["Mathematics"])).toEqual([]);
-  // Chapters are asked only when Mathematics is studied.
-  expect(asksChapters("cbse", 11, ["Physics"])).toBe(false);
+  // Chapters are asked only when Mathematics is studied, never based on the class.
+  expect(asksChapters("cbse", ["Physics"])).toBe(false);
   expect(savedChapters(["cbse-11-statistics"], 11, "cbse", ["Physics"])).toEqual([]);
-  expect(asksChapters("cbse", 11, ["Mathematics", "Physics"])).toBe(true);
+  expect(asksChapters("cbse", ["Mathematics", "Physics"])).toBe(true);
 });
 
 it("CBSE classes 9 and 10 are not asked which subjects they study", () => {

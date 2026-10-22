@@ -97,11 +97,11 @@ export function SurveyForm() {
         </label>
       </div>
 
-      {asksChapters(curriculum, Number(grade), subjects) && (
+      {asksChapters(curriculum, subjects) && (
         <fieldset className="flex flex-col gap-2 text-sm">
           <legend className="mb-1">Class 11 maths chapters you have finished</legend>
           <p className="mb-2 text-muted-foreground">Tick any of these you have done at school. We use it to mark SAT topics you probably know, and nothing is ever hidden from you.</p>
-          <CbseChapterPicker key={grade} grade={11} onChange={setChapters} />
+          <CbseChapterPicker onChange={setChapters} />
         </fieldset>
       )}
 
