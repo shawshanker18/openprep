@@ -2,6 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 import { Markdown } from "@/components/markdown";
+import { CBSE_SKILL_COVERAGE } from "@/content/cbse-skill-coverage";
 import { likelyCoveredSkills } from "@/lib/curriculum-coverage";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
@@ -84,9 +85,10 @@ function WorkedExample({ label, md }: { label: string; md: string }) {
 export function LessonStudyView({ sections, skillId, stepKey, curriculum, grade, subjects, chaptersDone = [] }: {
   sections: Section[]; skillId: string; stepKey?: string; curriculum: string | null; grade: number | null; subjects: string[]; chaptersDone?: string[];
 }) {
-  const eligible = curriculum === "cbse";
+  const cov = CBSE_SKILL_COVERAGE[skillId];
+  const eligible = curriculum === "cbse" && !!cov;
   const [revision, setRevision] = useState(false);
-  const covered = likelyCoveredSkills({ curriculum, grade, subjects, topicsStudied: [], chaptersDone }).has(skillId);
+  const covered = eligible && likelyCoveredSkills({ curriculum, grade, subjects, topicsStudied: [], chaptersDone }).has(skillId);
   const basics = sections.filter(s => /^(What this skill|Learn the idea|Formulas|Worked example 1)/i.test(s.heading));
   const sat = sections.filter(s => !basics.includes(s));
   // Formulas stay in plain text, each `###` concept under them opens on click, and each worked example opens on click.
@@ -117,9 +119,19 @@ export function LessonStudyView({ sections, skillId, stepKey, curriculum, grade,
   });
   return <div className="flex min-w-0 flex-col gap-6">
     {eligible && <div className="flex flex-col gap-3 rounded-xl border p-4">
-      <label className="flex items-center gap-2 text-sm"><input type="checkbox" role="switch" checked={revision} onChange={e=>setRevision(e.target.checked)}/>CBSE revision view</label>
-      {revision && <p className="text-sm text-muted-foreground">{covered ? "This topic is likely covered in your school syllabus, from the chapters you marked as done. Review the fundamentals, then focus on the SAT examples and common traps." : "School coverage varies. Start with the fundamentals here, then work through the SAT examples."} All lesson content remains available.</p>}
+      {cov.school === "none" ? (
+        <p className="text-sm text-muted-foreground">CBSE doesn&apos;t teach this topic, so nothing here is school revision. Learn it in full: the SAT asks it directly, and the lesson below covers it from the ground up.</p>
+      ) : (<>
+        <label className="flex items-center gap-2 text-sm"><input type="checkbox" role="switch" checked={revision} onChange={e=>setRevision(e.target.checked)}/>CBSE revision view</label>
+        {revision && <p className="text-sm text-muted-foreground">{
+          covered
+            ? `Your school chapters cover: ${cov.schoolSummary} Focus on the SAT additions: ${cov.satAdds.slice(0, 3).join(", ")}.`
+            : cov.school === "partial"
+              ? `School covers only part of this: ${cov.schoolSummary} You haven't marked the chapters that teach it, so start with the fundamentals.`
+              : "School coverage varies. Start with the fundamentals here, then work through the SAT examples."
+        } All lesson content remains available.</p>}
+      </>)}
     </div>}
-    {revision ? <><section className="flex flex-col gap-3"><h2 className="text-xl font-semibold">School revision</h2><p className="text-sm text-muted-foreground">Review the key ideas and formulas before trying the examples.</p><details className="rounded-xl border p-4"><summary className="cursor-pointer font-medium">Review fundamentals</summary><div className="mt-4 flex flex-col gap-6">{render(basics)}</div></details></section><section className="flex flex-col gap-6"><h2 className="text-xl font-semibold">SAT application</h2>{render(sat)}</section></> : render(sections)}
+    {revision && cov?.school !== "none" ? <><section className="flex flex-col gap-3"><h2 className="text-xl font-semibold">School revision</h2><p className="text-sm text-muted-foreground">Review the key ideas and formulas before trying the examples.</p><details className="rounded-xl border p-4"><summary className="cursor-pointer font-medium">Review fundamentals</summary><div className="mt-4 flex flex-col gap-6">{render(basics)}</div></details></section><section className="flex flex-col gap-6"><h2 className="text-xl font-semibold">SAT application</h2>{render(sat)}</section></> : render(sections)}
   </div>;
 }

@@ -1,6 +1,7 @@
 import { expect, it } from "vitest";
 import { CBSE_CHAPTERS, asksChapters, asksSubjects, askedChapters, chaptersBelowGrade, completedChapters, savedChapters, skillsFromChapters } from "@/content/cbse-chapters";
-import { SKILL_BY_ID } from "@/content/taxonomy";
+import { CBSE_SKILL_COVERAGE } from "@/content/cbse-skill-coverage";
+import { SKILLS, SKILL_BY_ID } from "@/content/taxonomy";
 import { likelyCoveredSkills } from "./curriculum-coverage";
 
 it("every chapter id is unique and every mapped skill exists", () => {
@@ -62,3 +63,34 @@ it("CBSE classes 9 and 10 are not asked which subjects they study", () => {
   expect(asksSubjects("cbse", 11)).toBe(true);
   expect(asksSubjects("icse", 9)).toBe(true);
 });
+
+it("every SAT math skill has one crosswalk coverage entry, and no other skill does", () => {
+  const math = SKILLS.filter((s) => s.section === "math").map((s) => s.id);
+  expect(Object.keys(CBSE_SKILL_COVERAGE).sort()).toEqual(math.sort());
+  for (const entry of Object.values(CBSE_SKILL_COVERAGE)) {
+    expect(["none", "partial", "direct"]).toContain(entry.school);
+    expect(entry.satAdds.length).toBeGreaterThan(0);
+    expect(entry.school === "none" ? "" : entry.schoolSummary).toBe(entry.schoolSummary); // none has no summary, others have one
+  }
+});
+
+it("skills the crosswalk says CBSE never teaches are never 'covered in school', whatever was ticked", () => {
+  const never = ["m-psda-inference", "m-psda-claims", "m-psda-percent", "m-psda-twovar"];
+  // A Class 12 CBSE student who ticked the statistics topic: the below-grade assumption plus their own tick still
+  // cannot claim the crosswalk's "dedicated lessons needed" skills.
+  const p = { curriculum: "cbse", grade: 12, subjects: ["Mathematics"], topicsStudied: ["stats"], chaptersDone: [] };
+  for (const id of never) expect(likelyCoveredSkills(p).has(id), id).toBe(false);
+  // The chapters assumption still covers what school genuinely teaches.
+  expect(likelyCoveredSkills({ ...p, topicsStudied: [] }).has("m-geo-trig")).toBe(true); // Class 11 chapter, assumed at grade 12
+  expect(likelyCoveredSkills({ ...p, topicsStudied: [] }).has("m-psda-onevar")).toBe(true); // Class 11 Statistics, direct overlap
+  // Every skill the coverage map claims as chapter-taught is reachable from real chapters; embedded skills like
+  // m-psda-ratios (taught inside geometry and mensuration, never as a chapter) are correctly unmapped.
+  for (const entry of Object.values(CBSE_SKILL_COVERAGE)) {
+    if (entry.school === "none") continue;
+    const mapped = CBSE_CHAPTERS.some((c) => c.skills.includes(entry.skillId));
+    if (mapped) expect(skillsFromChapters(CBSE_CHAPTERS.filter((c) => c.skills.includes(entry.skillId)).map((c) => c.id)).has(entry.skillId), entry.skillId).toBe(true);
+    else expect(entry.school, entry.skillId).toBe("partial");
+  }
+  expect(SKILL_BY_ID["m-psda-inference"]).toBeDefined();
+});
+
