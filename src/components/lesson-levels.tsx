@@ -7,7 +7,9 @@ type Section = { heading: string; md: string };
 type Level = { minutes: number | null; sections: Section[] };
 
 /** Foundation and Mastery for one skill. Mastery is shown only when it has been written. */
-export function LessonLevels({ skillId, foundation, mastery }: { skillId: string; foundation: Level; mastery: Level | null }) {
+export function LessonLevels({ skillId, foundation, mastery, stepKey, curriculum = null, grade = null, subjects = [], chaptersDone = [] }: {
+  skillId: string; foundation: Level; mastery: Level | null; stepKey?: string; curriculum?: string | null; grade?: number | null; subjects?: string[]; chaptersDone?: string[];
+}) {
   const [level, setLevel] = useState<"foundation" | "mastery">("foundation");
   const current = level === "mastery" && mastery ? mastery : foundation;
   return (
@@ -23,7 +25,7 @@ export function LessonLevels({ skillId, foundation, mastery }: { skillId: string
         </div>
       )}
       {current.minutes && <p className="text-sm text-muted-foreground">About {current.minutes} minutes · {level === "mastery" && mastery ? "Mastery" : "Foundation"}</p>}
-      <LessonStudyView sections={current.sections} skillId={skillId} curriculum={null} grade={null} subjects={[]} />
+      <LessonStudyView sections={current.sections} skillId={skillId} stepKey={stepKey} curriculum={curriculum} grade={grade} subjects={subjects} chaptersDone={chaptersDone} />
     </div>
   );
 }

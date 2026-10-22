@@ -89,28 +89,28 @@ export const chaptersBelowGrade = (grade: number | null | undefined): string[] =
 export const completedChapters = (ticked: readonly string[], grade: number | null | undefined): string[] =>
   [...new Set([...chaptersBelowGrade(grade), ...ticked])];
 
-/** The Class 11 chapters that have a course of their own. Only Class 11 students are asked about chapters. */
+/** The Class 11 chapters that have a course of their own. These are the ones every CBSE student is asked about. */
 export const COURSE_CHAPTER_IDS: readonly string[] = [
   "cbse-11-relations-functions", "cbse-11-trigonometric-functions", "cbse-11-straight-lines",
   "cbse-11-linear-inequalities", "cbse-11-conic-sections", "cbse-11-statistics",
 ];
 
-/** The chapters the student is asked about: Class 11 only, and only the course chapters. Other classes are not asked. */
-export const askedChapters = (grade: number | null | undefined): CbseChapter[] =>
-  grade === 11 ? CBSE_CHAPTERS.filter((ch) => COURSE_CHAPTER_IDS.includes(ch.id)) : [];
+/** The chapters the student is asked about: the course chapters, whatever their class. */
+export const askedChapters = (): CbseChapter[] => CBSE_CHAPTERS.filter((ch) => COURSE_CHAPTER_IDS.includes(ch.id));
 
 /**
- * What is stored for a student's chapters. Only CBSE Class 11 keeps chapter ticks (course chapters only, plus the
- * assumption that Classes 9 and 10 are done). Every other class stores none, so they get the default courses.
+ * What is stored for a student's chapters. Only CBSE maths students keep chapter ticks (course chapters only, plus the
+ * assumption that Classes below their own are done, taken from the profile grade). Every other curriculum stores none,
+ * so they get the default courses.
  */
 export const savedChapters = (ticked: readonly string[], grade: number | null | undefined, curriculum: string | null | undefined, subjects: readonly string[]): string[] => {
-  if (!asksChapters(curriculum, grade, subjects)) return [];
+  if (!asksChapters(curriculum, subjects)) return [];
   return completedChapters(ticked.filter((id) => COURSE_CHAPTER_IDS.includes(id)), grade);
 };
 
-/** Chapters are asked only of CBSE Class 11 students who study Mathematics. */
-export const asksChapters = (curriculum: string | null | undefined, grade: number | null | undefined, subjects: readonly string[]): boolean =>
-  curriculum === "cbse" && grade === 11 && subjects.includes("Mathematics");
+/** Chapters are asked of CBSE students who study Mathematics, whatever their class: coverage comes from what they ticked. */
+export const asksChapters = (curriculum: string | null | undefined, subjects: readonly string[]): boolean =>
+  curriculum === "cbse" && subjects.includes("Mathematics");
 
 /** CBSE Classes 9 and 10 are not asked which subjects they study. Everyone else is. */
 export const asksSubjects = (curriculum: string | null | undefined, grade: number | null | undefined): boolean =>

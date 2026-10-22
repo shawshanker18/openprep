@@ -98,10 +98,10 @@ export default async function SettingsPage({ searchParams }: PageProps<"/setting
             ))}
           </div>
         </fieldset>
-        {asksChapters(profile.curriculum, profile.grade, profile.subjects) && (
+        {asksChapters(profile.curriculum, profile.subjects) && (
           <fieldset className="flex flex-col gap-2 text-sm">
             <legend className="mb-2">Class 11 maths chapters you&apos;ve finished</legend>
-            <CbseChapterPicker defaultChecked={profile.chaptersDone} grade={profile.grade ?? undefined} />
+            <CbseChapterPicker defaultChecked={profile.chaptersDone} />
             <label className="mt-2 flex min-h-9 items-center gap-2 border-t pt-2">
               <input type="hidden" name="cbseReviewShown" value="1" />
               <input type="checkbox" name="cbseReview" defaultChecked={profile.cbseReview} /> CBSE-specific review for those chapters
