@@ -46,7 +46,7 @@ const nextConfig: NextConfig = {
       { source: "/course/:path*", destination: "/start", permanent: false },
     ];
   },
-  // Security headers (spec 05, section 5).
+  // Security headers (spec 05, section 5)
   async headers() {
     return [{
       source: "/sw.js",
