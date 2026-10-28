@@ -13,9 +13,9 @@ export default async function Preview({ searchParams }: { searchParams: Promise<
   const current = sp.current === "plus" ? "plus" : sp.current === "pro" ? "pro" : "free";
   const now = new Date();
   const options: BuyOption[] = [
+    ...upcomingSatDates(now.toISOString().slice(0, 10)).slice(0, 2).map((date) => ({ billing: `until_test:${date}`, label: `${new Date(`${date}T00:00:00Z`).toLocaleDateString("en-US", { month: "long", timeZone: "UTC" })} SAT · ${date}`, note: `Access through the day after the ${date} SAT.` })),
     { billing: "monthly", label: "Monthly", note: "30 days of access. One payment, no automatic renewal." },
     { billing: "quarterly", label: "Quarterly", note: "90 days of access. Save compared with buying three monthly passes." },
-    ...upcomingSatDates(now.toISOString().slice(0, 10)).slice(0, 2).map((date, i) => ({ billing: `until_test:${date}`, label: `${i ? "Following SAT" : "Next SAT"} · ${date}`, note: `Access through the day after the ${date} SAT.` })),
   ].map((c) => {
     const [billing, exam] = c.billing.split(":");
     const get = (tier: "plus" | "pro") => quote(tier, billing as Billing, exam, now)!;

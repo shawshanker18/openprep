@@ -17,14 +17,18 @@ export default async function Pricing() {
   const blocks = await getMembership(userId, now);
   const current = tierAt(blocks, now);
   const active = blocks.find((b) => b.tier === current && b.startsAt <= now && now < b.endsAt);
+  const sats = upcomingSatDates(now.toISOString().slice(0, 10)).slice(0, 2).map((date) => {
+    const when = new Date(`${date}T00:00:00Z`);
+    return {
+      billing: `until_test:${date}`,
+      label: `${when.toLocaleDateString("en-US", { month: "long", timeZone: "UTC" })} SAT · ${niceDate(when)}`,
+      note: `Access through the day after the ${niceDate(when)} SAT. One payment.`,
+    };
+  });
   const choices = [
+    ...sats,
     { billing: "monthly", label: "Monthly", note: "30 days of access. One payment, no automatic renewal." },
     { billing: "quarterly", label: "Quarterly", note: "90 days of access. Save compared with buying three monthly passes." },
-    ...upcomingSatDates(now.toISOString().slice(0, 10)).slice(0, 2).map((date, i) => ({
-      billing: `until_test:${date}`,
-      label: `${i === 0 ? "Next SAT" : "Following SAT"} · ${niceDate(new Date(`${date}T00:00:00Z`))}`,
-      note: `Access through the day after the ${niceDate(new Date(`${date}T00:00:00Z`))} SAT. One payment.`,
-    })),
   ];
   const options: BuyOption[] = choices.map((c) => {
     const [billing, exam] = c.billing.split(":");
