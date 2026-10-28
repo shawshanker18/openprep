@@ -224,17 +224,30 @@ export function FloatingDesmos({ sessionKey, open, onClose }: { sessionKey: stri
   const [mode, setMode] = useState<"normal" | "max" | "min">("normal");
   const box = useRef<HTMLDivElement>(null);
   const drag = useRef<{ dx: number; dy: number } | null>(null);
+  const sizing = useRef<{ dir: string; sx: number; sy: number; start: Win } | null>(null);
   const remember = (v: Win) => { try { localStorage.setItem(winKey, JSON.stringify(v)); } catch { /* storage unavailable */ } };
-  // The browser's own corner handle resizes the box; read the new size back when the pointer is released.
-  const settle = () => {
-    if (mode !== "normal") return;
-    const r = box.current?.getBoundingClientRect();
-    if (r) setWin((w) => { const next = clampWin({ ...w, w: r.width, h: r.height }); remember(next); return next; });
+  /** Edge and corner handles: each pointer move recomputes the box from where the drag began. */
+  const resizeMove = (e: React.PointerEvent) => {
+    const r = sizing.current; if (!r) return;
+    const dx = e.clientX - r.sx, dy = e.clientY - r.sy, { start: o, dir } = r;
+    const minW = 260, minH = 200;
+    let { x, y, w, h } = o;
+    if (dir.includes("e")) w = Math.max(minW, Math.min(o.w + dx, window.innerWidth - o.x));
+    if (dir.includes("s")) h = Math.max(minH, Math.min(o.h + dy, window.innerHeight - o.y));
+    if (dir.includes("w")) { w = Math.max(minW, Math.min(o.w - dx, o.x + o.w)); x = o.x + o.w - w; }
+    if (dir.includes("n")) { h = Math.max(minH, Math.min(o.h - dy, o.y + o.h)); y = o.y + o.h - h; }
+    setWin({ x, y, w, h });
   };
+  const HANDLES: [string, string][] = [
+    ["n", "inset-x-2 top-0 h-2 cursor-ns-resize"], ["s", "inset-x-2 bottom-0 h-2 cursor-ns-resize"],
+    ["w", "inset-y-2 left-0 w-2 cursor-ew-resize"], ["e", "inset-y-2 right-0 w-2 cursor-ew-resize"],
+    ["nw", "left-0 top-0 size-4 cursor-nwse-resize"], ["ne", "right-0 top-0 size-4 cursor-nesw-resize"],
+    ["sw", "bottom-0 left-0 size-4 cursor-nesw-resize"], ["se", "bottom-0 right-0 size-5 cursor-nwse-resize"],
+  ];
   return (
-    <div ref={box} onPointerUp={settle} aria-hidden={!open}
-      style={mode === "max" ? { left: 16, top: 16, width: "calc(100vw - 32px)", height: "calc(100dvh - 32px)" } : mode === "min" ? { left: win.x, top: win.y, width: win.w } : { left: win.x, top: win.y, width: win.w, height: win.h, resize: "both" }}
-      className={`fixed z-50 flex min-w-[260px] max-w-[100vw] flex-col overflow-hidden rounded-lg border bg-white shadow-2xl ${mode === "normal" ? "min-h-[260px] max-h-[95dvh]" : ""} ${mode === "max" ? "max-h-none" : ""} ${open ? "" : "pointer-events-none invisible"}`}>
+    <div ref={box} aria-hidden={!open}
+      style={mode === "max" ? { left: 16, top: 16, width: "calc(100vw - 32px)", height: "calc(100dvh - 32px)" } : mode === "min" ? { left: win.x, top: win.y, width: win.w } : { left: win.x, top: win.y, width: win.w, height: win.h }}
+      className={`fixed z-50 flex min-w-[260px] max-w-[100vw] flex-col overflow-hidden rounded-lg border bg-white shadow-2xl ${open ? "" : "pointer-events-none invisible"}`}>
       <div className={`flex shrink-0 select-none items-center justify-between gap-2 bg-neutral-900 px-3 py-2 text-sm text-white ${mode === "max" ? "" : "cursor-grab touch-none active:cursor-grabbing"}`}
         onPointerDown={(e) => { if (mode === "max" || (e.target as HTMLElement).closest("button")) return; e.currentTarget.setPointerCapture(e.pointerId); drag.current = { dx: e.clientX - win.x, dy: e.clientY - win.y }; }}
         onPointerMove={(e) => { const d = drag.current; if (d) setWin((w) => clampWin({ ...w, x: e.clientX - d.dx, y: e.clientY - d.dy })); }}
@@ -246,6 +259,14 @@ export function FloatingDesmos({ sessionKey, open, onClose }: { sessionKey: stri
           <button type="button" onClick={onClose} className="min-h-8 rounded-md px-3 hover:bg-white/10">Close</button>
         </div>
       </div>
+      {mode === "normal" && HANDLES.map(([dir, cls]) => (
+        <div key={dir} aria-hidden className={`absolute z-30 touch-none ${cls}`}
+          onPointerDown={(e) => { e.preventDefault(); e.currentTarget.setPointerCapture(e.pointerId); sizing.current = { dir, sx: e.clientX, sy: e.clientY, start: win }; }}
+          onPointerMove={resizeMove}
+          onPointerUp={() => { if (sizing.current) { sizing.current = null; setWin((w) => { remember(w); return w; }); } }}>
+          {dir === "se" && <svg viewBox="0 0 20 20" className="absolute bottom-0.5 right-0.5 size-4 text-neutral-400"><path d="M18 8 8 18M18 13l-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" fill="none" /></svg>}
+        </div>
+      ))}
       <div hidden={mode === "min"} className="flex min-h-0 flex-1 flex-col">
         <DesmosCalculator stateKey={`${sessionKey}:graph`} className="min-h-0 flex-1 border-0" />
       </div>
