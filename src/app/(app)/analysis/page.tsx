@@ -204,7 +204,7 @@ function AnalysisBody({ buckets, days, total }: {
 
       <section aria-labelledby="difficulty" className="flex flex-col gap-6">
         <h2 id="difficulty" className="font-medium">By SAT difficulty</h2>
-        <p className="text-xs text-muted-foreground">Each ring is split into Easy (green), Medium (yellow) and Hard (red). Unanswered attempts are not counted, and a time is only used when it is between 1 second and 10 minutes.</p>
+        <p className="text-xs text-muted-foreground">Each ring is split into Easy (lightest), Medium and Hard (darkest). Unanswered attempts are not counted, and a time is only used when it is between 1 second and 10 minutes.</p>
         {subjectRings.map((subj) => (
           <div key={subj.key} className="flex flex-col gap-3">
             <h3 className="text-sm font-medium text-muted-foreground">{subj.label}</h3>

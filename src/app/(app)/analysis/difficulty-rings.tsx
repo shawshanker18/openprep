@@ -18,11 +18,11 @@ const C = 2 * Math.PI * RADIUS;
  * segments end up about 4 units apart, a small gap between colours with both ends rounded.
  */
 const TRIM = 9;
-/** Easy is green, Medium yellow, Hard red, in every chart. */
+/** Easy is the lightest tone, Medium the middle one, Hard the darkest, in every chart. Built from the text colour so they follow the chosen theme. */
 const TONE: Record<Segment["label"], { stroke: string; swatch: string }> = {
-  Easy: { stroke: "stroke-green-600", swatch: "bg-green-600" },
-  Medium: { stroke: "stroke-yellow-500", swatch: "bg-yellow-500" },
-  Hard: { stroke: "stroke-red-600", swatch: "bg-red-600" },
+  Easy: { stroke: "stroke-foreground/30", swatch: "bg-foreground/30" },
+  Medium: { stroke: "stroke-foreground/60", swatch: "bg-foreground/60" },
+  Hard: { stroke: "stroke-foreground", swatch: "bg-foreground" },
 };
 
 export function DifficultyRing({ title, segments, centerValue, centerLabel }: {
