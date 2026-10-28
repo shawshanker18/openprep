@@ -104,15 +104,15 @@ export function QuestionView({ question: q, value, onChange, disabled, correct, 
                     "flex min-h-12 [@media(max-height:34rem)]:min-h-10 min-w-0 flex-1 items-center gap-3 rounded-lg border-2 bg-background px-3 py-2 text-left transition-colors",
                     !disabled && "hover:border-foreground/50",
                     chosen && "border-foreground bg-muted",
-                    isRight && "border-emerald-600 bg-emerald-50 dark:bg-emerald-950/40",
-                    isWrong && "border-red-600 bg-red-50 dark:bg-red-950/40",
+                    isRight && "border-foreground bg-muted",
+                    isWrong && "border-dashed border-foreground/60 bg-muted/50",
                     crossed && !chosen && "opacity-60",
                   )}>
                   <span className={cn("flex shrink-0 items-center justify-center rounded-full border-2 border-current font-semibold", large ? "size-9 text-base" : "size-7 text-sm",
                     chosen && "bg-foreground text-background")}>{c.id}</span>
                   <Markdown className={cn("min-w-0 flex-1", text, crossed && "line-through decoration-2")}>{c.md}</Markdown>
-                  {isRight && <Check className="size-5 shrink-0 text-emerald-700" aria-label="Correct answer" />}
-                  {isWrong && <X className="size-5 shrink-0 text-red-700" aria-label="Your answer" />}
+                  {isRight && <Check className="size-5 shrink-0 text-foreground" aria-label="Correct answer" />}
+                  {isWrong && <X className="size-5 shrink-0 text-foreground" aria-label="Your answer" />}
                 </button>
                 {canEliminate && showElim && (
                   <button type="button" aria-pressed={crossed} aria-label={`${crossed ? "Restore" : "Cross out"} choice ${c.id}`}

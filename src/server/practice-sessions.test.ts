@@ -201,3 +201,28 @@ it("a new session is never longer than 50 questions, even if the caller asks for
   const [row] = await database.select().from(schema.practiceSessions).where(eq(schema.practiceSessions.id, adaptive));
   expect((row!.config as { count: number }).count).toBe(50);
 });
+
+it("gets the next question ready only after three seconds on the current one, and never moves the cursor",async()=>{
+ const set=await S.createPracticeSession(user,{mode:"set",skillIds:[skill.id],count:5},"Prefetch");
+ const first=await S.loadPracticeSession(user,profile,set);
+ if(first.done) throw Error("missing question");
+ const count=async()=>(await database.select().from(schema.practiceSessionItems).where(eq(schema.practiceSessionItems.sessionId,set))).length;
+ await S.prefetchNextPractice(user,profile,set);
+ expect(await count()).toBe(1); // called at once: nothing is prepared
+ await database.update(schema.practiceSessionItems).set({servedAt:new Date(Date.now()-4000)}).where(eq(schema.practiceSessionItems.sessionId,set));
+ await S.prefetchNextPractice(user,profile,set);
+ await S.prefetchNextPractice(user,profile,set);
+ expect(await count()).toBe(2); // once, however often it is called
+ expect((await S.getPracticeSession(user,set))!.cursor).toBe(0);
+ const next=await S.loadPracticeSession(user,profile,set,{kind:"next",position:0});
+ expect(next).toMatchObject({done:false,position:1});
+});
+
+it("records no more answer time than the server saw pass since it delivered the question",async()=>{
+ const set=await S.createPracticeSession(user,{mode:"set",skillIds:[skill.id],count:5},"Timing");
+ const first=await S.loadPracticeSession(user,profile,set);
+ if(first.done) throw Error("missing question");
+ await S.answerPracticeSession(user,set,0,{response:"A",timeMs:3_600_000,confidence:null});
+ const [row]=await database.select({t:schema.attempts.timeMs}).from(schema.practiceSessionItems).innerJoin(schema.attempts,eq(schema.attempts.id,schema.practiceSessionItems.attemptId)).where(eq(schema.practiceSessionItems.sessionId,set));
+ expect(row!.t).toBeLessThan(60_000); // claimed an hour; the server had delivered it moments ago
+});

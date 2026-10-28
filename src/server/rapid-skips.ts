@@ -41,7 +41,7 @@ export async function checkRapidSkips(userId: string, questionId: string, now = 
     if((robotic>=12 && now-continuousStart>=5*60_000) ||
        (cycles>=50 && robotic>=5 && now-continuousStart>=10*60_000))
       blocked=now+48*3600_000;
-    cooldown = count>=20 ? now+8000 : 0;
+    cooldown = count>=20 ? now+3000 : 0;
     await tx.update(deliveryWindows).set({times:[now,count,cooldown,blocked,start,violations,fingerprint,burstStart,robotic,continuousStart,cycles],expiresAt:new Date(now+48*3600_000)}).where(eq(deliveryWindows.id,id));
     return blocked>now ? "Rapid automated requests detected. New practice questions are paused for your account for 48 hours." : null;
   });

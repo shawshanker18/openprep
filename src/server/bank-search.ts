@@ -5,6 +5,11 @@ import { and, count, eq, ilike, inArray, or, sql, type SQL } from "drizzle-orm";
 import { db } from "@/db";
 import { attempts, bookmarks, questions } from "@/db/schema";
 import { SKILLS, type DomainId, type Section } from "@/content/taxonomy";
+import { deliveryContext } from "./delivery-context";
+import { eventQuota, exposeQuestions, lockDelivery } from "./delivery";
+import { DeliveryBlocked } from "./delivery-policy";
+import { availableQuestion } from "./question-availability";
+import { publicId } from "./questions";
 import { likeEscape, previewText, type BankFilters } from "@/lib/bank-filters";
 
 export * from "@/lib/bank-filters";
@@ -65,4 +70,22 @@ export async function searchBank(userId: string, f: BankFilters, client: Pick<ty
     attempted: !!r.attempted, missed: !!r.missed, saved: !!r.saved,
   }));
   return { total, pages: Math.max(1, Math.ceil(total / PER_PAGE)), rows: out };
+}
+
+/**
+ * "Practice" in the question bank: picks up to `count` questions matching the filters that this student can open now,
+ * marks them as delivered to this account (so their hashed ids resolve), and returns those ids in order.
+ * Questions in the student's other open sessions or tests are skipped here instead of failing later.
+ */
+export async function pickBankQuestions(userId: string, f: BankFilters) {
+  const context = await deliveryContext();
+  await eventQuota(userId, context, "set");
+  return db.transaction(async (tx) => {
+    await lockDelivery(tx, userId, context);
+    const rows = await tx.select({ id: questions.id, skillId: questions.skillId }).from(questions)
+      .where(and(bankWhere(userId, f), availableQuestion(userId))).orderBy(sql`random()`).limit(f.count);
+    if (!rows.length) throw new DeliveryBlocked("No questions match these filters, or you already have them open in another session. Try broader filters.");
+    await exposeQuestions(tx, userId, rows, context);
+    return rows.map((r) => publicId(r.id, userId));
+  });
 }

@@ -8,7 +8,7 @@ beforeAll(async()=>{await pg.exec("create table delivery_windows(id text primary
 const a="00000000-0000-0000-0000-000000000001",b="00000000-0000-0000-0000-000000000002",t=1700000000000;
 it("allows twenty fast deliveries, then an eight-second account-only cooldown",async()=>{
  for(let n=0;n<20;n++)await checkRapidSkips(a,"q"+n,t+n*100);
- await expect(checkRapidSkips(a,"q20",t+2000)).rejects.toThrow(/8 seconds/);
+ await expect(checkRapidSkips(a,"q20",t+2000)).rejects.toThrow(/3 seconds/);
  await expect(checkRapidSkips(b,"q20",t+2000)).resolves.toBeUndefined();
  await expect(checkRapidSkips(a,"q20",t+9900)).resolves.toBeUndefined();
 });
@@ -30,12 +30,12 @@ it("allows human-speed countdown use but detects sustained machine-fast timed bu
  let h=t,r=t;
  for(let cycle=0;cycle<40;cycle++){
    for(let n=0;n<20;n++){await checkRapidSkips(human,"h"+cycle+"-"+n,h);h+=300;}
-   h+=7700;
+   h+=2700;
  }
  let detected=false;
- for(let cycle=0;cycle<60&&!detected;cycle++){
+ for(let cycle=0;cycle<120&&!detected;cycle++){
    for(let n=0;n<20;n++){try{await checkRapidSkips(robot,"r"+cycle+"-"+n,r);}catch(err){expect(String(err)).toMatch(/48 hours/);detected=true;break;}r+=50;}
-   r+=7950;
+   r+=2950;
  }
  expect(detected).toBe(true);
 },120000); // ~2,000 sequential PGlite queries: slower than the 30s default under parallel load

@@ -10,6 +10,9 @@ type DesmosApi = {
   setExpression(expression: { id: string; latex: string }): void;
   resize(): void;
   destroy(): void;
+  getState(): unknown;
+  setState(state: unknown): void;
+  observeEvent(event: string, callback: () => void): void;
 };
 declare global {
   interface Window {
@@ -46,7 +49,7 @@ function loadDesmos(): Promise<void> {
 }
 
 /** Desmos calculator with a hosted embed when the API key is unavailable. */
-export function DesmosCalculator({ expressions = EMPTY_EXPRESSIONS, className = "h-96" }: { expressions?: string[]; className?: string }) {
+export function DesmosCalculator({ expressions = EMPTY_EXPRESSIONS, className = "h-96", stateKey }: { expressions?: string[]; className?: string; stateKey?: string }) {
   const el = useRef<HTMLDivElement>(null);
   const viewport = useRef<HTMLDivElement>(null);
   const shell = useRef<HTMLDivElement>(null);
@@ -69,6 +72,15 @@ export function DesmosCalculator({ expressions = EMPTY_EXPRESSIONS, className = 
           calculator = window.Desmos.GraphingCalculator(target, { autosize: false, expressions: true, settingsMenu: false });
           (JSON.parse(expressionKey) as string[]).forEach((latex, index) =>
             calculator!.setExpression({ id: `lesson-${index}`, latex }));
+          // Graphs the student drew earlier in this session come back as they left them.
+          if (stateKey) {
+            try { const saved = localStorage.getItem(stateKey); if (saved) calculator.setState(JSON.parse(saved)); } catch { /* storage unavailable */ }
+            let timer = 0;
+            calculator.observeEvent("change", () => {
+              window.clearTimeout(timer);
+              timer = window.setTimeout(() => { try { localStorage.setItem(stateKey, JSON.stringify(calculator!.getState())); } catch { /* storage unavailable */ } }, 400);
+            });
+          }
         }
         calculator.resize();
         window.clearTimeout(timeout);
@@ -89,7 +101,7 @@ export function DesmosCalculator({ expressions = EMPTY_EXPRESSIONS, className = 
       calculator?.destroy();
       target.replaceChildren();
     };
-  }, [expressionKey]);
+  }, [expressionKey, stateKey]);
   useEffect(() => {
     sizing.current?.refresh();
     if (!fullscreen) return;
@@ -188,5 +200,55 @@ export function DesmosDock() {
         </div>
       )}
     </>
+  );
+}
+
+type Win = { x: number; y: number; w: number; h: number };
+const clampWin = (v: Win): Win => ({
+  w: v.w, h: v.h,
+  x: Math.min(Math.max(0, v.x), Math.max(0, window.innerWidth - 120)),
+  y: Math.min(Math.max(0, v.y), Math.max(0, window.innerHeight - 48)),
+});
+
+/**
+ * A calculator window the student can drag by its title bar and resize from its corner. It is created once for a
+ * practice session and only hidden when closed, so it is already loaded when opened, and its graphs and its place
+ * on screen are kept for the whole session instead of resetting with each question.
+ */
+export function FloatingDesmos({ sessionKey, open, onClose }: { sessionKey: string; open: boolean; onClose: () => void }) {
+  const winKey = `${sessionKey}:window`;
+  const [win, setWin] = useState<Win>(() => {
+    const fallback = { x: 16, y: Math.max(72, window.innerHeight - 460), w: Math.min(380, window.innerWidth - 32), h: 420 };
+    try { const saved = localStorage.getItem(winKey); return saved ? clampWin({ ...fallback, ...JSON.parse(saved) }) : fallback; } catch { return fallback; }
+  });
+  const box = useRef<HTMLDivElement>(null);
+  const drag = useRef<{ dx: number; dy: number } | null>(null);
+  const remember = (v: Win) => { try { localStorage.setItem(winKey, JSON.stringify(v)); } catch { /* storage unavailable */ } };
+  // The browser's own corner handle resizes the box; read the new size back when the pointer is released.
+  const settle = () => {
+    const r = box.current?.getBoundingClientRect();
+    if (r) setWin((w) => { const next = clampWin({ ...w, w: r.width, h: r.height }); remember(next); return next; });
+  };
+  return (
+    <div ref={box} onPointerUp={settle} aria-hidden={!open}
+      style={{ left: win.x, top: win.y, width: win.w, height: win.h, resize: "both" }}
+      className={`fixed z-50 flex min-h-[260px] min-w-[260px] max-h-[95dvh] max-w-[95vw] flex-col overflow-hidden rounded-lg border bg-white shadow-2xl ${open ? "" : "pointer-events-none invisible"}`}>
+      <div className="flex shrink-0 cursor-grab touch-none select-none items-center justify-between bg-neutral-900 px-3 py-2 text-sm text-white active:cursor-grabbing"
+        onPointerDown={(e) => { if ((e.target as HTMLElement).closest("button")) return; e.currentTarget.setPointerCapture(e.pointerId); drag.current = { dx: e.clientX - win.x, dy: e.clientY - win.y }; }}
+        onPointerMove={(e) => { const d = drag.current; if (d) setWin((w) => clampWin({ ...w, x: e.clientX - d.dx, y: e.clientY - d.dy })); }}
+        onPointerUp={() => { if (drag.current) { drag.current = null; setWin((w) => { remember(w); return w; }); } }}>
+        <span className="font-medium">Calculator · drag to move</span>
+        <button type="button" onClick={onClose} className="min-h-8 rounded-md px-3 hover:bg-white/10">Close</button>
+      </div>
+      <DesmosCalculator stateKey={`${sessionKey}:graph`} className="min-h-0 flex-1 border-0" />
+    </div>
+  );
+}
+
+/** Top-bar button that opens and closes the floating calculator. */
+export function CalculatorButton({ open, onToggle }: { open: boolean; onToggle: () => void }) {
+  return (
+    <button type="button" aria-expanded={open} onClick={onToggle}
+      className="flex min-h-9 items-center gap-1.5 rounded-md border px-3 text-sm hover:bg-muted"><Calculator className="size-4" />Calculator</button>
   );
 }

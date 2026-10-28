@@ -4,7 +4,7 @@ import { text } from "@/lib/text";
 import { requireUser } from "@/server/auth";
 import { limitPractice } from "@/server/ratelimit";
 import { DeliveryBlocked } from "@/server/delivery-policy";
-import { answerPracticeSession, loadPracticeSession, savePracticeDraft } from "@/server/practice-sessions";
+import { answerPracticeSession, loadPracticeSession, prefetchNextPractice, savePracticeDraft } from "@/server/practice-sessions";
 
 const reference = {sessionId:z.uuid(), position:z.number().int().min(0).max(99)};
 const Draft = z.strictObject({...reference,response:text().max(8).nullable(),timeMs:z.number().int().min(0).max(86400_000)});
@@ -37,4 +37,15 @@ export async function answerSavedPractice(input:z.input<typeof Answer>) {
   const limited=await limitPractice(userId,"answer",`${p.data.sessionId}:${p.data.position}`);
   if(limited) return {ok:false as const,error:limited};
   return result(()=>answerPracticeSession(userId,p.data.sessionId,p.data.position,p.data));
+}
+
+const Prefetch = z.strictObject({ sessionId: z.uuid() });
+/** Best effort: a failure here only means the next question loads the usual way. */
+export async function prefetchSavedPractice(input: z.input<typeof Prefetch>) {
+  const { userId, profile } = await requireUser();
+  const p = Prefetch.safeParse(input);
+  if (!p.success) return;
+  if (await limitPractice(userId, "request")) return;
+  try { await prefetchNextPractice(userId, profile, p.data.sessionId); }
+  catch (e) { if (!(e instanceof DeliveryBlocked)) console.warn("Prefetch failed", e instanceof Error ? e.message : e); }
 }

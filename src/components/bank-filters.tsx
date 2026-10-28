@@ -47,7 +47,8 @@ export function BankFilters({ subject, domains, skills, difficulties, status, sa
   };
 
   return (
-    <form action="/question-bank" method="get" className="flex flex-col gap-5 rounded-xl border p-5" aria-label="Filter questions">
+    <form action="/practice" method="get" className="flex flex-col gap-5 rounded-xl border p-5" aria-label="Filter questions">
+      <input type="hidden" name="mode" value="bank" />
       <div className="flex flex-col gap-2">
         <label htmlFor="bank-q" className="text-sm font-medium">Search</label>
         <input id="bank-q" name="q" type="search" defaultValue={q} maxLength={100} placeholder="Words in the question, or a skill name"
@@ -117,14 +118,14 @@ export function BankFilters({ subject, domains, skills, difficulties, status, sa
         </label>
       </div>
 
-      <label className="flex flex-col gap-2 text-sm font-medium sm:max-w-xs">Questions in a practice set
+      <label className="flex flex-col gap-2 text-sm font-medium sm:max-w-xs">Questions in a set
         <select name="count" defaultValue={String(count)} className="min-h-11 rounded-md border bg-background px-3 text-sm font-normal">
           {[10, 20, 30].map((n) => <option key={n} value={n}>{n}</option>)}
         </select>
       </label>
 
       <div className="flex flex-wrap gap-3">
-        <Button type="submit">Show questions</Button>
+        <Button type="submit">Practice</Button>
         <Button variant="outline" render={<Link href="/question-bank" />}>Clear all</Button>
       </div>
     </form>

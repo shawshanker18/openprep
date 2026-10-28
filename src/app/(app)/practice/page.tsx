@@ -12,6 +12,7 @@ import { z } from "zod";
 import { ACCEPTED_SET_SIZES, MAX_QUESTIONS_PER_SET } from "@/lib/question-limits";
 import { PracticeRunner } from "./practice-runner";
 import { PracticeSetup } from "@/components/practice-setup";
+import { parseBankFilters, pickBankQuestions } from "@/server/bank-search";
 import { getTier } from "@/server/subscription";
 
 export const metadata = { title: "Adaptive Practice" };
@@ -49,6 +50,12 @@ async function loadPage({ searchParams }: PageProps<"/practice">) {
 
   // Where to go when the set is finished: the course or the question bank (only these paths are accepted).
   const back = typeof sp.from === "string" && /^\/(start(\/[a-z0-9-]+)?|course(\/[a-z0-9-]+)?|question-bank(\?[\w=&%.,-]*)?|bookmarks(\?page=\d+)?|analysis)$/.test(sp.from) ? sp.from : undefined;
+
+  if (sp.mode === "bank") {
+    const ids = await pickBankQuestions(userId, parseBankFilters(sp));
+    const sessionId = await createPracticeSession(userId, { mode: "list", ids, count: ids.length }, "Question bank", "/question-bank");
+    redirect(`/practice?session=${sessionId}`);
+  }
 
   if (mode === "list") {
     const ids = list(sp.ids).filter((id) => /^[\w-]{22}$/.test(id)).slice(0, MAX_QUESTIONS_PER_SET);

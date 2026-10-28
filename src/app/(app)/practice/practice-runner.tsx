@@ -9,7 +9,7 @@ import { Bookmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Markdown } from "@/components/markdown";
 import { QuestionView } from "@/components/question-view";
-import { DesmosCalculator, DesmosDock } from "@/components/desmos-panel";
+import { CalculatorButton, DesmosCalculator, FloatingDesmos } from "@/components/desmos-panel";
 import { ExamFooter, ExamFrame, ExamTop } from "@/components/exam-frame";
 import { TutorPanel } from "@/components/tutor-panel";
 import { cn, isTyping } from "@/lib/utils";
@@ -20,7 +20,7 @@ import { RemixBadge, RemixBar } from "./remix-bar";
 import type { Tier } from "@/lib/tiers";
 import { readDraft, writeDraft } from "@/lib/answer-drafts";
 
-import { loadSavedPractice, saveSavedPractice, answerSavedPractice } from "./session-actions";
+import { loadSavedPractice, prefetchSavedPractice, saveSavedPractice, answerSavedPractice } from "./session-actions";
 
 type Mode = "skill" | "smart" | "review" | "set" | "list";
 type SetConfig = { count: number };
@@ -75,12 +75,30 @@ function Countdown({ limitS, elapsedS = 0 }: { limitS: number; elapsedS?:number 
     const id = setInterval(() => setLeft(limitS - elapsedS - (performance.now() - t0) / 1000), 1000);
     return () => clearInterval(id);
   }, [limitS,elapsedS]);
-  return <span className={cn("tabular-nums", left <= 0 && "text-red-700")}>{left > 0 ? clock(left) : `Time's up +${clock(-left)}`}</span>;
+  return <span className={cn("tabular-nums", left <= 0 && "font-semibold")}>{left > 0 ? clock(left) : `Time's up +${clock(-left)}`}</span>;
 }
 
-export function PracticeRunner({ sessionId, userId, mode, title, block, set, back, studentName, tier = "free" }: {
+type CalcControl = { open: boolean; toggle: () => void; enable: () => void };
+
+/**
+ * The calculator lives out here, above the question screens, because the runner swaps whole screens between questions
+ * (loading, question, summary). Inside one of them it would be destroyed and rebuilt, losing the student's graphs.
+ */
+export function PracticeRunner(props: Parameters<typeof PracticeRunnerBody>[0] extends infer P ? Omit<P & object, "calc"> : never) {
+  const [open, setOpen] = useState(false);
+  const [enabled, setEnabled] = useState(false);
+  const calc: CalcControl = { open, toggle: () => setOpen((o) => !o), enable: useCallback(() => setEnabled(true), []) };
+  return (
+    <>
+      <PracticeRunnerBody {...props} calc={calc} />
+      {enabled && <FloatingDesmos sessionKey={`openprep:desmos:${props.userId}:${props.sessionId}`} open={open} onClose={() => setOpen(false)} />}
+    </>
+  );
+}
+
+function PracticeRunnerBody({ sessionId, userId, mode, title, block, set, back, studentName, tier = "free", calc }: {
   sessionId: string; userId: string; mode: Mode; title: string; block?: { index: number; target: number } | null;
-  set?: SetConfig; back?: string; studentName?: string; tier?: Tier;
+  set?: SetConfig; back?: string; studentName?: string; tier?: Tier; calc: CalcControl;
 }) {
   // Choices crossed out, per question, kept for this visit.
   const [crossed, setCrossed] = useState<Record<string, string[]>>({});
@@ -89,6 +107,9 @@ export function PracticeRunner({ sessionId, userId, mode, title, block, set, bac
   // after the first tap on a choice, and when the answer is revealed. Only as far as needed, never while typing.
   const submitRef = useRef<HTMLDivElement>(null);
   const resultRef = useRef<HTMLDivElement>(null);
+  const mathNow = (s.phase === "answering" || s.phase === "revealed") && s.q.section === "math";
+  const enableCalc = calc.enable;
+  useEffect(() => { if (mathNow) enableCalc(); }, [mathNow, enableCalc]);
   const picked = s.phase === "answering" && s.value !== null && !!s.q.choices?.length;
   useEffect(() => { if (picked) submitRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" }); }, [picked]);
   useEffect(() => { if (s.phase === "revealed") resultRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" }); }, [s.phase]);
@@ -148,6 +169,13 @@ export function PracticeRunner({ sessionId, userId, mode, title, block, set, bac
     if(!(await save())) {toast.error("Save failed. Check your connection and try again.");return;}
     await load(kind,at);
   }),[save,load]);
+  // Three seconds after a question is up, get the next one ready in the background (fixed lists and sets only).
+  const shownQuestion = s.phase === "answering" || s.phase === "revealed" ? s.q.id : null;
+  useEffect(() => {
+    if (!shownQuestion || (mode !== "list" && mode !== "set")) return;
+    const timer = setTimeout(() => { void prefetchSavedPractice({ sessionId }).catch(() => {}); }, 3000);
+    return () => clearTimeout(timer);
+  }, [shownQuestion, mode, sessionId]);
   const next = useCallback(()=>navigate("next",position),[navigate,position]);
   useEffect(()=>{
     const leave=(event:BeforeUnloadEvent)=>{if(s.phase==="answering" && saveStatus!=="Saved to your account"){event.preventDefault();event.returnValue="";}};
@@ -267,7 +295,7 @@ export function PracticeRunner({ sessionId, userId, mode, title, block, set, bac
       top={<ExamTop title={title} subtitle={`${s.q.section === "rw" ? "Reading and Writing" : "Math"}${set ? ` · ${s.answered}/${set.count} answered` : ` · ${s.answered} answered`}${block && s.answered < block.target ? ` · ${block.target - s.answered} to finish this block` : ""}`}
         center={s.phase === "answering" && s.limitS ? <span className="text-xl font-semibold"><Countdown key={s.q.id} limitS={s.limitS} elapsedS={savedTimeMs / 1000} /></span> : undefined}
         tools={<>
-          {isMath && <DesmosDock />}
+          {isMath && <CalculatorButton open={calc.open} onToggle={calc.toggle} />}
           <Button variant="ghost" size="sm" aria-label="Bookmark" aria-pressed={bookmarked} onClick={bookmark}><Bookmark className={bookmarked ? "fill-current" : undefined} /></Button>
           <ReportQuestion questionId={s.q.id} />
           <span role="status" className="hidden whitespace-nowrap text-xs text-muted-foreground xl:block">{saveStatus}</span>
@@ -297,7 +325,7 @@ export function PracticeRunner({ sessionId, userId, mode, title, block, set, bac
           {r && (
             <div ref={resultRef} className="flex flex-col gap-4 rounded-lg border p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className={cn("font-semibold", r.correct ? "text-emerald-700 dark:text-emerald-400" : "text-red-700 dark:text-red-400")}>
+                <p className="font-semibold">
                   {r.correct ? "✓ Correct" : `✗ Not quite${"accepted" in r.revealed.answer ? `. The accepted answer is ${r.revealed.answer.accepted.join(" or ")}` : ""}`}
                 </p>
                 <span className="rounded-full bg-muted px-2 py-0.5 text-xs tabular-nums">{r.skillName}: {r.masteryBefore}% → {r.masteryAfter}%</span>

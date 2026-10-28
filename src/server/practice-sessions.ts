@@ -156,11 +156,51 @@ export async function answerPracticeSession(userId: string, id: string, position
       if(a?.response!==input.response) throw new DeliveryBlocked("This question has already been answered.");
       return; // Client reloads the authoritative saved result.
     }
-    const result = await submitAnswer(userId,{...input,questionId:item.questionId},tx,{id,servedAt:item.servedAt});
+    // The clock is the server's: time spent can never exceed the time since the server delivered this question, whatever
+    // the browser reports. (The browser's figure is still used when lower, because it pauses while the tab is hidden.)
+    const timeMs = Math.max(0, Math.min(input.timeMs, Date.now() - item.servedAt.getTime()));
+    const result = await submitAnswer(userId,{...input,timeMs,questionId:item.questionId},tx,{id,servedAt:item.servedAt});
     if(!result) throw new DeliveryBlocked("Reload your saved session before answering this question.");
     const [a] = await tx.select().from(attempts).where(eq(attempts.id,result.attemptId));
     // Answer and session item commit together, including lost-response retries.
     await tx.update(items).set({response:input.response,timeMs:a!.timeMs,attemptId:result.attemptId}).where(itemKey(id,position));
     await tx.update(sessions).set({updatedAt:new Date()}).where(eq(sessions.id,id));
+  });
+}
+
+/**
+ * Gets the next question of a fixed list or set ready while the student is still on this one, so "Next" finds it
+ * already chosen and delivered. It never moves the cursor. Adaptive modes pick from the answer, so they are skipped.
+ */
+export const PREFETCH_AFTER_MS = 3000;
+
+export async function prefetchNextPractice(userId: string, profile: Profile, id: string) {
+  const session = await getPracticeSession(userId, id);
+  if (!session || session.status !== "active") return;
+  const config = PaperConfigSchema.parse(session.config);
+  const wanted = session.cursor + 1;
+  if ((config.mode !== "list" && config.mode !== "set") || wanted >= config.count) return;
+  const rows = await db.select().from(items).where(eq(items.sessionId, id));
+  if (rows.some((r) => r.position === wanted)) return;
+  // The three-second wait is enforced here, from the time the server delivered this question, not by the browser's
+  // timer: a script that calls this at once gets nothing, so it cannot run ahead of a real student.
+  const shown = rows.find((r) => r.position === session.cursor);
+  if (!shown || Date.now() - shown.servedAt.getTime() < PREFETCH_AFTER_MS) return;
+  const ids = config.ids ? await internalIds(config.ids, userId) : undefined;
+  if (config.ids && ids?.length !== config.ids.length) return;
+  const candidate = await selectPracticeQuestion(userId, profile, { ...config, ids, exclude: rows.map((r) => r.questionId) });
+  if (!candidate) return;
+  const context = await deliveryContext();
+  await checkRapidSkips(userId, candidate.id);
+  await db.transaction(async (tx) => {
+    await lockDelivery(tx, userId, context);
+    const current = await owned(tx, userId, id);
+    const now = await tx.select().from(items).where(eq(items.sessionId, id));
+    if (current.cursor !== session.cursor || now.some((r) => r.position === wanted || r.questionId === candidate.id)) return;
+    const [available] = await tx.select({ id: questions.id }).from(questions).where(and(eq(questions.id, candidate.id), availableQuestion(userId, id)));
+    if (!available) return;
+    await servePractice(userId, candidate, context, undefined, tx);
+    const [serve] = await tx.select().from(questionServes).where(and(eq(questionServes.userId, userId), eq(questionServes.questionId, candidate.id)));
+    await tx.insert(items).values({ sessionId: id, position: wanted, questionId: candidate.id, servedAt: serve!.servedAt });
   });
 }
