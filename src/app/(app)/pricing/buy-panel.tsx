@@ -23,7 +23,7 @@ export function BuyPanel({ current, clientId, options }: { current: Tier; client
         <div><h2 className="text-xl font-semibold">Choose your upgrade</h2><p className="mt-1 text-sm text-muted-foreground">More practice, on your timeline.</p></div>
         <div className="flex w-full flex-col gap-1.5 sm:w-64">
           <label htmlFor="upgrade-duration" className="text-xs font-medium text-muted-foreground">Access duration</label>
-          <select id="upgrade-duration" value={billing} onChange={(e) => { setBilling(e.target.value); setSelected(null); }} className="min-h-11 w-full rounded-full border bg-background px-4 text-sm focus-visible:outline-2 focus-visible:outline-ring">
+          <select id="upgrade-duration" value={billing} onChange={(e) => { setBilling(e.target.value); setSelected(null); }} className="min-h-11 w-full rounded-lg border bg-background px-3 text-sm focus-visible:outline-2 focus-visible:outline-ring">
             {options.map((o) => <option key={o.billing} value={o.billing}>{o.label}</option>)}
           </select>
         </div>

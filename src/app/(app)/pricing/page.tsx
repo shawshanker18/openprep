@@ -48,7 +48,7 @@ export default async function Pricing() {
         <div className="text-sm text-muted-foreground sm:text-right">{active ? <><p className="font-medium text-foreground">Active until {niceDate(active.endsAt)}</p><p>Paid time is preserved when you upgrade.</p></> : <><p className="font-medium text-foreground">Ready for more?</p><p>Compare your upgrade options below.</p></>}</div>
       </section>
       <BuyPanel current={current} clientId={paypalConfigured() ? process.env.PAYPAL_CLIENT_ID! : null} options={options} />
-      <p className="text-balance text-center text-xs text-muted-foreground">All prices in USD. One-time payments. AI remixes are practice questions, not official SAT questions.</p>
+      <p className="text-balance text-center text-xs text-muted-foreground">All prices in USD. One-time payments.</p>
     </div>
   );
 }
