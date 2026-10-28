@@ -7,10 +7,10 @@ import { satAttempts } from "@/db/schema";
 import { SUBJECTS, TOPICS } from "@/content/taxonomy";
 import { asksChapters, asksSubjects } from "@/content/cbse-chapters";
 import { requireUser } from "@/server/auth";
-import { getSubscription } from "@/server/subscription";
+import { getMembership } from "@/server/subscription";
+import { tierAt } from "@/lib/membership";
 import { creditsLeft } from "@/server/remix";
-import { PLANS, tierOf } from "@/lib/tiers";
-import { cancelPlan } from "@/app/(app)/pricing/actions";
+import { PLANS } from "@/lib/tiers";
 import { signOut } from "@/app/auth/actions";
 import { ThemeSelect } from "@/components/theme";
 import { CbseChapterPicker } from "@/components/cbse-chapter-picker";
@@ -40,7 +40,8 @@ export default async function SettingsPage({ searchParams }: PageProps<"/setting
   const sp = await searchParams;
   const { userId, profile } = await requireUser();
   const scores = await db.select().from(satAttempts).where(eq(satAttempts.userId, userId)).orderBy(satAttempts.takenOn);
-  const sub = await getSubscription(userId), tier = tierOf(sub ?? undefined), left = await creditsLeft(userId, tier);
+  const blocks = await getMembership(userId), tier = tierAt(blocks, new Date()), left = await creditsLeft(userId, tier);
+  const day = (d: Date) => d.toLocaleDateString("en-US", { dateStyle: "long" });
 
   return (
     <div className="flex max-w-xl flex-col gap-10">
@@ -59,9 +60,12 @@ export default async function SettingsPage({ searchParams }: PageProps<"/setting
           <p className="text-sm">You&apos;re on the Free plan. <Link className="underline" href="/pricing">See Plus and Pro</Link></p>
         ) : (
           <div className="flex flex-col gap-2 text-sm">
-            <p><b>{PLANS[tier].name}</b> · ${PLANS[tier].priceUsd}/month through PayPal{sub?.status === "cancelled" && sub.currentPeriodEnd ? `. Cancelled: stays active until ${sub.currentPeriodEnd.toLocaleDateString("en-US", { dateStyle: "long" })}.` : sub?.currentPeriodEnd ? `. Renews ${sub.currentPeriodEnd.toLocaleDateString("en-US", { dateStyle: "long" })}.` : "."}</p>
+            <ul className="flex flex-col gap-1">
+              {blocks.map((b) => <li key={b.startsAt.toISOString()}><b>{PLANS[b.tier].name}</b> until {day(b.endsAt)}</li>)}
+            </ul>
+            <p className="text-muted-foreground">One-time payments. Nothing renews by itself, and you go back to Free when your paid time ends.</p>
             <p className="text-muted-foreground">{left === null ? "Unlimited AI remixes." : `${left} of 50 AI remixes left this month.`}</p>
-            {sub?.status === "active" && <form action={cancelPlan}><Button type="submit" variant="outline" size="sm">Cancel plan</Button></form>}
+            <Link className="underline" href="/pricing">Buy more time or upgrade</Link>
           </div>
         )}
       </section>

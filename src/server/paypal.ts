@@ -1,16 +1,17 @@
 import "server-only";
-import { eq } from "drizzle-orm";
+import { and, count, eq, gte } from "drizzle-orm";
 import { db } from "@/db";
-import { paypalEvents, subscriptions } from "@/db/schema";
-import { isPaidTier, type PaidTier } from "@/lib/tiers";
+import { membershipPurchases, paypalEvents } from "@/db/schema";
+import { quote, type Billing } from "@/lib/membership";
+import { PLANS, type PaidTier } from "@/lib/tiers";
+import { grantPurchase, revokePurchase } from "./membership";
 
-/** PayPal Subscriptions. The two billing plans ($7 and $15 a month) are created once in the PayPal dashboard. */
+/** One-time PayPal payments (Orders API). Each payment buys days of Plus or Pro; nothing renews by itself. */
 const base = () => (process.env.PAYPAL_ENV === "live" ? "https://api-m.paypal.com" : "https://api-m.sandbox.paypal.com");
-export const paypalConfigured = () =>
-  !!(process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET && process.env.PAYPAL_PLAN_PLUS && process.env.PAYPAL_PLAN_PRO);
-const planId = (tier: PaidTier) => (tier === "plus" ? process.env.PAYPAL_PLAN_PLUS : process.env.PAYPAL_PLAN_PRO)!;
-const tierOfPlan = (plan: string | undefined): PaidTier | null =>
-  plan && plan === process.env.PAYPAL_PLAN_PLUS ? "plus" : plan && plan === process.env.PAYPAL_PLAN_PRO ? "pro" : null;
+export const paypalConfigured = () => !!(process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET);
+
+/** A message that is safe to show the student. */
+export class CheckoutError extends Error {}
 
 async function token() {
   const auth = Buffer.from(`${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`).toString("base64");
@@ -32,56 +33,52 @@ async function call<T = unknown>(path: string, init: { method?: string; body?: u
   return (r.status === 204 ? undefined : await r.json()) as T;
 }
 
-type PayPalSubscription = {
-  id: string; status: string; plan_id: string; custom_id?: string;
-  billing_info?: { next_billing_time?: string; last_payment?: { time?: string } };
-  links?: { rel: string; href: string }[];
+type Money = { currency_code?: string; value?: string };
+type Order = {
+  id: string; status: string;
+  purchase_units?: { custom_id?: string; payments?: { captures?: { id?: string; status?: string; amount?: Money }[] } }[];
 };
+const cents = (m?: Money) => (m?.currency_code === "USD" && m.value ? Math.round(Number(m.value) * 100) : NaN);
 
-const siteUrl = () => (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
-
-/** Starts checkout: records a pending subscription and returns its id for the PayPal buttons on our own pricing page. */
-export async function startCheckout(userId: string, tier: PaidTier) {
-  const sub = await call<PayPalSubscription>("/v1/billing/subscriptions", {
+/** Creates the PayPal order. The price comes from the student's account here, never from the browser. Returns the order id for the buttons. */
+export async function createOrder(userId: string, tier: PaidTier, billing: Billing, testDate: string | null, now = new Date()) {
+  const q = quote(tier, billing, testDate, now);
+  if (!q) throw new CheckoutError("Add your SAT date in Settings first, or pick a 30-day or 3-month option.");
+  const [recent] = await db.select({ n: count() }).from(membershipPurchases)
+    .where(and(eq(membershipPurchases.userId, userId), eq(membershipPurchases.status, "created"), gte(membershipPurchases.createdAt, new Date(now.getTime() - 3_600_000))));
+  if (recent!.n >= 10) throw new CheckoutError("Too many unfinished payments. Please wait a little and try again.");
+  const order = await call<Order>("/v2/checkout/orders", {
     method: "POST",
     body: {
-      plan_id: planId(tier), custom_id: userId,
-      application_context: {
-        brand_name: "OpenPrep", user_action: "SUBSCRIBE_NOW", shipping_preference: "NO_SHIPPING",
-        return_url: `${siteUrl()}/billing/return`, cancel_url: `${siteUrl()}/pricing`,
-      },
+      intent: "CAPTURE",
+      purchase_units: [{ custom_id: userId, description: `OpenPrep ${PLANS[tier].name}, ${q.days} days`, amount: { currency_code: "USD", value: (q.cents / 100).toFixed(2) } }],
+      application_context: { brand_name: "OpenPrep", user_action: "PAY_NOW", shipping_preference: "NO_SHIPPING" },
     },
   });
-  await db.insert(subscriptions).values({ userId, tier, status: "pending", paypalSubscriptionId: sub.id })
-    .onConflictDoUpdate({ target: subscriptions.userId, set: { tier, status: "pending", paypalSubscriptionId: sub.id, currentPeriodEnd: null, updatedAt: new Date() } });
-  return sub.id;
+  await db.insert(membershipPurchases).values({ userId, tier, billing, days: q.days, amountCents: q.cents, paypalOrderId: order.id });
+  return order.id;
 }
 
-const STATUS: Record<string, string> = { ACTIVE: "active", APPROVAL_PENDING: "pending", APPROVED: "pending", SUSPENDED: "suspended", CANCELLED: "cancelled", EXPIRED: "expired" };
-
-/** Copies PayPal's view of one subscription into our table. Tier comes from the PayPal plan, never from the browser. */
-export async function syncSubscription(paypalId: string, expectUser?: string) {
-  const remote = await call<PayPalSubscription>(`/v1/billing/subscriptions/${encodeURIComponent(paypalId)}`);
-  const [row] = await db.select().from(subscriptions).where(eq(subscriptions.paypalSubscriptionId, paypalId));
-  if (!row || (expectUser && row.userId !== expectUser) || (remote.custom_id && remote.custom_id !== row.userId)) return null;
-  const tier = tierOfPlan(remote.plan_id);
-  if (!tier) return null;
-  const next = remote.billing_info?.next_billing_time;
-  const status = STATUS[remote.status] ?? row.status;
-  await db.update(subscriptions).set({
-    tier, status, updatedAt: new Date(),
-    // A cancelled plan keeps its tier until the period already paid for ends.
-    currentPeriodEnd: next ? new Date(next) : row.currentPeriodEnd,
-  }).where(eq(subscriptions.paypalSubscriptionId, paypalId));
-  return { userId: row.userId, tier, status };
-}
-
-export async function cancelSubscription(userId: string) {
-  const [row] = await db.select().from(subscriptions).where(eq(subscriptions.userId, userId));
-  if (!row || row.status !== "active" || !isPaidTier(row.tier)) return false;
-  await call(`/v1/billing/subscriptions/${encodeURIComponent(row.paypalSubscriptionId)}/cancel`, { method: "POST", body: { reason: "Cancelled by the student" } });
-  await syncSubscription(row.paypalSubscriptionId, userId);
+/** Grants the days only when PayPal reports the capture completed for exactly the amount we asked for, on this student's order. */
+async function settle(purchaseId: string, order: Order) {
+  const [p] = await db.select().from(membershipPurchases).where(eq(membershipPurchases.id, purchaseId));
+  if (!p) return false;
+  if (p.status === "completed") return true;
+  const unit = order.purchase_units?.[0], capture = unit?.payments?.captures?.[0];
+  if (order.status !== "COMPLETED" || capture?.status !== "COMPLETED" || unit?.custom_id !== p.userId || cents(capture.amount) !== p.amountCents) return false;
+  await grantPurchase(p.id);
   return true;
+}
+
+/** Captures an approved order (or finds it already captured) and grants the days. Called when the student returns and again from the webhook. */
+export async function captureOrder(orderId: string, userId?: string) {
+  const [p] = await db.select().from(membershipPurchases).where(eq(membershipPurchases.paypalOrderId, orderId));
+  if (!p || (userId && p.userId !== userId)) return false;
+  if (p.status === "completed") return true;
+  let order: Order;
+  try { order = await call<Order>(`/v2/checkout/orders/${encodeURIComponent(orderId)}/capture`, { method: "POST", body: {} }); }
+  catch { order = await call<Order>(`/v2/checkout/orders/${encodeURIComponent(orderId)}`); } // already captured, or not approved yet
+  return settle(p.id, order);
 }
 
 /** True when PayPal itself vouches for this webhook delivery. */
@@ -99,17 +96,26 @@ export async function verifyWebhook(headers: Headers, event: unknown) {
   return out.verification_status === "SUCCESS";
 }
 
-/** Events that change what a student has paid for. Anything else is acknowledged and ignored. */
-const RELEVANT = new Set([
-  "BILLING.SUBSCRIPTION.ACTIVATED", "BILLING.SUBSCRIPTION.CANCELLED", "BILLING.SUBSCRIPTION.SUSPENDED", "BILLING.SUBSCRIPTION.EXPIRED",
-  "BILLING.SUBSCRIPTION.UPDATED", "BILLING.SUBSCRIPTION.PAYMENT.FAILED", "PAYMENT.SALE.COMPLETED",
-]);
+type Event = {
+  id?: string; event_type?: string;
+  resource?: { id?: string; amount?: Money; supplementary_data?: { related_ids?: { order_id?: string } } };
+};
+const RELEVANT = new Set(["CHECKOUT.ORDER.APPROVED", "PAYMENT.CAPTURE.COMPLETED", "PAYMENT.CAPTURE.REFUNDED", "PAYMENT.CAPTURE.REVERSED", "PAYMENT.CAPTURE.DENIED"]);
 
-export async function applyEvent(event: { id?: string; event_type?: string; resource?: { id?: string; billing_agreement_id?: string } }) {
+/** The webhook is the safety net: it grants days if the student closed the tab after paying, and takes them back on a refund or chargeback. */
+export async function applyEvent(event: Event) {
   if (!event.id || !event.event_type || !RELEVANT.has(event.event_type)) return;
-  // A redelivery of an event already applied does nothing.
-  const fresh = await db.insert(paypalEvents).values({ id: event.id }).onConflictDoNothing().returning({ id: paypalEvents.id });
-  if (!fresh.length) return;
-  const subId = event.event_type === "PAYMENT.SALE.COMPLETED" ? event.resource?.billing_agreement_id : event.resource?.id;
-  if (subId) await syncSubscription(subId);
+  const [seen] = await db.select({ id: paypalEvents.id }).from(paypalEvents).where(eq(paypalEvents.id, event.id));
+  if (seen) return;
+  const type = event.event_type;
+  const orderId = type === "CHECKOUT.ORDER.APPROVED" ? event.resource?.id : event.resource?.supplementary_data?.related_ids?.order_id;
+  if (orderId) {
+    const [p] = await db.select().from(membershipPurchases).where(eq(membershipPurchases.paypalOrderId, orderId));
+    if (p) {
+      if (type === "CHECKOUT.ORDER.APPROVED" || type === "PAYMENT.CAPTURE.COMPLETED") await captureOrder(orderId);
+      // A partial refund leaves the days alone; only a full refund, a chargeback or a denied capture takes them back.
+      else if (type !== "PAYMENT.CAPTURE.REFUNDED" || cents(event.resource?.amount) >= p.amountCents) await revokePurchase(p.id);
+    }
+  }
+  await db.insert(paypalEvents).values({ id: event.id }).onConflictDoNothing();
 }

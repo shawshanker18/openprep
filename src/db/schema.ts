@@ -506,18 +506,36 @@ export const conceptQuestions = pgTable("concept_questions", {
 
 
 /* ───────── paid tiers ───────── */
-/** One row per paying user. No row (or an ended one) means the free tier. */
-export const subscriptions = pgTable("subscriptions", {
-  userId: userRef().primaryKey(),
+/** One row per PayPal payment. The price is set by the server when the order is created and checked again when it is captured. */
+export const membershipPurchases = pgTable("membership_purchases", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: userRef(),
   tier: text("tier").notNull(), // plus | pro
-  status: text("status").notNull(), // pending | active | cancelled | suspended | expired
-  paypalSubscriptionId: text("paypal_subscription_id").notNull(),
-  currentPeriodEnd: ts("current_period_end"), // a cancelled plan keeps its tier until then
-  updatedAt: ts("updated_at").notNull().defaultNow(),
+  billing: text("billing").notNull(), // monthly | quarterly | until_test
+  days: integer("days").notNull(),
+  amountCents: integer("amount_cents").notNull(),
+  paypalOrderId: text("paypal_order_id").notNull(),
+  status: text("status").notNull().default("created"), // created | completed | refunded
+  createdAt: ts("created_at").notNull().defaultNow(),
+  completedAt: ts("completed_at"),
 }, (t) => [
-  check("subscriptions_tier_check", sql`${t.tier} in ('plus', 'pro')`),
-  check("subscriptions_status_check", sql`${t.status} in ('pending', 'active', 'cancelled', 'suspended', 'expired')`),
-  uniqueIndex("subscriptions_paypal_idx").on(t.paypalSubscriptionId),
+  check("membership_purchases_tier_check", sql`${t.tier} in ('plus', 'pro')`),
+  check("membership_purchases_billing_check", sql`${t.billing} in ('monthly', 'quarterly', 'until_test')`),
+  check("membership_purchases_status_check", sql`${t.status} in ('created', 'completed', 'refunded')`),
+  uniqueIndex("membership_purchases_order_idx").on(t.paypalOrderId),
+  index("membership_purchases_user_idx").on(t.userId, t.createdAt),
+]).enableRLS();
+
+/** The paid time a student has right now, laid out as dated blocks (Pro first, then Plus). No block covering today means Free. */
+export const membershipBlocks = pgTable("membership_blocks", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: userRef(),
+  tier: text("tier").notNull(),
+  startsAt: ts("starts_at").notNull(),
+  endsAt: ts("ends_at").notNull(),
+}, (t) => [
+  check("membership_blocks_tier_check", sql`${t.tier} in ('plus', 'pro')`),
+  index("membership_blocks_user_idx").on(t.userId, t.endsAt),
 ]).enableRLS();
 
 /** Webhook deliveries already applied, so a PayPal retry is a no-op. */

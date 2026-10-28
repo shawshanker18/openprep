@@ -26,14 +26,3 @@ export const REMIX = {
 export const canRemix = (tier: Tier) => tier !== "free";
 export const canOpenPaper = (tier: Tier, paper: number) => paper <= PAPER_LIMIT[tier];
 export const isPaidTier = (v: unknown): v is PaidTier => v === "plus" || v === "pro";
-
-type SubscriptionRow = { tier: string; status: string; currentPeriodEnd: Date | null };
-
-/** Active plans count; a cancelled plan keeps its tier until the period it paid for ends. */
-export function tierOf(row: SubscriptionRow | undefined, now = new Date()): Tier {
-  if (!row || !isPaidTier(row.tier)) return "free";
-  if (row.status === "active") return row.tier;
-  if (row.status === "cancelled" && row.currentPeriodEnd && row.currentPeriodEnd > now) return row.tier;
-  return "free";
-}
-
