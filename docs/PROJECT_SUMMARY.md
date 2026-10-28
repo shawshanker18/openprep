@@ -1,6 +1,6 @@
 # OpenPrep: project summary
 
-Last updated 17 October 2026. This is a working summary for the team: what the product is, how the code is laid out,
+Last updated 28 October 2026. This is a working summary for the team: what the product is, how the code is laid out,
 what has been built, the commands we use, and what is still open. Credentials and keys are never written here.
 
 ## 1. What it is
@@ -22,11 +22,16 @@ after onboarding. An optional diagnostic gives a starting skill profile, and pra
 - **Maths:** KaTeX through `remark-math` and `rehype-katex`. Lessons and questions are Markdown with `$...$` maths.
 - **Graphing:** Desmos API (`NEXT_PUBLIC_DESMOS_API_KEY`), with a hosted fallback.
 - **AI tutor:** the Vercel AI SDK, with Anthropic, OpenAI, Google and OpenRouter providers. It is optional.
+- **Payments:** PayPal one-time payments (Orders API, JS SDK buttons, webhook). See `docs/PAID_TIERS.md`.
+- **AI remix:** Mistral API (GLM 5.3 Flash) through the Vercel AI SDK, for Plus and Pro.
+- **Hosting:** Vercel (region `bom1`) runs the app, including all payment code. Supabase stores the data and runs the cron timer.
 - **Other:** Upstash rate limiting, web push reminders, Cloudflare R2 for question images, Vitest for tests.
 
 Environment variables (names only): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `DATABASE_URL`,
 `MIGRATE_DATABASE_URL`, `NEXT_PUBLIC_SITE_URL`, `AI_MODEL`, `ANTHROPIC_API_KEY`, `AI_DAILY_LIMIT`,
-`NEXT_PUBLIC_DESMOS_API_KEY`, `DEV_USER_ID` (local only), `CRON_SECRET`, `QUESTION_ID_SECRET`, and the VAPID keys.
+`NEXT_PUBLIC_DESMOS_API_KEY`, `DEV_USER_ID` (local only), `CRON_SECRET`, `QUESTION_ID_SECRET`, the VAPID keys,
+`MISTRAL_API_KEY`, `REMIX_MODEL`, `REMIX_GLOBAL_DAILY_CAP`, and `PAYPAL_ENV`, `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`,
+`PAYPAL_WEBHOOK_ID`. Payment and remix secrets live in Vercel's environment settings, not in Supabase.
 The full list is in `.env.example`.
 
 ## 3. Repository layout
@@ -45,8 +50,8 @@ The full list is in `.env.example`.
 | `content/questions/` | Authored question bank as JSON (261 questions, 9 per skill) |
 | `content/lessons/` | One Markdown lesson per skill (29) |
 | `content/desmos/` | Desmos lessons (8) |
-| `drizzle/` | SQL migrations 0000 to 0025 and their snapshots |
-| `docs/` | Design notes for question pools, delivery security, saved practice, the CBSE roadmap, and repair status |
+| `drizzle/` | SQL migrations 0000 to 0031 and their snapshots |
+| `docs/` | Design notes for question pools, delivery security, saved practice, the CBSE roadmap, paid plans (`PAID_TIERS.md`) and repair status |
 | `scripts/` | Content validation and seeding, admin CLI, enable-RLS, verify |
 
 Engine modules, briefly: `mastery.ts` is an Elo and 1PL-IRT hybrid student model. `select.ts` picks a skill and then a
@@ -70,7 +75,10 @@ rearranged. `score.ts` handles test scoring and estimates. `assignment.ts` is th
 - **Course assignment:** CBSE chapter courses. Each course has a default version (taught from the basics, and the
   fallback) and a covered-at-school version. Rules pick which version each student gets, from the chapters they
   finished. Reassignment never changes lesson progress.
-- **Settings:** profile, chapters, subjects, official scores, reminders, account deletion.
+- **Plans (`/pricing`):** Free, Plus and Pro, bought with one-time PayPal payments (30 days, 3 months, or up to an SAT
+  exam). Nothing auto-renews. Paid time is stored as dated blocks, Pro first. Full details in `docs/PAID_TIERS.md`.
+- **AI remix (Plus and Pro):** easier, same, harder, or numbers-only versions of a question, saved and shared.
+- **Settings:** profile, chapters, subjects, official scores, reminders, plan and paid-time schedule, account deletion.
 
 ## 5. Data model (main tables)
 
@@ -84,6 +92,8 @@ rearranged. `score.ts` handles test scoring and estimates. `assignment.ts` is th
   uses). Added in migration 0025.
 - **Course assignment:** `courses`, `course_skills`, `course_versions`, `course_version_lessons`, `assignment_rules`,
   `student_course_assignments`, `assignment_history`, `user_groups`, `user_group_members`.
+- **Plans and remix:** `membership_purchases`, `membership_blocks`, `membership_reminders`, `paypal_events`,
+  `question_remixes`, `remix_usage`. Remixes are ordinary `questions` rows in the `remix` pool.
 - **Admin and safety:** `admins`, `admin_audit`, `feedback`, `question_reports`, `security_reports`, `ai_messages`,
   `ai_cache`, rate-limit windows.
 
@@ -197,7 +207,19 @@ Windows notes: the shell is Git Bash. Files are CRLF in the working copy, and Gi
   `/cbse-math` (linked from Start for CBSE students). Commits `bcf8bde` and `96b40d6` were pushed under the Fionoz
   identity by mistake and are left as they are; later commits use the owner's identity.
 
+- **Oct 18 to 28:** paid plans and PayPal. Plus and Pro, first as monthly subscriptions, then changed to one-time
+  payments (30 days, 3 months, until an SAT exam) with a Pro-first queue on upgrade. Card and PayPal buttons embedded in
+  the pricing page. AI remix with Mistral and shared saved remixes, a numbers-only mode, and no remixing of figure
+  questions. Question bank went straight to practice; "Question not found" fixed; floating saved Desmos window;
+  monochrome right and wrong styling; next-question prefetch; server-capped answer time; shorter rapid-skip cooldown.
+  Plan-ending reminders (bell, settings, push). Migrations 0027 to 0031 applied to `openprep-dev` (the production
+  database). First sandbox purchase did not confirm; the capture check was loosened and logging added.
+
 ## 12. Known gaps and open decisions
+
+0. **Payments are not confirmed end to end.** A full sandbox purchase, the webhook, and live Mistral output still need
+   checking. See "Not done or not verified" in `docs/PAID_TIERS.md`. The upgraded question bank has no content, and the
+   FAQ, About and Terms pages still say "no subscription".
 
 1. **Completion is self-reported.** "Done, next topic" needs no check. Khan Academy and ALEKS verify mastery with
    checkpoints and levels. We have not built that yet. Checkpoints run but do not record a score or change a level.

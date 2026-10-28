@@ -1,6 +1,6 @@
 <p align="center"><img src="assets/banner.png" alt="openprep" width="100%"></p>
 
-> Free adaptive SAT practice.
+> Free adaptive SAT practice, with optional Plus and Pro plans.
 
 | | |
 |---|---|
@@ -77,12 +77,21 @@ be granted from the backend. The account must have signed in once. Either:
 Everyone else gets a 404 on every admin page and action. Every admin change is recorded in `admin_audit`, which the
 site can append to but never edit.
 
+## Plans, payments and AI remix
+
+Free students keep the full question bank. Plus and Pro add extra practice tests, AI question remix and more, paid with
+one-time PayPal payments (nothing auto-renews). Pricing rules, the PayPal setup, the remix design, and what is not yet
+verified are in [docs/PAID_TIERS.md](docs/PAID_TIERS.md). The project overview and history are in
+[docs/PROJECT_SUMMARY.md](docs/PROJECT_SUMMARY.md).
+
 ## Deploy (Vercel)
 
 Import the repo, region `bom1` (set in `vercel.json`, next to Supabase `ap-south-1`). Environment variables:
 `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `DATABASE_URL`, `NEXT_PUBLIC_SITE_URL`, `AI_MODEL`,
 `ANTHROPIC_API_KEY` (optional — the tutor shows a friendly message without it), `AI_DAILY_LIMIT`,
-`NEXT_PUBLIC_DESMOS_API_KEY` (optional — falls back to a link). Then in Supabase → Authentication → URL configuration,
+`NEXT_PUBLIC_DESMOS_API_KEY` (optional — falls back to a link), `PAYPAL_ENV`, `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`,
+`PAYPAL_WEBHOOK_ID` (payments), and `MISTRAL_API_KEY` with `REMIX_MODEL` (AI remix). Set these in Vercel's environment
+settings and redeploy. Then in Supabase → Authentication → URL configuration,
 add `https://<your-domain>/auth/callback` to the redirect URLs and set the Site URL.
 
 ## Licence
