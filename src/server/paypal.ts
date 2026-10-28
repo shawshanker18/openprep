@@ -13,14 +13,19 @@ export const paypalConfigured = () => !!(process.env.PAYPAL_CLIENT_ID && process
 /** A message that is safe to show the student. */
 export class CheckoutError extends Error {}
 
+let cached: { value: string; expires: number } | null = null;
+/** PayPal tokens last hours, so a warm server reuses one instead of asking PayPal for a new one on every call. */
 async function token() {
+  if (cached && cached.expires > Date.now()) return cached.value;
   const auth = Buffer.from(`${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`).toString("base64");
   const r = await fetch(`${base()}/v1/oauth2/token`, {
     method: "POST", headers: { Authorization: `Basic ${auth}`, "Content-Type": "application/x-www-form-urlencoded" },
     body: "grant_type=client_credentials", signal: AbortSignal.timeout(10_000),
   });
   if (!r.ok) throw new Error(`PayPal auth failed (${r.status})`);
-  return (await r.json() as { access_token: string }).access_token;
+  const out = await r.json() as { access_token: string; expires_in?: number };
+  cached = { value: out.access_token, expires: Date.now() + Math.max(60, (out.expires_in ?? 600) - 120) * 1000 };
+  return out.access_token;
 }
 
 async function call<T = unknown>(path: string, init: { method?: string; body?: unknown } = {}): Promise<T> {
@@ -29,14 +34,18 @@ async function call<T = unknown>(path: string, init: { method?: string; body?: u
     headers: { Authorization: `Bearer ${await token()}`, "Content-Type": "application/json" },
     body: init.body === undefined ? undefined : JSON.stringify(init.body),
   });
-  if (!r.ok) throw new Error(`PayPal ${init.method ?? "GET"} ${path} failed (${r.status})`);
+  if (!r.ok) {
+    // PayPal's error name and issue code are safe to log and are what tells us why a call was refused.
+    const detail = await r.json().then((j: { name?: string; details?: { issue?: string }[] }) => `${j.name ?? ""} ${j.details?.[0]?.issue ?? ""}`.trim(), () => "").catch(() => "");
+    throw new Error(`PayPal ${init.method ?? "GET"} ${path} failed (${r.status}) ${detail}`.trim());
+  }
   return (r.status === 204 ? undefined : await r.json()) as T;
 }
 
 type Money = { currency_code?: string; value?: string };
 type Order = {
   id: string; status: string;
-  purchase_units?: { custom_id?: string; payments?: { captures?: { id?: string; status?: string; amount?: Money }[] } }[];
+  purchase_units?: { custom_id?: string; payments?: { captures?: { id?: string; status?: string; amount?: Money; custom_id?: string }[] } }[];
 };
 const cents = (m?: Money) => (m?.currency_code === "USD" && m.value ? Math.round(Number(m.value) * 100) : NaN);
 
@@ -44,8 +53,11 @@ const cents = (m?: Money) => (m?.currency_code === "USD" && m.value ? Math.round
 export async function createOrder(userId: string, tier: PaidTier, billing: Billing, exam: string | null, now = new Date()) {
   const q = quote(tier, billing, exam, now);
   if (!q) throw new CheckoutError("That SAT date has passed. Pick another option.");
-  const [recent] = await db.select({ n: count() }).from(membershipPurchases)
-    .where(and(eq(membershipPurchases.userId, userId), eq(membershipPurchases.status, "created"), gte(membershipPurchases.createdAt, new Date(now.getTime() - 3_600_000))));
+  const [[recent]] = await Promise.all([
+    db.select({ n: count() }).from(membershipPurchases)
+      .where(and(eq(membershipPurchases.userId, userId), eq(membershipPurchases.status, "created"), gte(membershipPurchases.createdAt, new Date(now.getTime() - 3_600_000)))),
+    token(), // warm the PayPal token while the count runs
+  ]);
   if (recent!.n >= 10) throw new CheckoutError("Too many unfinished payments. Please wait a little and try again.");
   const order = await call<Order>("/v2/checkout/orders", {
     method: "POST",
@@ -65,7 +77,12 @@ async function settle(purchaseId: string, order: Order) {
   if (!p) return false;
   if (p.status === "completed") return true;
   const unit = order.purchase_units?.[0], capture = unit?.payments?.captures?.[0];
-  if (order.status !== "COMPLETED" || capture?.status !== "COMPLETED" || unit?.custom_id !== p.userId || cents(capture.amount) !== p.amountCents) return false;
+  // The order id is already tied to this student in our table; custom_id is only a second check, and PayPal puts it on the unit or the capture.
+  const owner = capture?.custom_id ?? unit?.custom_id;
+  if (order.status !== "COMPLETED" || capture?.status !== "COMPLETED" || (owner && owner !== p.userId) || cents(capture.amount) !== p.amountCents) {
+    console.warn("PayPal payment not granted", { order: order.status, capture: capture?.status, amount: capture?.amount, expected: p.amountCents });
+    return false;
+  }
   await grantPurchase(p.id);
   return true;
 }
@@ -79,6 +96,13 @@ export async function captureOrder(orderId: string, userId?: string) {
   try { order = await call<Order>(`/v2/checkout/orders/${encodeURIComponent(orderId)}/capture`, { method: "POST", body: {} }); }
   catch { order = await call<Order>(`/v2/checkout/orders/${encodeURIComponent(orderId)}`); } // already captured, or not approved yet
   return settle(p.id, order);
+}
+
+/** Re-checks this student's recent unfinished payments with PayPal. Heals a payment whose confirmation was missed. */
+export async function reconcilePending(userId: string, now = new Date()) {
+  const rows = await db.select({ orderId: membershipPurchases.paypalOrderId }).from(membershipPurchases)
+    .where(and(eq(membershipPurchases.userId, userId), eq(membershipPurchases.status, "created"), gte(membershipPurchases.createdAt, new Date(now.getTime() - 86_400_000))));
+  for (const r of rows.slice(0, 3)) await captureOrder(r.orderId, userId).catch((e) => console.warn("PayPal reconcile failed", e instanceof Error ? e.message : e));
 }
 
 /** True when PayPal itself vouches for this webhook delivery. */

@@ -8,6 +8,7 @@ import { SUBJECTS, TOPICS } from "@/content/taxonomy";
 import { asksChapters, asksSubjects } from "@/content/cbse-chapters";
 import { requireUser } from "@/server/auth";
 import { getMembership } from "@/server/subscription";
+import { reconcilePending } from "@/server/paypal";
 import { planEnding, tierAt } from "@/lib/membership";
 import { creditsLeft } from "@/server/remix";
 import { PLANS } from "@/lib/tiers";
@@ -40,6 +41,7 @@ export default async function SettingsPage({ searchParams }: PageProps<"/setting
   const sp = await searchParams;
   const { userId, profile } = await requireUser();
   const scores = await db.select().from(satAttempts).where(eq(satAttempts.userId, userId)).orderBy(satAttempts.takenOn);
+  if (sp.plan === "processing") await reconcilePending(userId);
   const blocks = await getMembership(userId), tier = tierAt(blocks, new Date()), left = await creditsLeft(userId, tier);
   const ending = planEnding(blocks, new Date());
   const day = (d: Date) => d.toLocaleDateString("en-US", { dateStyle: "long" });
