@@ -5,7 +5,7 @@ import { notFound, redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Markdown } from "@/components/markdown";
 import { MasteryBar } from "@/components/mastery-bar";
-import { DOMAINS, SKILL_BY_ID } from "@/content/taxonomy";
+import { DOMAINS, SKILL_BY_ID, tagLabel } from "@/content/taxonomy";
 import { certaintyLabel, certaintyPct } from "@/engine/mastery";
 import { cn } from "@/lib/utils";
 import { requireUser } from "@/server/auth";
@@ -116,7 +116,7 @@ export default async function SkillPage({ params, searchParams }: PageProps<"/sk
                 <tbody>
                   {stats.byTag.map((t) => (
                     <tr key={t.tag} className="border-t">
-                      <td className="py-2 first-letter:uppercase">{t.tag.replace(/-/g, " ")}</td>
+                      <td className="py-2 first-letter:uppercase">{tagLabel(t.tag)}</td>
                       <td className="tabular-nums">{t.n}</td>
                       <td className="tabular-nums">{Math.round((100 * t.c) / t.n)}%</td>
                     </tr>
@@ -133,7 +133,7 @@ export default async function SkillPage({ params, searchParams }: PageProps<"/sk
           {detail.missed.length === 0 ? <p className="text-muted-foreground">No mistakes in this skill yet.</p> : (<>
             <div className="grid gap-6 sm:grid-cols-2">
               <div><h3 className="mb-2 text-sm font-medium">By topic</h3>
-                <ul className="text-sm">{detail.mistakesByTag.map((t) => <li key={t.tag} className="flex justify-between"><span>{t.tag.replace(/-/g, " ")}</span><span>{t.n}</span></li>)}</ul></div>
+                <ul className="text-sm">{detail.mistakesByTag.map((t) => <li key={t.tag} className="flex justify-between"><span>{tagLabel(t.tag)}</span><span>{t.n}</span></li>)}</ul></div>
 
             </div>
             <ul className="flex flex-col gap-2">

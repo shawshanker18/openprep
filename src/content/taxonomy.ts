@@ -54,6 +54,8 @@ export const SKILLS: Skill[] = [
 export const SKILL_BY_ID: Record<string, Skill | undefined> = Object.assign(Object.create(null), Object.fromEntries(SKILLS.map((k) => [k.id, k])));
 /** Name for compact lists: drops clarifying parentheses, e.g. "Form, Structure, and Sense (grammar)" → "Form, Structure, and Sense". */
 export const shortSkillName = (name: string) => name.replace(/\s*\([^)]*\)/g, "").trim();
+/** Readable name for a question tag: a skill id becomes the skill's name, anything else just loses its dashes. */
+export const tagLabel = (tag: string) => { const k = SKILL_BY_ID[tag]; return k ? shortSkillName(k.name) : tag.replace(/[-_]/g, " "); };
 export const skillsIn = (domain: string) => SKILLS.filter((k) => k.domain === domain);
 export const skillWeight = (k: Skill) => DOMAINS[k.domain].weight / skillsIn(k.domain).length;
 

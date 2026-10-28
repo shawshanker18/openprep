@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Calculator, Expand, ExternalLink, LoaderCircle, Minimize } from "lucide-react";
+import { Calculator, ChevronDown, ChevronUp, Expand, ExternalLink, LoaderCircle, Maximize2, Minimize, Minimize2 } from "lucide-react";
 import { watchCalculatorSize } from "@/lib/calculator-size";
 import { Markdown } from "@/components/markdown";
 import { Button } from "@/components/ui/button";
@@ -221,26 +221,34 @@ export function FloatingDesmos({ sessionKey, open, onClose }: { sessionKey: stri
     const fallback = { x: 16, y: Math.max(72, window.innerHeight - 460), w: Math.min(380, window.innerWidth - 32), h: 420 };
     try { const saved = localStorage.getItem(winKey); return saved ? clampWin({ ...fallback, ...JSON.parse(saved) }) : fallback; } catch { return fallback; }
   });
+  const [mode, setMode] = useState<"normal" | "max" | "min">("normal");
   const box = useRef<HTMLDivElement>(null);
   const drag = useRef<{ dx: number; dy: number } | null>(null);
   const remember = (v: Win) => { try { localStorage.setItem(winKey, JSON.stringify(v)); } catch { /* storage unavailable */ } };
   // The browser's own corner handle resizes the box; read the new size back when the pointer is released.
   const settle = () => {
+    if (mode !== "normal") return;
     const r = box.current?.getBoundingClientRect();
     if (r) setWin((w) => { const next = clampWin({ ...w, w: r.width, h: r.height }); remember(next); return next; });
   };
   return (
     <div ref={box} onPointerUp={settle} aria-hidden={!open}
-      style={{ left: win.x, top: win.y, width: win.w, height: win.h, resize: "both" }}
-      className={`fixed z-50 flex min-h-[260px] min-w-[260px] max-h-[95dvh] max-w-[95vw] flex-col overflow-hidden rounded-lg border bg-white shadow-2xl ${open ? "" : "pointer-events-none invisible"}`}>
-      <div className="flex shrink-0 cursor-grab touch-none select-none items-center justify-between bg-neutral-900 px-3 py-2 text-sm text-white active:cursor-grabbing"
-        onPointerDown={(e) => { if ((e.target as HTMLElement).closest("button")) return; e.currentTarget.setPointerCapture(e.pointerId); drag.current = { dx: e.clientX - win.x, dy: e.clientY - win.y }; }}
+      style={mode === "max" ? { left: 16, top: 16, width: "calc(100vw - 32px)", height: "calc(100dvh - 32px)" } : mode === "min" ? { left: win.x, top: win.y, width: win.w } : { left: win.x, top: win.y, width: win.w, height: win.h, resize: "both" }}
+      className={`fixed z-50 flex min-w-[260px] max-w-[100vw] flex-col overflow-hidden rounded-lg border bg-white shadow-2xl ${mode === "normal" ? "min-h-[260px] max-h-[95dvh]" : ""} ${mode === "max" ? "max-h-none" : ""} ${open ? "" : "pointer-events-none invisible"}`}>
+      <div className={`flex shrink-0 select-none items-center justify-between gap-2 bg-neutral-900 px-3 py-2 text-sm text-white ${mode === "max" ? "" : "cursor-grab touch-none active:cursor-grabbing"}`}
+        onPointerDown={(e) => { if (mode === "max" || (e.target as HTMLElement).closest("button")) return; e.currentTarget.setPointerCapture(e.pointerId); drag.current = { dx: e.clientX - win.x, dy: e.clientY - win.y }; }}
         onPointerMove={(e) => { const d = drag.current; if (d) setWin((w) => clampWin({ ...w, x: e.clientX - d.dx, y: e.clientY - d.dy })); }}
         onPointerUp={() => { if (drag.current) { drag.current = null; setWin((w) => { remember(w); return w; }); } }}>
-        <span className="font-medium">Calculator · drag to move</span>
-        <button type="button" onClick={onClose} className="min-h-8 rounded-md px-3 hover:bg-white/10">Close</button>
+        <span className="font-medium">Calculator{mode === "max" ? "" : " · drag to move"}</span>
+        <div className="flex items-center gap-1">
+          <button type="button" onClick={() => setMode((m) => (m === "min" ? "normal" : "min"))} aria-label={mode === "min" ? "Restore calculator" : "Collapse calculator"} title={mode === "min" ? "Restore" : "Collapse"} className="grid size-8 place-items-center rounded-md hover:bg-white/10">{mode === "min" ? <ChevronDown className="size-4" /> : <ChevronUp className="size-4" />}</button>
+          <button type="button" onClick={() => setMode((m) => (m === "max" ? "normal" : "max"))} aria-label={mode === "max" ? "Shrink calculator" : "Expand calculator"} title={mode === "max" ? "Shrink" : "Expand"} className="grid size-8 place-items-center rounded-md hover:bg-white/10">{mode === "max" ? <Minimize2 className="size-4" /> : <Maximize2 className="size-4" />}</button>
+          <button type="button" onClick={onClose} className="min-h-8 rounded-md px-3 hover:bg-white/10">Close</button>
+        </div>
       </div>
-      <DesmosCalculator stateKey={`${sessionKey}:graph`} className="min-h-0 flex-1 border-0" />
+      <div hidden={mode === "min"} className="flex min-h-0 flex-1 flex-col">
+        <DesmosCalculator stateKey={`${sessionKey}:graph`} className="min-h-0 flex-1 border-0" />
+      </div>
     </div>
   );
 }

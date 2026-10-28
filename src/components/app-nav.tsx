@@ -38,12 +38,13 @@ export const NAV_GROUPS = [
   },
 ] as const;
 
-/** Bottom bar on phones: the five most used destinations. */
+/** Bottom bar on phones: the most used destinations. */
 export const MOBILE_TABS = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
   { href: "/practice", label: "Practice", icon: Sparkles },
   { href: "/start", label: "Learn", icon: GraduationCap },
   { href: "/tests", label: "Tests", icon: ClipboardList },
+  { href: "/analysis", label: "Analysis", icon: Activity },
 ] as const;
 
 /** Where a nav item points. The guest site mounts the same menu under /guest, and its home is /guest rather than /guest/dashboard. */
