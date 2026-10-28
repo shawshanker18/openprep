@@ -1,16 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Moon, Sun, SunDim, MonitorSmartphone } from "lucide-react";
+import { Moon, Sparkles, Sun, MonitorSmartphone } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const SEEN_KEY = "openprep-theme-asked";
 const OPTIONS = [
-  { value: "light", label: "Light", icon: Sun, bg: "oklch(1 0 0)", ink: "oklch(0.145 0 0)" },
-  { value: "dull", label: "Dull light (softer white)", icon: SunDim, bg: "oklch(0.925 0.005 85)", ink: "oklch(0.22 0 0)" },
-  { value: "dark", label: "Dark", icon: Moon, bg: "oklch(0.205 0 0)", ink: "oklch(0.95 0 0)" },
-  { value: "system", label: "Match my device", icon: MonitorSmartphone, bg: "oklch(1 0 0)", ink: "oklch(0.205 0 0)" },
+  { value: "dull", label: "Dull light (softer white)", icon: Sparkles, main: "oklch(0.925 0.005 85)", second: "oklch(0.22 0 0)" },
+  { value: "light", label: "Light", icon: Sun, main: "oklch(1 0 0)", second: "oklch(0.145 0 0)" },
+  { value: "dark", label: "Dark", icon: Moon, main: "oklch(0.205 0 0)", second: "oklch(0.95 0 0)" },
+  { value: "system", label: "Match my device", icon: MonitorSmartphone, main: "oklch(1 0 0)", second: "oklch(0.205 0 0)" },
 ] as const;
 
 /** First visit after signing up: one small question, "light or dark?". Remembered per browser; changeable later in Settings. */
@@ -35,13 +35,12 @@ export function ThemePrompt() {
           <DialogDescription>Pick the one that is easier on your eyes. You can change it any time in Settings.</DialogDescription>
         </DialogHeader>
         <div className="grid gap-2">
-          {OPTIONS.map(({ value, label, icon: Icon, bg, ink }) => (
+          {OPTIONS.map(({ value, label, icon: Icon, main, second }) => (
             <button key={value} type="button" onClick={() => finish(value)}
               className="flex items-center gap-3 rounded-xl border px-4 py-3 text-left font-sans text-sm font-medium hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2">
               <Icon className="size-5 shrink-0" /><span className="flex-1">{label}</span>
-              <span aria-hidden className="relative size-7 shrink-0 overflow-hidden rounded-md border border-black/15" style={{ background: bg }}>
-                {value === "system" && <span className="absolute inset-y-0 right-0 w-1/2" style={{ background: "oklch(0.205 0 0)" }} />}
-                <span className="absolute bottom-1.5 left-1.5 right-1.5 h-1 rounded-full" style={{ background: value === "system" ? "oklch(0.5 0 0)" : ink }} />
+              <span aria-hidden className="relative h-7 w-11 shrink-0 overflow-hidden rounded-md border border-black/15" style={{ background: main }}>
+                <span className="absolute inset-0" style={{ background: second, clipPath: "polygon(62% 0, 100% 0, 100% 100%, 38% 100%)" }} />
               </span>
             </button>
           ))}
