@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { daysToTest, layout, quote, remainingMs, tierAt, withDays, type Block } from "@/lib/membership";
+import { daysThroughExam, planEnding, layout, outrightCents, parseChoice, quote, remainingMs, tierAt, withDays, type Block } from "@/lib/membership";
 
 const now = new Date("2026-03-01T00:00:00Z");
 const day = 86_400_000;
@@ -12,19 +12,26 @@ describe("quote", () => {
     expect(quote("pro", "quarterly", null, now)).toEqual({ days: 90, cents: 3200 });
     expect(quote("plus", "quarterly", null, now)).toEqual({ days: 90, cents: 1500 });
   });
-  it("needs a future test date for 'until my SAT'", () => {
+  it("only sells official SAT dates that have not passed", () => {
     expect(quote("plus", "until_test", null, now)).toBeNull();
     expect(quote("plus", "until_test", "2026-02-28", now)).toBeNull();
+    expect(parseChoice("until_test:2027-03-06")).toEqual({ billing: "until_test", exam: "2027-03-06" });
+    expect(parseChoice("until_test:2027-03-07")).toBeNull();
+    expect(parseChoice("until_test")).toBeNull();
+    expect(parseChoice("monthly")).toEqual({ billing: "monthly", exam: null });
+    expect(parseChoice("monthly:2027-03-06")).toBeNull();
   });
-  it("counts today through test day, and rounds to 50 cents", () => {
-    expect(daysToTest("2026-03-01", now)).toBe(1);
-    expect(daysToTest("2026-03-10", now)).toBe(10);
-    expect(quote("plus", "until_test", "2026-03-10", now)).toEqual({ days: 10, cents: 250 }); // 10 × 7/30 = 2.33
-    expect(quote("plus", "until_test", "2026-03-01", now)).toEqual({ days: 1, cents: 200 }); // floor
+  it("runs through the day after the exam", () => {
+    expect(daysThroughExam("2026-03-01", now)).toBe(2); // exam today: today and tomorrow
+    expect(daysThroughExam("2026-03-10", now)).toBe(11);
+    expect(daysThroughExam("2026-02-28", now)).toBeNull();
   });
-  it("uses the cheaper quarterly rate from 90 days and caps at a year", () => {
-    expect(quote("plus", "until_test", "2026-05-29", now)).toEqual({ days: 90, cents: 1500 });
-    expect(quote("pro", "until_test", "2030-01-01", now)).toEqual({ days: 365, cents: 13000 }); // 365 × 32/90 = 129.78, nearest 50 cents
+  it("costs a little less than buying the same months outright", () => {
+    expect(outrightCents("plus", 11)).toBe(700);
+    expect(outrightCents("plus", 31)).toBe(1400);
+    expect(outrightCents("plus", 85)).toBe(1500); // one 3-month pack beats three 30-day packs
+    expect(outrightCents("pro", 120)).toBe(3200 + 1500);
+    expect(quote("plus", "until_test", "2026-12-05", new Date("2026-10-30T00:00:00Z"))).toEqual({ days: 38, cents: 1250 }); // 2 months outright = 1400, less 10% = 1260, nearest 50 cents
   });
 });
 
@@ -50,5 +57,15 @@ describe("membership blocks", () => {
   it("is free with no blocks", () => {
     expect(tierAt([], now)).toBe("free");
     expect(layout({ plus: 0, pro: 0 }, now)).toEqual([]);
+  });
+});
+
+describe("planEnding", () => {
+  it("flags the last paid day when it is within a week", () => {
+    expect(planEnding([block("plus", 0, 12)], now)).toBeNull();
+    expect(planEnding([block("plus", 0, 5)], now)).toMatchObject({ tier: "plus", days: 4 });
+    expect(planEnding([block("pro", 0, 3), block("plus", 3, 5)], now)).toMatchObject({ tier: "plus" });
+    expect(planEnding([block("plus", -3, 0.5)], now)).toMatchObject({ days: 0 });
+    expect(planEnding([], now)).toBeNull();
   });
 });

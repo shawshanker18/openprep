@@ -1,6 +1,6 @@
 import { cleanDeliveryWindows } from "@/server/delivery-maintenance";
 import { timingSafeEqual } from "node:crypto";
-import { sendDueReminders } from "@/server/push";
+import { sendDueReminders, sendExpiryReminders } from "@/server/push";
 import { sweepTests } from "@/server/tests";
 import { deleteOldSignupTickets } from "@/server/signup";
 
@@ -20,7 +20,8 @@ export async function POST(req: Request) {
   if (!authorized(req)) return new Response("Unauthorized", { status: 401 });
   const tests = await sweepTests();
   const reminders = await sendDueReminders();
+  const expiry = await sendExpiryReminders();
   await deleteOldSignupTickets();
   await cleanDeliveryWindows();
-  return Response.json({ tests, reminders });
+  return Response.json({ tests, reminders, expiry });
 }

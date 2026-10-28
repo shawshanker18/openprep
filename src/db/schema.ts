@@ -538,6 +538,13 @@ export const membershipBlocks = pgTable("membership_blocks", {
   index("membership_blocks_user_idx").on(t.userId, t.endsAt),
 ]).enableRLS();
 
+/** One push reminder per student per end date, so "your plan ends soon" is sent once, not on every cron tick. */
+export const membershipReminders = pgTable("membership_reminders", {
+  userId: userRef(),
+  endsAt: ts("ends_at").notNull(),
+  sentAt: ts("sent_at").notNull().defaultNow(),
+}, (t) => [primaryKey({ columns: [t.userId, t.endsAt] })]).enableRLS();
+
 /** Webhook deliveries already applied, so a PayPal retry is a no-op. */
 export const paypalEvents = pgTable("paypal_events", {
   id: text("id").primaryKey(),

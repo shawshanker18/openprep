@@ -5,6 +5,7 @@ import { getTier } from "@/server/subscription";
 import { PLANS, type Tier } from "@/lib/tiers";
 import { paypalConfigured } from "@/server/paypal";
 import { quote, type Billing } from "@/lib/membership";
+import { upcomingSatDates } from "@/lib/sat-dates";
 import { BuyPanel, type BuyOption } from "./buy-panel";
 
 export const metadata = { title: "Plans" };
@@ -29,21 +30,25 @@ const CARDS: { tier: Tier; blurb: string; features: { text: string; has: boolean
 
 const usd = (cents: number) => `${(cents / 100).toFixed(cents % 100 ? 2 : 0)}`;
 
+const niceDate = (d: string) => new Date(`${d}T00:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
+
 /** Prices are shown from the same function the server uses to charge. */
-function optionsFor(tier: "plus" | "pro", testDate: string | null): BuyOption[] {
-  const get = (b: Billing) => quote(tier, b, testDate)!;
+function optionsFor(tier: "plus" | "pro"): BuyOption[] {
+  const get = (b: Billing) => quote(tier, b, null)!;
   const out: BuyOption[] = [
     { billing: "monthly", label: "30 days", price: usd(get("monthly").cents) },
     { billing: "quarterly", label: "3 months", price: usd(get("quarterly").cents), note: "Cheaper per month" },
   ];
-  const t = quote(tier, "until_test", testDate);
-  if (t) out.push({ billing: "until_test", label: `Until my SAT (${t.days} days)`, price: usd(t.cents), note: "Covers you right up to your test date" });
+  for (const date of upcomingSatDates(new Date().toISOString().slice(0, 10)).slice(0, 4)) {
+    const q = quote(tier, "until_test", date);
+    if (q) out.push({ billing: `until_test:${date}`, label: `Until the ${niceDate(date)} SAT`, price: usd(q.cents), note: `${q.days} days, ends the day after the exam. Less than buying the same months separately.` });
+  }
   return out;
 }
 
 export default async function Pricing({ searchParams }: PageProps<"/pricing">) {
   const sp = await searchParams;
-  const { userId, profile } = await requireUser();
+  const { userId } = await requireUser();
   const current = await getTier(userId);
   const clientId = paypalConfigured() ? process.env.PAYPAL_CLIENT_ID! : null;
   return (
@@ -63,7 +68,7 @@ export default async function Pricing({ searchParams }: PageProps<"/pricing">) {
               <p className="mt-2 text-4xl font-semibold tracking-tight">${price}<span className="text-sm font-normal text-muted-foreground">{paid ? " for 30 days" : ""}</span></p>
               <p className="mt-1 text-sm text-muted-foreground">{c.blurb}</p>
               {!paid ? (c.tier === current ? <Button variant="outline" size="lg" className="mt-5 w-full" disabled>Current plan</Button> : <div className="mt-5 h-11" />)
-                : clientId ? <BuyPanel tier={c.tier as "plus" | "pro"} clientId={clientId} options={optionsFor(c.tier as "plus" | "pro", profile.testDate)} />
+                : clientId ? <BuyPanel tier={c.tier as "plus" | "pro"} clientId={clientId} options={optionsFor(c.tier as "plus" | "pro")} />
                 : <Button size="lg" variant="outline" className="mt-5 w-full" disabled>Payments coming soon</Button>}
               <ul className="mt-5 flex flex-col gap-2 text-sm">
                 {c.features.map((f) => (

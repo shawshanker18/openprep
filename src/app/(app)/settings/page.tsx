@@ -8,7 +8,7 @@ import { SUBJECTS, TOPICS } from "@/content/taxonomy";
 import { asksChapters, asksSubjects } from "@/content/cbse-chapters";
 import { requireUser } from "@/server/auth";
 import { getMembership } from "@/server/subscription";
-import { tierAt } from "@/lib/membership";
+import { planEnding, tierAt } from "@/lib/membership";
 import { creditsLeft } from "@/server/remix";
 import { PLANS } from "@/lib/tiers";
 import { signOut } from "@/app/auth/actions";
@@ -41,6 +41,7 @@ export default async function SettingsPage({ searchParams }: PageProps<"/setting
   const { userId, profile } = await requireUser();
   const scores = await db.select().from(satAttempts).where(eq(satAttempts.userId, userId)).orderBy(satAttempts.takenOn);
   const blocks = await getMembership(userId), tier = tierAt(blocks, new Date()), left = await creditsLeft(userId, tier);
+  const ending = planEnding(blocks, new Date());
   const day = (d: Date) => d.toLocaleDateString("en-US", { dateStyle: "long" });
 
   return (
@@ -63,6 +64,7 @@ export default async function SettingsPage({ searchParams }: PageProps<"/setting
             <ul className="flex flex-col gap-1">
               {blocks.map((b) => <li key={b.startsAt.toISOString()}><b>{PLANS[b.tier].name}</b> until {day(b.endsAt)}</li>)}
             </ul>
+            {ending && <p role="status" className="rounded-md border border-foreground p-3 font-medium">Your plan ends {ending.days <= 0 ? "today" : `in ${ending.days} day${ending.days === 1 ? "" : "s"}`}. <Link className="underline" href="/pricing">Add more time</Link></p>}
             <p className="text-muted-foreground">One-time payments. Nothing renews by itself, and you go back to Free when your paid time ends.</p>
             <p className="text-muted-foreground">{left === null ? "Unlimited AI remixes." : `${left} of 50 AI remixes left this month.`}</p>
             <Link className="underline" href="/pricing">Buy more time or upgrade</Link>

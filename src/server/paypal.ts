@@ -41,9 +41,9 @@ type Order = {
 const cents = (m?: Money) => (m?.currency_code === "USD" && m.value ? Math.round(Number(m.value) * 100) : NaN);
 
 /** Creates the PayPal order. The price comes from the student's account here, never from the browser. Returns the order id for the buttons. */
-export async function createOrder(userId: string, tier: PaidTier, billing: Billing, testDate: string | null, now = new Date()) {
-  const q = quote(tier, billing, testDate, now);
-  if (!q) throw new CheckoutError("Add your SAT date in Settings first, or pick a 30-day or 3-month option.");
+export async function createOrder(userId: string, tier: PaidTier, billing: Billing, exam: string | null, now = new Date()) {
+  const q = quote(tier, billing, exam, now);
+  if (!q) throw new CheckoutError("That SAT date has passed. Pick another option.");
   const [recent] = await db.select({ n: count() }).from(membershipPurchases)
     .where(and(eq(membershipPurchases.userId, userId), eq(membershipPurchases.status, "created"), gte(membershipPurchases.createdAt, new Date(now.getTime() - 3_600_000))));
   if (recent!.n >= 10) throw new CheckoutError("Too many unfinished payments. Please wait a little and try again.");

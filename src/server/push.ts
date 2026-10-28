@@ -4,7 +4,7 @@ import webpush from "web-push";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db";
-import { pushSubscriptions } from "@/db/schema";
+import { membershipBlocks, membershipReminders, pushSubscriptions } from "@/db/schema";
 
 const MAX_DEVICES = 10;
 
@@ -114,4 +114,29 @@ export async function sendDueReminders() {
   for (const t of targets) if (ok.has(t.endpoint)) byDay.set(t.local_day, [...(byDay.get(t.local_day) ?? []), t.endpoint]);
   for (const [day, eps] of byDay) await db.update(pushSubscriptions).set({ lastSentOn: day }).where(inArray(pushSubscriptions.endpoint, eps));
   return { candidates: targets.length, sent: ok.size };
+}
+
+/** Push to every device of a student whose paid time ends within 3 days. Once per end date, and only for students who have a device. */
+export async function sendExpiryReminders(now = new Date()) {
+  if (!configure()) return { sent: 0 };
+  const last = sql<Date>`max(${membershipBlocks.endsAt})`;
+  const ending = await db.select({ userId: membershipBlocks.userId, endsAt: last }).from(membershipBlocks).groupBy(membershipBlocks.userId)
+    .having(sql`${last} > ${now} and ${last} <= ${new Date(now.getTime() + 3 * 86_400_000)}`);
+  let sent = 0;
+  for (const r of ending) {
+    const endsAt = new Date(r.endsAt);
+    const subs = await db.select().from(pushSubscriptions).where(eq(pushSubscriptions.userId, r.userId));
+    if (!subs.length) continue;
+    const fresh = await db.insert(membershipReminders).values({ userId: r.userId, endsAt }).onConflictDoNothing().returning({ u: membershipReminders.userId });
+    if (!fresh.length) continue;
+    const [b] = await db.select({ tier: membershipBlocks.tier }).from(membershipBlocks).where(and(eq(membershipBlocks.userId, r.userId), eq(membershipBlocks.endsAt, endsAt)));
+    const days = Math.max(0, Math.ceil((endsAt.getTime() - now.getTime()) / 86_400_000) - 1);
+    const ok = await sendAll(subs.map((s) => ({ ...s, payload: {
+      title: "Your OpenPrep plan ends soon",
+      body: `Your ${b?.tier === "pro" ? "Pro" : "Plus"} plan ends ${days === 0 ? "today" : `in ${days} day${days === 1 ? "" : "s"}`}. Add more time to keep your extras.`,
+      url: "/pricing",
+    } })));
+    sent += ok.length;
+  }
+  return { sent };
 }
