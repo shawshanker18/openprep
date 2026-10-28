@@ -294,3 +294,24 @@ img, video { max-width: 100%; }
   from { opacity: 0; transform: translateY(-4px); }
   to { opacity: 1; transform: none; }
 }
+
+@media (prefers-reduced-motion: no-preference) {
+  .upgrade-celebration { animation: upgrade-arrive 650ms cubic-bezier(.16, 1, .3, 1) both; }
+  .upgrade-plan-reveal { animation: upgrade-arrive 700ms 180ms both; }
+  .upgrade-confetti { animation: upgrade-confetti 3200ms ease-out both; }
+}
+@keyframes upgrade-arrive {
+  from { opacity: 0; transform: translateY(18px) scale(.9); }
+  to { opacity: 1; transform: none; }
+}
+/* Two small party-popper bursts on a transparent, non-interactive layer. */
+.upgrade-confetti { position: absolute; top: 65%; opacity: 0; }
+@keyframes upgrade-confetti {
+  0% { opacity: 0; transform: translate3d(0, 0, 0) scale(.3); }
+  10% { opacity: .75; }
+  45% { opacity: .65; transform: translate3d(calc(var(--confetti-x) * .65), var(--confetti-rise), 0) rotate(calc(var(--confetti-spin) * .5)); }
+  100% { opacity: 0; transform: translate3d(var(--confetti-x), 40vh, 0) rotate(var(--confetti-spin)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .upgrade-confetti-overlay { display: none; }
+}

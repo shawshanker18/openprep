@@ -1,87 +1,50 @@
-import { Check, Minus } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Sparkles } from "lucide-react";
 import { requireUser } from "@/server/auth";
-import { getTier } from "@/server/subscription";
-import { PLANS, type Tier } from "@/lib/tiers";
+import { getMembership } from "@/server/subscription";
+import { PLANS } from "@/lib/tiers";
 import { paypalConfigured } from "@/server/paypal";
-import { quote, type Billing } from "@/lib/membership";
+import { quote, tierAt } from "@/lib/membership";
 import { upcomingSatDates } from "@/lib/sat-dates";
 import { BuyPanel, type BuyOption } from "./buy-panel";
 
-export const metadata = { title: "Plans" };
+export const metadata = { title: "Upgrade" };
 
-const ERRORS: Record<string, string> = {
-  invalid: "That plan isn't available.",
-  unavailable: "Payments aren't switched on yet. Please try again soon.",
-  paypal: "We couldn't reach PayPal. Nothing was charged. Please try again.",
-};
+const niceDate = (d: Date) => d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
 
-// Feature copy lives here so the plans can be tuned without touching the billing code.
-const CARDS: { tier: Tier; blurb: string; features: { text: string; has: boolean }[] }[] = [
-  { tier: "free", blurb: "Everything you need to start.", features: [
-    { text: "Question bank and Smart Practice", has: true }, { text: "6 practice tests", has: true }, { text: "Free lessons", has: true },
-    { text: "Upgraded question bank", has: false }, { text: "AI question remix", has: false }] },
-  { tier: "plus", blurb: "More tests, harder questions.", features: [
-    { text: "Everything in Free", has: true }, { text: "All 20 practice tests", has: true }, { text: "Upgraded bank: hard and official SAT questions", has: true },
-    { text: "50 AI remixes a month", has: true }, { text: "Unlimited AI remix", has: false }] },
-  { tier: "pro", blurb: "Unlimited remixing.", features: [
-    { text: "Everything in Plus", has: true }, { text: "Unlimited AI question remix", has: true }, { text: "Easier, same-level or harder version of any question", has: true }] },
-];
-
-const usd = (cents: number) => `${(cents / 100).toFixed(cents % 100 ? 2 : 0)}`;
-
-const niceDate = (d: string) => new Date(`${d}T00:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
-
-/** Prices are shown from the same function the server uses to charge. */
-function optionsFor(tier: "plus" | "pro"): BuyOption[] {
-  const get = (b: Billing) => quote(tier, b, null)!;
-  const out: BuyOption[] = [
-    { billing: "monthly", label: "30 days", price: usd(get("monthly").cents) },
-    { billing: "quarterly", label: "3 months", price: usd(get("quarterly").cents), note: "Cheaper per month" },
-  ];
-  for (const date of upcomingSatDates(new Date().toISOString().slice(0, 10)).slice(0, 4)) {
-    const q = quote(tier, "until_test", date);
-    if (q) out.push({ billing: `until_test:${date}`, label: `Until the ${niceDate(date)} SAT`, price: usd(q.cents), note: `${q.days} days, ends the day after the exam. Less than buying the same months separately.` });
-  }
-  return out;
-}
-
-export default async function Pricing({ searchParams }: PageProps<"/pricing">) {
-  const sp = await searchParams;
+export default async function Pricing() {
   const { userId } = await requireUser();
-  const current = await getTier(userId);
-  const clientId = paypalConfigured() ? process.env.PAYPAL_CLIENT_ID! : null;
+  const now = new Date();
+  const blocks = await getMembership(userId, now);
+  const current = tierAt(blocks, now);
+  const active = blocks.find((b) => b.tier === current && b.startsAt <= now && now < b.endsAt);
+  const choices = [
+    { billing: "monthly", label: "Monthly", note: "30 days of access. One payment, no automatic renewal." },
+    { billing: "quarterly", label: "Quarterly", note: "90 days of access. Save compared with buying three monthly passes." },
+    ...upcomingSatDates(now.toISOString().slice(0, 10)).slice(0, 2).map((date, i) => ({
+      billing: `until_test:${date}`,
+      label: `${i === 0 ? "Next SAT" : "Following SAT"} · ${niceDate(new Date(`${date}T00:00:00Z`))}`,
+      note: `Access through the day after the ${niceDate(new Date(`${date}T00:00:00Z`))} SAT. One payment.`,
+    })),
+  ];
+  const options: BuyOption[] = choices.map((c) => {
+    const [billing, exam] = c.billing.split(":");
+    const get = (tier: "plus" | "pro") => quote(tier, billing as "monthly" | "quarterly" | "until_test", exam, now)!;
+    return { ...c, prices: { plus: get("plus").cents, pro: get("pro").cents }, days: get("plus").days };
+  });
+
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-8">
-      <header className="text-center">
-        <h1 className="text-3xl font-semibold tracking-tight">Practice free. Upgrade when you want more.</h1>
-        <p className="mt-2 text-muted-foreground">Every student keeps the full question bank. Paid plans add extras. One payment by card or PayPal. Nothing renews by itself.</p>
+    <div className="mx-auto flex w-full max-w-4xl flex-col gap-8">
+      <header>
+        <p className="mb-3 flex items-center gap-2 text-sm font-medium text-muted-foreground"><Sparkles className="size-4" />A little more practice. A lot more possibility.</p>
+        <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Your next step starts here.</h1>
+        <p className="mt-3 max-w-2xl text-muted-foreground">Unlock more ways to prepare with Plus or Pro. Choose your plan and how long you need it. Nothing renews automatically.</p>
       </header>
-      {typeof sp.error === "string" && Object.hasOwn(ERRORS, sp.error) && <p role="alert" className="rounded-md border border-destructive p-3 text-sm text-destructive">{ERRORS[sp.error]}</p>}
-      <div className="grid gap-5 md:grid-cols-3">
-        {CARDS.map((c) => {
-          const paid = c.tier !== "free", popular = c.tier === "plus", price = paid ? PLANS[c.tier as "plus" | "pro"].priceUsd : 0;
-          return (
-            <section key={c.tier} aria-label={`${c.tier} plan`} className={`relative flex flex-col rounded-2xl border bg-card p-7 ${popular ? "border-2 border-foreground shadow-lg" : ""}`}>
-              {popular && <span className="absolute -top-3 left-7 rounded-full bg-foreground px-3 py-1 text-xs font-medium text-background">Most popular</span>}
-              <p className="text-xs font-semibold tracking-wider text-muted-foreground">{c.tier.toUpperCase()}</p>
-              <p className="mt-2 text-4xl font-semibold tracking-tight">${price}<span className="text-sm font-normal text-muted-foreground">{paid ? " for 30 days" : ""}</span></p>
-              <p className="mt-1 text-sm text-muted-foreground">{c.blurb}</p>
-              {!paid ? (c.tier === current ? <Button variant="outline" size="lg" className="mt-5 w-full" disabled>Current plan</Button> : <div className="mt-5 h-11" />)
-                : clientId ? <BuyPanel tier={c.tier as "plus" | "pro"} clientId={clientId} options={optionsFor(c.tier as "plus" | "pro")} />
-                : <Button size="lg" variant="outline" className="mt-5 w-full" disabled>Payments coming soon</Button>}
-              <ul className="mt-5 flex flex-col gap-2 text-sm">
-                {c.features.map((f) => (
-                  <li key={f.text} className={`flex gap-2 ${f.has ? "" : "text-muted-foreground/60"}`}>
-                    {f.has ? <Check className="mt-0.5 size-4 shrink-0" aria-label="Included" /> : <Minus className="mt-0.5 size-4 shrink-0" aria-label="Not included" />}{f.text}
-                  </li>
-                ))}
-              </ul>
-            </section>
-          );
-        })}
-      </div>
-      <p className="text-center text-xs text-muted-foreground">Prices in USD. Remixes are AI-generated practice, not official questions.</p>
+      <section aria-label="Your current plan" className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border bg-muted/40 p-5">
+        <div><p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Your current plan</p><p className="mt-1 text-xl font-semibold">OpenPrep {current === "free" ? "Free" : PLANS[current].name}</p></div>
+        <div className="text-sm text-muted-foreground">{active ? <><p className="font-medium text-foreground">Active until {niceDate(active.endsAt)}</p><p>Paid time is preserved when you upgrade.</p></> : <><p className="font-medium text-foreground">Ready for more?</p><p>Compare your upgrade options below.</p></>}</div>
+      </section>
+      <BuyPanel current={current} clientId={paypalConfigured() ? process.env.PAYPAL_CLIENT_ID! : null} options={options} />
+      <p className="text-center text-xs text-muted-foreground">All prices in USD. One-time payments. AI remixes are practice questions, not official SAT questions.</p>
     </div>
   );
 }

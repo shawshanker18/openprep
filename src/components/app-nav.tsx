@@ -18,7 +18,6 @@ export const NAV_GROUPS = [
       { href: "/dashboard", label: "Dashboard", icon: Home },
       { href: "/analysis", label: "Analysis", icon: Activity },
       { href: "/bookmarks", label: "Saved questions", icon: Bookmark },
-      { href: "/pricing", label: "Plans", icon: CreditCard },
     ],
   },
   {
@@ -58,7 +57,7 @@ export function CurrentSection({ base = "" }: { base?: string }) {
     const target = hrefFor(base, item.href);
     return item.href === "/dashboard" ? path === target : path === target || path.startsWith(`${target}/`);
   });
-  return <span className="mr-auto text-sm font-medium" aria-label="Current section">{item?.label ?? (path.startsWith(`${base}/settings`) ? "Settings" : "OpenPrep")}</span>;
+  return <span className="mr-auto text-sm font-medium" aria-label="Current section">{item?.label ?? (path.startsWith(`${base}/pricing`) ? "Upgrade" : path.startsWith(`${base}/settings`) ? "Settings" : "OpenPrep")}</span>;
 }
 
 /**
@@ -93,8 +92,9 @@ export function NavLinks({ signOut, onNavigate, base = "", guest = false }: { si
           ))}
         </div>
       ))}
-      {/* The menu ends with just two things: feedback and sign out. Settings and Admin live in the top bar. */}
+      {/* Upgrade stays at the bottom of the full menu, including on mobile. */}
       <div className="mt-auto flex flex-col gap-0.5">
+        <Link href={guest ? "/pricing" : hrefFor(base, "/pricing")} onClick={onNavigate} aria-current={isActive(path, search, "/pricing", base) ? "page" : undefined} className={`${ROW} mb-2 border border-border font-medium aria-[current=page]:bg-muted`}><CreditCard className="size-4" />Upgrade</Link>
         <FeedbackDialog />
         {guest ? (
           <Link href="/login" className={`${ROW} text-muted-foreground hover:text-foreground`}><LogOut className="size-4 rotate-180" />Sign in</Link>

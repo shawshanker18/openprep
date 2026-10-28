@@ -20,7 +20,7 @@ content; the owner decides what goes in it. Limits live in `src/lib/tiers.ts`.
 Nothing renews by itself. Each payment is a one-time PayPal payment that buys days of Plus or Pro. When the paid time
 ends the student goes back to Free unless they buy again.
 
-Options on `/pricing`:
+Options on `/pricing` (Upgrade at the bottom of the sidebar):
 
 | Option | Days | Plus | Pro |
 |---|---|---|---|
@@ -29,7 +29,7 @@ Options on `/pricing`:
 | Until an SAT exam | through the day after the exam | about 10% under buying the same months outright | same rule |
 
 - The 3-month price is $5 a month for Plus (the owner's 7 to 5 ratio). Pro keeps the same ratio, rounded to a dollar.
-- An exam pass lists the next four official SAT dates (`src/lib/sat-dates.ts`). The plan ends the day after the exam.
+- The shared duration selector lists monthly, quarterly, and the next two official SAT dates (`src/lib/sat-dates.ts`). The plan ends the day after the exam.
   The price is the cheapest mix of 30-day and 3-month packs for those days, times 0.9 (`EXAM_RATE`), rounded to the
   nearest 50 cents, never under $2 (`MIN_CENTS`). **Add new SAT dates to `sat-dates.ts` as they are announced, or
   the exam options run out.**
@@ -47,14 +47,18 @@ A student's paid time is a short list of dated blocks. The higher tier always ru
 
 ### What happens on a purchase
 
-1. The student picks an option on `/pricing`. PayPal's buttons (card, PayPal) are shown on our own page. The card
+1. The student sees their current plan separately from the two paid options (no Free purchase card). One duration
+   selector updates both plan prices from the server quote function. Selecting a paid plan reveals an integrated
+   checkout with the total, duration and PayPal’s card/PayPal buttons. The card
    button opens a small PayPal window where the student can pay as a guest, with no PayPal login.
 2. `startPayment` (server action, `src/app/(app)/pricing/actions.ts`) prices the order and creates it at PayPal. A row
    goes into `membership_purchases` with status `created`.
 3. The student approves. `capturePayment` captures the payment at PayPal and checks it is `COMPLETED` for exactly the
    expected amount. Only then are the days granted (`src/server/membership.ts`), once, in a locked transaction.
-4. The student lands on `/settings?plan=active`. If PayPal is slow, they land on `?plan=processing`, and opening that
-   page re-checks their unfinished payments (`reconcilePending`).
+4. The student lands on `/pricing/success?order=<order-id>`. The page checks that the order belongs to the signed-in
+   student and reads its status from the database. Completed purchases show an animated congratulations screen for
+   the purchased tier (with reduced-motion support). Pending payments show a status-check button, which retries that
+   order; refunded orders never show congratulations. Settings can also reconcile unfinished payments as before.
 5. The webhook (`/api/paypal/webhook`) is the safety net. It grants days if the student closed the tab after paying,
    and takes days back on a full refund, a chargeback, or a denied capture. Partial refunds leave the days alone.
 

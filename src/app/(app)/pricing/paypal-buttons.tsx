@@ -26,15 +26,16 @@ export function PayPalButtons({ tier, billing, clientId }: { tier: "plus" | "pro
   const router = useRouter();
   const card = useRef<HTMLDivElement>(null), wallet = useRef<HTMLDivElement>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     let stop = false;
     const open: Button[] = [];
-    loadSdk(clientId).then((sdk) => {
-      const make = (fundingSource: string, color: string, el: HTMLDivElement | null) => {
+    loadSdk(clientId).then(async (sdk) => {
+      const make = async (fundingSource: string, color: string, el: HTMLDivElement | null) => {
         if (stop || !el) return;
         const button = sdk.Buttons({
-          fundingSource, style: { layout: "vertical", shape: "rect", color, label: "pay", height: 44 },
+          fundingSource, style: { layout: "vertical", shape: "pill", color, label: "pay", height: 44 },
           createOrder: async () => {
             setMessage(null);
             const r = await startPayment(tier, billing);
@@ -42,24 +43,28 @@ export function PayPalButtons({ tier, billing, clientId }: { tier: "plus" | "pro
             return r.id;
           },
           onApprove: async (data: { orderID?: string }) => {
-            const r = await capturePayment(data.orderID ?? "");
-            router.push(r.active ? "/settings?plan=active#plan" : "/settings?plan=processing#plan");
+            await capturePayment(data.orderID ?? "");
+            router.push(`/pricing/success?order=${encodeURIComponent(data.orderID ?? "")}`);
           },
           onCancel: () => setMessage(null),
-          onError: () => setMessage((m) => m ?? "The payment didn't go through. Nothing was charged. Please try again."),
+          onError: () => setMessage((m) => m ?? "We couldn't confirm the payment. Check your membership before trying again."),
         });
         if (!button.isEligible()) return;
         open.push(button);
-        void button.render(el).catch(() => {});
+        await button.render(el);
       };
-      make(sdk.FUNDING.CARD, "black", card.current);
-      make(sdk.FUNDING.PAYPAL, "gold", wallet.current);
-    }).catch(() => setMessage("We couldn't load the payment form. Please refresh and try again."));
+      await Promise.all([make(sdk.FUNDING.CARD, "black", card.current), make(sdk.FUNDING.PAYPAL, "white", wallet.current)]);
+      if (!stop) {
+        setReady(true);
+        if (!open.length) setMessage("No payment methods are available. Please try another browser or contact support.");
+      }
+    }).catch(() => { if (!stop) { setReady(true); setMessage("We couldn't load the payment form. Please refresh and try again."); } });
     return () => { stop = true; open.forEach((b) => void b.close().catch(() => {})); };
   }, [clientId, tier, billing, router]);
 
   return (
-    <div className="mt-3 flex flex-col gap-2">
+    <div className="flex flex-col gap-2">
+      {!ready && <p role="status" className="py-3 text-center text-xs text-muted-foreground">Loading secure checkout…</p>}
       <div ref={card} aria-label="Pay with a debit or credit card" />
       <div ref={wallet} aria-label="Pay with PayPal" />
       {message && <p role="alert" className="text-sm text-destructive">{message}</p>}
