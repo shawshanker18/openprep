@@ -12,6 +12,7 @@ import { z } from "zod";
 import { ACCEPTED_SET_SIZES, MAX_QUESTIONS_PER_SET } from "@/lib/question-limits";
 import { PracticeRunner } from "./practice-runner";
 import { PracticeSetup } from "@/components/practice-setup";
+import { getTier } from "@/server/subscription";
 
 export const metadata = { title: "Adaptive Practice" };
 
@@ -38,7 +39,7 @@ async function loadPage({ searchParams }: PageProps<"/practice">) {
     if (!session) notFound();
     const studentName=(await safely(()=>getAuthUser(),null))?.name??undefined;
     return <PracticeRunner key={session.id} userId={userId} sessionId={session.id} mode={session.config.mode} studentName={studentName}
-      title={session.title} block={block} set={{count:session.config.count??MAX_QUESTIONS_PER_SET}} back={session.back??undefined} />;
+      title={session.title} block={block} set={{count:session.config.count??MAX_QUESTIONS_PER_SET}} back={session.back??undefined} tier={await getTier(userId)} />;
   }
   const skillId = typeof sp.skill === "string" ? sp.skill : undefined;
   const d = sp.difficulty === "mixed" ? "mixed" : Number(sp.difficulty);

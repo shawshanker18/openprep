@@ -1,0 +1,2 @@
+ALTER TABLE "question_remixes" DROP CONSTRAINT "question_remixes_direction_check";--> statement-breakpoint
+ALTER TABLE "question_remixes" ADD CONSTRAINT "question_remixes_direction_check" CHECK ("question_remixes"."direction" in ('easier', 'same', 'harder', 'numbers'));

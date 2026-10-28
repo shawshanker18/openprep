@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { requireUser } from '@/server/auth';
 import { startTest } from '@/server/tests';
+import { getTier } from '@/server/subscription';
+import { canOpenPaper } from '@/lib/tiers';
 
 const paper = z.coerce.number().pipe(z.literal([1,2,3,4]));
 const section = z.enum(['math','rw']);
@@ -18,6 +20,7 @@ export async function startTestAction(form: FormData) {
   const scope = first==='full' ? {kind:'full'} : second ? {kind:'module',section:first,route:second} : {kind:'section',section:first};
   const parsed = Start.safeParse({...scope,paper:form.get('paper')});
   if (!parsed.success) redirect('/tests?error=invalid');
+  if (!canOpenPaper(await getTier(userId), parsed.data.paper)) redirect('/pricing');
   const result = await startTest(userId, parsed.data);
   if (!result.ok) redirect(result.resumeId ? `/tests?resume=${result.resumeId}` : result.error==='rate' ? '/tests?error=rate' : '/tests?error=empty');
   redirect(`/test/${result.id}`);

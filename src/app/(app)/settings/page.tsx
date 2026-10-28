@@ -7,6 +7,10 @@ import { satAttempts } from "@/db/schema";
 import { SUBJECTS, TOPICS } from "@/content/taxonomy";
 import { asksChapters, asksSubjects } from "@/content/cbse-chapters";
 import { requireUser } from "@/server/auth";
+import { getSubscription } from "@/server/subscription";
+import { creditsLeft } from "@/server/remix";
+import { PLANS, tierOf } from "@/lib/tiers";
+import { cancelPlan } from "@/app/(app)/pricing/actions";
 import { signOut } from "@/app/auth/actions";
 import { ThemeSelect } from "@/components/theme";
 import { CbseChapterPicker } from "@/components/cbse-chapter-picker";
@@ -22,6 +26,7 @@ export const metadata = { title: "Settings" };
 
 const control = "h-9 rounded-md border bg-background px-2 text-sm";
 const ERRORS: Record<string, string> = {
+  cancel: "We couldn't cancel with PayPal. Nothing changed. Please try again or cancel in your PayPal account.",
   settings: "Please check your settings and try again.",
   testdate: "Pick an upcoming test date: today or later, and within three years.",
   profile: "Please check your profile and try again.",
@@ -35,6 +40,7 @@ export default async function SettingsPage({ searchParams }: PageProps<"/setting
   const sp = await searchParams;
   const { userId, profile } = await requireUser();
   const scores = await db.select().from(satAttempts).where(eq(satAttempts.userId, userId)).orderBy(satAttempts.takenOn);
+  const sub = await getSubscription(userId), tier = tierOf(sub ?? undefined), left = await creditsLeft(userId, tier);
 
   return (
     <div className="flex max-w-xl flex-col gap-10">
@@ -44,6 +50,20 @@ export default async function SettingsPage({ searchParams }: PageProps<"/setting
         <h2 className="font-medium">Appearance</h2>
         <ThemeSelect />
         <p className="text-xs text-muted-foreground">System follows your device. Saved in this browser.</p>
+      </section>
+      <section id="plan" className="flex scroll-mt-20 flex-col gap-2">
+        <h2 className="font-medium">Plan</h2>
+        {sp.plan === "active" && <p role="status" className="rounded-md border p-3 text-sm">You&apos;re all set. Your plan is active.</p>}
+        {sp.plan === "processing" && <p role="status" className="rounded-md border p-3 text-sm">PayPal is still confirming your payment. Your plan turns on in a moment. Refresh this page shortly.</p>}
+        {tier === "free" ? (
+          <p className="text-sm">You&apos;re on the Free plan. <Link className="underline" href="/pricing">See Plus and Pro</Link></p>
+        ) : (
+          <div className="flex flex-col gap-2 text-sm">
+            <p><b>{PLANS[tier].name}</b> · ${PLANS[tier].priceUsd}/month through PayPal{sub?.status === "cancelled" && sub.currentPeriodEnd ? `. Cancelled: stays active until ${sub.currentPeriodEnd.toLocaleDateString("en-US", { dateStyle: "long" })}.` : sub?.currentPeriodEnd ? `. Renews ${sub.currentPeriodEnd.toLocaleDateString("en-US", { dateStyle: "long" })}.` : "."}</p>
+            <p className="text-muted-foreground">{left === null ? "Unlimited AI remixes." : `${left} of 50 AI remixes left this month.`}</p>
+            {sub?.status === "active" && <form action={cancelPlan}><Button type="submit" variant="outline" size="sm">Cancel plan</Button></form>}
+          </div>
+        )}
       </section>
       {typeof sp.error === "string" && Object.hasOwn(ERRORS, sp.error) && <p role="alert" className="rounded-md border border-destructive p-3 text-sm text-destructive">{ERRORS[sp.error]}</p>}
       {sp.saved && <p role="status" className="rounded-md border p-3 text-sm">Saved.</p>}

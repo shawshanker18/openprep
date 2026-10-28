@@ -16,6 +16,8 @@ import { cn, isTyping } from "@/lib/utils";
 import type { PublicQuestion, RevealedQuestion } from "@/server/questions";
 import { toggleBookmark } from "./actions";
 import { ReportQuestion } from "./report-question";
+import { RemixBadge, RemixBar } from "./remix-bar";
+import type { Tier } from "@/lib/tiers";
 import { readDraft, writeDraft } from "@/lib/answer-drafts";
 
 import { loadSavedPractice, saveSavedPractice, answerSavedPractice } from "./session-actions";
@@ -76,9 +78,9 @@ function Countdown({ limitS, elapsedS = 0 }: { limitS: number; elapsedS?:number 
   return <span className={cn("tabular-nums", left <= 0 && "text-red-700")}>{left > 0 ? clock(left) : `Time's up +${clock(-left)}`}</span>;
 }
 
-export function PracticeRunner({ sessionId, userId, mode, title, block, set, back, studentName }: {
+export function PracticeRunner({ sessionId, userId, mode, title, block, set, back, studentName, tier = "free" }: {
   sessionId: string; userId: string; mode: Mode; title: string; block?: { index: number; target: number } | null;
-  set?: SetConfig; back?: string; studentName?: string;
+  set?: SetConfig; back?: string; studentName?: string; tier?: Tier;
 }) {
   // Choices crossed out, per question, kept for this visit.
   const [crossed, setCrossed] = useState<Record<string, string[]>>({});
@@ -290,6 +292,7 @@ export function PracticeRunner({ sessionId, userId, mode, title, block, set, bac
         number={questionNumber} eliminated={crossed[s.q.id] ?? []} onEliminate={(next) => setCrossed((c) => ({ ...c, [s.q.id]: next }))}
         onChange={(v) => { setSaveStatus("Saving…"); dispatch({ type: "select", value: v }); }} correct={correctChoice}
         below={<>
+          {s.q.remix && <RemixBadge key={s.q.id} questionId={s.q.id} />}
           {s.phase === "answering" && <div ref={submitRef} className="flex flex-wrap items-start gap-2"><TutorPanel key={s.q.id} questionId={s.q.id} answered={false} /></div>}
           {r && (
             <div ref={resultRef} className="flex flex-col gap-4 rounded-lg border p-4">
@@ -308,6 +311,7 @@ export function PracticeRunner({ sessionId, userId, mode, title, block, set, bac
                 )}
                 <TutorPanel key={s.q.id} questionId={s.q.id} answered wrongChoice={!r.correct && !!s.q.choices?.length ? s.value : null} />
               </div>
+              <RemixBar questionId={s.q.id} tier={tier} question={s.q} />
             </div>
           )}
         </>} />

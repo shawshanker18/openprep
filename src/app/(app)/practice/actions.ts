@@ -13,6 +13,12 @@ import { deliveryContext } from "@/server/delivery-context";
 import { eventQuota } from "@/server/delivery";
 import { DeliveryBlocked } from "@/server/delivery-policy";
 import { readPaper } from "@/server/papers";
+import { DIRECTIONS, DIRECTION_LABEL } from "@/lib/remix";
+import { getTier } from "@/server/subscription";
+import { getOrCreateRemix, limitRemixRequests, remixOrigin, RemixError } from "@/server/remix";
+import { servePractice } from "@/server/delivery";
+import { createPracticeSession } from "@/server/practice-sessions";
+import { publicId } from "@/server/questions";
 
 const id = text().min(1).max(64);
 
@@ -100,4 +106,36 @@ export async function reportQuestion(input: z.input<typeof Report>) {
   if (!q || !(await wasGiven(userId,q.id))) return { ok: false as const, error: "Question not found." };
   await db.insert(questionReports).values({ userId, ...p.data, questionId: q.id });
   return { ok: true as const, data: undefined };
+}
+
+const Remix = z.object({ questionId: id, direction: z.enum(DIRECTIONS) });
+/** Plus and Pro: an easier, same-level or harder AI version of a question already answered. Opens it as a new one-question practice session. */
+export async function remixQuestion(input: z.input<typeof Remix>) {
+  const { userId } = await requireUser();
+  const p = Remix.safeParse(input);
+  if (!p.success) return { ok: false as const, error: "Invalid request." };
+  try {
+    const sourceId = await internalId(p.data.questionId, userId);
+    if (!sourceId) return { ok: false as const, error: "Question not found." };
+    const [answered] = await db.select({ id: attempts.id }).from(attempts).where(and(eq(attempts.userId, userId), eq(attempts.questionId, sourceId))).limit(1);
+    if (!answered) return { ok: false as const, error: "Answer the question first, then remix it." };
+    await limitRemixRequests(userId);
+    const remixId = await getOrCreateRemix(userId, await getTier(userId), sourceId, p.data.direction);
+    const [remix] = await db.select().from(questions).where(eq(questions.id, remixId));
+    if (!remix) return { ok: false as const, error: "Couldn't open the remix." };
+    await servePractice(userId, remix, await deliveryContext());
+    const sessionId = await createPracticeSession(userId, { mode: "list", ids: [publicId(remixId, userId)], count: 1 }, `${DIRECTION_LABEL[p.data.direction]} remix`);
+    return { ok: true as const, data: { url: `/practice?session=${sessionId}` } };
+  } catch (e) {
+    if (e instanceof RemixError || e instanceof DeliveryBlocked) return { ok: false as const, error: e.message };
+    throw e;
+  }
+}
+
+/** Label for a remix page: which question it was made from and in which direction. */
+export async function remixOriginOf(input: { questionId: string }) {
+  const { userId } = await requireUser();
+  const questionId = await internalId(String(input.questionId), userId);
+  const origin = questionId ? await remixOrigin(questionId) : null;
+  return origin ? { direction: origin.direction, sourceRef: publicId(origin.sourceId, userId).slice(0, 4) } : null;
 }

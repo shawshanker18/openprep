@@ -1,7 +1,7 @@
 import { SKILL_BY_ID } from "@/content/taxonomy";
 import type { PublicQuestion } from "@/server/questions";
 export type GuestQuestion = PublicQuestion & { correct: string; explanation: string };
-const make=(id:string,section:"math"|"rw",skillId:string,domain:string,stemMd:string,answers:string[],correct:string,explanation:string):GuestQuestion=>({id,section,skillId,domain:SKILL_BY_ID[skillId]?.domain??domain,stemMd,passageMd:null,choices:answers.map((md,i)=>({id:"ABCD"[i]!,md})),difficulty:2,copyRef:"guest",correct,explanation});
+const make=(id:string,section:"math"|"rw",skillId:string,domain:string,stemMd:string,answers:string[],correct:string,explanation:string):GuestQuestion=>({id,section,skillId,domain:SKILL_BY_ID[skillId]?.domain??domain,stemMd,passageMd:null,choices:answers.map((md,i)=>({id:"ABCD"[i]!,md})),difficulty:2,copyRef:"guest",remix:false,correct,explanation});
 /** Original public examples, separate from the scored question bank and reserved test pool. */
 export const GUEST_QUESTIONS:GuestQuestion[]=[
   make("g-m1","math","m-alg-lin1","algebra","If $3x+7=22$, what is $x$?",["3","5","7","15"],"B","Subtract 7 from both sides: $3x=15$. Divide by 3 to get $x=5$."),

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import {
-  Activity, Bookmark, BookOpen, Calculator, ClipboardList, GraduationCap, Home, Library, LogOut, Menu, Settings, ShieldCheck, Sparkles,
+  Activity, Bookmark, BookOpen, Calculator, ClipboardList, CreditCard, GraduationCap, Home, Library, LogOut, Menu, Settings, ShieldCheck, Sparkles,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
@@ -18,6 +18,7 @@ export const NAV_GROUPS = [
       { href: "/dashboard", label: "Dashboard", icon: Home },
       { href: "/analysis", label: "Analysis", icon: Activity },
       { href: "/bookmarks", label: "Saved questions", icon: Bookmark },
+      { href: "/pricing", label: "Plans", icon: CreditCard },
     ],
   },
   {

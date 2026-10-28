@@ -32,13 +32,13 @@ export async function internalIds(pubs: string[], userId: string) {
 }
 
 export type PublicQuestion = Pick<Question,
-  "id" | "passageMd" | "stemMd" | "choices" | "section" | "skillId" | "domain" | "difficulty"> & { copyRef: string };
+  "id" | "passageMd" | "stemMd" | "choices" | "section" | "skillId" | "domain" | "difficulty"> & { copyRef: string; remix: boolean };
 export type RevealedQuestion = PublicQuestion & Pick<Question,
   "answer" | "explanationMd" | "choiceRationales" | "fastMethodMd" | "desmos">;
 
 export function toPublic(q: Question, userId: string): PublicQuestion {
   const md = (s: string) => questionMarkdown(q,s,userId);
-  return { id: publicId(q.id, userId), section: q.section, skillId: q.skillId, domain: q.domain, difficulty: q.difficulty, copyRef: digest(`copy:${userId}:${q.id}`).slice(0,16), passageMd: q.passageMd ? md(q.passageMd) : null, stemMd: md(q.stemMd),
+  return { id: publicId(q.id, userId), section: q.section, skillId: q.skillId, domain: q.domain, difficulty: q.difficulty, copyRef: digest(`copy:${userId}:${q.id}`).slice(0,16), remix: q.pool === "remix", passageMd: q.passageMd ? md(q.passageMd) : null, stemMd: md(q.stemMd),
     choices: q.choices?.map(c=>({...c,md:md(c.md)})) ?? null };
 }
 export function questionMarkdown(q:Pick<Question,'id'|'stemMd'|'passageMd'|'choices'>,s:string,userId:string) {

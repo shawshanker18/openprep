@@ -70,9 +70,10 @@ export const questions = pgTable("questions", {
   status: text("status").notNull().default("active"), // active | retired
   version: integer("version").notNull().default(1),
   // study = practice and the question bank; test = mock tests and the diagnostic only (see docs/QUESTION_POOLS.md).
+  // remix = AI-made variants of a question (see question_remixes); never part of the bank, practice picks or tests.
   pool: text("pool").notNull().default("study"),
 }, (t) => [
-  check("questions_pool_check", sql`${t.pool} in ('study', 'test')`),
+  check("questions_pool_check", sql`${t.pool} in ('study', 'test', 'remix')`),
   index("q_skill_diff").on(t.skillId, t.difficulty, t.status),
   // Pool and bank-size counts group active questions by section; this index answers them without reading every row.
   index("questions_status_section_pool_idx").on(t.status, t.section, t.pool),
@@ -502,3 +503,45 @@ export const conceptQuestions = pgTable("concept_questions", {
   primaryKey({ columns: [t.conceptId, t.questionId] }),
   index("concept_questions_question_idx").on(t.questionId),
 ]).enableRLS();
+
+
+/* ───────── paid tiers ───────── */
+/** One row per paying user. No row (or an ended one) means the free tier. */
+export const subscriptions = pgTable("subscriptions", {
+  userId: userRef().primaryKey(),
+  tier: text("tier").notNull(), // plus | pro
+  status: text("status").notNull(), // pending | active | cancelled | suspended | expired
+  paypalSubscriptionId: text("paypal_subscription_id").notNull(),
+  currentPeriodEnd: ts("current_period_end"), // a cancelled plan keeps its tier until then
+  updatedAt: ts("updated_at").notNull().defaultNow(),
+}, (t) => [
+  check("subscriptions_tier_check", sql`${t.tier} in ('plus', 'pro')`),
+  check("subscriptions_status_check", sql`${t.status} in ('pending', 'active', 'cancelled', 'suspended', 'expired')`),
+  uniqueIndex("subscriptions_paypal_idx").on(t.paypalSubscriptionId),
+]).enableRLS();
+
+/** Webhook deliveries already applied, so a PayPal retry is a no-op. */
+export const paypalEvents = pgTable("paypal_events", {
+  id: text("id").primaryKey(),
+  createdAt: ts("created_at").notNull().defaultNow(),
+}).enableRLS();
+
+/** An AI remix of a question, one per source question and direction, shared by every student. remix_id is a row in questions. */
+export const questionRemixes = pgTable("question_remixes", {
+  sourceId: text("source_id").notNull().references(() => questions.id, { onDelete: "cascade" }),
+  direction: text("direction").notNull(), // easier | same | harder | numbers
+  remixId: text("remix_id").notNull().references(() => questions.id, { onDelete: "cascade" }),
+  createdBy: uuid("created_by").references(() => profiles.id, { onDelete: "set null" }),
+  createdAt: ts("created_at").notNull().defaultNow(),
+}, (t) => [
+  primaryKey({ columns: [t.sourceId, t.direction] }),
+  check("question_remixes_direction_check", sql`${t.direction} in ('easier', 'same', 'harder', 'numbers')`),
+  uniqueIndex("question_remixes_remix_idx").on(t.remixId),
+]).enableRLS();
+
+/** One row per fresh AI generation (cache hits are free), used for monthly credits and the daily abuse cap. */
+export const remixUsage = pgTable("remix_usage", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: userRef(),
+  createdAt: ts("created_at").notNull().defaultNow(),
+}, (t) => [index("remix_usage_user_time").on(t.userId, t.createdAt), index("remix_usage_time").on(t.createdAt)]).enableRLS();
