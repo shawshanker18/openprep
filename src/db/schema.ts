@@ -35,6 +35,14 @@ export const profiles = pgTable("profiles", {
   weeklyFocus: jsonb("weekly_focus").$type<{ weekOf: string; skillIds: string[] } | null>(),
 });
 
+// The student's saved default calculator window (position, size, which calculator). A separate table so a problem with it
+// can only ever affect the calculator, never sign-in or the profile.
+export const calculatorLayouts = pgTable("calculator_layouts", {
+  userId: userRef().primaryKey(),
+  layout: jsonb("layout").$type<{ x: number; y: number; w: number; h: number; tab: "graphing" | "scientific" }>().notNull(),
+  updatedAt: ts("updated_at").notNull().defaultNow(),
+});
+
 // One bounded row per student; the practice API updates this atomically.
 export const practiceRateWindows = pgTable("practice_rate_windows", {
   userId: userRef().primaryKey(),

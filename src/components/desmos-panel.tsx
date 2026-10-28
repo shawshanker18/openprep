@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Calculator, ChevronDown, ChevronUp, Expand, ExternalLink, LoaderCircle, Maximize2, Minimize, Minimize2 } from "lucide-react";
+import { Calculator, ChartLine, ChevronDown, ChevronUp, Expand, ExternalLink, GripHorizontal, LoaderCircle, Maximize2, Minimize, Minimize2, Save, X } from "lucide-react";
+import { toast } from "sonner";
+import { getCalculatorLayout, saveCalculatorLayout } from "@/app/calculator-actions";
 import { watchCalculatorSize } from "@/lib/calculator-size";
 import { Markdown } from "@/components/markdown";
 import { Button } from "@/components/ui/button";
@@ -16,12 +18,13 @@ type DesmosApi = {
 };
 declare global {
   interface Window {
-    Desmos?: { GraphingCalculator(element: HTMLElement, options?: Record<string, unknown>): DesmosApi };
+    Desmos?: { GraphingCalculator(element: HTMLElement, options?: Record<string, unknown>): DesmosApi; ScientificCalculator(element: HTMLElement, options?: Record<string, unknown>): DesmosApi };
   }
 }
 
 const EMPTY_EXPRESSIONS: string[] = [];
 const FALLBACK = "https://www.desmos.com/testing/collegeboard/graphing";
+const FALLBACK_SCIENTIFIC = "https://www.desmos.com/testing/collegeboard/scientific";
 // The hosted page has a 50 px green header at every width. Crop a few pixels more so fractional display scaling
 // (125%, 150%, 175%) never leaves a sliver of it showing along the top edge.
 const API_KEY = process.env.NEXT_PUBLIC_DESMOS_API_KEY;
@@ -49,7 +52,7 @@ function loadDesmos(): Promise<void> {
 }
 
 /** Desmos calculator with a hosted embed when the API key is unavailable. */
-export function DesmosCalculator({ expressions = EMPTY_EXPRESSIONS, className = "h-96", stateKey }: { expressions?: string[]; className?: string; stateKey?: string }) {
+export function DesmosCalculator({ expressions = EMPTY_EXPRESSIONS, className = "h-96", stateKey, kind = "graphing", bare = false }: { expressions?: string[]; className?: string; stateKey?: string; kind?: "graphing" | "scientific"; bare?: boolean }) {
   const el = useRef<HTMLDivElement>(null);
   const viewport = useRef<HTMLDivElement>(null);
   const shell = useRef<HTMLDivElement>(null);
@@ -69,11 +72,13 @@ export function DesmosCalculator({ expressions = EMPTY_EXPRESSIONS, className = 
       if (cancelled || timedOut || !scriptReady || !window.Desmos) return;
       try {
         if (!calculator) {
-          calculator = window.Desmos.GraphingCalculator(target, { autosize: false, expressions: true, settingsMenu: false });
-          (JSON.parse(expressionKey) as string[]).forEach((latex, index) =>
+          calculator = kind === "scientific"
+            ? window.Desmos.ScientificCalculator(target, {})
+            : window.Desmos.GraphingCalculator(target, { autosize: false, expressions: true, settingsMenu: false });
+          if (kind === "graphing") (JSON.parse(expressionKey) as string[]).forEach((latex, index) =>
             calculator!.setExpression({ id: `lesson-${index}`, latex }));
           // Graphs the student drew earlier in this session come back as they left them.
-          if (stateKey) {
+          if (stateKey && kind === "graphing") {
             try { const saved = localStorage.getItem(stateKey); if (saved) calculator.setState(JSON.parse(saved)); } catch { /* storage unavailable */ }
             let timer = 0;
             calculator.observeEvent("change", () => {
@@ -101,7 +106,7 @@ export function DesmosCalculator({ expressions = EMPTY_EXPRESSIONS, className = 
       calculator?.destroy();
       target.replaceChildren();
     };
-  }, [expressionKey, stateKey]);
+  }, [expressionKey, stateKey, kind]);
   useEffect(() => {
     sizing.current?.refresh();
     if (!fullscreen) return;
@@ -125,8 +130,8 @@ export function DesmosCalculator({ expressions = EMPTY_EXPRESSIONS, className = 
   return (
     <div ref={shell} role={fullscreen ? "dialog" : undefined} aria-modal={fullscreen || undefined}
       aria-label="Desmos graphing calculator"
-      className={fullscreen ? "fixed inset-0 z-50 flex flex-col bg-white" : `relative flex min-h-[320px] min-w-0 max-w-full flex-col overflow-hidden border border-neutral-300 bg-white ${className}`}>
-      <div className="absolute right-3 bottom-3 z-20 flex items-center gap-2">
+      className={fullscreen ? "fixed inset-0 z-50 flex flex-col bg-white" : `relative flex ${bare ? "" : "min-h-[320px]"} min-w-0 max-w-full flex-col overflow-hidden border border-neutral-300 bg-white ${className}`}>
+      {!bare && <div className="absolute right-3 bottom-3 z-20 flex items-center gap-2">
         <a href={FALLBACK} target="_blank" rel="noopener noreferrer" onClick={openInWindow} className={CONTROL}>
           <ExternalLink className="size-4" />New window
         </a>
@@ -134,10 +139,10 @@ export function DesmosCalculator({ expressions = EMPTY_EXPRESSIONS, className = 
           aria-label={fullscreen ? "Exit full-screen calculator" : "Open full-screen calculator"}>
           {fullscreen ? <Minimize className="size-4" /> : <Expand className="size-4" />}{fullscreen ? "Exit full screen" : "Full screen"}
         </button>
-      </div>
+      </div>}
       {hosted ? (
         <>
-          <div className="relative min-h-0 w-full flex-1 overflow-hidden"><iframe title="Desmos graphing calculator" src={FALLBACK} className="absolute -top-[54px] left-0 h-[calc(100%+54px)] w-full border-0" allowFullScreen /></div>
+          <div className="relative min-h-0 w-full flex-1 overflow-hidden"><iframe title="Desmos graphing calculator" src={kind === "scientific" ? FALLBACK_SCIENTIFIC : FALLBACK} className="absolute -top-[54px] left-0 h-[calc(100%+54px)] w-full border-0" allowFullScreen /></div>
           {expressions.length > 0 && <div className="shrink-0 border-t border-neutral-200 bg-neutral-50 px-3 py-2 text-xs text-neutral-600">
             Equations {expressions.map((expression) => <Markdown key={expression} className="mx-1 inline-block rounded bg-white px-2 py-1 text-neutral-900">{`$${expression}$`}</Markdown>)}
           </div>}
@@ -180,52 +185,80 @@ export function DesmosToggle({ className = "h-[65dvh] min-h-[20rem]" }: { classN
 }
 
 /**
- * The test-day calculator: a button for the top bar that slides a half-screen Desmos over the right side of the exam.
- * It stays mounted after the first open, so graphs are still there when it is reopened.
+ * The test-day calculator: a top-bar button that opens the same floating Bluebook-style window the question bank uses.
+ * It stays mounted after the first open, so graphs, position and size are still there between questions and when reopened.
  */
-export function DesmosDock() {
+export function DesmosDock({ sessionKey }: { sessionKey: string }) {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   return (
     <>
       <button type="button" aria-expanded={open} onClick={() => { setMounted(true); setOpen((o) => !o); }}
         className="flex min-h-9 items-center gap-1.5 rounded-md border px-3 text-sm hover:bg-muted"><Calculator className="size-4" />Calculator</button>
-      {mounted && (
-        <div hidden={!open} className="fixed inset-y-0 right-0 z-50 flex w-full flex-col border-l bg-white shadow-2xl sm:w-1/2">
-          <div className="flex shrink-0 items-center justify-between bg-neutral-900 px-3 py-2 text-sm text-white">
-            <span className="font-medium">Calculator</span>
-            <button type="button" onClick={() => setOpen(false)} className="min-h-9 rounded-md px-3 hover:bg-white/10">Close</button>
-          </div>
-          <DesmosCalculator className="min-h-0 flex-1 border-0" />
-        </div>
-      )}
+      {mounted && <FloatingDesmos sessionKey={sessionKey} open={open} onClose={() => setOpen(false)} />}
     </>
   );
 }
 
+type Tab = "graphing" | "scientific";
 type Win = { x: number; y: number; w: number; h: number };
+type Saved = Win & { tab: Tab };
 const clampWin = (v: Win): Win => ({
   w: v.w, h: v.h,
   x: Math.min(Math.max(0, v.x), Math.max(0, window.innerWidth - 120)),
   y: Math.min(Math.max(0, v.y), Math.max(0, window.innerHeight - 48)),
 });
+/** Where Bluebook puts it: top-left, under the exam header, about half the width of the screen's question column. */
+const bluebookLayout = (): Saved => {
+  const w = Math.min(560, window.innerWidth - 32), h = Math.min(545, window.innerHeight - 100);
+  return { x: Math.min(24, Math.max(0, window.innerWidth - w)), y: Math.min(76, Math.max(0, window.innerHeight - h - 8)), w, h, tab: "graphing" };
+};
+const fitSaved = (v: Saved): Saved => {
+  const w = Math.min(Math.max(260, v.w), window.innerWidth), h = Math.min(Math.max(200, v.h), window.innerHeight);
+  return { ...clampWin({ x: v.x, y: v.y, w, h }), tab: v.tab === "scientific" ? "scientific" : "graphing" };
+};
 
 /**
- * A calculator window the student can drag by its title bar and resize from its corner. It is created once for a
- * practice session and only hidden when closed, so it is already loaded when opened, and its graphs and its place
- * on screen are kept for the whole session instead of resetting with each question.
+ * A Bluebook-style calculator window: Graphing and Scientific tabs, a grip to drag it by, collapse, expand and close, and
+ * resize handles on every edge. It is created once per practice or test session and only hidden when closed, so its graphs
+ * and its place on screen survive moving between questions. Where it starts is decided once, when it is first opened:
+ * this browser's last position for the session, otherwise the student's saved default from the database, otherwise the
+ * Bluebook layout. After that it never asks the database again; only "Save as default" writes to it.
  */
 export function FloatingDesmos({ sessionKey, open, onClose }: { sessionKey: string; open: boolean; onClose: () => void }) {
   const winKey = `${sessionKey}:window`;
-  const [win, setWin] = useState<Win>(() => {
-    const fallback = { x: 16, y: Math.max(72, window.innerHeight - 460), w: Math.min(380, window.innerWidth - 32), h: 420 };
-    try { const saved = localStorage.getItem(winKey); return saved ? clampWin({ ...fallback, ...JSON.parse(saved) }) : fallback; } catch { return fallback; }
+  const [start, setStart] = useState<Saved | null>(() => {
+    try { const saved = localStorage.getItem(winKey); return saved ? fitSaved({ ...bluebookLayout(), ...JSON.parse(saved) }) : null; } catch { return null; }
   });
+  useEffect(() => {
+    if (start) return;
+    let off = false;
+    getCalculatorLayout().then((saved) => saved ? fitSaved({ ...bluebookLayout(), ...saved }) : bluebookLayout(), () => bluebookLayout())
+      .then((layout) => { if (!off) setStart(layout); });
+    return () => { off = true; };
+  }, [start]);
+  if (!start) return null;
+  return <CalculatorWindow key="w" winKey={winKey} sessionKey={sessionKey} initial={start} open={open} onClose={onClose} />;
+}
+
+function CalculatorWindow({ winKey, sessionKey, initial, open, onClose }: { winKey: string; sessionKey: string; initial: Saved; open: boolean; onClose: () => void }) {
+  const [win, setWin] = useState<Win>({ x: initial.x, y: initial.y, w: initial.w, h: initial.h });
+  const [tab, setTab] = useState<Tab>(initial.tab);
+  const [scientificSeen, setScientificSeen] = useState(initial.tab === "scientific");
   const [mode, setMode] = useState<"normal" | "max" | "min">("normal");
-  const box = useRef<HTMLDivElement>(null);
+  const [saving, setSaving] = useState(false);
   const drag = useRef<{ dx: number; dy: number } | null>(null);
   const sizing = useRef<{ dir: string; sx: number; sy: number; start: Win } | null>(null);
-  const remember = (v: Win) => { try { localStorage.setItem(winKey, JSON.stringify(v)); } catch { /* storage unavailable */ } };
+  const remember = (v: Win, t: Tab = tab) => { try { localStorage.setItem(winKey, JSON.stringify({ ...v, tab: t })); } catch { /* storage unavailable */ } };
+  const pick = (t: Tab) => { setTab(t); if (t === "scientific") setScientificSeen(true); remember(win, t); };
+  const saveDefault = async () => {
+    setSaving(true);
+    try {
+      const res = await saveCalculatorLayout({ ...win, tab });
+      if (res.ok) toast.success("Saved as your default calculator layout"); else toast.error("Couldn't save the layout. Try again.");
+    } catch { toast.error("Couldn't save the layout. Check your connection and try again."); }
+    finally { setSaving(false); }
+  };
   /** Edge and corner handles: each pointer move recomputes the box from where the drag began. */
   const resizeMove = (e: React.PointerEvent) => {
     const r = sizing.current; if (!r) return;
@@ -244,19 +277,30 @@ export function FloatingDesmos({ sessionKey, open, onClose }: { sessionKey: stri
     ["nw", "left-0 top-0 size-4 cursor-nwse-resize"], ["ne", "right-0 top-0 size-4 cursor-nesw-resize"],
     ["sw", "bottom-0 left-0 size-4 cursor-nesw-resize"], ["se", "bottom-0 right-0 size-5 cursor-nwse-resize"],
   ];
+  const tabBtn = (t: Tab, label: string, Icon: typeof Calculator) => (
+    <button type="button" role="tab" aria-selected={tab === t} onClick={() => pick(t)}
+      className={`flex items-center gap-1.5 rounded px-2 py-1 text-xs font-semibold ${tab === t ? "bg-white text-neutral-900 shadow-sm ring-1 ring-neutral-300 [&>span]:underline [&>span]:underline-offset-4" : "text-neutral-700 hover:bg-neutral-200"}`}>
+      <Icon className="size-3.5" /><span>{label}</span>
+    </button>
+  );
+  const icon = "grid size-8 place-items-center rounded text-neutral-800 hover:bg-neutral-200 disabled:opacity-50";
   return (
-    <div ref={box} aria-hidden={!open}
+    <div aria-hidden={!open}
       style={mode === "max" ? { left: 16, top: 16, width: "calc(100vw - 32px)", height: "calc(100dvh - 32px)" } : mode === "min" ? { left: win.x, top: win.y, width: win.w } : { left: win.x, top: win.y, width: win.w, height: win.h }}
-      className={`fixed z-50 flex min-w-[260px] max-w-[100vw] flex-col overflow-hidden rounded-lg border bg-white shadow-2xl ${open ? "" : "pointer-events-none invisible"}`}>
-      <div className={`flex shrink-0 select-none items-center justify-between gap-2 bg-neutral-900 px-3 py-2 text-sm text-white ${mode === "max" ? "" : "cursor-grab touch-none active:cursor-grabbing"}`}
+      className={`fixed z-50 flex min-w-[260px] max-w-[100vw] flex-col overflow-hidden border border-neutral-500 bg-white text-neutral-900 shadow-2xl ${open ? "" : "pointer-events-none invisible"}`}>
+      <div className={`flex shrink-0 select-none items-center gap-2 border-b border-neutral-300 bg-neutral-100 px-2 py-1.5 ${mode === "max" ? "" : "cursor-grab touch-none active:cursor-grabbing"}`}
         onPointerDown={(e) => { if (mode === "max" || (e.target as HTMLElement).closest("button")) return; e.currentTarget.setPointerCapture(e.pointerId); drag.current = { dx: e.clientX - win.x, dy: e.clientY - win.y }; }}
         onPointerMove={(e) => { const d = drag.current; if (d) setWin((w) => clampWin({ ...w, x: e.clientX - d.dx, y: e.clientY - d.dy })); }}
         onPointerUp={() => { if (drag.current) { drag.current = null; setWin((w) => { remember(w); return w; }); } }}>
-        <span className="font-medium">Calculator{mode === "max" ? "" : " · drag to move"}</span>
-        <div className="flex items-center gap-1">
-          <button type="button" onClick={() => setMode((m) => (m === "min" ? "normal" : "min"))} aria-label={mode === "min" ? "Restore calculator" : "Collapse calculator"} title={mode === "min" ? "Restore" : "Collapse"} className="grid size-8 place-items-center rounded-md hover:bg-white/10">{mode === "min" ? <ChevronDown className="size-4" /> : <ChevronUp className="size-4" />}</button>
-          <button type="button" onClick={() => setMode((m) => (m === "max" ? "normal" : "max"))} aria-label={mode === "max" ? "Shrink calculator" : "Expand calculator"} title={mode === "max" ? "Shrink" : "Expand"} className="grid size-8 place-items-center rounded-md hover:bg-white/10">{mode === "max" ? <Minimize2 className="size-4" /> : <Maximize2 className="size-4" />}</button>
-          <button type="button" onClick={onClose} className="min-h-8 rounded-md px-3 hover:bg-white/10">Close</button>
+        <div role="tablist" aria-label="Calculator type" className="flex shrink-0 gap-0.5 rounded-md bg-neutral-200/70 p-0.5">
+          {tabBtn("graphing", "Graphing", ChartLine)}{tabBtn("scientific", "Scientific", Calculator)}
+        </div>
+        <GripHorizontal aria-hidden className="mx-auto size-5 text-neutral-500" />
+        <div className="flex shrink-0 items-center">
+          <button type="button" disabled={saving} onClick={saveDefault} aria-label="Save as default calculator layout" title="Save position, size and calculator as my default" className={icon}><Save className="size-4" /></button>
+          <button type="button" onClick={() => setMode((m) => (m === "min" ? "normal" : "min"))} aria-label={mode === "min" ? "Restore calculator" : "Collapse calculator"} title={mode === "min" ? "Restore" : "Collapse"} className={icon}>{mode === "min" ? <ChevronDown className="size-4" /> : <ChevronUp className="size-4" />}</button>
+          <button type="button" onClick={() => setMode((m) => (m === "max" ? "normal" : "max"))} aria-label={mode === "max" ? "Shrink calculator" : "Expand calculator"} title={mode === "max" ? "Shrink" : "Expand"} className={icon}>{mode === "max" ? <Minimize2 className="size-4" /> : <Maximize2 className="size-4" />}</button>
+          <button type="button" onClick={onClose} aria-label="Close calculator" title="Close" className={icon}><X className="size-5" /></button>
         </div>
       </div>
       {mode === "normal" && HANDLES.map(([dir, cls]) => (
@@ -268,7 +312,8 @@ export function FloatingDesmos({ sessionKey, open, onClose }: { sessionKey: stri
         </div>
       ))}
       <div hidden={mode === "min"} className="flex min-h-0 flex-1 flex-col">
-        <DesmosCalculator stateKey={`${sessionKey}:graph`} className="min-h-0 flex-1 border-0" />
+        <div hidden={tab !== "graphing"} className="flex min-h-0 flex-1 flex-col"><DesmosCalculator bare stateKey={`${sessionKey}:graph`} className="min-h-0 flex-1 border-0" /></div>
+        {scientificSeen && <div hidden={tab !== "scientific"} className="flex min-h-0 flex-1 flex-col"><DesmosCalculator bare kind="scientific" className="min-h-0 flex-1 border-0" /></div>}
       </div>
     </div>
   );

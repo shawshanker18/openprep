@@ -35,7 +35,7 @@ export function DiagnosticRunner({ sessionId, initial, initialIndex, studentName
   return (
     <ExamFrame
       top={<ExamTop title="Diagnostic" subtitle={q.section === "rw" ? "Reading and Writing" : "Math"} tools={<>
-        {q.section === "math" && <DesmosDock />}
+        {q.section === "math" && <DesmosDock sessionKey={`openprep:desmos:test:${sessionId}`} />}
         <EndTest action={endDiagnostic.bind(null, sessionId)} detail="The answers you've given so far are kept. You can take the diagnostic again later from your dashboard." />
       </>} />}
       footer={<ExamFooter name={studentName} label={`Question ${index + 1} of up to ${DIAGNOSTIC_LENGTH}`}

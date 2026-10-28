@@ -217,7 +217,7 @@ export function TestRunner({ userId, sessionId, module: m, items: initial, serve
     <ExamTop title={title} subtitle={screen === "review" ? "Check your work" : `${SECTION[m.section] ?? m.section}`}
       center={left != null ? <ExamTimer label={clock(left)} urgent={left < 5 * 60_000} /> : undefined}
       tools={<>
-        {isMath && <DesmosDock />}
+        {isMath && <DesmosDock sessionKey={`openprep:desmos:test:${sessionId}`} />}
         {isMath && <ReferenceSheet />}
         <span className="w-16 text-center text-xs text-muted-foreground" role="status">{saving === "saving" ? "Saving…" : saving === "error" ? "Not saved" : "Saved"}</span>
         <EndTest action={abandon.bind(null, sessionId)} detail="It won't be scored and your answers so far won't count." />
