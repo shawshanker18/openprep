@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { requireUser } from "@/server/auth";
 import { getTier } from "@/server/subscription";
 import { PLANS, type Tier } from "@/lib/tiers";
-import { subscribe } from "./actions";
+import { paypalConfigured } from "@/server/paypal";
+import { PayPalButtons } from "./paypal-buttons";
 
 export const metadata = { title: "Plans" };
 
@@ -30,11 +31,12 @@ export default async function Pricing({ searchParams }: PageProps<"/pricing">) {
   const sp = await searchParams;
   const { userId } = await requireUser();
   const current = await getTier(userId);
+  const clientId = paypalConfigured() ? process.env.PAYPAL_CLIENT_ID! : null;
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-8">
       <header className="text-center">
         <h1 className="text-3xl font-semibold tracking-tight">Practice free. Upgrade when you want more.</h1>
-        <p className="mt-2 text-muted-foreground">Every student keeps the full question bank. Paid plans add extras. Billed monthly through PayPal. Cancel anytime.</p>
+        <p className="mt-2 text-muted-foreground">Every student keeps the full question bank. Paid plans add extras. Pay by card or PayPal, billed monthly. Cancel anytime.</p>
       </header>
       {typeof sp.error === "string" && Object.hasOwn(ERRORS, sp.error) && <p role="alert" className="rounded-md border border-destructive p-3 text-sm text-destructive">{ERRORS[sp.error]}</p>}
       <div className="grid gap-5 md:grid-cols-3">
@@ -48,8 +50,8 @@ export default async function Pricing({ searchParams }: PageProps<"/pricing">) {
               <p className="mt-1 text-sm text-muted-foreground">{c.blurb}</p>
               {c.tier === current ? <Button variant="outline" size="lg" className="mt-5 w-full" disabled>Current plan</Button>
                 : paid && current === "free" ? (
-                  <form action={subscribe} className="mt-5"><input type="hidden" name="tier" value={c.tier} />
-                    <Button type="submit" size="lg" variant={popular ? "default" : "outline"} className="w-full">Upgrade to {PLANS[c.tier as "plus" | "pro"].name}</Button></form>
+                  clientId ? <PayPalButtons tier={c.tier as "plus" | "pro"} clientId={clientId} />
+                    : <Button size="lg" variant="outline" className="mt-5 w-full" disabled>Payments coming soon</Button>
                 ) : paid ? <Button variant="outline" size="lg" className="mt-5 w-full" render={<Link href="/settings#plan" />}>Manage plan</Button>
                 : <div className="mt-5 h-11" />}
               <ul className="mt-5 flex flex-col gap-2 text-sm">

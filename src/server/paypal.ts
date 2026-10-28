@@ -40,7 +40,7 @@ type PayPalSubscription = {
 
 const siteUrl = () => (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
 
-/** Starts checkout: records a pending subscription and returns PayPal's approval link. */
+/** Starts checkout: records a pending subscription and returns its id for the PayPal buttons on our own pricing page. */
 export async function startCheckout(userId: string, tier: PaidTier) {
   const sub = await call<PayPalSubscription>("/v1/billing/subscriptions", {
     method: "POST",
@@ -52,11 +52,9 @@ export async function startCheckout(userId: string, tier: PaidTier) {
       },
     },
   });
-  const approve = sub.links?.find((l) => l.rel === "approve")?.href;
-  if (!approve) throw new Error("PayPal returned no approval link");
   await db.insert(subscriptions).values({ userId, tier, status: "pending", paypalSubscriptionId: sub.id })
     .onConflictDoUpdate({ target: subscriptions.userId, set: { tier, status: "pending", paypalSubscriptionId: sub.id, currentPeriodEnd: null, updatedAt: new Date() } });
-  return approve;
+  return sub.id;
 }
 
 const STATUS: Record<string, string> = { ACTIVE: "active", APPROVAL_PENDING: "pending", APPROVED: "pending", SUSPENDED: "suspended", CANCELLED: "cancelled", EXPIRED: "expired" };
