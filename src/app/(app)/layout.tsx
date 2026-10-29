@@ -51,7 +51,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
         <SiteFooter scope="app" />
       </div>
       <MobileTabs />
-      <AppBridge reminderHour={profile.reminderHour} timezone={profile.timezone} />
+      <AppBridge reminderHour={profile.reminderHour} timezone={profile.timezone} touchSeen={profile.touchSeen} tabletLayout={profile.tabletLayout} />
     </div>
   );
 }

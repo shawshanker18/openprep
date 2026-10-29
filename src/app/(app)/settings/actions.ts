@@ -149,3 +149,17 @@ export async function syncTimezone(tz: unknown) {
   try { new Intl.DateTimeFormat("en", { timeZone: tz }); } catch { return; }
   await db.update(profiles).set({ timezone: tz }).where(eq(profiles.id, userId));
 }
+
+/** Remember on the account that it has been opened on a phone or tablet, so Settings offers the tablet layout choice. */
+export async function markTouchDevice() {
+  const { userId, profile } = await requireUser();
+  if (profile.touchSeen) return;
+  await db.update(profiles).set({ touchSeen: true }).where(eq(profiles.id, userId));
+}
+
+export async function setTabletLayout(value: unknown): Promise<{ ok: boolean }> {
+  const { userId } = await requireUser();
+  if (value !== "tabs" && value !== "sidebar") return { ok: false };
+  await db.update(profiles).set({ tabletLayout: value }).where(eq(profiles.id, userId));
+  return { ok: true };
+}

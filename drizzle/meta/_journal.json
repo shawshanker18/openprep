@@ -232,6 +232,13 @@
       "when": 1793211518782,
       "tag": "0032_calculator_layouts",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1793258795636,
+      "tag": "0033_tablet_layout",
+      "breakpoints": true
     }
   ]
 }

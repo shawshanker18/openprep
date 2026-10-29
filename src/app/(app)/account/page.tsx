@@ -12,7 +12,7 @@ export const metadata = { title: "Your account" };
 
 export default async function AccountPage({ searchParams }: PageProps<"/account">) {
   const sp = await searchParams;
-  const { userId } = await requireUser();
+  const { userId, profile } = await requireUser();
   const user = await safely(() => getAuthUser(), null);
   if (sp.plan === "processing") await reconcilePending(userId);
   const blocks = await getMembership(userId), now = new Date(), tier = tierAt(blocks, now);
@@ -25,5 +25,5 @@ export default async function AccountPage({ searchParams }: PageProps<"/account"
     ending: planEnding(blocks, now), remixesLeft: left,
   };
   const one = (v: string | string[] | undefined) => (typeof v === "string" ? v : undefined);
-  return <AccountView account={account} plan={plan} signOut={signOut} error={one(sp.error)} planStatus={one(sp.plan)} />;
+  return <AccountView account={account} plan={plan} signOut={signOut} error={one(sp.error)} planStatus={one(sp.plan)} touchSeen={profile.touchSeen} tabletLayout={profile.tabletLayout === "sidebar" ? "sidebar" : "tabs"} />;
 }

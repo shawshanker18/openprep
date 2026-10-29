@@ -30,6 +30,8 @@ export const profiles = pgTable("profiles", {
   testDate: date("test_date"),
   minutesPerDay: smallint("minutes_per_day").notNull().default(45),
   daysPerWeek: smallint("days_per_week").notNull().default(5),
+  touchSeen: boolean("touch_seen").notNull().default(false), // this account has been opened on a phone or tablet at least once
+  tabletLayout: text("tablet_layout").notNull().default("tabs"), // "tabs" (bottom bar, sidebar hidden) or "sidebar" on tablets
   reminderHour: smallint("reminder_hour"), // local hour 0–23 for the daily practice reminder; null = off
   dashboardLayout: jsonb("dashboard_layout").$type<{ id: string; visible: boolean }[] | null>(), // null = automatic default
   weeklyFocus: jsonb("weekly_focus").$type<{ weekOf: string; skillIds: string[] } | null>(),
