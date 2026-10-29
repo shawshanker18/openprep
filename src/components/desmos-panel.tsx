@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Calculator, ChartLine, ChevronRight, Expand, GripHorizontal, ExternalLink, LoaderCircle, Maximize2, Minimize, Minimize2, Save, X } from "lucide-react";
+import { Calculator, ChartLine, Expand, GripHorizontal, ExternalLink, LoaderCircle, Maximize2, Minimize, Minimize2, Save, X } from "lucide-react";
 import { toast } from "sonner";
 import { getCalculatorLayout, saveCalculatorLayout } from "@/app/calculator-actions";
 import { watchCalculatorSize } from "@/lib/calculator-size";
@@ -230,11 +230,10 @@ const fitSaved = (v: Partial<Saved>): Saved => {
  */
 export function FloatingDesmos({ sessionKey, open, onOpen, onClose }: { sessionKey: string; open: boolean; onOpen: () => void; onClose: () => void }) {
   const winKey = `${sessionKey}:window`;
-  const [armed, setArmed] = useState(open);
-  if (open && !armed) setArmed(true);
   const [start, setStart] = useState<Saved | null>(null);
+  /** How far the edge bar has been pulled to the right: the calculator follows it, and lets go open or shut. */
+  const [pull, setPull] = useState<number | null>(null);
   useEffect(() => {
-    if (!armed || start) return;
     let off = false;
     const local = (): Saved | null => {
       try { const saved = localStorage.getItem(winKey); return saved ? fitSaved(JSON.parse(saved)) : null; } catch { return null; }
@@ -242,21 +241,32 @@ export function FloatingDesmos({ sessionKey, open, onOpen, onClose }: { sessionK
     Promise.resolve().then(() => local() ?? Promise.race([getCalculatorLayout(), new Promise<null>((resolve) => setTimeout(() => resolve(null), 2500))]).then((saved) => fitSaved(saved ?? {}), () => fitSaved({})))
       .then((layout) => { if (!off) setStart(layout); });
     return () => { off = true; };
-  }, [armed, start, winKey]);
-  const swipe = useRef<number | null>(null);
+  }, [winKey]);
   return (
     <>
-      {!open && (
-        <button type="button" onClick={onOpen} aria-label="Open calculator" title="Calculator"
-          onPointerDown={(e) => { swipe.current = e.clientX; }}
-          onPointerMove={(e) => { if (swipe.current !== null && e.clientX - swipe.current > 24) { swipe.current = null; onOpen(); } }}
-          onPointerUp={() => { swipe.current = null; }} onPointerCancel={() => { swipe.current = null; }}
-          className="fixed left-0 top-1/2 z-40 flex h-32 w-8 -translate-y-1/2 touch-pan-y flex-col items-center justify-center gap-2 rounded-r-2xl border border-l-0 border-neutral-300 bg-white text-neutral-700 shadow-md hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-          <Calculator className="size-4" /><ChevronRight className="size-4" />
-        </button>
-      )}
-      {start && <CalculatorWindow winKey={winKey} sessionKey={sessionKey} initial={start} open={open} onClose={onClose} />}
+      {!open && <EdgeBar onPull={setPull} onOpen={onOpen} />}
+      {start && <CalculatorWindow winKey={winKey} sessionKey={sessionKey} initial={start} open={open} pull={open ? null : pull} onClose={onClose} />}
     </>
+  );
+}
+
+/** A slim bar on the left edge of the screen: tap it, or pull it to the right and the calculator slides out after your finger. */
+function EdgeBar({ onPull, onOpen }: { onPull: (px: number | null) => void; onOpen: () => void }) {
+  const from = useRef<{ x: number; moved: boolean } | null>(null);
+  const end = (e: React.PointerEvent, cancelled = false) => {
+    const d = from.current; if (!d) return;
+    from.current = null; onPull(null);
+    if (!cancelled && (!d.moved || e.clientX > 80)) onOpen();
+  };
+  return (
+    <button type="button" aria-label="Open calculator" title="Calculator"
+      onPointerDown={(e) => { e.currentTarget.setPointerCapture(e.pointerId); from.current = { x: e.clientX, moved: false }; }}
+      onPointerMove={(e) => { const d = from.current; if (!d) return; if (Math.abs(e.clientX - d.x) > 6) d.moved = true; if (d.moved) onPull(Math.max(0, e.clientX)); }}
+      onPointerUp={(e) => end(e)} onPointerCancel={(e) => end(e, true)}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpen(); } }}
+      className="group fixed left-0 top-1/2 z-40 flex h-28 w-5 -translate-y-1/2 cursor-grab touch-none items-center focus-visible:outline-none">
+      <span className="h-20 w-1.5 rounded-r-full bg-neutral-500 shadow ring-1 ring-white/70 transition-all group-hover:w-2.5 group-focus-visible:w-2.5 group-focus-visible:ring-2 group-focus-visible:ring-blue-600" />
+    </button>
   );
 }
 
@@ -283,7 +293,7 @@ function ResizeHandle({ dir, className, box, onBox, onDone }: { dir: string; cla
   );
 }
 
-function CalculatorWindow({ winKey, sessionKey, initial, open, onClose }: { winKey: string; sessionKey: string; initial: Saved; open: boolean; onClose: () => void }) {
+function CalculatorWindow({ winKey, sessionKey, initial, open, pull, onClose }: { winKey: string; sessionKey: string; initial: Saved; open: boolean; pull: number | null; onClose: () => void }) {
   const [win, setWin] = useState<Win>({ x: initial.x, y: initial.y, w: initial.w, h: initial.h });
   const [tab, setTab] = useState<Tab>(initial.tab);
   const [scientificSeen, setScientificSeen] = useState(initial.tab === "scientific");
@@ -325,10 +335,12 @@ function CalculatorWindow({ winKey, sessionKey, initial, open, onClose }: { winK
   );
   const icon = "grid size-8 place-items-center rounded-lg text-neutral-800 hover:bg-neutral-200 disabled:opacity-50";
   const box = expanded ? { left: 12, top: 12, width: "calc(100vw - 24px)", height: "calc(100dvh - 24px)" } : { left: win.x, top: win.y, width: win.w, height: win.h };
+  const away = (expanded ? 12 + window.innerWidth : win.x + win.w) + 24;
+  const shown = open || pull !== null;
   return (
     <div aria-hidden={!open} inert={!open}
-      style={{ ...box, transform: open ? "none" : `translateX(-${(expanded ? 12 : win.x) + (expanded ? window.innerWidth : win.w) + 24}px)` }}
-      className={`fixed z-50 flex min-w-[300px] max-w-[100vw] flex-col overflow-hidden rounded-2xl border border-neutral-300 bg-white text-neutral-900 shadow-2xl transition-[transform,opacity,visibility] duration-300 ease-out ${open ? "opacity-100" : "pointer-events-none invisible opacity-0"}`}>
+      style={{ ...box, transform: open ? "none" : `translateX(${Math.min(0, -away + (pull ?? 0))}px)` }}
+      className={`fixed z-50 flex min-w-[300px] max-w-[100vw] flex-col overflow-hidden rounded-2xl border border-neutral-300 bg-white text-neutral-900 shadow-2xl ${pull !== null ? "" : "transition-[transform,opacity,visibility] duration-300 ease-out"} ${shown ? "opacity-100" : "pointer-events-none invisible opacity-0"}`}>
       <div className={`flex shrink-0 select-none items-center gap-2 border-b border-neutral-200 bg-neutral-100 px-2.5 py-2 ${expanded ? "" : "cursor-grab touch-none active:cursor-grabbing"}`}
         onPointerDown={(e) => { if (expanded || (e.target as HTMLElement).closest("button")) return; e.currentTarget.setPointerCapture(e.pointerId); drag.current = { dx: e.clientX - win.x, dy: e.clientY - win.y, from: win.x }; }}
         onPointerMove={dragMove} onPointerUp={dragEnd} onPointerCancel={dragEnd}>
