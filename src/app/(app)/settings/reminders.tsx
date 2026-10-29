@@ -70,7 +70,7 @@ export function Reminders({ hour }: { hour: number | null }) {
   }
 
   return (
-    <section id="reminders" className="flex scroll-mt-20 flex-col gap-3">
+    <section id="reminders" className="flex scroll-mt-20 flex-col gap-4 rounded-xl border p-5">
       <h2 className="font-medium">Study reminders</h2>
       <p className="text-sm text-muted-foreground">A notification at your study time on days you haven&apos;t practiced yet. Turn it on for each device you use.</p>
       <label className="flex flex-col gap-1 text-sm sm:w-60">Remind me at

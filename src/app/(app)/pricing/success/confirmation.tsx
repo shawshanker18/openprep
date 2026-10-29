@@ -33,7 +33,7 @@ export function UpgradeConfirmation({ tier, days, status }: { tier: PaidTier; da
       {complete && <div className="upgrade-plan-reveal mt-8 w-full rounded-2xl border bg-card p-6 shadow-sm"><Sparkles className="mx-auto mb-3 size-6" /><p className="text-2xl font-semibold">OpenPrep {name}</p><p className="mt-2 text-sm text-muted-foreground">{name === "Pro" ? "All practice tests · Unlimited AI remixing" : "All practice tests · 50 AI remixes each month"}</p></div>}
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         {complete || refunded ? <Button size="lg" render={<Link href={complete ? "/practice" : "/pricing"} />}>{complete ? "Let’s practice" : "View plans"}<ArrowRight className="size-4" /></Button> : <CheckPaymentStatus />}
-        <Button size="lg" variant="outline" render={<Link href="/settings#plan" />}>View my membership</Button>
+        <Button size="lg" variant="outline" render={<Link href="/account#plan" />}>View my membership</Button>
       </div>
     </div>
   );

@@ -100,7 +100,7 @@ export async function retakeDiagnostic() {
 
 export async function deleteAccount(form: FormData) {
   const { userId } = await requireUser();
-  if (form.get("confirm") !== "DELETE") redirect("/settings?error=delete");
+  if (form.get("confirm") !== "DELETE") redirect("/account?error=delete");
   await db.transaction(async (tx) => {
     await tx.delete(profiles).where(eq(profiles.id, userId)); // cascades to every per-user table
     await tx.execute(sql`select app_private.delete_auth_user(${userId}::uuid)`);

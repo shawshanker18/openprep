@@ -69,7 +69,7 @@ export function CurrentSection({ base = "" }: { base?: string }) {
     const target = hrefFor(base, item.href);
     return item.href === "/dashboard" ? path === target : path === target || path.startsWith(`${target}/`);
   });
-  return <span className="mr-auto text-sm font-medium" aria-label="Current section">{item?.label ?? (path.startsWith(`${base}/pricing`) ? "Upgrade" : path.startsWith(`${base}/account`) ? "Account" : path.startsWith(`${base}/settings`) ? "Settings" : "OpenPrep")}</span>;
+  return <span className="mr-auto text-sm font-medium" aria-label="Current section">{item?.label ?? (path.startsWith(`${base}/pricing`) ? "Upgrade" : path.startsWith(`${base}/account`) ? "Account" : path.startsWith(`${base}/settings`) ? "Study settings" : "OpenPrep")}</span>;
 }
 
 /**
@@ -144,7 +144,7 @@ export function AccountLinks({ isAdmin, user, base = "" }: { isAdmin: boolean; u
   return (
     <div className="flex items-center">
       {isAdmin && <Link href="/admin" aria-label="Admin" title="Admin" aria-current={path.startsWith("/admin") ? "page" : undefined} className={icon}><ShieldCheck className="size-5" /></Link>}
-      <Link href={`${base}/settings`} aria-label="Settings" title={`Settings · ${user}`} aria-current={path.startsWith(`${base}/settings`) ? "page" : undefined} className={icon}><Settings className="size-5" /></Link>
+      <Link href={`${base}/settings`} aria-label="Study settings" title={`Study settings · ${user}`} aria-current={path.startsWith(`${base}/settings`) ? "page" : undefined} className={icon}><Settings className="size-5" /></Link>
     </div>
   );
 }

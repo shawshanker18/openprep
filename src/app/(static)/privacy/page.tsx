@@ -23,7 +23,7 @@ export default function Privacy(){
   <h2>Guest practice</h2>
   <p>Guest practice does not create an account. Sample-question answers are stored in your browser and are not added to student learning records. Clear this site’s browser data to remove them. Network and security information may still be processed when you visit the site.</p>
   <h2>Delete your data</h2>
-  <p>Go to <Link href="/settings" className="underline">Settings</Link> → Delete my account, type DELETE, and confirm. This removes your sign-in account and linked learning records from the active database. Turning reminders off on a device removes its push subscription. You can clear site data in your browser to remove local drafts and preferences.</p>
+  <p>Go to <Link href="/account" className="underline">Your account</Link> → Delete my account, type DELETE, and confirm. This removes your sign-in account and linked learning records from the active database. Turning reminders off on a device removes its push subscription. You can clear site data in your browser to remove local drafts and preferences.</p>
   <p>Feedback and security reports may remain after account deletion, with the account link removed where applicable. Limited security records and provider backups may remain under their retention schedules. To request removal of a report or ask a privacy question, use the Feedback link at the bottom of the website and identify the relevant report.</p>
   <h2>Age</h2>
   <p>OpenPrep is for people aged 13 and over.</p>
