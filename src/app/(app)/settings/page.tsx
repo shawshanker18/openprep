@@ -14,6 +14,7 @@ import { creditsLeft } from "@/server/remix";
 import { PLANS } from "@/lib/tiers";
 import { signOut } from "@/app/auth/actions";
 import { ThemeSelect } from "@/components/theme";
+import { LayoutSelect } from "@/components/layout-select";
 import { CbseChapterPicker } from "@/components/cbse-chapter-picker";
 import { Reminders } from "./reminders";
 import {
@@ -54,6 +55,8 @@ export default async function SettingsPage({ searchParams }: PageProps<"/setting
         <h2 className="font-medium">Appearance</h2>
         <ThemeSelect />
         <p className="text-xs text-muted-foreground">System follows your device. Saved in this browser.</p>
+        <LayoutSelect />
+        <p className="text-xs text-muted-foreground">Automatic gives tablets and phones the menu button with tabs along the bottom, and computers the full sidebar. Saved in this browser.</p>
       </section>
       <section id="plan" className="flex scroll-mt-20 flex-col gap-2">
         <h2 className="font-medium">Plan</h2>

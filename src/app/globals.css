@@ -10,9 +10,20 @@
    side = desk with room for the sidebar: a mouse/trackpad window at least 24rem tall.
           The sidebar sizes itself to the height it is given (row height follows the window), so it never scrolls and never crams.
    lap  = only a sliver of a window (under 24rem tall): same top bar, the menu opens from a button. */
-@custom-variant desk (@media (min-width: 64rem) and (pointer: fine));
-@custom-variant side (@media (min-width: 64rem) and (min-height: 24rem) and (pointer: fine));
-@custom-variant lap (@media (min-width: 64rem) and (max-height: 23.99rem) and (pointer: fine));
+/* Settings can override all of this per browser: html[data-layout="desktop"] forces the desktop shell (from 48rem up),
+   html[data-layout="tablet"] forces the phone/tablet one. With no attribute the device decides, as above. */
+@custom-variant desk {
+  @media (min-width: 64rem) and (pointer: fine) { &:where(html:not([data-layout]) *) { @slot; } }
+  @media (min-width: 48rem) { &:where(html[data-layout="desktop"] *) { @slot; } }
+}
+@custom-variant side {
+  @media (min-width: 64rem) and (min-height: 24rem) and (pointer: fine) { &:where(html:not([data-layout]) *) { @slot; } }
+  @media (min-width: 48rem) and (min-height: 24rem) { &:where(html[data-layout="desktop"] *) { @slot; } }
+}
+@custom-variant lap {
+  @media (min-width: 64rem) and (max-height: 23.99rem) and (pointer: fine) { &:where(html:not([data-layout]) *) { @slot; } }
+  @media (min-width: 48rem) and (max-height: 23.99rem) { &:where(html[data-layout="desktop"] *) { @slot; } }
+}
 /* Under 44rem tall the sidebar swaps its two big cards (Getting started, Admin) for icons. */
 @custom-variant snug (@media (max-height: 44rem));
 /* Exam screens go side by side (passage | question) on any wide screen, and on a phone or tablet turned sideways. */
@@ -196,7 +207,10 @@ html.dark {
     scroll-padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
   }
   @media (min-width: 64rem) and (min-height: 30rem) and (pointer: fine) {
-    html { scroll-padding-bottom: 0; }
+    html:not([data-layout]) { scroll-padding-bottom: 0; }
+  }
+  @media (min-width: 48rem) and (min-height: 30rem) {
+    html[data-layout="desktop"] { scroll-padding-bottom: 0; }
   }
 }
 /* Phones: while typing, the keyboard is up and the bottom nav would ride on top of it (a stray tap loses the answer).
@@ -248,10 +262,13 @@ body.lesson-focus-mode main { max-width: none; padding-top: 1rem; }
 
 /* Keep controls reachable beneath the tablet/mobile navigation. */
 @media not ((min-width: 64rem) and (pointer: fine)) {
-  body:has(.bottom-nav) > .site-footer {
-    padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
-  }
+  html:not([data-layout]) body:has(.bottom-nav) > .site-footer { padding-bottom: calc(4.5rem + env(safe-area-inset-bottom)); }
 }
+html[data-layout="tablet"] body:has(.bottom-nav) > .site-footer { padding-bottom: calc(4.5rem + env(safe-area-inset-bottom)); }
+@media (max-width: 47.99rem) {
+  html[data-layout="desktop"] body:has(.bottom-nav) > .site-footer { padding-bottom: calc(4.5rem + env(safe-area-inset-bottom)); }
+}
+
 
 /* Big screens: the whole interface scales up (rem-based) instead of sitting small in the middle of a huge empty window.
    The height conditions keep the sidebar fitting. 1920 wide ≈ 112%, 2560 ≈ 125%, 4K and wider ≈ 150%. */
