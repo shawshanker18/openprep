@@ -11,7 +11,7 @@ export function FooterFeedback() {
 }
 
 /** Pages that render inside the signed-in app shell (its footer lives in the content column, never under the sidebar). */
-const APP_PAGES = ["/dashboard", "/settings"];
+const APP_PAGES = ["/dashboard", "/settings", "/account"];
 /** Standalone pages that show the notice at the bottom of the window. */
 const SITE_PAGES = ["/", "/login", "/onboarding", "/about", "/privacy", "/terms", "/security", "/feedback", "/guest", "/guest/settings"];
 

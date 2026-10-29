@@ -20,7 +20,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
   if (profile.onboardingStep !== "done" && profile.onboardingStep !== "diagnostic_skipped" && profile.onboardingStep !== "diagnostic") redirect("/onboarding");
   // Furniture, not content: if any of these is slow or fails the page still renders without it.
   const [user, admin] = await Promise.all([safely(() => getAuthUser(), null), safely(() => isAdmin(userId), false)]);
-  const nav = { signOut };
+  const nav = { signOut, account: { name: user?.name ?? user?.email ?? "Account", email: user?.email ?? null, avatarUrl: user?.avatarUrl ?? null } };
   const account = <AccountLinks isAdmin={admin} user={user?.name ?? user?.email ?? "Account"} />;
   const bell = <Suspense fallback={<span className="inline-block size-9 shrink-0" aria-hidden />}><UserNotifications userId={userId} profile={profile} /></Suspense>;
 

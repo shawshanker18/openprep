@@ -11,6 +11,17 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/s
 
 const ROW = "flex items-center gap-2 rounded-md px-2 py-1.5 text-sm side:h-[clamp(1.375rem,5.6dvh,2.125rem)] side:py-0 hover:bg-muted";
 
+export type AccountSummary = { name: string; email: string | null; avatarUrl: string | null };
+
+/** The profile picture from the sign-in provider, or the person's initial when there isn't one. */
+export function Avatar({ account, className = "size-8" }: { account: AccountSummary; className?: string }) {
+  const initial = (account.name || account.email || "?").trim().charAt(0).toUpperCase();
+  return account.avatarUrl
+    // eslint-disable-next-line @next/next/no-img-element
+    ? <img src={account.avatarUrl} alt="" referrerPolicy="no-referrer" className={`${className} shrink-0 rounded-full object-cover`} />
+    : <span aria-hidden className={`${className} grid shrink-0 place-items-center rounded-full bg-muted text-sm font-medium text-foreground`}>{initial}</span>;
+}
+
 export const NAV_GROUPS = [
   {
     label: null,
@@ -58,7 +69,7 @@ export function CurrentSection({ base = "" }: { base?: string }) {
     const target = hrefFor(base, item.href);
     return item.href === "/dashboard" ? path === target : path === target || path.startsWith(`${target}/`);
   });
-  return <span className="mr-auto text-sm font-medium" aria-label="Current section">{item?.label ?? (path.startsWith(`${base}/pricing`) ? "Upgrade" : path.startsWith(`${base}/settings`) ? "Settings" : "OpenPrep")}</span>;
+  return <span className="mr-auto text-sm font-medium" aria-label="Current section">{item?.label ?? (path.startsWith(`${base}/pricing`) ? "Upgrade" : path.startsWith(`${base}/account`) ? "Account" : path.startsWith(`${base}/settings`) ? "Settings" : "OpenPrep")}</span>;
 }
 
 /**
@@ -77,7 +88,7 @@ function isActive(path: string, search: URLSearchParams, href: string, base = ""
 }
 
 /** Guest mode: the same menu under /guest, with Sign in where Sign out would be. */
-export function NavLinks({ signOut, onNavigate, base = "", guest = false }: { signOut?: () => Promise<void>; onNavigate?: () => void; base?: string; guest?: boolean }) {
+export function NavLinks({ signOut, onNavigate, base = "", guest = false, account }: { signOut?: () => Promise<void>; onNavigate?: () => void; base?: string; guest?: boolean; account?: AccountSummary }) {
   const path = usePathname();
   const search = useSearchParams();
   return (
@@ -96,7 +107,13 @@ export function NavLinks({ signOut, onNavigate, base = "", guest = false }: { si
       {/* Upgrade stays at the bottom of the full menu, including on mobile. */}
       <div className="mt-auto flex flex-col gap-0.5">
         <Link href={guest ? "/pricing" : hrefFor(base, "/pricing")} onClick={onNavigate} aria-current={isActive(path, search, "/pricing", base) ? "page" : undefined} className={`${ROW} mb-2 border border-border font-medium aria-[current=page]:bg-muted`}><CreditCard className="size-4" />Upgrade</Link>
-        <FeedbackDialog />
+        {account ? (
+          <Link href="/account" onClick={onNavigate} aria-current={path.startsWith("/account") ? "page" : undefined}
+            className="mb-1 flex items-center gap-2.5 rounded-md px-2 py-1.5 hover:bg-muted aria-[current=page]:bg-muted">
+            <Avatar account={account} />
+            <span className="min-w-0 flex-1 leading-tight"><span className="block truncate text-sm font-medium">{account.name}</span><span className="block text-xs text-muted-foreground">Your account</span></span>
+          </Link>
+        ) : <FeedbackDialog />}
         {guest ? (
           <Link href="/login" className={`${ROW} text-muted-foreground hover:text-foreground`}><LogOut className="size-4 rotate-180" />Sign in</Link>
         ) : signOut ? (
@@ -122,7 +139,7 @@ export function AccountLinks({ isAdmin, user, base = "" }: { isAdmin: boolean; u
 }
 
 /** Phone/tablet: hamburger that opens the full sidebar as a sheet. */
-export function MobileMenu(props: { signOut?: () => Promise<void>; base?: string; guest?: boolean }) {
+export function MobileMenu(props: { signOut?: () => Promise<void>; base?: string; guest?: boolean; account?: AccountSummary }) {
   const [open, setOpen] = useState(false);
   return (
     <Sheet open={open} onOpenChange={setOpen}>
