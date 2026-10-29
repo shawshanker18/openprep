@@ -4,13 +4,14 @@
 
 @custom-variant dark (&:is(.dark *));
 /* What kind of device is this? The layout follows the input and the room, not just the width:
-   desk = a desktop/laptop shell (top bar, no bottom tabs): wide enough AND either a mouse/trackpad (Mac, Windows, Linux,
-          iPad with a trackpad) or a tall touch screen (iPad landscape). Phones and iPad portrait never get it.
-   side = desk with room for the sidebar: a mouse/trackpad window at least 24rem tall, or a touch screen at least 40rem tall.
+   desk = a desktop/laptop shell (top bar, no bottom tabs): wide enough AND a mouse/trackpad (Mac, Windows, Linux).
+          Touch devices, tablets in either orientation included, keep the phone layout: hidden sidebar behind the menu
+          button, tab bar along the bottom.
+   side = desk with room for the sidebar: a mouse/trackpad window at least 24rem tall.
           The sidebar sizes itself to the height it is given (row height follows the window), so it never scrolls and never crams.
    lap  = only a sliver of a window (under 24rem tall): same top bar, the menu opens from a button. */
-@custom-variant desk (@media (min-width: 64rem) and ((pointer: fine) or (min-height: 40rem)));
-@custom-variant side (@media (min-width: 64rem) and (min-height: 24rem) and ((pointer: fine) or (min-height: 40rem)));
+@custom-variant desk (@media (min-width: 64rem) and (pointer: fine));
+@custom-variant side (@media (min-width: 64rem) and (min-height: 24rem) and (pointer: fine));
 @custom-variant lap (@media (min-width: 64rem) and (max-height: 23.99rem) and (pointer: fine));
 /* Under 44rem tall the sidebar swaps its two big cards (Getting started, Admin) for icons. */
 @custom-variant snug (@media (max-height: 44rem));
@@ -194,7 +195,7 @@ html.dark {
     /* Phones: scrolling something into view (focus, scrollIntoView) clears the fixed bottom nav. */
     scroll-padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
   }
-  @media (min-width: 64rem) and (min-height: 30rem) {
+  @media (min-width: 64rem) and (min-height: 30rem) and (pointer: fine) {
     html { scroll-padding-bottom: 0; }
   }
 }
@@ -246,7 +247,7 @@ body.lesson-focus-mode main { max-width: none; padding-top: 1rem; }
 }
 
 /* Keep controls reachable beneath the tablet/mobile navigation. */
-@media not ((min-width: 64rem) and ((pointer: fine) or (min-height: 40rem))) {
+@media not ((min-width: 64rem) and (pointer: fine)) {
   body:has(.bottom-nav) > .site-footer {
     padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
   }
