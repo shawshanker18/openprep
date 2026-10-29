@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Calculator, ChartLine, Expand, ExternalLink, LoaderCircle, Maximize2, Minimize, Minimize2, Save, X } from "lucide-react";
+import { Calculator, ChartLine, ChevronRight, Expand, GripHorizontal, ExternalLink, LoaderCircle, Maximize2, Minimize, Minimize2, Save, X } from "lucide-react";
 import { toast } from "sonner";
 import { getCalculatorLayout, saveCalculatorLayout } from "@/app/calculator-actions";
 import { watchCalculatorSize } from "@/lib/calculator-size";
@@ -190,66 +190,133 @@ export function DesmosToggle({ className = "h-[65dvh] min-h-[20rem]" }: { classN
  */
 export function DesmosDock({ sessionKey }: { sessionKey: string }) {
   const [open, setOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
   return (
     <>
-      <button type="button" aria-expanded={open} onClick={() => { setMounted(true); setOpen((o) => !o); }}
+      <button type="button" aria-expanded={open} onClick={() => setOpen((o) => !o)}
         className="flex min-h-9 items-center gap-1.5 rounded-md border px-3 text-sm hover:bg-muted"><Calculator className="size-4" />Calculator</button>
-      {mounted && <FloatingDesmos sessionKey={sessionKey} open={open} onClose={() => setOpen(false)} />}
+      <FloatingDesmos sessionKey={sessionKey} open={open} onOpen={() => setOpen(true)} onClose={() => setOpen(false)} />
     </>
   );
 }
 
 type Tab = "graphing" | "scientific";
-type Saved = { w: number; tab: Tab };
-const MIN_W = 300;
-const maxWidth = () => Math.max(MIN_W, window.innerWidth - 24);
-const fitSaved = (v: { w?: number; tab?: string }): Saved => ({
-  w: Math.min(Math.max(MIN_W, Number.isFinite(v.w) ? (v.w as number) : 560), maxWidth()),
-  tab: v.tab === "scientific" ? "scientific" : "graphing",
+type Win = { x: number; y: number; w: number; h: number };
+type Saved = Win & { tab: Tab };
+const MIN_W = 300, MIN_H = 240;
+const clampWin = (v: Win): Win => ({
+  w: v.w, h: v.h,
+  x: Math.min(Math.max(0, v.x), Math.max(0, window.innerWidth - 120)),
+  y: Math.min(Math.max(0, v.y), Math.max(0, window.innerHeight - 48)),
 });
+/** Where it first appears: against the left edge under the header, about half the width of the question column. */
+const defaultLayout = (): Saved => {
+  const w = Math.min(560, window.innerWidth - 24), h = Math.min(545, window.innerHeight - 100);
+  return { x: 12, y: Math.min(76, Math.max(0, window.innerHeight - h - 8)), w, h, tab: "graphing" };
+};
+const fitSaved = (v: Partial<Saved>): Saved => {
+  const d = defaultLayout(), num = (n: unknown, fallback: number) => (typeof n === "number" && Number.isFinite(n) ? n : fallback);
+  const w = Math.min(Math.max(MIN_W, num(v.w, d.w)), window.innerWidth), h = Math.min(Math.max(MIN_H, num(v.h, d.h)), window.innerHeight);
+  return { ...clampWin({ x: num(v.x, d.x), y: num(v.y, d.y), w, h }), tab: v.tab === "scientific" ? "scientific" : "graphing" };
+};
 
 /**
- * The calculator: a rounded panel that slides in from the left edge, with Graphing and Scientific tabs, collapse to
- * full width, close, and a handle on its right edge to resize. It is created once per practice or test session and only
- * slid out of view when closed, so its graphs and width survive moving between questions. The width and tab start from
- * this browser's last choice for the session, otherwise the student's saved default from the database, otherwise 560 px.
+ * The calculator: a rounded window that slides in from the left. While it is closed a tab sits on the left edge of the
+ * screen; tap it, or drag it to the right, to bring the calculator in. Drag the window by its header to move it, and
+ * drag it off to the left to put it away. Edges and corners resize it. Graphing and Scientific tabs, expand and close.
+ * It is created once per practice or test session and only slid out of view when closed, so its graphs, size and
+ * position survive moving between questions. Where it starts is decided once, when it is first opened: this browser's
+ * last layout for the session, otherwise the student's saved default from the database, otherwise the default above.
  * After that it never asks the database again; only "Save as default" writes to it.
  */
-export function FloatingDesmos({ sessionKey, open, onClose }: { sessionKey: string; open: boolean; onClose: () => void }) {
+export function FloatingDesmos({ sessionKey, open, onOpen, onClose }: { sessionKey: string; open: boolean; onOpen: () => void; onClose: () => void }) {
   const winKey = `${sessionKey}:window`;
-  const [start, setStart] = useState<Saved | null>(() => {
-    try { const saved = localStorage.getItem(winKey); return saved ? fitSaved(JSON.parse(saved)) : null; } catch { return null; }
-  });
+  const [armed, setArmed] = useState(open);
+  if (open && !armed) setArmed(true);
+  const [start, setStart] = useState<Saved | null>(null);
   useEffect(() => {
-    if (start) return;
+    if (!armed || start) return;
     let off = false;
-    getCalculatorLayout().then((saved) => fitSaved(saved ?? {}), () => fitSaved({}))
+    const local = (): Saved | null => {
+      try { const saved = localStorage.getItem(winKey); return saved ? fitSaved(JSON.parse(saved)) : null; } catch { return null; }
+    };
+    Promise.resolve().then(() => local() ?? Promise.race([getCalculatorLayout(), new Promise<null>((resolve) => setTimeout(() => resolve(null), 2500))]).then((saved) => fitSaved(saved ?? {}), () => fitSaved({})))
       .then((layout) => { if (!off) setStart(layout); });
     return () => { off = true; };
-  }, [start]);
-  if (!start) return null;
-  return <CalculatorWindow key="w" winKey={winKey} sessionKey={sessionKey} initial={start} open={open} onClose={onClose} />;
+  }, [armed, start, winKey]);
+  const swipe = useRef<number | null>(null);
+  return (
+    <>
+      {!open && (
+        <button type="button" onClick={onOpen} aria-label="Open calculator" title="Calculator"
+          onPointerDown={(e) => { swipe.current = e.clientX; }}
+          onPointerMove={(e) => { if (swipe.current !== null && e.clientX - swipe.current > 24) { swipe.current = null; onOpen(); } }}
+          onPointerUp={() => { swipe.current = null; }} onPointerCancel={() => { swipe.current = null; }}
+          className="fixed left-0 top-1/2 z-40 flex h-32 w-8 -translate-y-1/2 touch-pan-y flex-col items-center justify-center gap-2 rounded-r-2xl border border-l-0 border-neutral-300 bg-white text-neutral-700 shadow-md hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+          <Calculator className="size-4" /><ChevronRight className="size-4" />
+        </button>
+      )}
+      {start && <CalculatorWindow winKey={winKey} sessionKey={sessionKey} initial={start} open={open} onClose={onClose} />}
+    </>
+  );
+}
+
+/** One edge or corner: each pointer move recomputes the box from where the drag began. */
+function ResizeHandle({ dir, className, box, onBox, onDone }: { dir: string; className: string; box: Win; onBox: (v: Win) => void; onDone: (v: Win) => void }) {
+  const from = useRef<{ sx: number; sy: number; start: Win } | null>(null);
+  const move = (e: React.PointerEvent) => {
+    const r = from.current; if (!r) return;
+    const dx = e.clientX - r.sx, dy = e.clientY - r.sy, o = r.start;
+    let { x, y, w, h } = o;
+    if (dir.includes("e")) w = Math.max(MIN_W, Math.min(o.w + dx, window.innerWidth - o.x));
+    if (dir.includes("s")) h = Math.max(MIN_H, Math.min(o.h + dy, window.innerHeight - o.y));
+    if (dir.includes("w")) { w = Math.max(MIN_W, Math.min(o.w - dx, o.x + o.w)); x = o.x + o.w - w; }
+    if (dir.includes("n")) { h = Math.max(MIN_H, Math.min(o.h - dy, o.y + o.h)); y = o.y + o.h - h; }
+    onBox({ x, y, w, h });
+  };
+  return (
+    <div aria-hidden className={`absolute z-30 touch-none ${className}`}
+      onPointerDown={(e) => { e.preventDefault(); e.currentTarget.setPointerCapture(e.pointerId); from.current = { sx: e.clientX, sy: e.clientY, start: box }; }}
+      onPointerMove={move}
+      onPointerUp={() => { if (from.current) { from.current = null; onDone(box); } }}>
+      {dir === "se" && <svg viewBox="0 0 20 20" className="absolute bottom-1 right-1 size-4 text-neutral-400"><path d="M18 8 8 18M18 13l-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" fill="none" /></svg>}
+    </div>
+  );
 }
 
 function CalculatorWindow({ winKey, sessionKey, initial, open, onClose }: { winKey: string; sessionKey: string; initial: Saved; open: boolean; onClose: () => void }) {
-  const [width, setWidth] = useState(initial.w);
+  const [win, setWin] = useState<Win>({ x: initial.x, y: initial.y, w: initial.w, h: initial.h });
   const [tab, setTab] = useState<Tab>(initial.tab);
   const [scientificSeen, setScientificSeen] = useState(initial.tab === "scientific");
-  const [wide, setWide] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const [saving, setSaving] = useState(false);
-  const sizing = useRef<{ sx: number; start: number } | null>(null);
-  const remember = (w: number, t: Tab = tab) => { try { localStorage.setItem(winKey, JSON.stringify({ w, tab: t })); } catch { /* storage unavailable */ } };
-  const pick = (t: Tab) => { setTab(t); if (t === "scientific") setScientificSeen(true); remember(width, t); };
+  const drag = useRef<{ dx: number; dy: number; from: number } | null>(null);
+  const remember = (v: Win, t: Tab = tab) => { try { localStorage.setItem(winKey, JSON.stringify({ ...v, tab: t })); } catch { /* storage unavailable */ } };
+  const pick = (t: Tab) => { setTab(t); if (t === "scientific") setScientificSeen(true); remember(win, t); };
   const saveDefault = async () => {
     setSaving(true);
     try {
-      // x, y and h are kept in the stored shape for layouts saved by the earlier floating window.
-      const res = await saveCalculatorLayout({ x: 12, y: 76, w: width, h: 545, tab });
+      const res = await saveCalculatorLayout({ ...win, tab });
       if (res.ok) toast.success("Saved as your default calculator layout"); else toast.error("Couldn't save the layout. Try again.");
     } catch { toast.error("Couldn't save the layout. Check your connection and try again."); }
     finally { setSaving(false); }
   };
+  /** Moving it: it may be dragged part-way off the left edge. Let go beyond a third of its width out and it goes away. */
+  const dragMove = (e: React.PointerEvent) => {
+    const d = drag.current; if (!d) return;
+    setWin((w) => ({ ...w, x: Math.min(Math.max(-w.w + 60, e.clientX - d.dx), Math.max(0, window.innerWidth - 120)), y: Math.min(Math.max(0, e.clientY - d.dy), Math.max(0, window.innerHeight - 48)) }));
+  };
+  const dragEnd = () => {
+    const d = drag.current; if (!d) return;
+    drag.current = null;
+    if (win.x < -win.w * 0.3) { const back = clampWin({ ...win, x: d.from }); setWin(back); remember(back); onClose(); return; }
+    const settled = clampWin(win); setWin(settled); remember(settled);
+  };
+  const HANDLES: [string, string][] = [
+    ["n", "inset-x-3 top-0 h-2 cursor-ns-resize"], ["s", "inset-x-3 bottom-0 h-2 cursor-ns-resize"],
+    ["w", "inset-y-3 left-0 w-2 cursor-ew-resize"], ["e", "inset-y-3 right-0 w-2 cursor-ew-resize"],
+    ["nw", "left-0 top-0 size-5 cursor-nwse-resize"], ["ne", "right-0 top-0 size-5 cursor-nesw-resize"],
+    ["sw", "bottom-0 left-0 size-5 cursor-nesw-resize"], ["se", "bottom-0 right-0 size-6 cursor-nwse-resize"],
+  ];
   const tabBtn = (t: Tab, label: string, Icon: typeof Calculator) => (
     <button type="button" role="tab" aria-selected={tab === t} onClick={() => pick(t)}
       className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold ${tab === t ? "bg-white text-neutral-900 shadow-sm ring-1 ring-neutral-300 [&>span]:underline [&>span]:underline-offset-4" : "text-neutral-700 hover:bg-neutral-200"}`}>
@@ -257,24 +324,27 @@ function CalculatorWindow({ winKey, sessionKey, initial, open, onClose }: { winK
     </button>
   );
   const icon = "grid size-8 place-items-center rounded-lg text-neutral-800 hover:bg-neutral-200 disabled:opacity-50";
+  const box = expanded ? { left: 12, top: 12, width: "calc(100vw - 24px)", height: "calc(100dvh - 24px)" } : { left: win.x, top: win.y, width: win.w, height: win.h };
   return (
     <div aria-hidden={!open} inert={!open}
-      style={{ width: wide ? "calc(100vw - 24px)" : width }}
-      className={`fixed bottom-3 left-3 top-[76px] z-50 flex min-w-[300px] max-w-[calc(100vw-24px)] flex-col overflow-hidden rounded-2xl border border-neutral-300 bg-white text-neutral-900 shadow-2xl transition-[transform,opacity,visibility] duration-300 ease-out ${open ? "translate-x-0 opacity-100" : "pointer-events-none invisible -translate-x-[calc(100%+24px)] opacity-0"}`}>
-      <div className="flex shrink-0 select-none items-center gap-2 border-b border-neutral-200 bg-neutral-100 px-2.5 py-2">
+      style={{ ...box, transform: open ? "none" : `translateX(-${(expanded ? 12 : win.x) + (expanded ? window.innerWidth : win.w) + 24}px)` }}
+      className={`fixed z-50 flex min-w-[300px] max-w-[100vw] flex-col overflow-hidden rounded-2xl border border-neutral-300 bg-white text-neutral-900 shadow-2xl transition-[transform,opacity,visibility] duration-300 ease-out ${open ? "opacity-100" : "pointer-events-none invisible opacity-0"}`}>
+      <div className={`flex shrink-0 select-none items-center gap-2 border-b border-neutral-200 bg-neutral-100 px-2.5 py-2 ${expanded ? "" : "cursor-grab touch-none active:cursor-grabbing"}`}
+        onPointerDown={(e) => { if (expanded || (e.target as HTMLElement).closest("button")) return; e.currentTarget.setPointerCapture(e.pointerId); drag.current = { dx: e.clientX - win.x, dy: e.clientY - win.y, from: win.x }; }}
+        onPointerMove={dragMove} onPointerUp={dragEnd} onPointerCancel={dragEnd}>
         <div role="tablist" aria-label="Calculator type" className="flex shrink-0 gap-0.5 rounded-xl bg-neutral-200/70 p-0.5">
           {tabBtn("graphing", "Graphing", ChartLine)}{tabBtn("scientific", "Scientific", Calculator)}
         </div>
-        <div className="ml-auto flex shrink-0 items-center">
-          <button type="button" disabled={saving} onClick={saveDefault} aria-label="Save as default calculator layout" title="Save width and calculator as my default" className={icon}><Save className="size-4" /></button>
-          <button type="button" onClick={() => setWide((v) => !v)} aria-label={wide ? "Shrink calculator" : "Expand calculator"} title={wide ? "Shrink" : "Expand"} className={icon}>{wide ? <Minimize2 className="size-4" /> : <Maximize2 className="size-4" />}</button>
+        <GripHorizontal aria-hidden className="mx-auto size-5 text-neutral-500" />
+        <div className="flex shrink-0 items-center">
+          <button type="button" disabled={saving} onClick={saveDefault} aria-label="Save as default calculator layout" title="Save position, size and calculator as my default" className={icon}><Save className="size-4" /></button>
+          <button type="button" onClick={() => setExpanded((v) => !v)} aria-label={expanded ? "Shrink calculator" : "Expand calculator"} title={expanded ? "Shrink" : "Expand"} className={icon}>{expanded ? <Minimize2 className="size-4" /> : <Maximize2 className="size-4" />}</button>
           <button type="button" onClick={onClose} aria-label="Close calculator" title="Close" className={icon}><X className="size-5" /></button>
         </div>
       </div>
-      {!wide && <div aria-hidden title="Drag to resize" className="absolute inset-y-0 right-0 z-30 w-2 cursor-ew-resize touch-none"
-        onPointerDown={(e) => { e.preventDefault(); e.currentTarget.setPointerCapture(e.pointerId); sizing.current = { sx: e.clientX, start: width }; }}
-        onPointerMove={(e) => { const r = sizing.current; if (r) setWidth(Math.min(maxWidth(), Math.max(MIN_W, r.start + e.clientX - r.sx))); }}
-        onPointerUp={() => { if (sizing.current) { sizing.current = null; remember(width); } }} />}
+      {!expanded && HANDLES.map(([dir, cls]) => (
+        <ResizeHandle key={dir} dir={dir} className={cls} box={win} onBox={setWin} onDone={remember} />
+      ))}
       <div className="flex min-h-0 flex-1 flex-col">
         <div hidden={tab !== "graphing"} className="flex min-h-0 flex-1 flex-col"><DesmosCalculator bare stateKey={`${sessionKey}:graph`} className="min-h-0 flex-1 border-0" /></div>
         {scientificSeen && <div hidden={tab !== "scientific"} className="flex min-h-0 flex-1 flex-col"><DesmosCalculator bare kind="scientific" className="min-h-0 flex-1 border-0" /></div>}

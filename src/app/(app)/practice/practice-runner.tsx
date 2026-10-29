@@ -91,7 +91,7 @@ export function PracticeRunner(props: Parameters<typeof PracticeRunnerBody>[0] e
   return (
     <>
       <PracticeRunnerBody {...props} calc={calc} />
-      {enabled && <FloatingDesmos sessionKey={`openprep:desmos:${props.userId}:${props.sessionId}`} open={open} onClose={() => setOpen(false)} />}
+      {enabled && <FloatingDesmos sessionKey={`openprep:desmos:${props.userId}:${props.sessionId}`} open={open} onOpen={() => setOpen(true)} onClose={() => setOpen(false)} />}
     </>
   );
 }
