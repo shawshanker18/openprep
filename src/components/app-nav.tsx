@@ -108,19 +108,30 @@ export function NavLinks({ signOut, onNavigate, base = "", guest = false, accoun
       <div className="mt-auto flex flex-col gap-0.5">
         <Link href={guest ? "/pricing" : hrefFor(base, "/pricing")} onClick={onNavigate} aria-current={isActive(path, search, "/pricing", base) ? "page" : undefined} className={`${ROW} mb-2 border border-border font-medium aria-[current=page]:bg-muted`}><CreditCard className="size-4" />Upgrade</Link>
         {account ? (
-          <Link href="/account" onClick={onNavigate} aria-current={path.startsWith("/account") ? "page" : undefined}
-            className="mb-1 flex items-center gap-2.5 rounded-md px-2 py-1.5 hover:bg-muted aria-[current=page]:bg-muted">
-            <Avatar account={account} />
-            <span className="min-w-0 flex-1 leading-tight"><span className="block truncate text-sm font-medium">{account.name}</span><span className="block text-xs text-muted-foreground">Your account</span></span>
-          </Link>
-        ) : <FeedbackDialog />}
-        {guest ? (
-          <Link href="/login" className={`${ROW} text-muted-foreground hover:text-foreground`}><LogOut className="size-4 rotate-180" />Sign in</Link>
-        ) : signOut ? (
-          <form action={signOut}>
-            <button type="submit" className={`${ROW} w-full text-left text-muted-foreground hover:text-foreground`}><LogOut className="size-4" />Sign out</button>
-          </form>
-        ) : null}
+          <div className="flex items-center gap-1 rounded-lg border border-border p-1">
+            <Link href="/account" onClick={onNavigate} aria-current={path.startsWith("/account") ? "page" : undefined}
+              className="flex min-w-0 flex-1 items-center gap-2.5 rounded-md px-1.5 py-1 hover:bg-muted aria-[current=page]:bg-muted">
+              <Avatar account={account} />
+              <span className="min-w-0 flex-1 leading-tight"><span className="block truncate text-sm font-medium">{account.name}</span><span className="block text-xs text-muted-foreground">Your account</span></span>
+            </Link>
+            {signOut && (
+              <form action={signOut}>
+                <button type="submit" aria-label="Sign out" title="Sign out" className="grid size-9 place-items-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"><LogOut className="size-4" /></button>
+              </form>
+            )}
+          </div>
+        ) : (
+          <>
+            <FeedbackDialog />
+            {guest ? (
+              <Link href="/login" className={`${ROW} text-muted-foreground hover:text-foreground`}><LogOut className="size-4 rotate-180" />Sign in</Link>
+            ) : signOut ? (
+              <form action={signOut}>
+                <button type="submit" className={`${ROW} w-full text-left text-muted-foreground hover:text-foreground`}><LogOut className="size-4" />Sign out</button>
+              </form>
+            ) : null}
+          </>
+        )}
       </div>
     </div>
   );
