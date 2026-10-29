@@ -21,7 +21,7 @@ export function AccountView({ account, plan, signOut, error, planStatus, touchSe
   account: AccountSummary; plan: PlanSummary; signOut: () => Promise<void>; error?: string; planStatus?: string; touchSeen: boolean; tabletLayout: "tabs" | "sidebar";
 }) {
   return (
-    <div className="flex max-w-4xl flex-col gap-6">
+    <div className="flex w-full min-w-0 flex-col gap-6">
       <h1 className="text-2xl font-semibold">Your account</h1>
       {error === "delete" && <p role="alert" className="rounded-md border border-destructive p-3 text-sm text-destructive">Type DELETE in capitals to confirm.</p>}
       {error === "cancel" && <p role="alert" className="rounded-md border border-destructive p-3 text-sm text-destructive">We couldn&apos;t cancel with PayPal. Nothing changed. Please try again or cancel in your PayPal account.</p>}

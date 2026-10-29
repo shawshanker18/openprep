@@ -17,7 +17,7 @@ export function CbseChapterPicker({ defaultChecked = [], onChange }: { defaultCh
     onChange?.([...next]);
   };
   return (
-    <div className="flex flex-col gap-1">
+    <div className="grid gap-x-6 gap-y-1 [grid-template-columns:repeat(auto-fill,minmax(min(100%,16rem),1fr))]">
       {askedChapters().map((ch) => (
         <label key={ch.id} className="flex min-h-9 items-center gap-2 text-sm">
           <input type="checkbox" name="chapters" value={ch.id} checked={checked.has(ch.id)} onChange={(e) => toggle(ch.id, e.target.checked)} /> {ch.title}
