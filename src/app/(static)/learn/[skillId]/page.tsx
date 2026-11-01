@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Markdown } from "@/components/markdown";
+import { Walkthrough } from "@/components/walkthrough";
 import { SKILL_BY_ID, SKILLS, DOMAINS, shortSkillName } from "@/content/taxonomy";
 import { getLesson, lessonExists } from "@/server/lessons";
 
@@ -55,12 +56,10 @@ export default async function LessonPage({ params }: PageProps<"/learn/[skillId]
     <p className="text-sm text-muted-foreground"><Link href="/learn" className="underline">All SAT lessons</Link> · {skill.section === "math" ? "SAT Math" : "SAT Reading and Writing"} · {domain.name}</p>
     <h1>SAT {name}</h1>
     {lesson.minutes && <p className="text-sm text-muted-foreground">About {lesson.minutes} minutes</p>}
-    {lesson.sections.map((s) => (
-      <section key={s.heading} className="flex flex-col gap-2">
-        <h2>{s.heading.replace(/\((easy|medium|hard)\)/gi, "").trim()}</h2>
-        <Markdown>{s.md}</Markdown>
-      </section>
-    ))}
+    <Walkthrough steps={lesson.sections.map((s) => {
+      const title = s.heading.replace(/\((easy|medium|hard)\)/gi, "").trim();
+      return { key: s.heading, title, body: <section className="flex flex-col gap-2"><h2>{title}</h2><Markdown>{s.md}</Markdown></section> };
+    })} />
     <div className="mt-6 rounded-xl border p-5">
       <p className="font-medium">Practice {name} for free</p>
       <p className="text-sm text-muted-foreground">OpenPrep adapts the questions to your level, tracks your progress and builds a study plan. No subscription.</p>
