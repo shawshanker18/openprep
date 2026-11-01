@@ -4,6 +4,7 @@ import { ChevronRight, Circle, CircleCheck, SkipForward } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BrandBanner } from "@/components/brand";
 import { requireUser } from "@/server/auth";
+import { getSkillSummary } from "@/server/analytics";
 import { safely } from "@/lib/safely";
 import { studentAssignments } from "@/server/course-assignment";
 import { GETTING_STARTED, scratchProgress } from "@/server/scratch";
@@ -16,7 +17,8 @@ const isGettingStarted = (group: string) => group === GETTING_STARTED;
 export default async function StartPage() {
   const { userId, profile } = await requireUser();
   const covered = likelyCoveredSkills(profile);
-  const [{ steps, next }, assigned] = await Promise.all([scratchProgress(userId), safely(() => studentAssignments(userId), [])]);
+  const [{ steps, next }, assigned, { skills: summaries }] = await Promise.all([scratchProgress(userId), safely(() => studentAssignments(userId), []), getSkillSummary(userId)]);
+  const summaryBySkill = new Map(summaries.map((s) => [s.id, s]));
   const done = steps.filter((s) => s.status === "done").length;
   const skipped = steps.filter((s) => s.status === "skipped").length;
   const allGroups = [...new Set(steps.map((s) => s.group))];
@@ -35,7 +37,9 @@ export default async function StartPage() {
             <ChevronRight className="size-4 shrink-0 transition-transform group-open:rotate-90" />
           </summary>
           <ol className="lesson-reveal flex flex-col divide-y border-t">
-            {steps.filter((s) => s.group === g).map((s) => (
+            {steps.filter((s) => s.group === g).map((s) => {
+              const sum = s.kind === "skill" ? summaryBySkill.get(s.ref) : undefined;
+              return (
               <li key={s.key}>
                 <Link href={`/start/${s.key}`} aria-current={s.key === next?.key ? "step" : undefined}
                   className="flex items-center gap-3 px-4 py-3 text-sm hover:bg-muted aria-[current=step]:bg-muted">
@@ -43,11 +47,13 @@ export default async function StartPage() {
                     : s.status === "skipped" ? <SkipForward className="size-4 shrink-0 text-muted-foreground" aria-label="Skipped" />
                     : <Circle className="size-4 shrink-0 text-muted-foreground" aria-label="Not done" />}
                   <span className={`flex-1 ${s.status === "skipped" ? "text-muted-foreground" : ""}`}>{s.title}{covered.has(s.ref) && <span className="ml-2 inline-block rounded bg-black px-2 py-0.5 text-xs text-white">Likely covered in school</span>}</span>
+                  {sum && sum.status !== "unknown" && <span className="shrink-0 text-xs text-muted-foreground tabular-nums">{sum.mastery}%</span>}
                   {s.status === "skipped" && <span className="text-xs text-muted-foreground">Skipped</span>}
                   <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
                 </Link>
               </li>
-            ))}
+              );
+            })}
           </ol>
         </details>
       ))}

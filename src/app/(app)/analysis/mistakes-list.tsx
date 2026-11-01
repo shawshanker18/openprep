@@ -73,7 +73,7 @@ export async function MistakesList({ sp }: { sp: Record<string, string | string[
               {m.response && m.rationale?.[m.response] && <Markdown>{fix(m.rationale[m.response]!)}</Markdown>}
               {m.explanation && <Markdown>{fix(`**Why:** ${m.explanation}`)}</Markdown>}
               <span className="text-xs text-muted-foreground">
-                <Link className="underline" href={`/skills/${m.skillId}?tab=mistakes`}>{SKILL_BY_ID[m.skillId]?.name}</Link>
+                <Link className="underline" href={`/start/${m.skillId}`}>{SKILL_BY_ID[m.skillId]?.name}</Link>
                 {" · "}missed {formatDate(m.at, profile.timezone)}
                 {" · "}{m.dueAt ? (m.dueAt <= now ? "due now" : `review ${formatDate(m.dueAt, profile.timezone)}`) : "cleared"}
               </span>

@@ -60,7 +60,7 @@ export default async function BookmarksPage({searchParams}:PageProps<"/bookmarks
                 </details>
               )}
               <div className="flex flex-wrap items-center gap-2">
-                <Link className="text-xs underline" href={`/skills/${r.skillId}`}>{SKILL_BY_ID[r.skillId]?.name}</Link>
+                <Link className="text-xs underline" href={`/start/${r.skillId}`}>{SKILL_BY_ID[r.skillId]?.name}</Link>
                 <span className="text-xs text-muted-foreground">saved {formatDate(r.at, profile.timezone)}</span>
                 <span className="flex-1" />
                 <Button size="sm" variant="outline" render={<Link href={`/practice?skill=${r.skillId}`} />}>Practice this skill</Button>

@@ -7,8 +7,10 @@ import { DesmosCalculator } from "@/components/desmos-panel";
 import { LessonLevels } from "@/components/lesson-levels";
 import { LessonTextSize } from "@/components/lesson-text-size";
 import { Markdown } from "@/components/markdown";
+import { MasteryBar } from "@/components/mastery-bar";
 import { orientationBy } from "@/content/getting-started";
 import { requireUser } from "@/server/auth";
+import { getSkillSummary } from "@/server/analytics";
 import { conceptsForSkill } from "@/server/concepts";
 import { getStudentLesson } from "@/server/course-lessons";
 import { safely } from "@/lib/safely";
@@ -29,12 +31,14 @@ export default async function StepPage({ params }: PageProps<"/start/[step]">) {
   if (i < 0) notFound();
   const step = steps[i]!;
   const prev = steps[i - 1], following = steps[i + 1];
-  const [lesson, mastery, desmos, concepts] = await Promise.all([
+  const [lesson, mastery, desmos, concepts, { skills: summaries }] = await Promise.all([
     step.kind === "skill" ? safely(() => getStudentLesson(userId, step.ref), null).then((own) => own ?? getLesson(step.ref)) : null,
     step.kind === "skill" ? safely(() => getMasteryLesson(step.ref), null) : null,
     step.kind === "desmos" ? listDesmosLessons().then((all) => all.find((l) => l.slug === step.ref) ?? null) : null,
     step.kind === "skill" ? safely(() => conceptsForSkill(step.ref), []) : [],
+    getSkillSummary(userId),
   ]);
+  const summary = step.kind === "skill" ? summaries.find((k) => k.id === step.ref) : undefined;
   // A lesson from a course version is already the student's own route (for example the CBSE-specific review), so the
   // generic in-lesson CBSE revision split would only repeat it. It stays on the built-in lessons.
   const onCourseVersion = !!(lesson as { versionId?: string } | null)?.versionId;
@@ -48,6 +52,12 @@ export default async function StepPage({ params }: PageProps<"/start/[step]">) {
         {likelyCoveredSkills(profile).has(step.ref) && <p className="text-sm text-neutral-700 dark:text-neutral-300">Likely covered in school. You can still study the full lesson and practice here.</p>}
         {step.status === "done" && <p className="text-sm text-muted-foreground">✓ You finished this topic</p>}
         {step.status === "skipped" && <p className="text-sm text-muted-foreground">You skipped this topic. Read it now and press Done to count it.</p>}
+        {summary && (
+          <div className="flex items-center gap-3">
+            <div className="w-48"><MasteryBar pct={summary.mastery} measured={summary.status !== "unknown"} selfRating={summary.selfRating} /></div>
+            <span className="text-sm text-muted-foreground tabular-nums">{summary.status === "unknown" ? "Not measured yet" : `${summary.mastery}% mastery`}</span>
+          </div>
+        )}
       </div>
 
       {step.kind === "intro" && <article className="max-w-2xl"><Markdown>{orientationBy(step.key)?.md ?? ""}</Markdown></article>}

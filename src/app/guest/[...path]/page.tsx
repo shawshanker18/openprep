@@ -13,7 +13,7 @@ import { GuestReview } from "../review";
 // Same section names as the signed-in menu. Anything that needs an account says so and offers Sign in.
 const titles: Record<string, string> = {
   dashboard: "Dashboard", analysis: "Analysis", practice: "Adaptive Practice", "question-bank": "Question bank",
-  start: "Start from scratch", skills: "Your skills", course: "Course", desmos: "Desmos", tests: "Practice tests",
+  start: "Start from scratch", course: "Course", desmos: "Desmos", tests: "Practice tests",
   mistakes: "Mistakes", bookmarks: "Saved questions", settings: "Settings",
 };
 
@@ -25,7 +25,7 @@ export default async function GuestSection({ params }: { params: Promise<{ path:
   if (!title || path.length > 2) notFound();
 
   // A lesson, exactly as a student sees it: the same lesson view, with no progress saved.
-  if ((section === "start" || section === "skills") && id) {
+  if (section === "start" && id) {
     const skill = SKILL_BY_ID[id];
     if (!skill) notFound();
     const lesson = await getLesson(id);
@@ -80,7 +80,7 @@ export default async function GuestSection({ params }: { params: Promise<{ path:
     <div className="flex w-full max-w-4xl flex-col gap-5">
       <h1 className="text-2xl font-semibold">{title}</h1>
       {section === "practice" || section === "question-bank" ? <GuestPractice /> :
-        section === "start" || section === "skills" || section === "course" ? (
+        section === "start" || section === "course" ? (
           <div className="grid items-start gap-3 sm:grid-cols-2">
             {Object.entries(DOMAINS).sort((a, b) => Number(b[1].section === "math") - Number(a[1].section === "math")).map(([domain, d]) => (
               <details key={domain} name={d.section === "math" ? "guest-math" : "guest-rw"} className="min-w-0 rounded-xl border p-4">
@@ -102,7 +102,7 @@ export default async function GuestSection({ params }: { params: Promise<{ path:
         section === "analysis" ? <p>Analysis shows your accuracy, pacing and mistakes once you have answered questions in an account.</p> :
         section === "dashboard" ? <p>Your home page shows what to do next once you have an account.</p> :
         <Link href="/guest/start" className="underline">Choose a lesson</Link>}
-      {!["practice", "question-bank", "start", "skills", "course", "desmos"].includes(section) && (
+      {!["practice", "question-bank", "start", "course", "desmos"].includes(section) && (
         <p className="text-sm text-muted-foreground"><Link href="/login" className="underline">Sign in</Link> to save your progress and use the full question bank and tests.</p>
       )}
     </div>

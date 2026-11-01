@@ -274,7 +274,7 @@ function AnalysisBody({ buckets, days, total }: {
                             </span>
                           </span>
                           <span className="flex gap-3 text-xs">
-                            <Link className="underline underline-offset-4" href={`/skills/${s.id}?tab=mistakes`}>Mistakes</Link>
+                            <Link className="underline underline-offset-4" href={`/start/${s.id}`}>Lesson</Link>
                             <Link className="underline underline-offset-4" href={practiceHref(s.id)} prefetch={false}>Practice</Link>
                             <Link className="underline underline-offset-4" href={`/question-bank?skill=${s.id}`}>Question bank</Link>
                           </span>

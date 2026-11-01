@@ -1,27 +1,24 @@
 "use client";
-// Adaptive Practice setup. Three modes are kept distinct: Adaptive changes difficulty from each answer, Fixed
-// keeps one difficulty, Mixed picks a random difficulty per question. Skills are only needed for Fixed and Mixed, because
-// Adaptive can use the student's own weekly focus when none are chosen.
+// Adaptive Practice setup. Two modes are kept distinct: Adaptive changes difficulty from each answer, Mixed picks a
+// random difficulty per question. Skills are only needed for Mixed, because Adaptive can use the student's own weekly
+// focus when none are chosen.
 import { useState } from "react";
 import Link from "next/link";
 import { DOMAINS, SKILLS, type DomainId, type Section } from "@/content/taxonomy";
 import { SET_SIZES } from "@/lib/question-limits";
 import { Button } from "@/components/ui/button";
 
-type Mode = "adaptive" | "fixed" | "mixed";
+type Mode = "adaptive" | "mixed";
 const MODES: { value: Mode; label: string; help: string }[] = [
   { value: "adaptive", label: "Adaptive", help: "Each answer sets the next question's difficulty: one step harder after a correct answer, one step easier after a wrong one. Skills can be left empty to use your weekly focus." },
-  { value: "fixed", label: "Fixed difficulty", help: "Every question is at the difficulty you choose. Choose at least one skill." },
   { value: "mixed", label: "Mixed difficulty", help: "Each question's difficulty is picked at random from Easy, Medium and Hard. Not adaptive. Choose at least one skill." },
 ];
-const DIFF = [["1", "Easy"], ["2", "Medium"], ["3", "Hard"]] as const;
 const MAX_SKILLS = 29;
 
 export function PracticeSetup() {
   const [mode, setMode] = useState<Mode>("adaptive");
   const [subject, setSubject] = useState<Section | null>(null);
   const [chosen, setChosen] = useState<string[]>([]);
-  const [difficulty, setDifficulty] = useState<"1" | "2" | "3">("2");
   const [count, setCount] = useState<number>(10);
   const [timed, setTimed] = useState<"auto" | "off">("auto");
 
@@ -33,7 +30,7 @@ export function PracticeSetup() {
 
   const params = new URLSearchParams();
   if (mode === "adaptive") params.set("mode", "smart");
-  else { params.set("mode", "set"); params.set("difficulty", mode === "fixed" ? difficulty : "mixed"); }
+  else { params.set("mode", "set"); params.set("difficulty", "mixed"); }
   for (const id of chosen) params.append("skills", id);
   params.set("count", String(count));
   if (timed === "off") params.set("timing", "off");
@@ -45,7 +42,7 @@ export function PracticeSetup() {
 
       <fieldset className="flex flex-col gap-2">
         <legend className="mb-1 text-sm font-medium">Practice mode</legend>
-        <div className="grid gap-2 sm:grid-cols-3">
+        <div className="grid gap-2 sm:grid-cols-2">
           {MODES.map((m) => (
             <label key={m.value} className="flex cursor-pointer flex-col gap-1 rounded-lg border p-3 text-sm has-[:checked]:bg-muted">
               <span className="flex items-center gap-2 font-medium">
@@ -88,19 +85,6 @@ export function PracticeSetup() {
           })}
         </div>
       </fieldset>
-
-      {mode === "fixed" && (
-        <fieldset className="flex flex-col gap-2">
-          <legend className="mb-1 text-sm font-medium">Difficulty</legend>
-          <div className="flex flex-wrap gap-2">
-            {DIFF.map(([v, label]) => (
-              <label key={v} className="flex min-h-11 cursor-pointer items-center gap-2 rounded-md border px-3 text-sm has-[:checked]:bg-muted">
-                <input type="radio" name="practice-difficulty" value={v} checked={difficulty === v} onChange={() => setDifficulty(v)} />{label} (SAT)
-              </label>
-            ))}
-          </div>
-        </fieldset>
-      )}
 
       <div className="grid gap-6 sm:grid-cols-2">
         <fieldset className="flex flex-col gap-2">

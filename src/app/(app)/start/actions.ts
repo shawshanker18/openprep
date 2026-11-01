@@ -17,7 +17,6 @@ export async function stepAction(key: string, action: "done" | "skip") {
   revalidatePath("/start", "layout");
   revalidatePath("/dashboard");
   revalidatePath("/plan");
-  if (step.kind === "skill") revalidatePath(`/skills/${step.ref}`);
   if (step.kind === "desmos") revalidatePath("/desmos");
   const next = nextAfter(steps.map((s) => (s.key === key ? { ...s, status: action === "done" ? "done" : "skipped" } : s)), key);
   redirect(next ? `/start/${next.key}` : "/start");

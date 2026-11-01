@@ -8,6 +8,6 @@ it("sends the old vercel.app address to the real domain, except the timer endpoi
   expect(rule.permanent).toBe(true);
   // "/:path(<regex>)" matches a leading slash followed by <regex>.
   const matches = (path: string) => new RegExp(`^/${rule.source.slice("/:path".length)}$`).test(path);
-  for (const path of ["/", "/dashboard", "/practice", "/login", "/auth/callback", "/skills/m-alg-lin1"]) expect(matches(path), path).toBe(true);
+  for (const path of ["/", "/dashboard", "/practice", "/login", "/auth/callback", "/start/m-alg-lin1"]) expect(matches(path), path).toBe(true);
   for (const path of ["/api/cron/tick", "/api/cron/"]) expect(matches(path), path).toBe(false);
 });
