@@ -7,6 +7,7 @@ import { likelyCoveredSkills } from "@/lib/curriculum-coverage";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Walkthrough, type WalkthroughStep } from "@/components/walkthrough";
 
 type Section = { heading: string; md: string };
 
@@ -90,7 +91,6 @@ export function LessonStudyView({ sections, skillId, stepKey, curriculum, grade,
   const [revision, setRevision] = useState(false);
   const covered = eligible && likelyCoveredSkills({ curriculum, grade, subjects, topicsStudied: [], chaptersDone }).has(skillId);
   const basics = sections.filter(s => /^(What this skill|Learn the idea|Formulas|Worked example 1)/i.test(s.heading));
-  const sat = sections.filter(s => !basics.includes(s));
   // Formulas stay in plain text, each `###` concept under them opens on click, and each worked example opens on click.
   const render = (items: Section[]) => items.map(sec => {
     if (/^Learn the idea/i.test(sec.heading)) {
@@ -117,6 +117,15 @@ export function LessonStudyView({ sections, skillId, stepKey, curriculum, grade,
       </section>
     );
   });
+  // One subtopic per step, Khan Academy style: Next moves to the next subtopic instead of scrolling. In CBSE
+  // revision view each step is labelled with its group (School revision / SAT application).
+  const revisionMode = revision && cbseLevel !== "mastery" && cov?.school !== "none";
+  const steps: WalkthroughStep[] = sections.map((sec) => ({
+    key: sec.heading,
+    title: sec.heading.replace(/\((easy|medium|hard)\)/gi, "").trim(),
+    group: revisionMode ? (basics.includes(sec) ? "School revision" : "SAT application") : undefined,
+    body: <>{render([sec])}</>,
+  }));
   return <div className="flex min-w-0 flex-col gap-6">
     {eligible && <div className="flex flex-col gap-3 rounded-xl border p-4">
       {cbseLevel === "mastery" ? (
@@ -140,6 +149,6 @@ export function LessonStudyView({ sections, skillId, stepKey, curriculum, grade,
         } All lesson content remains available.</p>}
       </>)}
     </div>}
-    {revision && cbseLevel !== "mastery" && cov?.school !== "none" ? <><section className="flex flex-col gap-3"><h2 className="text-xl font-semibold">School revision</h2><p className="text-sm text-muted-foreground">Review the key ideas and formulas before trying the examples.</p><details className="rounded-xl border p-4"><summary className="cursor-pointer font-medium">Review fundamentals</summary><div className="mt-4 flex flex-col gap-6">{render(basics)}</div></details></section><section className="flex flex-col gap-6"><h2 className="text-xl font-semibold">SAT application</h2>{render(sat)}</section></> : render(sections)}
+    <Walkthrough steps={steps} />
   </div>;
 }
