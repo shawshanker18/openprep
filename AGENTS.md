@@ -7,3 +7,17 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+## Git identity and pushing
+
+Every commit and push from this repository uses this identity:
+
+- **Name:** `shawshanker18`
+- **Email:** `shashanksaraswat93@gmail.com`
+
+The repo-local git config is already set to these values — do not override
+them with `--global`, a different name, or a personal identity. If a commit
+author does not match, run `git config user.name shawshanker18` and
+`git config user.email shashanksaraswat93@gmail.com` in the repo root before
+committing. (This repo previously had `shawsanker18` set as the name; that
+spelling is outdated.)
