@@ -126,7 +126,7 @@ export async function startTest(userId: string, input: {
     const sections: Section[] = input.kind === "full" ? ["rw", "math"] : input.section ? [input.section] : [];
     const config: Config = { sections, adaptive: input.kind === "full" || input.kind === "section", timed };
     const route = input.paper && input.kind === "module" ? input.route ?? "base" : "base";
-    if (input.paper) Object.assign(config, { paper: input.paper, ...(input.kind === "module" ? { route, title: moduleTitle(input.paper, sections[0] ?? "rw", route) } : {}) });
+    if (input.paper) Object.assign(config, { paper: input.paper, ...(input.difficulty ? { difficulty: input.difficulty } : {}), ...(input.kind === "module" ? { route, title: moduleTitle(input.paper, sections[0] ?? "rw", route) } : {}) });
     if (input.kind === "custom") Object.assign(config, { skillIds: input.skillIds, count: input.count, tags: input.tags ?? [], difficulty: input.difficulty ?? "mixed", ...(input.title ? { title: input.title } : {}) });
     const [s] = await tx.insert(testSessions).values({ userId, kind: input.kind, config }).returning({ id: testSessions.id });
     const id = s!.id;

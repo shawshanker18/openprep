@@ -1,5 +1,6 @@
 // In-app notifications, computed on every request (no table, no email).
 import "server-only";
+import { cookies } from "next/headers";
 import type { Profile } from "@/db/schema";
 import { daysToTest, dueReviewsNow, mockDueNow } from "./daily";
 import { getMembership } from "./subscription";
@@ -17,5 +18,12 @@ export async function getNotifications(userId: string, profile: Profile): Promis
   if (days != null && days >= 0 && days <= 7) out.push({ id: "test", label: `Your SAT is in ${days} day${days === 1 ? "" : "s"}`, href: "/dashboard" });
   const ending = planEnding(blocks, new Date());
   if (ending) out.unshift({ id: "plan", label: `Your ${PLANS[ending.tier].name} plan ends ${ending.days <= 0 ? "today" : `in ${ending.days} day${ending.days === 1 ? "" : "s"}`}. Add more time`, href: "/pricing" });
+
+  const cookieStore = await cookies().catch(() => null);
+  const dismissedRaw = cookieStore?.get("openprep_dismissed_notifications")?.value;
+  if (dismissedRaw) {
+    const dismissed = new Set(dismissedRaw.split(",").filter(Boolean));
+    return out.filter((n) => !dismissed.has(n.id));
+  }
   return out;
 }

@@ -54,7 +54,7 @@ export default async function GuestSection({ params }: { params: Promise<{ path:
     if (id && !lesson) notFound();
     if (lesson) {
       return (
-        <LessonWorkspace title={lesson.title} slug={lesson.slug} calculator={<DesmosCalculator expressions={lesson.expressions} className="h-[min(calc(100dvh-7.5rem),52rem)] min-h-[26rem]" />}>
+        <LessonWorkspace title={lesson.title} slug={lesson.slug} expressions={lesson.expressions}>
           <LessonTextSize>
             <Markdown className="text-[1em] leading-relaxed">{lesson.md}</Markdown>
           </LessonTextSize>

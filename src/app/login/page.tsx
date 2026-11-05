@@ -8,8 +8,9 @@ import { BrandLogo } from "@/components/brand";
 export const metadata = { title: "Continue to OpenPrep" };
 
 export default async function LoginPage({ searchParams }: PageProps<"/login">) {
-  if (await getUserId()) redirect("/dashboard");
-  const [{ error }, h] = await Promise.all([searchParams, headers()]);
+  const sp = await searchParams;
+  if (!sp.preview && (await getUserId())) redirect("/dashboard");
+  const [{ error }, h] = [sp, await headers()];
   // Desktop/Android shells add "OpenPrepApp" to their user agent. Google blocks its sign-in inside embedded browsers,
   // so there it runs in the real browser and comes back to the app (see /auth/google).
   const inApp = (h.get("user-agent") ?? "").includes("OpenPrepApp");

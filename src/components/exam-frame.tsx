@@ -45,7 +45,7 @@ export function ExamTimer({ label, urgent }: { label: string; urgent?: boolean }
   return (
     <div className="flex items-center gap-2 leading-none">
       <span className={cn("min-w-14 text-center text-lg font-semibold tabular-nums", urgent && "text-red-600", !show && "invisible")} aria-live="off">{label}</span>
-      <button type="button" onClick={() => setShow((v) => !v)} className="min-h-8 rounded-full border px-2.5 text-xs">{show ? "Hide" : "Show"}</button>
+      <button type="button" onClick={() => setShow((v) => !v)} className="min-h-8 rounded-md border px-2.5 text-xs">{show ? "Hide" : "Show"}</button>
     </div>
   );
 }
@@ -79,8 +79,8 @@ export function ExamFooter({ name, label, popup, onBack, onNext, backDisabled, n
       </div>
       <div className="flex flex-1 basis-24 items-center justify-end gap-2">
         {extra}
-        {onBack && <button type="button" onClick={onBack} disabled={backDisabled} className="min-h-9 rounded-full bg-foreground px-5 text-sm font-semibold text-background disabled:opacity-40">Back</button>}
-        {onNext && <button type="button" onClick={onNext} disabled={nextDisabled} className="min-h-9 rounded-full bg-foreground px-5 text-sm font-semibold text-background disabled:opacity-40">{nextLabel}</button>}
+        {onBack && <button type="button" onClick={onBack} disabled={backDisabled} className="min-h-9 rounded-lg bg-foreground px-5 text-sm font-semibold text-background disabled:opacity-40">Back</button>}
+        {onNext && <button type="button" onClick={onNext} disabled={nextDisabled} className="min-h-9 rounded-lg bg-foreground px-5 text-sm font-semibold text-background disabled:opacity-40">{nextLabel}</button>}
       </div>
     </>
   );

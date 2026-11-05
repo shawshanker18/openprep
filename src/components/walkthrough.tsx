@@ -24,15 +24,15 @@ export function Walkthrough({ steps }: { steps: WalkthroughStep[] }) {
           <span className="text-muted-foreground tabular-nums">Subtopic {current + 1} of {steps.length}</span>
           {step.group && <span className="text-xs font-medium text-muted-foreground">{step.group}</span>}
         </div>
-        <div className="h-1.5 overflow-hidden rounded-full bg-muted" role="progressbar"
+        <div className="h-1.5 overflow-hidden rounded-md bg-muted" role="progressbar"
           aria-valuenow={current + 1} aria-valuemin={0} aria-valuemax={steps.length} aria-label="Lesson progress">
-          <div className="h-full bg-primary transition-all" style={{ width: `${(100 * (current + 1)) / steps.length}%` }} />
+          <div className="h-full rounded-md bg-primary transition-all" style={{ width: `${(100 * (current + 1)) / steps.length}%` }} />
         </div>
         {steps.length > 1 && (
           <div className="flex flex-wrap gap-1.5" role="navigation" aria-label="Subtopics">
             {steps.map((s, n) => (
               <button key={s.key} type="button" onClick={() => setI(n)} title={s.title} aria-current={n === current ? "step" : undefined} aria-label={`Subtopic ${n + 1}: ${s.title}`}
-                className={cn("flex size-8 items-center justify-center rounded-full border text-xs tabular-nums",
+                className={cn("flex size-8 items-center justify-center rounded-md border text-xs tabular-nums",
                   n === current ? "border-primary bg-primary font-medium text-primary-foreground" : "hover:bg-muted")}>
                 {n + 1}
               </button>
