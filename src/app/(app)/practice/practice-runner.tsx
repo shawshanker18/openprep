@@ -147,7 +147,7 @@ function PracticeRunnerBody({ sessionId, userId, mode, title, block, set, back, 
 
   const save = useCallback(async () => {
     if(s.phase!=="answering") return true;
-    setSaveStatus("Saving…");
+    setSaveStatus(v=>v.startsWith("Not saved")?v:"Saving…"); // a retry must not hide the warning until it works
     const res=await saveSavedPractice({sessionId,position,response:s.value,timeMs:Math.min(86400_000,carriedMs.current+elapsedMs(shownAt.current,hiddenMs.current,hiddenSince.current))})
       .catch(()=>({ok:false as const,error:"Couldn't save. Your answer is kept on this device; try again."}));
     if(res.ok) {
@@ -298,7 +298,7 @@ function PracticeRunnerBody({ sessionId, userId, mode, title, block, set, back, 
           {isMath && <CalculatorButton open={calc.open} onToggle={calc.toggle} />}
           <Button variant="ghost" size="sm" aria-label="Bookmark" aria-pressed={bookmarked} onClick={bookmark}><Bookmark className={bookmarked ? "fill-current" : undefined} /></Button>
           <ReportQuestion questionId={s.q.id} />
-          <span role="status" className="hidden whitespace-nowrap text-xs text-muted-foreground xl:block">{saveStatus}</span>
+          {saveStatus.startsWith("Not saved") && <span role="alert" className="whitespace-nowrap text-xs text-destructive"><span className="xl:hidden">Not saved</span><span className="hidden xl:inline">{saveStatus}</span></span>}
           <Button variant="outline" size="sm" disabled={pending} onClick={() => start(async () => { if (await save()) router.push(back ?? "/practice/sessions"); else toast.error("Couldn't save. Please try again."); })}>Save and leave</Button>
         </>} />}
       footer={<ExamFooter name={studentName} label={`Question ${questionNumber} of ${target}`}
