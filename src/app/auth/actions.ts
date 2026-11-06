@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import { DeliveryBlocked } from "@/server/delivery-policy";
 import { clientIp, issueSignupTicket, SIGNUP_REFUSALS } from "@/server/signup";
 
 export async function signOut() {
@@ -16,7 +17,13 @@ export async function prepareEmailSignIn(email: string, privacyAccepted: boolean
   if(privacyAccepted!==true)return {ok:false as const,error:"Please accept the Privacy Policy before continuing."};
   const p = z.email().max(254).safeParse(email);
   if(!p.success)return {ok:false as const,error:"Enter a valid email address."};
-  if(!(await issueSignupTicket(p.data, await clientIp())))return {ok:false as const,error:"Too many sign-in attempts. Please wait and try again."};
+  try {
+    if(!(await issueSignupTicket(p.data, await clientIp())))return {ok:false as const,error:"Too many sign-in attempts. Please wait and try again."};
+  } catch (e) {
+    // A missing request context (no device cookie yet) must surface as a message, never as a server error.
+    if (e instanceof DeliveryBlocked) return {ok:false as const,error:"Please refresh this page and try again."};
+    throw e;
+  }
   return {ok:true as const};
 }
 

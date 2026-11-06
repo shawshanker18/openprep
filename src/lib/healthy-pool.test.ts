@@ -24,14 +24,29 @@ it("recycles a socket that never responds before callers execute queries", async
   expect(pool.current.id).toBe(2);
   expect(close).toHaveBeenCalledExactlyOnceWith({ id: 1 });
 });
-it("returns a bounded failure when the replacement is also unavailable", async () => {
+it("returns a bounded failure when the database stays unreachable across a full retry ladder", async () => {
   vi.useFakeTimers();
   let id = 0;
   const pool = healthyPool(() => ({ id: ++id }), () => new Promise(() => {}), async () => {}, 100);
   const result = pool.ready().catch(error => error.message);
-  await vi.advanceTimersByTimeAsync(201);
+  // attempt 1 (100 ms) + attempt 2 on a new pool (100 ms) + pause (250 ms) + final attempt (100 ms)
+  await vi.advanceTimersByTimeAsync(455);
+  await vi.advanceTimersByTimeAsync(100);
   expect(await result).toBe("Database connection check timed out");
-  expect(id).toBe(2);
+  expect(id).toBe(3); // one replacement mid-ladder, then a fresh pool for the final attempt
+});
+
+it("recovers on a fresh pool when only the first connect fails", async () => {
+  // The reported first-press failure: a brand-new pool's first connect fails once; the second attempt succeeds.
+  vi.useFakeTimers();
+  let id = 0;
+  const close = vi.fn(async () => {});
+  const pool = healthyPool(() => ({ id: ++id }), p => p.id === 1 ? Promise.reject(new Error("connect failed")) : Promise.resolve(), close, 100);
+  const pending = pool.ready();
+  await vi.advanceTimersByTimeAsync(251);
+  await pending;
+  expect(pool.current.id).toBe(2);
+  expect(close).toHaveBeenCalledExactlyOnceWith({ id: 1 });
 });
 
 it("recycle replaces a stalled pool at once, closes the old one and probes the new one afresh", async () => {
@@ -47,7 +62,7 @@ it("recycle replaces a stalled pool at once, closes the old one and probes the n
   await pool.ready(); // the cached "healthy" verdict belonged to the old pool
   expect(probe).toHaveBeenCalledTimes(2);
 });
-it("replaces a pool that sat unused past the idle limit at once, without waiting for a probe to time out", async () => {
+it("replaces a pool that sat unused past the idle limit at once, then probes the fresh pool before queries run", async () => {
   vi.useFakeTimers();
   let id = 0;
   const close = vi.fn(async () => {});
@@ -58,9 +73,9 @@ it("replaces a pool that sat unused past the idle limit at once, without waiting
   await pool.ready();
   expect(id).toBe(1); // used again inside the idle window: same pool
   await vi.advanceTimersByTimeAsync(7000);
-  await pool.ready(); // resolves immediately; a hanging probe on the old pool would have taken 3 s
+  await pool.ready(); // resolves immediately; no probe on the old pool, only on the fresh one
   expect(id).toBe(2);
   expect(close).toHaveBeenCalledExactlyOnceWith({ id: 1 });
   expect(pool.current.id).toBe(2);
-  expect(probe).toHaveBeenCalledTimes(1); // the replacement was not probed, and the stale pool never was
+  expect(probe).toHaveBeenCalledTimes(2); // the fresh pool was probed once; the stale pool never was
 });
