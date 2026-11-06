@@ -3,7 +3,7 @@
 import { FeedbackDialog } from "@/components/feedback-dialog";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Activity, Bookmark, Calculator, ClipboardList, CreditCard, GraduationCap, Home, Library, LogOut, Menu, Settings, ShieldCheck, Sparkles,
 } from "lucide-react";
@@ -68,7 +68,14 @@ export function CurrentSection({ base = "" }: { base?: string }) {
     const target = hrefFor(base, item.href);
     return item.href === "/dashboard" ? path === target : path === target || path.startsWith(`${target}/`);
   });
-  return <span className="mr-auto text-sm font-medium" aria-label="Current section">{item?.label ?? (path.startsWith(`${base}/pricing`) ? "Upgrade" : path.startsWith(`${base}/account`) ? "Account" : path.startsWith(`${base}/settings`) ? "Study settings" : "OpenPrep")}</span>;
+  const label = item?.label ?? (path.startsWith(`${base}/pricing`) ? "Upgrade" : path.startsWith(`${base}/account`) ? "Account" : path.startsWith(`${base}/settings`) ? "Study settings" : "OpenPrep");
+  // The page's own heading already says this, so the top bar stays quiet instead of repeating it.
+  const [dup, setDup] = useState(false);
+  useEffect(() => {
+    const h = document.querySelector("main h1")?.textContent?.trim().toLowerCase();
+    setDup(!!h && h === String(label).trim().toLowerCase());
+  }, [path, label]);
+  return <span className="mr-auto text-sm font-medium" aria-label="Current section">{dup ? null : label}</span>;
 }
 
 /**

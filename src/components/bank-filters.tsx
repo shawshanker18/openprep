@@ -45,7 +45,7 @@ export function Pill({ type = "checkbox", name, value, checked, onChange, childr
   return (
     <label className="cursor-pointer">
       <input type={type} name={name} value={value} checked={checked} onChange={onChange} className="peer sr-only" />
-      <span className={`inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm transition-colors hover:bg-muted peer-checked:hover:bg-foreground peer-checked:border-foreground peer-checked:bg-foreground peer-checked:text-background peer-focus-visible:ring-3 peer-focus-visible:ring-ring/50 ${className}`}>{children}</span>
+      <span className={`inline-flex min-h-9 items-center gap-1.5 rounded-md border px-3.5 py-1.5 text-sm transition-colors hover:bg-muted peer-checked:hover:bg-foreground peer-checked:border-foreground peer-checked:bg-foreground peer-checked:text-background peer-focus-visible:ring-3 peer-focus-visible:ring-ring/50 ${className}`}>{children}</span>
     </label>
   );
 }

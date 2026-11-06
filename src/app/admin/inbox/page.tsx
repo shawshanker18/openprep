@@ -70,7 +70,7 @@ export default async function AdminInbox({ searchParams }: PageProps<"/admin/inb
     items = rows.slice(0, PER_PAGE).map((r) => (
       <li key={r.id} className="flex flex-col gap-2 rounded-xl border p-4 text-sm">
         <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-          <span className="rounded-full border px-2 py-0.5 font-medium text-foreground">{KIND_LABEL[r.kind] ?? r.kind}</span>
+          <span className="rounded-md border px-2 py-0.5 font-medium text-foreground">{KIND_LABEL[r.kind] ?? r.kind}</span>
           {r.rating != null && <span aria-label={`${r.rating} out of 5`}>{"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}</span>}
           <span>{STATUS_LABEL[r.status]}</span><span>·</span><span>{when(r.createdAt)}</span>
           {r.page && <><span>·</span><span>from <code>{r.page}</code></span></>}
@@ -92,7 +92,7 @@ export default async function AdminInbox({ searchParams }: PageProps<"/admin/inb
     items = rows.slice(0, PER_PAGE).map(({ r, q }) => (
       <li key={r.id} className="flex flex-col gap-2 rounded-xl border p-4 text-sm">
         <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-          <span className="rounded-full border px-2 py-0.5 font-medium text-foreground">{REASON_LABEL[r.reason] ?? r.reason}</span>
+          <span className="rounded-md border px-2 py-0.5 font-medium text-foreground">{REASON_LABEL[r.reason] ?? r.reason}</span>
           <span>{STATUS_LABEL[r.status]}</span><span>·</span><span>{when(r.createdAt)}</span><span>·</span>
           <span>question <code>{r.questionId}</code>{q ? ` (${SKILL_BY_ID[q.skillId]?.name ?? q.skillId}${q.status !== "active" ? ", retired" : ""})` : " (no longer in the bank)"}</span>
         </div>
@@ -127,7 +127,7 @@ export default async function AdminInbox({ searchParams }: PageProps<"/admin/inb
     ));
   }
 
-  const chip = (active: boolean) => cn("rounded-full border px-3 py-1 text-xs", active ? "bg-primary text-primary-foreground" : "hover:bg-muted");
+  const chip = (active: boolean) => cn("rounded-md border px-3 py-1 text-xs", active ? "bg-primary text-primary-foreground" : "hover:bg-muted");
   return (
     <div className="flex flex-col gap-4">
       <h1 className="text-xl font-semibold">Inbox</h1>

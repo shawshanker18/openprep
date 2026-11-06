@@ -27,7 +27,7 @@ export function OAuthGoogleButton({ enabled, privacyAccepted }: { enabled: boole
     });
   }
   return <div className="flex flex-col gap-2">
-    <Button type="button" className="h-12 w-full rounded-full text-base font-medium flex items-center justify-center gap-2.5 shadow-sm" disabled={pending} aria-busy={pending} aria-disabled={!enabled} onClick={openGoogle}>
+    <Button type="button" className="h-12 w-full rounded-md text-base font-medium flex items-center justify-center gap-2.5 shadow-sm" disabled={pending} aria-busy={pending} aria-disabled={!enabled} onClick={openGoogle}>
       <GoogleG />
       {pending ? "Opening Google…" : "Continue with Google"}
     </Button>

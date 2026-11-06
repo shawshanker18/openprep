@@ -51,7 +51,7 @@ export function LoginForm({ google: showGoogle, inApp = false }: { google: boole
   const guest = (
     <Link
       href="/guest"
-      className="flex h-12 items-center justify-center rounded-full border border-neutral-300 dark:border-neutral-700 bg-background text-sm font-medium text-foreground shadow-xs hover:bg-muted/80 transition-colors"
+      className="flex h-12 items-center justify-center rounded-md border border-neutral-300 dark:border-neutral-700 bg-background text-sm font-medium text-foreground shadow-xs hover:bg-muted/80 transition-colors"
     >
       Continue as guest
     </Link>

@@ -12,7 +12,7 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <Link href="/admin" className="text-lg font-semibold">OpenPrep admin</Link>
-          <span className="rounded-full border px-2 py-0.5 text-xs text-muted-foreground">admins only</span>
+          <span className="rounded-md border px-2 py-0.5 text-xs text-muted-foreground">admins only</span>
         </div>
         <Link href="/dashboard" className="text-sm text-muted-foreground underline">Back to the app</Link>
       </div>

@@ -34,14 +34,14 @@ export function DifficultySection({ subjectRings }: { subjectRings: SubjectRingD
         <div
           role="radiogroup"
           aria-label="Filter difficulty analytics by subject"
-          className="inline-flex self-start sm:self-auto rounded-full border border-border/80 bg-muted/40 p-1 text-xs font-medium text-muted-foreground shadow-2xs"
+          className="inline-flex self-start sm:self-auto rounded-md border border-border/80 bg-muted/40 p-1 text-xs font-medium text-muted-foreground shadow-2xs"
         >
           <button
             type="button"
             role="radio"
             aria-checked={filter === "math"}
             onClick={() => setFilter("math")}
-            className={`rounded-full px-3.5 py-1.5 transition-all ${
+            className={`rounded-md px-3.5 py-1.5 transition-all ${
               filter === "math"
                 ? "bg-background text-foreground font-semibold shadow-xs"
                 : "hover:text-foreground"
@@ -54,7 +54,7 @@ export function DifficultySection({ subjectRings }: { subjectRings: SubjectRingD
             role="radio"
             aria-checked={filter === "rw"}
             onClick={() => setFilter("rw")}
-            className={`rounded-full px-3.5 py-1.5 transition-all ${
+            className={`rounded-md px-3.5 py-1.5 transition-all ${
               filter === "rw"
                 ? "bg-background text-foreground font-semibold shadow-xs"
                 : "hover:text-foreground"
@@ -67,7 +67,7 @@ export function DifficultySection({ subjectRings }: { subjectRings: SubjectRingD
             role="radio"
             aria-checked={filter === "both"}
             onClick={() => setFilter("both")}
-            className={`rounded-full px-3.5 py-1.5 transition-all ${
+            className={`rounded-md px-3.5 py-1.5 transition-all ${
               filter === "both"
                 ? "bg-background text-foreground font-semibold shadow-xs"
                 : "hover:text-foreground"

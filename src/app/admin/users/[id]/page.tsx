@@ -37,7 +37,7 @@ export default async function AdminUser({ params }: PageProps<"/admin/users/[id]
       <div className="flex flex-col gap-1">
         <Link href="/admin/users" className="text-sm text-muted-foreground underline">← Users</Link>
         <h1 className="break-all text-xl font-semibold">{e?.email ?? id}</h1>
-        {d.admin && <span className="self-start rounded-full border px-2 py-0.5 text-xs">admin</span>}
+        {d.admin && <span className="self-start rounded-md border px-2 py-0.5 text-xs">admin</span>}
       </div>
       <dl className="grid grid-cols-1 gap-x-6 gap-y-2 rounded-xl border p-4 text-sm sm:grid-cols-2 lg:grid-cols-3">
         {facts.map(([k, v]) => <div key={k} className="flex justify-between gap-3 border-b py-1 last:border-0 sm:border-0"><dt className="text-muted-foreground">{k}</dt><dd className="text-right tabular-nums">{v}</dd></div>)}
