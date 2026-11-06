@@ -5,7 +5,8 @@ import { PGlite } from "@electric-sql/pglite";
 import { drizzle } from "drizzle-orm/pglite";
 import * as schema from "@/db/schema";
 
-const pg = new PGlite(), db = drizzle(pg, { schema });
+const params: unknown[] = [];
+const pg = new PGlite(), db = drizzle(pg, { schema, logger: { logQuery: (_query, values) => { params.push(...values); } } });
 vi.mock("@/db", () => ({ db }));
 const send = vi.fn(async () => ({}));
 vi.mock("web-push", () => ({ default: { setVapidDetails: vi.fn(), sendNotification: send } }));
@@ -43,4 +44,11 @@ it("reminds only students whose paid time ends within 3 days and who have a devi
 it("sends once per end date", async () => {
   await sendExpiryReminders(now);
   expect(await sendExpiryReminders(new Date(now.getTime() + 3_600_000))).toEqual({ sent: 0 });
+});
+
+it("never hands the driver a raw Date, which production's postgres-js rejects and PGlite accepts", async () => {
+  params.length = 0;
+  await sendExpiryReminders(now);
+  expect(params.length).toBeGreaterThan(0);
+  expect(params.filter((value) => value instanceof Date)).toEqual([]);
 });

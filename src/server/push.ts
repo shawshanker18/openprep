@@ -121,7 +121,7 @@ export async function sendExpiryReminders(now = new Date()) {
   if (!configure()) return { sent: 0 };
   const last = sql<Date>`max(${membershipBlocks.endsAt})`;
   const ending = await db.select({ userId: membershipBlocks.userId, endsAt: last }).from(membershipBlocks).groupBy(membershipBlocks.userId)
-    .having(sql`${last} > ${now} and ${last} <= ${new Date(now.getTime() + 3 * 86_400_000)}`);
+    .having(sql`${last} > ${now.toISOString()}::timestamptz and ${last} <= ${new Date(now.getTime() + 3 * 86_400_000).toISOString()}::timestamptz`);
   let sent = 0;
   for (const r of ending) {
     const endsAt = new Date(r.endsAt);
