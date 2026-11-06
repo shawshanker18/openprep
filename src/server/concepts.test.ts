@@ -109,6 +109,7 @@ describe("deleting a concept", () => {
 
 describe("checkpoints", () => {
   it("starts with a concept question, uses only active study questions, and never repeats one", async () => {
+    await db.delete(schema.conceptQuestions); // earlier tests leave links behind, and concept picks are random
     await saveConcept(ADMIN, { ...base, title: "Checkpoint concept", questionIds: ["q-active-2"] });
     const picks = await checkpointQuestions(SKILL);
     expect(picks[0]?.id).toBe("q-active-2");

@@ -11,7 +11,7 @@ import { guarded } from "@/server/guard";
 import { getAnalysisBuckets, getDailyAccuracy, parseRange, rangeSince, RANGES, type Range } from "@/server/analysis";
 import { cn } from "@/lib/utils";
 import { DifficultyRing, type Segment } from "./difficulty-rings";
-import { DifficultySection } from "./difficulty-section";
+import { DifficultySection, type SubjectRingData } from "./difficulty-section";
 import { MistakesList } from "./mistakes-list";
 
 export const metadata = { title: "Analytics" };
@@ -151,7 +151,7 @@ function AnalysisBody({ buckets, days, total }: {
   const periodSummary = (rs: typeof active) => summarize([{ skillId: "", difficulty: 1, answered: rs.reduce((a, d) => a + d.answered, 0), correct: rs.reduce((a, d) => a + d.correct, 0), timedN: 0, timedMs: 0 }]);
   const change = active.length >= 4 ? accuracyChange(periodSummary(active.slice(0, mid)), periodSummary(active.slice(mid))) : null;
 
-  const subjectRings = (["math", "rw"] as const).map((section) => {
+  const subjectRings = (["math", "rw"] as const).map((section): SubjectRingData => {
     const list = buckets.filter((b) => SKILL_BY_ID[b.skillId]?.section === section);
     const d = byDifficulty(list);
     const levels = [1, 2, 3] as const;
@@ -203,7 +203,7 @@ function AnalysisBody({ buckets, days, total }: {
         </div>
       </section>
 
-      <DifficultySection subjectRings={subjectRings as any} />
+      <DifficultySection subjectRings={subjectRings} />
 
       <section aria-labelledby="trend" className="flex flex-col gap-3">
         <h2 id="trend" className="font-medium">Accuracy over time</h2>

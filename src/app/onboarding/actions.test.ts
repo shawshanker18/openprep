@@ -13,6 +13,7 @@ const db = drizzle(pg, { schema });
 const userId = "00000000-0000-0000-0000-000000000001";
 vi.mock("@/db", () => ({ db }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
+vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined }), headers: async () => new Headers() }));
 vi.mock("next/navigation", () => ({ redirect: vi.fn() }));
 vi.mock("@/server/auth", () => ({ requireUser: async () => ({ userId, profile: await db.query.profiles.findFirst({ where: eq(schema.profiles.id, userId) }) }) }));
 const { submitSurvey } = await import("./actions");

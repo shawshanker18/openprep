@@ -1,32 +1,34 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { Bell, X } from "lucide-react";
 import type { Notification } from "@/server/notifications";
 import { dismissNotificationsAction } from "@/server/notifications-actions";
 
 const PANEL_W = 280;
+const STORAGE_KEY = "openprep:dismissed-notifications";
+
+const noSubscribe = () => () => {};
+function storedDismissals() {
+  try { return localStorage.getItem(STORAGE_KEY) ?? "[]"; } catch { return "[]"; } // storage unavailable
+}
+function parseDismissals(raw: string): string[] {
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
 
 export function NotificationBell({ items, align = "left" }: { items: Notification[]; align?: "left" | "right" }) {
   const ref = useRef<HTMLDetailsElement>(null);
   const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
-  const [dismissed, setDismissed] = useState<Set<string>>(new Set());
-
-  // Load dismissed notifications from localStorage on mount
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem("openprep:dismissed-notifications");
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed)) {
-          setDismissed(new Set(parsed));
-        }
-      }
-    } catch {
-      // storage unavailable
-    }
-  }, []);
+  const stored = useSyncExternalStore(noSubscribe, storedDismissals, () => "[]");
+  // Kept in state too, so dismissing still works for this visit when storage is unavailable.
+  const [dismissedNow, setDismissedNow] = useState<string[]>([]);
+  const dismissed = useMemo(() => new Set([...parseDismissals(stored), ...dismissedNow]), [stored, dismissedNow]);
 
   const close = () => ref.current?.removeAttribute("open");
 
@@ -63,9 +65,9 @@ export function NotificationBell({ items, align = "left" }: { items: Notificatio
     e.stopPropagation();
     const next = new Set(dismissed);
     next.add(id);
-    setDismissed(next);
+    setDismissedNow(Array.from(next));
     try {
-      localStorage.setItem("openprep:dismissed-notifications", JSON.stringify(Array.from(next)));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(next)));
     } catch {
       // storage unavailable
     }
@@ -78,9 +80,9 @@ export function NotificationBell({ items, align = "left" }: { items: Notificatio
     const allIds = items.map((n) => n.id);
     const next = new Set(dismissed);
     for (const id of allIds) next.add(id);
-    setDismissed(next);
+    setDismissedNow(Array.from(next));
     try {
-      localStorage.setItem("openprep:dismissed-notifications", JSON.stringify(Array.from(next)));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(next)));
     } catch {
       // storage unavailable
     }

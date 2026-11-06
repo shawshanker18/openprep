@@ -3,7 +3,7 @@
 import { FeedbackDialog } from "@/components/feedback-dialog";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import {
   Activity, Bookmark, Calculator, ClipboardList, CreditCard, GraduationCap, Home, Library, LogOut, Menu, Settings, ShieldCheck, Sparkles,
 } from "lucide-react";
@@ -62,6 +62,14 @@ export function hrefFor(base: string, href: string) {
   return base && href === "/dashboard" ? base : `${base}${href}`;
 }
 
+/** The page heading lives outside this component and can arrive after it renders, so it is watched in the DOM. */
+function subscribeHeading(onChange: () => void) {
+  const observer = new MutationObserver(onChange);
+  observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+  return () => observer.disconnect();
+}
+const pageHeading = () => document.querySelector("main h1")?.textContent?.trim().toLowerCase() ?? "";
+
 export function CurrentSection({ base = "" }: { base?: string }) {
   const path = usePathname();
   const item = NAV_GROUPS.flatMap(group => [...group.items]).sort((a, b) => b.href.length - a.href.length).find(item => {
@@ -70,11 +78,8 @@ export function CurrentSection({ base = "" }: { base?: string }) {
   });
   const label = item?.label ?? (path.startsWith(`${base}/pricing`) ? "Upgrade" : path.startsWith(`${base}/account`) ? "Account" : path.startsWith(`${base}/settings`) ? "Study settings" : "OpenPrep");
   // The page's own heading already says this, so the top bar stays quiet instead of repeating it.
-  const [dup, setDup] = useState(false);
-  useEffect(() => {
-    const h = document.querySelector("main h1")?.textContent?.trim().toLowerCase();
-    setDup(!!h && h === String(label).trim().toLowerCase());
-  }, [path, label]);
+  const heading = useSyncExternalStore(subscribeHeading, pageHeading, () => "");
+  const dup = !!heading && heading === String(label).trim().toLowerCase();
   return <span className="mr-auto text-sm font-medium" aria-label="Current section">{dup ? null : label}</span>;
 }
 
