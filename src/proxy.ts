@@ -33,8 +33,7 @@ export async function proxy(request: NextRequest) {
   // Only the landing and sign-in pages may appear in search results; nothing inside the app or its API.
   if (!["/", "/login"].includes(request.nextUrl.pathname)) response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive, nosnippet");
   // The landing page is static; signed-in visitors go straight to the app from here instead.
-  const previewSignedOut = request.nextUrl.searchParams.has("preview_signed_out") || !!request.cookies.get("preview_signed_out");
-  const devUser = process.env.NODE_ENV === "development" && !!process.env.DEV_USER_ID && !previewSignedOut;
+  const devUser = process.env.NODE_ENV === "development" && !!process.env.DEV_USER_ID;
   if (request.nextUrl.pathname === "/" && (user || devUser)) {
     const to = NextResponse.redirect(new URL("/dashboard", request.url));
     response.cookies.getAll().forEach((c) => to.cookies.set(c)); // keep any refreshed session cookies

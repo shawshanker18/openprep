@@ -26,7 +26,7 @@ export default async function DesmosLessonPage({ params }: PageProps<"/desmos/[s
   await db.insert(lessonProgress).values({ userId, skillId: `desmos:${slug}` })
     .onConflictDoUpdate({ target: [lessonProgress.userId, lessonProgress.skillId], set: { completedAt: new Date() } });
   return (
-    <LessonWorkspace title={lesson.title} slug={slug} expressions={lesson.expressions}>
+    <LessonWorkspace title={lesson.title} slug={slug} calculator={<DesmosCalculator expressions={lesson.expressions} className="h-[min(calc(100dvh-7.5rem),52rem)] min-h-[26rem]" />}>
       <LessonTextSize>
       <Markdown className="text-[1em] leading-relaxed">{lesson.md}</Markdown>
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t pt-4">

@@ -3,7 +3,6 @@
 import { useRef, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { beginGoogleOAuth } from "@/app/auth/actions";
-import { GoogleG } from "./app-google-button";
 
 export function OAuthGoogleButton({ enabled, privacyAccepted }: { enabled: boolean; privacyAccepted: boolean }) {
   const opening = useRef(false);
@@ -27,8 +26,7 @@ export function OAuthGoogleButton({ enabled, privacyAccepted }: { enabled: boole
     });
   }
   return <div className="flex flex-col gap-2">
-    <Button type="button" className="h-12 w-full rounded-md text-base font-medium flex items-center justify-center gap-2.5 shadow-sm" disabled={pending} aria-busy={pending} aria-disabled={!enabled} onClick={openGoogle}>
-      <GoogleG />
+    <Button type="button" className="h-12 w-full rounded-md text-base font-medium" disabled={pending} aria-busy={pending} aria-disabled={!enabled} onClick={openGoogle}>
       {pending ? "Opening Google…" : "Continue with Google"}
     </Button>
     {error && <p role="alert" className="text-sm text-destructive">{error}</p>}

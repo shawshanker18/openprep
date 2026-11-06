@@ -17,8 +17,8 @@ const KIND: Record<string, string> = { full: "Full practice test", section: "Sec
 
 function Card({ title, children, className = "" }: { title: string; children: React.ReactNode; className?: string }) {
   return (
-    <section className={`flex min-w-0 flex-col gap-3 rounded-2xl border border-border/50 bg-background/50 p-5 ${className}`}>
-      <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{title}</h2>
+    <section className={`flex min-w-0 flex-col gap-3 rounded-xl border p-5 ${className}`}>
+      <h2 className="text-sm font-medium text-muted-foreground">{title}</h2>
       {children}
     </section>
   );
@@ -84,83 +84,31 @@ export function DashboardView({profile,user,d,summary,home,savedPractice}: {
           )}
         </Card>
 
-        <section aria-labelledby="numbers-h" className="order-3 lg:col-span-2 flex min-w-0 flex-col gap-4 rounded-xl border border-border/80 bg-card p-5 shadow-xs">
-          {/* Header row: Title + Target Score & Current Estimate */}
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-border/60 pb-3.5">
-            <div>
-              <h2 id="numbers-h" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Your numbers</h2>
-              <p className="text-sm font-medium text-foreground mt-0.5">Overview of your preparation and score trajectory</p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3 sm:gap-5">
-              <div className="flex flex-col">
-                <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Current Estimate</span>
-                <span className="text-base font-bold tabular-nums text-foreground">
-                  {d.estimate.total ? `≈ ${d.estimate.total}` : "—"}
-                </span>
-              </div>
-              <div className="h-7 w-px bg-border/70 hidden sm:block" />
-              <div className="flex flex-col">
-                <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Target Score</span>
-                <span className="text-base font-bold tabular-nums text-foreground">
-                  {profile.targetScore ?? 1400}
-                </span>
-              </div>
-              {(() => {
-                const targetScore = profile.targetScore ?? 1400;
-                const currentTotal = d.estimate.total;
-                if (!currentTotal) return null;
-                const diff = targetScore - currentTotal;
-                return (
-                  <span className="rounded-md border border-border/70 bg-muted/40 px-2.5 py-1 text-xs font-medium text-muted-foreground tabular-nums">
-                    {diff > 0 ? `${diff} pts to goal` : "Goal reached! 🎉"}
-                  </span>
-                );
-              })()}
-            </div>
-          </div>
-
-          {/* Core Numbers - Hairline-divided unified strip, NO chunky boxes */}
-          <dl className="grid grid-cols-1 divide-y divide-border/60 rounded-lg border border-border/60 bg-muted/20 sm:grid-cols-3 sm:divide-y-0 sm:divide-x">
+        <Card title="Your numbers" className="order-3 lg:col-span-2">
+          <dl className="grid grid-cols-1 gap-3 text-center min-[360px]:grid-cols-3">
             {[
-              ["Questions Answered", home.totals.answered.toLocaleString("en-US"), `${d.week.answered} this week`],
+              ["Questions", home.totals.answered.toLocaleString("en-US"), `${d.week.answered} this week`],
               ["Accuracy", home.totals.accuracy == null ? "—" : `${home.totals.accuracy}%`, d.week.accuracy == null ? "none this week" : `${d.week.accuracy}% this week`],
-              ["Study Time", hours(home.totals.minutes), `${hours(d.week.minutes)} this week`],
+              ["Time", hours(home.totals.minutes), `${hours(d.week.minutes)} this week`],
             ].map(([k, v, s]) => (
-              <div key={k} className="flex flex-col gap-1 p-3.5 text-center sm:text-left">
-                <dt className="text-xs font-medium text-muted-foreground">{k}</dt>
-                <dd className="text-xl font-bold tracking-tight text-foreground tabular-nums">{v}</dd>
-                <dd className="text-xs text-muted-foreground tabular-nums">{s}</dd>
+              <div key={k} className="flex flex-col gap-0.5 rounded-lg bg-muted/50 p-3">
+                <dt className="text-xs text-muted-foreground">{k}</dt><dd className="text-lg font-semibold tabular-nums">{v}</dd><dd className="text-xs text-muted-foreground">{s}</dd>
               </div>
             ))}
           </dl>
-
-          {/* Subject Mastery Breakdown */}
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 pt-1">
+          <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
             {(["math", "rw"] as const).map((sec) => {
               const m = sectionMastery(sec);
-              const est = sec === "math" ? d.estimate.math : d.estimate.rw;
-              const halfTarget = Math.round((profile.targetScore ?? 1400) / 2);
               return (
-                <div key={sec} className="flex flex-col gap-2 rounded-lg border border-border/60 bg-muted/15 p-3.5">
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-sm text-foreground">
-                      {sec === "math" ? "Math" : "Reading and Writing"}
-                    </span>
-                    <span className="text-sm font-bold tabular-nums text-foreground">
-                      {est ? `≈ ${est}` : "—"}
-                    </span>
-                  </div>
+                <div key={sec} className="flex flex-col gap-1">
+                  <span className="flex justify-between"><span>{sec === "math" ? "Math" : "Reading and Writing"}</span><span className="tabular-nums text-muted-foreground">{m == null ? "—" : `≈ ${sec === "math" ? d.estimate.math : d.estimate.rw}`}</span></span>
                   <MasteryBar pct={m ?? 0} measured={m != null} />
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>{m == null ? "Not measured yet" : `${m}% skill mastery`}</span>
-                    <span>Target: {halfTarget}</span>
-                  </div>
+                  <span className="text-xs text-muted-foreground">{m == null ? "not measured yet" : `${m}% skill mastery`}</span>
                 </div>
               );
             })}
           </div>
-        </section>
+        </Card>
 
         <Card title="Skills to work on" className="order-2">
           {weakest.length ? weakest.map((k) => (

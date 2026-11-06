@@ -7,14 +7,10 @@ import { db, ensureDatabase } from "@/db";
 import { profiles } from "@/db/schema";
 import { guarded } from "./guard";
 
-import { headers, cookies } from "next/headers";
-
 export type AuthUser = { id: string; email: string | null; name: string | null; avatarUrl: string | null };
 
 /** Current user from a verified JWT, or null. One auth round-trip per request. */
 export const getAuthUser = cache(async (): Promise<AuthUser | null> => {
-  const c = await cookies().catch(() => null);
-  if (c?.get("preview_signed_out")) return null;
   // Local-only stub so flows can be exercised without a real sign-in. Never active in production builds.
   if (process.env.NODE_ENV === "development" && process.env.DEV_USER_ID) return { id: process.env.DEV_USER_ID, email: null, name: null, avatarUrl: null };
   const supabase = await createClient();

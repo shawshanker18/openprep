@@ -8,8 +8,10 @@ import type { TestResult } from "@/engine/score";
 import { requireUser } from "@/server/auth";
 import { completedPracticeTests, listTests, openTestProgress, openTests, TESTS_PER_PAGE } from "@/server/tests";
 import { abandon } from "@/app/test/[sessionId]/actions";
+import { startTestAction } from "./actions";
+import { ScopeButton } from "@/components/scope-button";
+import { ModuleMenu } from "@/components/module-menu";
 import { MODULE_ROUTES, MODULE_SECTIONS } from "@/lib/test-modules";
-import { PracticeTestsList, type TestCardData } from "./practice-tests-list";
 
 export const metadata = { title: "Practice tests" };
 
@@ -80,7 +82,7 @@ export default async function TestsPage({ searchParams }: PageProps<"/tests">) {
                     {p.section && ` · now on ${p.section === "math" ? "Math" : "Reading and Writing"} ${ROUTE_NAME[p.route ?? "base"]}`}
                   </p>
                   <div className="mt-2 flex items-center gap-2">
-                    <span className="h-1.5 flex-1 overflow-hidden rounded-md bg-muted"><span className="block h-full bg-primary" style={{ width: `${Math.min(100, (100 * p.done) / of)}%` }} /></span>
+                    <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted"><span className="block h-full bg-primary" style={{ width: `${Math.min(100, (100 * p.done) / of)}%` }} /></span>
                     <span className="text-xs tabular-nums text-muted-foreground">{p.done}/{of} modules done</span>
                   </div>
                 </div>
@@ -96,14 +98,8 @@ export default async function TestsPage({ searchParams }: PageProps<"/tests">) {
 
       <section aria-label="Practice tests" className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold">Practice tests</h2>
-        {(() => {
-          const defaultDiffs: Record<number, "easy" | "medium" | "hard" | "mixed"> = {
-            1: "easy",
-            2: "medium",
-            3: "hard",
-            4: "mixed",
-          };
-          const cardsData: TestCardData[] = PAPERS.map((n) => {
+        <div className="grid gap-4 lg:grid-cols-2">
+          {PAPERS.map((n) => {
             const mine = done.filter((t) => cfg(t).paper === n);
             const fulls = mine.filter((t) => t.kind === "full" && total(t) != null);
             const lastFull = fulls[0]?.result as TestResult | undefined;
@@ -112,26 +108,39 @@ export default async function TestsPage({ searchParams }: PageProps<"/tests">) {
               const r = (mine.find((t) => t.kind === "module" && cfg(t).sections?.[0] === sec.id && cfg(t).route === m.route)?.result as TestResult | undefined)?.sections[sec.id];
               if (r) last[`${sec.id}:${m.route}`] = `${r.correct}/${r.total}`;
             }
-            const openHere = Boolean(open.find((t) => cfg(t).paper === n));
+            const openHere = open.find((t) => cfg(t).paper === n);
             const openFull = open.find((t) => cfg(t).paper === n && t.kind === "full");
+            return (
+              <form key={n} action={startTestAction} className="flex min-w-0 flex-col gap-4 rounded-xl border bg-card p-5">
+                <input type="hidden" name="paper" value={n} />
+                <header className="flex flex-wrap items-start justify-between gap-2">
+                  <div>
+                    <h3 className="text-lg font-semibold">Practice Test {n}</h3>
+                    <p className="text-sm text-muted-foreground">98 questions · 2 h 14 min · 10-min break</p>
+                  </div>
+                  <span className={`rounded-full border px-2.5 py-0.5 text-xs ${openHere ? STATUS_STYLE.in_progress : STATUS_STYLE[mine.length ? "completed" : "abandoned"]}`}>
+                    {openHere ? "In progress" : mine.length ? `${mine.length} finished` : "Not started"}
+                  </span>
+                </header>
 
-            return {
-              paper: n,
-              defaultDifficulty: defaultDiffs[n] ?? "mixed",
-              lastFull: lastFull ? {
-                total: lastFull.total,
-                math: lastFull.sections.math?.score,
-                rw: lastFull.sections.rw?.score,
-              } : undefined,
-              lastModules: last,
-              openHere,
-              openFullId: openFull?.id,
-              finishedCount: mine.length,
-            };
-          });
+                <dl className="grid grid-cols-3 gap-2 text-center">
+                  {[["Last total", lastFull?.total], ["Last Math", lastFull?.sections.math?.score], ["Last R&W", lastFull?.sections.rw?.score]].map(([k, v]) => (
+                    <div key={String(k)} className="rounded-lg bg-muted/50 px-2 py-2">
+                      <dt className="text-xs text-muted-foreground">{k}</dt>
+                      <dd className="text-lg font-semibold tabular-nums">{v ? `≈ ${v}` : "—"}</dd>
+                    </div>
+                  ))}
+                </dl>
 
-          return <PracticeTestsList tests={cardsData} />;
-        })()}
+                {openFull
+                  ? <Button size="lg" render={<Link href={`/test/${openFull.id}`} />}>Resume full test</Button>
+                  : <ScopeButton value="full" variant="default" size="lg" className="w-full">Start full test</ScopeButton>}
+
+                <ModuleMenu paper={n} last={last} />
+              </form>
+            );
+          })}
+        </div>
       </section>
 
       <section id="history" className="flex scroll-mt-4 flex-col gap-3">
@@ -149,17 +158,10 @@ export default async function TestsPage({ searchParams }: PageProps<"/tests">) {
                   <tr key={t.id} className="border-t hover:bg-muted/30">
                     <td className="px-4 py-3 tabular-nums">{formatDate(t.startedAt, profile.timezone)}</td>
                     <td className="px-4 py-3 font-medium">{testLabel(t.kind, t.config)}</td>
-                    <td className="px-4 py-3"><span className={`rounded-md border px-2 py-0.5 text-xs ${STATUS_STYLE[t.status] ?? ""}`}>{t.status.replace("_", " ")}</span></td>
+                    <td className="px-4 py-3"><span className={`rounded-full border px-2 py-0.5 text-xs ${STATUS_STYLE[t.status] ?? ""}`}>{t.status.replace("_", " ")}</span></td>
                     <td className="px-4 py-3 tabular-nums">{diagnostic ? "—" : sectionCell(r, "math")}</td>
                     <td className="px-4 py-3 tabular-nums">{diagnostic ? "—" : sectionCell(r, "rw")}</td>
-                    {(() => {
-                      const totalVal = typeof r?.total === "object" && r?.total !== null && "total" in (r.total as Record<string, unknown>)
-                        ? (r.total as { total?: number }).total
-                        : typeof r?.total === "number"
-                        ? r.total
-                        : null;
-                      return <td className="px-4 py-3 tabular-nums">{totalVal != null ? `≈ ${totalVal}` : "—"}</td>;
-                    })()}
+                    <td className="px-4 py-3 tabular-nums">{r?.total != null ? `≈ ${r.total}` : "—"}</td>
                     <td className="px-4 py-3 text-right"><Link className="underline" href={t.status === "in_progress" ? `/test/${t.id}` : `/test/${t.id}/results${diagnostic && t.status === "completed" ? "?review=mistakes" : ""}`}>{t.status === "in_progress" ? "Resume" : diagnostic && t.status === "completed" ? "Review mistakes" : "View"}</Link></td>
                   </tr>
                 );

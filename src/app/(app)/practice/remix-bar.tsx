@@ -52,7 +52,7 @@ export function RemixBadge({ questionId }: { questionId: string }) {
   }, [questionId]);
   return (
     <p className="text-sm">
-      <span className="rounded-md bg-foreground px-3 py-1 text-xs font-medium text-background">
+      <span className="rounded-full bg-foreground px-3 py-1 text-xs font-medium text-background">
         {origin ? `${DIRECTION_BADGE[origin.direction as Direction] ?? "AI"} remix of question ${origin.sourceRef}` : "AI remix"}
       </span>
       <span className="ml-2 text-muted-foreground">AI-generated, not official</span>

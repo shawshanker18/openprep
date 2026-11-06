@@ -228,39 +228,15 @@ const fitSaved = (v: Partial<Saved>): Saved => {
  * last layout for the session, otherwise the student's saved default from the database, otherwise the default above.
  * After that it never asks the database again; only "Save as default" writes to it.
  */
-export function FloatingDesmos({
-  sessionKey, open, onOpen, onClose, expressions,
-}: {
-  sessionKey: string; open: boolean; onOpen: () => void; onClose: () => void; expressions?: string[];
-}) {
+export function FloatingDesmos({ sessionKey, open, onOpen, onClose }: { sessionKey: string; open: boolean; onOpen: () => void; onClose: () => void }) {
   const winKey = `${sessionKey}:window`;
   const [start, setStart] = useState<Saved | null>(null);
   /** How far the edge bar has been pulled to the right: the calculator follows it, and lets go open or shut. */
   const [pull, setPull] = useState<number | null>(null);
-
-  // Global 'd' shortcut to toggle Desmos
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "d" || e.key === "D") {
-        const target = e.target as HTMLElement | null;
-        const tag = target?.tagName?.toLowerCase();
-        if (tag === "input" || tag === "textarea" || tag === "select" || target?.isContentEditable) return;
-        e.preventDefault();
-        if (open) onClose();
-        else onOpen();
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open, onOpen, onClose]);
-
   useEffect(() => {
     let off = false;
     const local = (): Saved | null => {
-      try {
-        const saved = localStorage.getItem(winKey) || localStorage.getItem("openprep:desmos:last-layout");
-        return saved ? fitSaved(JSON.parse(saved)) : null;
-      } catch { return null; }
+      try { const saved = localStorage.getItem(winKey); return saved ? fitSaved(JSON.parse(saved)) : null; } catch { return null; }
     };
     Promise.resolve().then(() => local() ?? Promise.race([getCalculatorLayout(), new Promise<null>((resolve) => setTimeout(() => resolve(null), 2500))]).then((saved) => fitSaved(saved ?? {}), () => fitSaved({})))
       .then((layout) => { if (!off) setStart(layout); });
@@ -269,7 +245,7 @@ export function FloatingDesmos({
   return (
     <>
       {!open && <EdgeBar onPull={setPull} onOpen={onOpen} />}
-      {start && <CalculatorWindow winKey={winKey} sessionKey={sessionKey} initial={start} open={open} pull={open ? null : pull} onClose={onClose} expressions={expressions} />}
+      {start && <CalculatorWindow winKey={winKey} sessionKey={sessionKey} initial={start} open={open} pull={open ? null : pull} onClose={onClose} />}
     </>
   );
 }
@@ -317,24 +293,14 @@ function ResizeHandle({ dir, className, box, onBox, onDone }: { dir: string; cla
   );
 }
 
-function CalculatorWindow({
-  winKey, sessionKey, initial, open, pull, onClose, expressions,
-}: {
-  winKey: string; sessionKey: string; initial: Saved; open: boolean; pull: number | null; onClose: () => void; expressions?: string[];
-}) {
+function CalculatorWindow({ winKey, sessionKey, initial, open, pull, onClose }: { winKey: string; sessionKey: string; initial: Saved; open: boolean; pull: number | null; onClose: () => void }) {
   const [win, setWin] = useState<Win>({ x: initial.x, y: initial.y, w: initial.w, h: initial.h });
   const [tab, setTab] = useState<Tab>(initial.tab);
   const [scientificSeen, setScientificSeen] = useState(initial.tab === "scientific");
   const [expanded, setExpanded] = useState(false);
   const [saving, setSaving] = useState(false);
   const drag = useRef<{ dx: number; dy: number; from: number } | null>(null);
-  const remember = (v: Win, t: Tab = tab) => {
-    try {
-      const data = JSON.stringify({ ...v, tab: t });
-      localStorage.setItem(winKey, data);
-      localStorage.setItem("openprep:desmos:last-layout", data);
-    } catch { /* storage unavailable */ }
-  };
+  const remember = (v: Win, t: Tab = tab) => { try { localStorage.setItem(winKey, JSON.stringify({ ...v, tab: t })); } catch { /* storage unavailable */ } };
   const pick = (t: Tab) => { setTab(t); if (t === "scientific") setScientificSeen(true); remember(win, t); };
   const saveDefault = async () => {
     setSaving(true);
@@ -392,7 +358,7 @@ function CalculatorWindow({
         <ResizeHandle key={dir} dir={dir} className={cls} box={win} onBox={setWin} onDone={remember} />
       ))}
       <div className="flex min-h-0 flex-1 flex-col">
-        <div hidden={tab !== "graphing"} className="flex min-h-0 flex-1 flex-col"><DesmosCalculator bare expressions={expressions} stateKey={`${sessionKey}:graph`} className="min-h-0 flex-1 border-0" /></div>
+        <div hidden={tab !== "graphing"} className="flex min-h-0 flex-1 flex-col"><DesmosCalculator bare stateKey={`${sessionKey}:graph`} className="min-h-0 flex-1 border-0" /></div>
         {scientificSeen && <div hidden={tab !== "scientific"} className="flex min-h-0 flex-1 flex-col"><DesmosCalculator bare kind="scientific" className="min-h-0 flex-1 border-0" /></div>}
       </div>
     </div>

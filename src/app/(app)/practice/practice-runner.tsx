@@ -312,7 +312,7 @@ function PracticeRunnerBody({ sessionId, userId, mode, title, block, set, back, 
             <Link href="/practice/sessions" className="mt-3 block text-center text-sm underline">Saved sessions</Link>
           </div>) : undefined}
         onBack={position > 0 ? () => navigate("jump", position - 1) : undefined} backDisabled={pending}
-        extra={s.phase === "answering" ? <button type="button" disabled={pending} onClick={next} className="min-h-10 rounded-lg border-2 border-foreground px-5 text-sm font-semibold disabled:opacity-40">Skip</button> : undefined}
+        extra={s.phase === "answering" ? <button type="button" disabled={pending} onClick={next} className="min-h-10 rounded-full border-2 border-foreground px-5 text-sm font-semibold disabled:opacity-40">Skip</button> : undefined}
         onNext={s.phase === "answering" ? submit : next}
         nextLabel={s.phase === "answering" ? (pending ? "Checking…" : "Check answer") : finished ? "See summary" : "Next"}
         nextDisabled={s.phase === "answering" ? s.value === null || pending : pending} />}>
@@ -328,7 +328,7 @@ function PracticeRunnerBody({ sessionId, userId, mode, title, block, set, back, 
                 <p className="font-semibold">
                   {r.correct ? "✓ Correct" : `✗ Not quite${"accepted" in r.revealed.answer ? `. The accepted answer is ${r.revealed.answer.accepted.join(" or ")}` : ""}`}
                 </p>
-                <span className="rounded-md bg-muted px-2 py-0.5 text-xs tabular-nums">{r.skillName}: {r.masteryBefore}% → {r.masteryAfter}%</span>
+                <span className="rounded-full bg-muted px-2 py-0.5 text-xs tabular-nums">{r.skillName}: {r.masteryBefore}% → {r.masteryAfter}%</span>
               </div>
               <p className="text-sm">Your answer: <b>{s.value ?? "Not answered"}</b> · Correct answer: <b>{"choice" in r.revealed.answer ? r.revealed.answer.choice : r.revealed.answer.accepted.join(" or ")}</b></p>
               {rationale && <Markdown className="text-sm">{`**Why ${s.value} is wrong:** ${rationale}`}</Markdown>}

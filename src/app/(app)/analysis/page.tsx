@@ -11,10 +11,9 @@ import { guarded } from "@/server/guard";
 import { getAnalysisBuckets, getDailyAccuracy, parseRange, rangeSince, RANGES, type Range } from "@/server/analysis";
 import { cn } from "@/lib/utils";
 import { DifficultyRing, type Segment } from "./difficulty-rings";
-import { DifficultySection } from "./difficulty-section";
 import { MistakesList } from "./mistakes-list";
 
-export const metadata = { title: "Analytics" };
+export const metadata = { title: "Analysis" };
 
 const RANGE_LABEL: Record<Range, string> = { "7d": "7 days", "30d": "30 days", "90d": "90 days", all: "All time" };
 const SECTION_LABEL = { rw: "Reading and Writing", math: "Math" } as const;
@@ -109,12 +108,12 @@ export default async function AnalysisPage({ searchParams }: PageProps<"/analysi
   return (
     <div className="flex flex-col gap-8">
       <header className="flex flex-col gap-3">
-        <h1 className="text-2xl font-semibold">Analytics</h1>
+        <h1 className="text-2xl font-semibold">Analysis</h1>
         <p className="text-sm text-muted-foreground">How you are doing, where your mistakes cluster, and what to practice next. Every number comes from your recorded answers.</p>
         {rangeNav}
       </header>
 
-      <nav aria-label="Analytics view" className="flex gap-5 border-b text-sm">
+      <nav aria-label="Analysis view" className="flex gap-5 border-b text-sm">
         <Link href="/analysis" aria-current={tab === "overview" ? "page" : undefined} className="-mb-px border-b-2 border-transparent pb-2 text-muted-foreground aria-[current=page]:border-foreground aria-[current=page]:font-medium aria-[current=page]:text-foreground">Overview</Link>
         <Link href="/analysis?tab=mistakes" aria-current={tab === "mistakes" ? "page" : undefined} className="-mb-px border-b-2 border-transparent pb-2 text-muted-foreground aria-[current=page]:border-foreground aria-[current=page]:font-medium aria-[current=page]:text-foreground">Mistakes</Link>
       </nav>
@@ -203,11 +202,44 @@ function AnalysisBody({ buckets, days, total }: {
         </div>
       </section>
 
-      <DifficultySection subjectRings={subjectRings as any} />
+      <section aria-labelledby="difficulty" className="flex flex-col gap-6">
+        <h2 id="difficulty" className="font-medium">By SAT difficulty</h2>
+        <p className="text-xs text-muted-foreground">Each ring is split into Easy (lightest), Medium and Hard (darkest). Unanswered attempts are not counted, and a time is only used when it is between 1 second and 10 minutes.</p>
+        {subjectRings.map((subj) => (
+          <div key={subj.key} className="flex flex-col gap-3">
+            <h3 className="text-sm font-medium text-muted-foreground">{subj.label}</h3>
+            <div className="grid auto-rows-fr gap-3 md:grid-cols-3">
+              <DifficultyRing title="Accuracy by difficulty"
+                segments={subj.accuracy} centerValue={subj.accuracyCenter} centerLabel="accuracy" />
+              <DifficultyRing title="Time per question"
+                segments={subj.time} centerValue={subj.timeCenter} centerLabel="average" />
+              <DifficultyRing title="Answers by difficulty"
+                segments={subj.share} centerValue={subj.shareCenter} centerLabel="answers" />
+            </div>
+          </div>
+        ))}
+      </section>
 
       <section aria-labelledby="trend" className="flex flex-col gap-3">
         <h2 id="trend" className="font-medium">Accuracy over time</h2>
         <AccuracyChart days={days} />
+      </section>
+
+      <section aria-labelledby="next" className="flex flex-col gap-3">
+        <h2 id="next" className="font-medium">What to practice next</h2>
+        {recs.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No clear next step yet. A skill is only ranked after {MIN_SAMPLE} answers, so keep practising and this will fill in.</p>
+        ) : (
+          <ul className="flex flex-col gap-2">
+            {recs.map((r) => (
+              <li key={`${r.kind}-${r.skillId}`} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border p-4 text-sm">
+                <span className="min-w-0"><b className="font-medium">{r.kind === "practice" ? "Practice" : "Speed up"}: {r.name}</b><span className="block text-xs text-muted-foreground">{r.reason}</span></span>
+                <Button variant="outline" size="sm" render={<Link href={practiceHref(r.skillId)} prefetch={false} />}>Practice this skill</Button>
+              </li>
+            ))}
+          </ul>
+        )}
+        <p className="text-xs text-muted-foreground">Recommendations need at least {MIN_SAMPLE} answers in a skill, and are based only on your answers.</p>
       </section>
 
       <section aria-labelledby="skills" className="flex flex-col gap-5">
@@ -255,6 +287,12 @@ function AnalysisBody({ buckets, days, total }: {
             })}
           </div>
         ))}
+      </section>
+
+      <section aria-labelledby="review" className="flex flex-col gap-3">
+        <h2 id="review" className="font-medium">Mistake review</h2>
+        <p className="text-sm text-muted-foreground">Every missed question with your answer, the correct answer and the explanation, newest first.</p>
+        <Button variant="outline" className="self-start" render={<Link href="/mistakes" />}>Review your mistakes</Button>
       </section>
     </>
   );

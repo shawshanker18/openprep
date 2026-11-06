@@ -48,14 +48,7 @@ export function LoginForm({ google: showGoogle, inApp = false }: { google: boole
   }
 
   // Not signing in at all: sample questions kept in this browser. Sits right under Google as a quieter second choice.
-  const guest = (
-    <Link
-      href="/guest"
-      className="flex h-12 items-center justify-center rounded-md border border-neutral-300 dark:border-neutral-700 bg-background text-sm font-medium text-foreground shadow-xs hover:bg-muted/80 transition-colors"
-    >
-      Continue as guest
-    </Link>
-  );
+  const guest = <Link href="/guest" className="flex h-11 items-center justify-center rounded-md border text-sm font-medium hover:bg-muted">Continue as guest</Link>;
   const or = (
     <div className="flex items-center gap-4 text-sm text-muted-foreground">
       <span className="h-px flex-1 bg-border" />or<span className="h-px flex-1 bg-border" />

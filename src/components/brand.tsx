@@ -45,7 +45,7 @@ export function BrandBanner({ eyebrow, title, description, children, tone: look 
               <BrandSymbol height={14} invert={dark} />{eyebrow}
             </p>
           )}
-          <h1 className="break-normal text-2xl font-semibold sm:text-3xl">{title}</h1>
+          <h1 className="break-words text-2xl font-semibold">{title}</h1>
           {description && <p className={cn("mt-1 max-w-prose text-sm", dark ? "text-white/70" : "text-muted-foreground")}>{description}</p>}
         </div>
         {children && <div className="shrink-0">{children}</div>}

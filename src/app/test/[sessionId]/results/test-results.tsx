@@ -115,7 +115,7 @@ export function TestResults({ data, timeZone }: { data: Data; timeZone: string }
         {Object.entries(r.byDomain).map(([d, v]) => (
           <div key={d} className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_3rem] items-center gap-3 text-sm">
             <span>{DOMAINS[d as DomainId]?.name ?? d}</span>
-            <span className="h-2 overflow-hidden rounded-md bg-muted"><span className="block h-full bg-primary" style={{ width: `${(100 * v.correct) / v.total}%` }} /></span>
+            <span className="h-2 overflow-hidden rounded-full bg-muted"><span className="block h-full bg-primary" style={{ width: `${(100 * v.correct) / v.total}%` }} /></span>
             <span className="text-right tabular-nums text-muted-foreground">{v.correct}/{v.total}</span>
           </div>
         ))}

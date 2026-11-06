@@ -27,7 +27,7 @@ export const NAV_GROUPS = [
     label: null,
     items: [
       { href: "/dashboard", label: "Dashboard", icon: Home },
-      { href: "/analysis", label: "Analytics", icon: Activity },
+      { href: "/analysis", label: "Analysis", icon: Activity },
       { href: "/bookmarks", label: "Saved questions", icon: Bookmark },
     ],
   },
@@ -54,7 +54,7 @@ export const MOBILE_TABS = [
   { href: "/practice", label: "Practice", icon: Sparkles },
   { href: "/start", label: "Learn", icon: GraduationCap },
   { href: "/tests", label: "Tests", icon: ClipboardList },
-  { href: "/analysis", label: "Analytics", icon: Activity },
+  { href: "/analysis", label: "Analysis", icon: Activity },
 ] as const;
 
 /** Where a nav item points. The guest site mounts the same menu under /guest, and its home is /guest rather than /guest/dashboard. */
