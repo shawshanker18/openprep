@@ -1,5 +1,5 @@
 "use client";
-// Adaptive Practice setup. Two modes are kept distinct: Adaptive changes difficulty from each answer, Mixed picks a
+// Adaptive Practice setup (restored to the pre-redesign version). Two modes are kept distinct: Adaptive changes difficulty from each answer, Mixed picks a
 // random difficulty per question. Skills are only needed for Mixed, because Adaptive can use the student's own weekly
 // focus when none are chosen.
 import { useState } from "react";
