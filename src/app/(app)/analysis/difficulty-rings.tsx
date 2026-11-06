@@ -53,7 +53,7 @@ export function DifficultyRing({ title, segments, centerValue, centerLabel }: {
           {segments.map((r) => (
             <div key={r.label} className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-2">
               <dt className="flex min-w-0 items-start gap-2">
-                <span aria-hidden className={`mt-1.5 size-2.5 shrink-0 rounded-full ${TONE[r.label].swatch}`} />
+                <span aria-hidden className={`mt-1.5 size-2.5 shrink-0 rounded-xs ${TONE[r.label].swatch}`} />
                 <span className="min-w-0">{r.label}<span className="block text-xs text-muted-foreground">{r.note}</span></span>
               </dt>
               <dd className="text-right font-medium tabular-nums">{r.display}</dd>
