@@ -3,6 +3,7 @@
 // them, and it only shows as ticked when every one of its skills is. Only skills (and the subject) are submitted, so a partly
 // chosen topic means exactly those skills. A subject change drops anything from the other subject.
 import { useState } from "react";
+import Form from "next/form";
 import Link from "next/link";
 import { ArrowRight, Check, Minus, RotateCcw, Search, Sparkles } from "lucide-react";
 import { DOMAINS, SKILLS, shortSkillName, type DomainId, type Section } from "@/content/taxonomy";
@@ -97,7 +98,7 @@ function ActionBar({ b, count }: { b: Bank; count: number }) {
 export function BankFilters(p: Props) {
   const b = useBank(p);
   return (
-    <form action="/practice" method="get" aria-label="Filter questions" className="flex flex-col gap-6">
+    <Form action="/practice" prefetch={false} aria-label="Filter questions" className="flex flex-col gap-6">
       <Hidden />
       <div className="flex flex-col gap-3 sm:flex-row">
         <Search_ q={p.q} className="flex-1" />
@@ -142,7 +143,7 @@ export function BankFilters(p: Props) {
         </div>
       </section>
       <ActionBar b={b} count={p.count} />
-    </form>
+    </Form>
   );
 }
 
