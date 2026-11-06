@@ -1,12 +1,14 @@
 "use client";
-// Adaptive Practice setup (pre-redesign version, restored). Two modes are kept distinct: Adaptive changes difficulty from each answer, Mixed picks a
+// Adaptive Practice setup, laid out like the question bank filters (topic cards with skill pills, no plain checkboxes). Two modes are kept distinct: Adaptive changes difficulty from each answer, Mixed picks a
 // random difficulty per question. Skills are only needed for Mixed, because Adaptive can use the student's own weekly
 // focus when none are chosen.
 import { useState } from "react";
 import Link from "next/link";
-import { DOMAINS, SKILLS, type DomainId, type Section } from "@/content/taxonomy";
+import { ArrowRight, Check, Minus, RotateCcw, Sparkles } from "lucide-react";
+import { DOMAINS, SKILLS, shortSkillName, type DomainId, type Section } from "@/content/taxonomy";
 import { SET_SIZES } from "@/lib/question-limits";
 import { Button } from "@/components/ui/button";
+import { Pill } from "@/components/bank-filters";
 
 type Mode = "adaptive" | "mixed";
 const MODES: { value: Mode; label: string; help: string }[] = [
@@ -14,6 +16,9 @@ const MODES: { value: Mode; label: string; help: string }[] = [
   { value: "mixed", label: "Mixed difficulty", help: "Each question's difficulty is picked at random from Easy, Medium and Hard. Not adaptive. Choose at least one skill." },
 ];
 const MAX_SKILLS = 29;
+
+const SUBJECTS = [[null, "All"], ["math", "Math"], ["rw", "Reading and Writing"]] as const;
+const skillsOf = (id: DomainId) => SKILLS.filter((x) => x.domain === id);
 
 export function PracticeSetup() {
   const [mode, setMode] = useState<Mode>("adaptive");
@@ -24,9 +29,13 @@ export function PracticeSetup() {
 
   const needsSkills = mode !== "adaptive";
   const canStart = !needsSkills || chosen.length > 0;
-  const toggle = (id: string) => setChosen((old) => old.includes(id) ? old.filter((x) => x !== id) : [...old, id].slice(0, MAX_SKILLS));
-  const inSubject = SKILLS.filter((s) => !subject || s.section === subject);
-  const domains = (Object.keys(DOMAINS) as DomainId[]).filter((d) => !subject || DOMAINS[d].section === subject);
+  const topicList = (Object.keys(DOMAINS) as DomainId[]).filter((d) => !subject || DOMAINS[d].section === subject);
+  const changeSubject = (v: Section | null) => { setSubject(v); setChosen((o) => o.filter((k) => !v || SKILLS.find((x) => x.id === k)!.section === v)); };
+  const toggleSkill = (id: string) => setChosen((o) => (o.includes(id) ? o.filter((x) => x !== id) : [...o, id].slice(0, MAX_SKILLS)));
+  const toggleTopic = (id: DomainId) => {
+    const own = skillsOf(id).map((x) => x.id);
+    setChosen((o) => (own.every((k) => o.includes(k)) ? o.filter((k) => !own.includes(k)) : [...new Set([...o, ...own])].slice(0, MAX_SKILLS)));
+  };
 
   const params = new URLSearchParams();
   if (mode === "adaptive") params.set("mode", "smart");
@@ -36,87 +45,70 @@ export function PracticeSetup() {
   if (timed === "off") params.set("timing", "off");
   const href = `/practice?${params}`;
 
-  return (
-    <section aria-labelledby="setup" className="flex flex-col gap-6 rounded-xl border p-5">
-      <h2 id="setup" className="text-lg font-semibold">Set up practice</h2>
+  const summary = [subject === "math" ? "Math" : subject === "rw" ? "Reading and Writing" : "All subjects", chosen.length ? `${chosen.length} ${chosen.length === 1 ? "skill" : "skills"}` : needsSkills ? "no skills yet" : "weekly focus", mode === "adaptive" ? "adaptive" : "mixed difficulty", timed === "off" ? "no timer" : "timed"].join(" · ");
 
-      <fieldset className="flex flex-col gap-2">
-        <legend className="mb-1 text-sm font-medium">Practice mode</legend>
-        <div className="grid gap-2 sm:grid-cols-2">
-          {MODES.map((m) => (
-            <label key={m.value} className="flex cursor-pointer flex-col gap-1 rounded-lg border p-3 text-sm has-[:checked]:bg-muted">
-              <span className="flex items-center gap-2 font-medium">
-                <input type="radio" name="practice-mode" value={m.value} checked={mode === m.value} onChange={() => setMode(m.value)} aria-describedby={`help-${m.value}`} />
-                {m.label}
-              </span>
-              <span id={`help-${m.value}`} className="text-xs text-muted-foreground">{m.help}</span>
-            </label>
-          ))}
+  return (
+    <section aria-label="Set up practice" className="flex flex-col gap-6">
+      <fieldset className="flex flex-col gap-2 rounded-xl border p-4">
+        <legend className="px-1 text-sm font-medium">Practice mode</legend>
+        <div className="flex flex-wrap gap-2">
+          {MODES.map((m) => <Pill key={m.value} type="radio" name="practice-mode" value={m.value} checked={mode === m.value} onChange={() => setMode(m.value)}>{m.label}</Pill>)}
         </div>
+        <p className="text-xs text-muted-foreground">{MODES.find((m) => m.value === mode)!.help}</p>
       </fieldset>
 
-      <fieldset className="flex flex-col gap-3">
-        <legend className="mb-1 text-sm font-medium">Topics and skills {needsSkills ? "" : "(optional)"} · {chosen.length} selected</legend>
-        <div className="flex flex-wrap gap-2">
-          {([[null, "All"], ["math", "Math"], ["rw", "Reading and Writing"]] as const).map(([value, label]) => (
-            <label key={label} className="flex min-h-11 cursor-pointer items-center gap-2 rounded-md border px-3 text-sm has-[:checked]:bg-muted">
-              <input type="radio" name="practice-subject" checked={subject === value} onChange={() => setSubject(value)} />{label}
-            </label>
-          ))}
-          <button type="button" className="min-h-11 px-2 text-sm underline underline-offset-4" onClick={() => setChosen(inSubject.slice(0, MAX_SKILLS).map((s) => s.id))}>Select all</button>
-          <button type="button" className="min-h-11 px-2 text-sm underline underline-offset-4" onClick={() => setChosen([])}>Clear</button>
-        </div>
-        <div className="grid gap-2 sm:grid-cols-2">
-          {domains.map((d) => {
-            const ids = SKILLS.filter((s) => s.domain === d && (!subject || s.section === subject)).map((s) => s.id);
-            const picked = ids.filter((id) => chosen.includes(id)).length;
+      <div role="radiogroup" aria-label="Subject" className="flex w-fit rounded-xl border bg-muted/50 p-1">
+        {SUBJECTS.map(([v, label]) => (
+          <label key={label} className="cursor-pointer">
+            <input type="radio" name="practice-subject" checked={subject === v} onChange={() => changeSubject(v)} className="peer sr-only" />
+            <span className="flex min-h-9 items-center rounded-lg px-3.5 text-sm font-medium text-muted-foreground transition-colors peer-checked:bg-background peer-checked:text-foreground peer-checked:shadow-sm peer-focus-visible:ring-3 peer-focus-visible:ring-ring/50">{label}</span>
+          </label>
+        ))}
+      </div>
+
+      <section aria-labelledby="setup-topics" className="flex flex-col gap-3">
+        <h2 id="setup-topics" className="text-sm font-medium">Topics and skills {needsSkills ? "" : "(optional) "}<span className="font-normal text-muted-foreground">· tap a skill to narrow, or tick a topic for all of it</span></h2>
+        <div className="grid gap-3 md:grid-cols-2">
+          {topicList.map((id) => {
+            const own = skillsOf(id), picked = own.filter((x) => chosen.includes(x.id)).length, all = picked === own.length, some = picked > 0;
             return (
-              <details key={d} className="min-w-0 rounded-lg border p-3">
-                <summary className="cursor-pointer text-sm font-medium">{DOMAINS[d].name} · {picked} of {ids.length}</summary>
-                <div className="mt-3 flex flex-col gap-2">
-                  {SKILLS.filter((s) => s.domain === d && (!subject || s.section === subject)).map((s) => (
-                    <label key={s.id} className="flex items-start gap-2 text-sm">
-                      <input type="checkbox" className="mt-1" checked={chosen.includes(s.id)} onChange={() => toggle(s.id)} />{s.name}
-                    </label>
-                  ))}
+              <div key={id} className={`flex min-w-0 flex-col gap-3 rounded-xl border p-4 transition-colors ${some ? "border-foreground/60 bg-muted/40" : ""}`}>
+                <label className="flex cursor-pointer items-center gap-3">
+                  <input type="checkbox" checked={all} onChange={() => toggleTopic(id)} aria-label={`${DOMAINS[id].name}, all skills`} className="peer sr-only" />
+                  <span aria-hidden className={`grid size-6 shrink-0 place-items-center rounded-md border peer-focus-visible:ring-3 peer-focus-visible:ring-ring/50 ${all ? "border-foreground bg-foreground text-background" : some ? "border-foreground bg-background text-foreground" : "bg-background text-transparent"}`}>{some && !all ? <Minus className="size-3.5" /> : <Check className="size-3.5" />}</span>
+                  <span className="min-w-0 flex-1 font-medium">{DOMAINS[id].name}</span>
+                  <span className="text-xs text-muted-foreground">{some ? `${picked} of ${own.length}` : `${own.length} skills`}</span>
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {own.map((x) => <Pill key={x.id} name="skill" value={x.id} checked={chosen.includes(x.id)} onChange={() => toggleSkill(x.id)} className="text-[0.8rem]">{shortSkillName(x.name)}</Pill>)}
                 </div>
-              </details>
+              </div>
             );
           })}
         </div>
-      </fieldset>
+      </section>
 
-      <div className="grid gap-6 sm:grid-cols-2">
-        <fieldset className="flex flex-col gap-2">
-          <legend className="mb-1 text-sm font-medium">Questions</legend>
+      <section className="grid gap-4 rounded-xl border p-4 sm:grid-cols-2 sm:gap-6">
+        <fieldset className="flex flex-col gap-2"><legend className="mb-1.5 text-sm font-medium">Questions</legend>
+          <div className="flex flex-wrap gap-2">{SET_SIZES.filter((n) => n <= 30).map((n) => <Pill key={n} type="radio" name="practice-count" value={String(n)} checked={count === n} onChange={() => setCount(n)}>{n}</Pill>)}</div>
+        </fieldset>
+        <fieldset className="flex flex-col gap-2"><legend className="mb-1.5 text-sm font-medium">Timer</legend>
           <div className="flex flex-wrap gap-2">
-            {SET_SIZES.filter((n) => n <= 30).map((n) => (
-              <label key={n} className="flex min-h-11 cursor-pointer items-center gap-2 rounded-md border px-3 text-sm has-[:checked]:bg-muted">
-                <input type="radio" name="practice-count" value={n} checked={count === n} onChange={() => setCount(n)} />{n}
-              </label>
-            ))}
+            {([["auto", "Timed, as on test day"], ["off", "No timer"]] as const).map(([v, label]) => <Pill key={v} type="radio" name="practice-timer" value={v} checked={timed === v} onChange={() => setTimed(v)}>{label}</Pill>)}
           </div>
         </fieldset>
-        <fieldset className="flex flex-col gap-2">
-          <legend className="mb-1 text-sm font-medium">Timer</legend>
-          <div className="flex flex-wrap gap-2">
-            {([["auto", "Timed, as on test day"], ["off", "No timer"]] as const).map(([v, label]) => (
-              <label key={v} className="flex min-h-11 cursor-pointer items-center gap-2 rounded-md border px-3 text-sm has-[:checked]:bg-muted">
-                <input type="radio" name="practice-timer" value={v} checked={timed === v} onChange={() => setTimed(v)} />{label}
-              </label>
-            ))}
-          </div>
-        </fieldset>
-      </div>
+      </section>
 
-      <div className="flex flex-col gap-2">
+      <div className="sticky bottom-20 z-10 flex items-center gap-3 rounded-xl border bg-background/95 p-3 pl-4 shadow-lg backdrop-blur desk:bottom-4">
+        <p className="min-w-0 flex-1 truncate text-sm"><span className="font-medium">{count} questions</span><span className="text-muted-foreground"> · {summary}</span></p>
+        <Button variant="ghost" className="h-9 px-3" onClick={() => setChosen([])} disabled={chosen.length === 0}><RotateCcw />Clear</Button>
         {canStart ? (
-          <Button className="self-start" render={<Link href={href} prefetch={false} />}>Start practice</Button>
+          <Button className="h-9 px-4" render={<Link href={href} prefetch={false} />}><Sparkles />Start practice<ArrowRight /></Button>
         ) : (
-          <Button className="self-start" disabled>Start practice</Button>
+          <Button className="h-9 px-4" disabled><Sparkles />Start practice<ArrowRight /></Button>
         )}
-        {!canStart && <p className="text-sm text-muted-foreground">Choose at least one topic or skill to start.</p>}
       </div>
+      {!canStart && <p className="-mt-3 text-sm text-muted-foreground">Choose at least one topic or skill to start.</p>}
     </section>
   );
 }

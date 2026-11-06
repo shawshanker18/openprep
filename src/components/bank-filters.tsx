@@ -41,7 +41,7 @@ function useBank(p: Props) {
 }
 type Bank = ReturnType<typeof useBank>;
 
-function Pill({ type = "checkbox", name, value, checked, onChange, children, className = "" }: { type?: "checkbox" | "radio"; name: string; value: string; checked: boolean; onChange: () => void; children: React.ReactNode; className?: string }) {
+export function Pill({ type = "checkbox", name, value, checked, onChange, children, className = "" }: { type?: "checkbox" | "radio"; name: string; value: string; checked: boolean; onChange: () => void; children: React.ReactNode; className?: string }) {
   return (
     <label className="cursor-pointer">
       <input type={type} name={name} value={value} checked={checked} onChange={onChange} className="peer sr-only" />
