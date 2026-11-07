@@ -1,6 +1,61 @@
+const TABLE_DIVIDER = /^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)*\|?\s*$/;
+const TABLE_TITLE = /^\s*\|\|\s*(.*?\S)\s*\|\|\s*$/;
+const EMPTY_PIPES = /^\s*\|[\s|]*$/;
+
+/** Split a table line into cells. A pipe inside math is the maths, not a column. */
+function tableCells(line: string) {
+  const text = line.trim(), out: string[] = [];
+  let cell = "", math = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i]!, escaped = text[i - 1] === "\\";
+    if (c === "$" && !escaped) math = !math;
+    if (c === "|" && !math && !escaped) { out.push(cell); cell = ""; } else cell += c;
+  }
+  out.push(cell);
+  if (text.startsWith("|")) out.shift();
+  if (text.endsWith("|") && out.length) out.pop();
+  return out.map((c) => c.trim().replace(/\$[^$]*\$/g, (m) => m.replace(/(?<!\\)\|/g, "\\vert ")));
+}
+/** Fit a row to the table. A leading pipe with a cell short means the first cell is empty, as in a corner cell. */
+function tableRow(line: string, width: number) {
+  const cells = tableCells(line);
+  if (line.trim().startsWith("|") && cells.length < width) cells.unshift("");
+  while (cells.length < width) cells.push("");
+  return `| ${cells.join(" | ")} |`;
+}
+
+/**
+ * Imported tables use a looser format than GFM: a || title || row above the header, a header a cell short, and a
+ * "- | - | -" divider that parses as a list. Rewrite those as plain GFM, and drop empty pipe rows left by import.
+ */
+function repairTables(source: string) {
+  const lines = source.split("\n"), out: string[] = [];
+  let fenced = false;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]!;
+    if (line.trimStart().startsWith("```")) fenced = !fenced;
+    if (fenced) { out.push(line); continue; }
+    const head = out.at(-1);
+    if (line.includes("|") && TABLE_DIVIDER.test(line) && head?.includes("|")) {
+      out.pop();
+      const title = out.at(-1)?.match(TABLE_TITLE)?.[1];
+      if (title) { out.pop(); out.push("", title.includes("**") ? title : `**${title}**`); }
+      const divider = tableCells(line), width = Math.max(divider.length, tableCells(head).length);
+      while (divider.length < width) divider.push("---");
+      out.push("", tableRow(head, width), `| ${divider.join(" | ")} |`);
+      while (lines[i + 1]?.trim() && lines[i + 1]!.includes("|")) out.push(tableRow(lines[++i]!, width));
+      out.push("");
+      continue;
+    }
+    if (!EMPTY_PIPES.test(line) || TABLE_DIVIDER.test(lines[i + 1] ?? "")) out.push(line);
+  }
+  return out.join("\n");
+}
+
 /** Repair imported text before parsing Markdown. Never enable arbitrary source HTML. */
 export function normalizeMarkdown(source: string): string {
-  return source
+  return repairTables(source
+    .replace(/^\|.*\|[ \t]*$/gm, (row) => row.replace(/\$[^$]*\$|\\n/g, (m) => m === "\\n" ? " " : m)) // A line break in a cell would end the row.
     .replace(/(?<!\\)\$(\d[\d,.]*)(?=\s+(?:billion|million|thousand|dollars)\b)/g, "\\$$$1")
     .replace(/\\{3,}n/g, "\\\\\n") // Overescaped equation row separators followed by a literal newline.
     .replace(/\\n(?![a-z])/g, "\n") // Preserve commands such as \neq, \nu and \nabla.
@@ -26,5 +81,5 @@ export function normalizeMarkdown(source: string): string {
       const symbols = "⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺ⁿ", plain = "0123456789-+n";
       return `$${base}^{${[...exponent].map(c => plain[symbols.indexOf(c)]).join("")}}$`;
     }))
-    .join("");
+    .join(""));
 }

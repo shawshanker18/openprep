@@ -40,3 +40,25 @@ describe("official SAT dates", () => {
 it('normalizes exponent notation inside math, preserving code and correctly grouping the entire power',()=>{
   expect(normalizeMarkdown('$2^(3x+1)+x²+10⁻³$ and `x²`')).toBe('$2^{3x+1}+x^{2}+10^{-3}$ and `x²`');
 });
+
+const lead = "|| **Lead levels** ||\n | Safe | Unsafe | Total\n:-|:-:|:-:|:-:\n**Vitamin D** |  | $27$ | \n**Zinc** |  |  | $86$\n\n\nA lab tested supplements.";
+it("moves a || title || row above the table and fills the corner cell", () => {
+  expect(normalizeMarkdown(lead)).toBe("\n**Lead levels**\n\n|  | Safe | Unsafe | Total |\n| :- | :-: | :-: | :-: |\n| **Vitamin D** |  | $27$ |  |\n| **Zinc** |  |  | $86$ |\n\n\n\nA lab tested supplements.");
+});
+it("does not read a dash divider as a list", () => {
+  expect(normalizeMarkdown("Name | Score\n- | -\nAda | $5$")).toContain("| Name | Score |\n| - | - |\n| Ada | $5$ |");
+});
+it("keeps a pipe in math inside its cell", () => {
+  expect(normalizeMarkdown("a | b\n-|-\n$|x|$ | 2")).toContain("| $\\vert x\\vert $ | 2 |");
+});
+it("joins a line break inside a table cell", () => {
+  expect(normalizeMarkdown("| Percent\\nchange | B |\n|---|---|\n| 1 | 2 |")).toContain("| Percent change | B |");
+});
+it("drops empty pipe rows outside a table but keeps them inside one", () => {
+  expect(normalizeMarkdown("Find the value.\n\n|  |\n|  |")).toBe("Find the value.\n");
+  expect(normalizeMarkdown("| a | b |\n|---|---|\n|  |  |\n| 1 | 2 |")).toContain("|  |  |\n| 1 | 2 |");
+});
+it("leaves absolute values and valid tables alone", () => {
+  expect(normalizeMarkdown("If $|x| = 2$ then x is 2.")).toBe("If $|x| = 2$ then x is 2.");
+  expect(normalizeMarkdown("| a | b |\n| --- | --- |\n| 1 | 2 |")).toContain("| a | b |\n| --- | --- |\n| 1 | 2 |");
+});
