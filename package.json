@@ -20,6 +20,7 @@
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.71",
     "@ai-sdk/google": "^4.0.87",
+    "@ai-sdk/mistral": "4.0.56",
     "@ai-sdk/openai": "^4.0.83",
     "@base-ui/react": "^1.8.0",
     "@supabase/ssr": "^0.12.7",
@@ -58,11 +59,11 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.8",
     "gray-matter": "^4.0.3",
+    "shadcn": "^4.21.1",
     "tailwindcss": "^4",
     "tsx": "^4.23.15",
     "typescript": "^5",
-    "vitest": "^5.0.3",
-    "shadcn": "^4.21.1"
+    "vitest": "^5.0.3"
   },
   "engines": {
     "node": "24.x"

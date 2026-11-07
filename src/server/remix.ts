@@ -74,7 +74,7 @@ export async function getOrCreateRemix(userId: string, tier: Tier, sourceId: str
     let draft: RemixDraft;
     try { draft = await generate(source, direction); }
     catch (e) {
-      console.warn("Remix generation failed", e instanceof Error ? e.message : e);
+      console.warn("Remix generation failed", e instanceof Error ? e.message : e, e instanceof Error && e.cause ? String(e.cause).slice(0, 500) : "");
       await refund();
       throw new RemixError("Couldn't make that remix right now. You weren't charged. Please try again.");
     }

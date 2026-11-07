@@ -1,14 +1,14 @@
 import "server-only";
-import { createOpenAI } from "@ai-sdk/openai";
+import { createMistral } from "@ai-sdk/mistral";
 import { generateText } from "ai";
 import { z } from "zod";
 import type { Question } from "@/db/schema";
 import type { Direction } from "@/lib/remix";
 
-/** Mistral's OpenAI-compatible endpoint. REMIX_MODEL is the API id of GLM 5.3 Flash from the Mistral console. */
+/** Mistral's own provider: its reasoning models send content as blocks, which the OpenAI adapter rejects. REMIX_MODEL is the API id of GLM 5.3 Flash from the Mistral console. */
 export function remixModel() {
   const key = process.env.MISTRAL_API_KEY, id = process.env.REMIX_MODEL;
-  return key && id ? createOpenAI({ baseURL: "https://api.mistral.ai/v1", apiKey: key }).chat(id) : null;
+  return key && id ? createMistral({ apiKey: key })(id) : null;
 }
 
 export type RemixDraft = Pick<Question, "passageMd" | "stemMd" | "choices" | "answer" | "explanationMd" | "choiceRationales">;
