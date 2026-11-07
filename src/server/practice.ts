@@ -25,14 +25,15 @@ export type Timing = "auto" | "off" | "on";
 async function dueReview(userId: string, now: Date, exclude: string[], skillId?: string) {
   const rows = await db.select({ q: questions }).from(reviewItems)
     .innerJoin(questions, eq(questions.id, reviewItems.questionId))
-    .where(and(eq(reviewItems.userId, userId), lte(reviewItems.dueAt, now), availableQuestion(userId), skillId ? eq(questions.skillId, skillId) : undefined))
+    .where(and(eq(reviewItems.userId, userId), lte(reviewItems.dueAt, now), eq(questions.status, "active"), availableQuestion(userId), skillId ? eq(questions.skillId, skillId) : undefined))
     .orderBy(asc(reviewItems.dueAt)).limit(exclude.length + 1);
   return rows.map((r) => r.q).find((q) => !exclude.includes(q.id)) ?? null;
 }
 
 export async function countDueReviews(userId: string, now = new Date()) {
   const [r] = await db.select({ c: count() }).from(reviewItems)
-    .where(and(eq(reviewItems.userId, userId), lte(reviewItems.dueAt, now)));
+    .innerJoin(questions, eq(questions.id, reviewItems.questionId))
+    .where(and(eq(reviewItems.userId, userId), lte(reviewItems.dueAt, now), eq(questions.status, "active")));
   return r!.c;
 }
 

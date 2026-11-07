@@ -104,3 +104,15 @@ it('a list set skips a question that is in another open set and serves the next 
  const r=await P.nextQuestion(USER,{} as schema.Profile,{mode:'list',ids:[a!,b!],exclude:[]});
  expect(r?.question.id).toBe(Q.publicId(b!,USER));
 });
+it('a retired question drops out of reviews instead of ending in a withdrawn message',async()=>{
+ const user='00000000-0000-0000-0000-00000000f00d',id='retired-review-fixture';
+ await db.insert(schema.profiles).values({id:user});
+ await db.insert(schema.questions).values({id,skillId:skill.id,section:skill.section,domain:skill.domain,difficulty:2,type:'mcq',stemMd:'stem',choices:[{id:'A',md:'1'}],answer:{choice:'A'},explanationMd:'because'});
+ await db.insert(schema.reviewItems).values({userId:user,questionId:id,dueAt:new Date(Date.now()-1000)});
+ const due=()=>P.selectPracticeQuestion(user,{} as schema.Profile,{mode:'review',exclude:[]});
+ expect(await P.countDueReviews(user)).toBe(1);
+ expect((await due())?.id).toBe(id);
+ await db.update(schema.questions).set({status:'retired'}).where(eq(schema.questions.id,id));
+ expect(await P.countDueReviews(user)).toBe(0);
+ expect(await due()).toBeNull();
+});
