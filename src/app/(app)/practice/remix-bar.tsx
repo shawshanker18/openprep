@@ -15,6 +15,7 @@ export function RemixMenu({ questionId, tier, question }: { questionId: string; 
   const [pending, start] = useTransition();
   const [open, setOpen] = useState(false);
   const box = useRef<HTMLDivElement>(null);
+  const hovering = useRef(false);
   useEffect(() => {
     if (!open) return;
     const away = (e: PointerEvent) => { if (box.current && !box.current.contains(e.target as Node)) setOpen(false); };
@@ -27,10 +28,13 @@ export function RemixMenu({ questionId, tier, question }: { questionId: string; 
     const res = await remixQuestion({ questionId, direction }).catch(() => ({ ok: false as const, error: "Couldn't remix. Check your connection and try again." }));
     if (res.ok) router.push(res.data.url); else toast.error(res.error);
   });
-  const hover = (next: boolean) => (e: React.PointerEvent) => { if (e.pointerType === "mouse") setOpen(next); };
+  const onEnter = (e: React.PointerEvent) => { if (e.pointerType === "mouse") { hovering.current = true; setOpen(true); } };
+  const onLeave = (e: React.PointerEvent) => { if (e.pointerType === "mouse") { hovering.current = false; setOpen(false); } };
+  // A mouse has already opened the menu by hovering, so its click must not close it again.
+  const onClick = () => { if (hovering.current) setOpen(true); else setOpen((v) => !v); };
   return (
-    <div ref={box} className="relative" onPointerEnter={hover(true)} onPointerLeave={hover(false)}>
-      <button type="button" aria-expanded={open} aria-haspopup="menu" disabled={pending} onClick={() => setOpen((v) => !v)}
+    <div ref={box} className="relative" onPointerEnter={onEnter} onPointerLeave={onLeave}>
+      <button type="button" aria-expanded={open} aria-haspopup="menu" disabled={pending} onClick={onClick}
         className="flex min-h-9 items-center gap-1.5 rounded-md border bg-background px-3 text-sm font-semibold disabled:opacity-60">
         <Sparkles className="size-4" />{pending ? "Remixing…" : "Remix"}
       </button>
