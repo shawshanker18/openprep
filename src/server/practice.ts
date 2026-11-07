@@ -1,6 +1,6 @@
 // Practice: which question next, and submitting an answer (spec 04 §3).
 import "server-only";
-import { availableQuestion } from "./question-availability";
+import { availableQuestion, listedQuestion } from "./question-availability";
 import { memo } from "@/lib/memo";
 import { and, asc, count, desc, eq, gte, inArray, isNotNull, lte, notInArray, sql } from "drizzle-orm";
 import { db, type Tx } from "@/db";
@@ -107,7 +107,7 @@ export async function selectPracticeQuestion(userId: string, profile: Profile, i
     // unavailable question (say, one in another open set) is skipped, not treated as the end of the list.
     const pending = (input.ids ?? []).filter((id) => !exclude.includes(id));
     if (pending.length) {
-      const open = await db.select().from(questions).where(and(inArray(questions.id, pending), eq(questions.status, "active"), availableQuestion(userId)));
+      const open = await db.select().from(questions).where(and(inArray(questions.id, pending), eq(questions.status, "active"), listedQuestion(userId)));
       q = pending.map((id) => open.find((row) => row.id === id)).find((row) => !!row) ?? null;
     }
   } else if (input.mode === "review") {

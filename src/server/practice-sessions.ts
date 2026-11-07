@@ -1,5 +1,5 @@
 import { checkRapidSkips } from "./rapid-skips";
-import { availableQuestion } from "./question-availability";
+import { availableQuestion, listedQuestion } from "./question-availability";
 import "server-only";
 import { and, asc, desc, eq } from "drizzle-orm";
 import { db, type Tx } from "@/db";
@@ -97,7 +97,7 @@ export async function loadPracticeSession(userId: string, profile: Profile, id: 
       if(candidate) {
         const candidateId = candidate.id;
         if(rows.some(r=>r.questionId===candidateId)) throw new DeliveryBlocked("Your session changed in another tab. Reload to continue.");
-        const [available] = await tx.select({id:questions.id}).from(questions).where(and(eq(questions.id,candidate.id),availableQuestion(userId,id)));
+        const [available] = await tx.select({id:questions.id}).from(questions).where(and(eq(questions.id,candidate.id),(config.mode==="list"?listedQuestion:availableQuestion)(userId,id)));
         if (!available) {
           candidate = await selectPracticeQuestion(userId,profile,{...config,ids,exclude:rows.map(r=>r.questionId)});
           if (!candidate) throw new DeliveryBlocked("No questions are available with these filters. Resume an active session or choose other skills.");
@@ -197,7 +197,7 @@ export async function prefetchNextPractice(userId: string, profile: Profile, id:
     const current = await owned(tx, userId, id);
     const now = await tx.select().from(items).where(eq(items.sessionId, id));
     if (current.cursor !== session.cursor || now.some((r) => r.position === wanted || r.questionId === candidate.id)) return;
-    const [available] = await tx.select({ id: questions.id }).from(questions).where(and(eq(questions.id, candidate.id), availableQuestion(userId, id)));
+    const [available] = await tx.select({ id: questions.id }).from(questions).where(and(eq(questions.id, candidate.id), (config.mode === "list" ? listedQuestion : availableQuestion)(userId, id)));
     if (!available) return;
     await servePractice(userId, candidate, context, undefined, tx);
     const [serve] = await tx.select().from(questionServes).where(and(eq(questionServes.userId, userId), eq(questionServes.questionId, candidate.id)));

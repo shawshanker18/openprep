@@ -3,7 +3,7 @@ import path from "node:path";
 import { beforeAll, beforeEach, expect, it, vi } from "vitest";
 import { PGlite } from "@electric-sql/pglite";
 import { drizzle } from "drizzle-orm/pglite";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import * as schema from "@/db/schema";
 import { REMIX } from "@/lib/tiers";
 
@@ -116,4 +116,19 @@ it("swaps numbers only on math questions with numbers in the text", async () => 
 it("rate limits remix requests per minute", async () => {
   for (let i = 0; i < REMIX.requestsPerMinute; i++) await R.limitRemixRequests(A);
   await expect(R.limitRemixRequests(A)).rejects.toThrow(/Too many/);
+});
+
+it("opens in its own list session, and stays out of the shared pool", async () => {
+  const { createPracticeSession, loadPracticeSession } = await import("./practice-sessions");
+  const { publicId } = await import("./questions");
+  const { availableQuestion } = await import("./question-availability");
+  const { servePractice } = await import("./delivery");
+  const id = await R.getOrCreateRemix(A, "plus", SRC, "same", gen);
+  const [remix] = await db.select().from(schema.questions).where(eq(schema.questions.id, id));
+  await servePractice(A, remix!, { ip: null, device: null });
+  const session = await createPracticeSession(A, { mode: "list", ids: [publicId(id, A)], count: 1 }, "Same level remix");
+  const profile = (await db.query.profiles.findFirst({ where: eq(schema.profiles.id, A) }))!;
+  await loadPracticeSession(A, profile, session);
+  expect(await db.select({ q: schema.practiceSessionItems.questionId }).from(schema.practiceSessionItems).where(eq(schema.practiceSessionItems.sessionId, session))).toEqual([{ q: id }]);
+  expect(await db.select({ id: schema.questions.id }).from(schema.questions).where(and(eq(schema.questions.id, id), availableQuestion(B)))).toEqual([]);
 });

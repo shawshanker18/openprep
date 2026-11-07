@@ -32,6 +32,14 @@ export function availableQuestion(userId: string, exceptSession?: string) {
   return sql`(${questions.pool}='study' or exists (select 1 from attempts a where a.user_id=${userId} and a.question_id=${questions.id})) and ${notInActiveWork(userId, exceptSession)}`;
 }
 
+/**
+ * A hand-picked list: the same, plus remixes. A remix is only ever reached by its own list, so it stays out of everything
+ * that draws from the shared bank, where it would show one student's remix to everyone.
+ */
+export function listedQuestion(userId: string, exceptSession?: string) {
+  return sql`(${questions.pool} in ('study','remix') or exists (select 1 from attempts a where a.user_id=${userId} and a.question_id=${questions.id})) and ${notInActiveWork(userId, exceptSession)}`;
+}
+
 /** Mock tests and the diagnostic: test-pool questions only (excluding those in this student's other live work). */
 export function availableTestQuestion(userId: string) {
   return sql`${questions.pool}='test' and ${notInActiveWork(userId)}`;
