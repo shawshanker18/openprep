@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
+import { Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -8,43 +9,57 @@ import { canRemixQuestion, canSwapNumbers, DIRECTIONS, DIRECTION_BADGE, DIRECTIO
 import type { Tier } from "@/lib/tiers";
 import { remixOriginOf, remixQuestion } from "./actions";
 
-/** Easier / same / harder AI remix of the question just answered. Free students see what it is and where to get it. */
-export function RemixBar({ questionId, tier, question }: { questionId: string; tier: Tier; question: Parameters<typeof canSwapNumbers>[0] }) {
+/** Remix button beside the question counter: hover or tap for easier / same / harder. Free students see where to get it. */
+export function RemixMenu({ questionId, tier, question }: { questionId: string; tier: Tier; question: Parameters<typeof canSwapNumbers>[0] }) {
   const router = useRouter();
   const [pending, start] = useTransition();
-  const [busy, setBusy] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
+  const box = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const away = (e: PointerEvent) => { if (box.current && !box.current.contains(e.target as Node)) setOpen(false); };
+    const esc = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("pointerdown", away); document.addEventListener("keydown", esc);
+    return () => { document.removeEventListener("pointerdown", away); document.removeEventListener("keydown", esc); };
+  }, [open]);
   if (!canRemixQuestion(question)) return null;
-  if (tier === "free") {
-    return (
-      <div className="flex flex-wrap items-center gap-2 rounded-lg border border-dashed p-3 text-sm">
-        <span className="text-muted-foreground">Want this question easier, the same, harder or with new numbers? AI remixes are part of Plus and Pro.</span>
-        <Button variant="outline" size="sm" render={<Link href="/pricing" />}>See plans</Button>
-      </div>
-    );
-  }
-  const go = (direction: Direction) => {
-    setBusy(direction);
-    start(async () => {
-      const res = await remixQuestion({ questionId, direction }).catch(() => ({ ok: false as const, error: "Couldn't remix. Check your connection and try again." }));
-      if (res.ok) router.push(res.data.url); else { toast.error(res.error); setBusy(null); }
-    });
-  };
+  const go = (direction: Direction) => start(async () => {
+    const res = await remixQuestion({ questionId, direction }).catch(() => ({ ok: false as const, error: "Couldn't remix. Check your connection and try again." }));
+    if (res.ok) router.push(res.data.url); else toast.error(res.error);
+  });
+  const hover = (next: boolean) => (e: React.PointerEvent) => { if (e.pointerType === "mouse") setOpen(next); };
   return (
-    <div className="flex flex-col gap-2 rounded-lg border p-3">
-      <p className="text-sm font-medium">Remix this question with AI</p>
-      <div className="flex flex-wrap gap-2">
-        {DIRECTIONS.filter((d) => d !== "numbers" || canSwapNumbers(question)).map((d) => (
-          <Button key={d} variant="outline" size="sm" disabled={pending} onClick={() => go(d)}>{busy === d ? "Remixing…" : DIRECTION_LABEL[d]}</Button>
-        ))}
-      </div>
-      <p className="text-xs text-muted-foreground">AI-generated, not an official question. Remixes someone already made open instantly.</p>
+    <div ref={box} className="relative" onPointerEnter={hover(true)} onPointerLeave={hover(false)}>
+      <button type="button" aria-expanded={open} aria-haspopup="menu" disabled={pending} onClick={() => setOpen((v) => !v)}
+        className="flex min-h-9 items-center gap-1.5 rounded-md border bg-background px-3 text-sm font-semibold disabled:opacity-60">
+        <Sparkles className="size-4" />{pending ? "Remixing…" : "Remix"}
+      </button>
+      {open && (
+        <div className="absolute bottom-full left-1/2 z-20 w-56 -translate-x-1/2 pb-2">
+          <div role="menu" className="flex flex-col gap-1 rounded-lg border bg-background p-2 shadow-xl">
+            {tier === "free" ? (
+              <>
+                <p className="p-1 text-xs text-muted-foreground">Make this question easier, the same, harder or with new numbers. AI remixes are part of Plus and Pro.</p>
+                <Button variant="outline" size="sm" render={<Link href="/pricing" />}>See plans</Button>
+              </>
+            ) : (
+              <>
+                {DIRECTIONS.filter((d) => d !== "numbers" || canSwapNumbers(question)).map((d) => (
+                  <button key={d} type="button" role="menuitem" disabled={pending} onClick={() => go(d)} className="rounded-md px-2 py-1.5 text-left text-sm hover:bg-muted disabled:opacity-60">{DIRECTION_LABEL[d]}</button>
+                ))}
+                <p className="px-2 pt-1 text-xs text-muted-foreground">AI-generated, not an official question.</p>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-/** "Harder remix of question 4f2a", shown above a remixed question. */
+/** "Harder", shown above a remixed question. */
 export function RemixBadge({ questionId }: { questionId: string }) {
-  const [origin, setOrigin] = useState<{ direction: string; sourceRef: string } | null | undefined>(undefined);
+  const [origin, setOrigin] = useState<{ direction: string } | null | undefined>(undefined);
   useEffect(() => {
     let live = true;
     remixOriginOf({ questionId }).then((o) => live && setOrigin(o)).catch(() => live && setOrigin(null));
@@ -53,7 +68,7 @@ export function RemixBadge({ questionId }: { questionId: string }) {
   return (
     <p className="text-sm">
       <span className="rounded-full bg-foreground px-3 py-1 text-xs font-medium text-background">
-        {origin ? `${DIRECTION_BADGE[origin.direction as Direction] ?? "AI"} remix of question ${origin.sourceRef}` : "AI remix"}
+        {origin ? DIRECTION_BADGE[origin.direction as Direction] ?? "AI remix" : "AI remix"}
       </span>
       <span className="ml-2 text-muted-foreground">AI-generated, not official</span>
     </p>

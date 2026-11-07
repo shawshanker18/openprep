@@ -51,8 +51,8 @@ export function ExamTimer({ label, urgent }: { label: string; urgent?: boolean }
 }
 
 /** Bottom bar: name on the left, "Question n of N" (opens the question list) in the middle, Back and Next on the right. */
-export function ExamFooter({ name, label, popup, onBack, onNext, backDisabled, nextLabel = "Next", nextDisabled, extra }: {
-  name?: string; label: string; popup?: React.ReactNode; onBack?: () => void; onNext?: () => void; backDisabled?: boolean; nextLabel?: string; nextDisabled?: boolean; extra?: React.ReactNode;
+export function ExamFooter({ name, label, popup, onBack, onNext, backDisabled, nextLabel = "Next", nextDisabled, extra, beside }: {
+  name?: string; label: string; popup?: React.ReactNode; onBack?: () => void; onNext?: () => void; backDisabled?: boolean; nextLabel?: string; nextDisabled?: boolean; extra?: React.ReactNode; beside?: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
   const box = useRef<HTMLDivElement>(null);
@@ -66,6 +66,7 @@ export function ExamFooter({ name, label, popup, onBack, onNext, backDisabled, n
   return (
     <>
       <p className="min-w-0 flex-1 basis-24 truncate text-sm font-semibold">{name}</p>
+      <div className="flex items-center justify-center gap-2">
       <div ref={box} className="relative flex justify-center">
         <button type="button" onClick={() => popup && setOpen((v) => !v)} aria-expanded={popup ? open : undefined}
           className="flex min-h-9 items-center gap-1.5 rounded-md bg-foreground px-4 text-sm font-semibold text-background">
@@ -76,6 +77,8 @@ export function ExamFooter({ name, label, popup, onBack, onNext, backDisabled, n
             {popup}
           </div>
         )}
+      </div>
+      {beside}
       </div>
       <div className="flex flex-1 basis-24 items-center justify-end gap-2">
         {extra}

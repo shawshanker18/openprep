@@ -1,8 +1,8 @@
 export const DIRECTIONS = ["easier", "same", "harder", "numbers"] as const;
 export type Direction = (typeof DIRECTIONS)[number];
 export const DIRECTION_LABEL: Record<Direction, string> = { easier: "Slightly easier", same: "Same level", harder: "Slightly harder", numbers: "Swap the numbers" };
-/** How a remix is named above the question: "Harder remix of question 4f2a". */
-export const DIRECTION_BADGE: Record<Direction, string> = { easier: "Easier", same: "Same-level", harder: "Harder", numbers: "New-numbers" };
+/** How a remix is named above the question. */
+export const DIRECTION_BADGE: Record<Direction, string> = { easier: "Easier", same: "Same level", harder: "Harder", numbers: "New numbers" };
 export const remixDifficulty = (d: number, dir: Direction) => Math.min(3, Math.max(1, d + (dir === "easier" ? -1 : dir === "harder" ? 1 : 0)));
 
 /** Questions with a figure or diagram are never remixed: the model cannot see it. */

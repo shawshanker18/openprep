@@ -16,7 +16,7 @@ import { cn, isTyping } from "@/lib/utils";
 import type { PublicQuestion, RevealedQuestion } from "@/server/questions";
 import { toggleBookmark } from "./actions";
 import { ReportQuestion } from "./report-question";
-import { RemixBadge, RemixBar } from "./remix-bar";
+import { RemixBadge, RemixMenu } from "./remix-bar";
 import type { Tier } from "@/lib/tiers";
 import { readDraft, writeDraft } from "@/lib/answer-drafts";
 
@@ -301,6 +301,7 @@ function PracticeRunnerBody({ sessionId, userId, mode, title, block, set, back, 
           <Button variant="outline" size="sm" disabled={pending} onClick={() => start(async () => { if (await save()) router.push(back ?? "/practice/sessions"); else toast.error("Couldn't save. Please try again."); })}>Save and leave</Button>
         </>} />}
       footer={<ExamFooter name={studentName} label={`Question ${questionNumber} of ${target}`}
+        beside={s.phase === "revealed" ? <RemixMenu key={s.q.id} questionId={s.q.id} tier={tier} question={s.q} /> : undefined}
         popup={positions.length > 0 ? (
           <div><p className="mb-3 text-center text-sm font-semibold">{title}</p>
             <div className="grid grid-cols-7 gap-1.5">{positions.map((p) => (
@@ -338,7 +339,6 @@ function PracticeRunnerBody({ sessionId, userId, mode, title, block, set, back, 
                 )}
                 <TutorPanel key={s.q.id} questionId={s.q.id} answered wrongChoice={!r.correct && !!s.q.choices?.length ? s.value : null} />
               </div>
-              <RemixBar questionId={s.q.id} tier={tier} question={s.q} />
             </div>
           )}
         </>} />

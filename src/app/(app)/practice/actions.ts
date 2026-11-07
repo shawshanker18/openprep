@@ -137,5 +137,5 @@ export async function remixOriginOf(input: { questionId: string }) {
   const { userId } = await requireUser();
   const questionId = await internalId(String(input.questionId), userId);
   const origin = questionId ? await remixOrigin(questionId) : null;
-  return origin ? { direction: origin.direction, sourceRef: publicId(origin.sourceId, userId).slice(0, 4) } : null;
+  return origin ? { direction: origin.direction } : null;
 }
