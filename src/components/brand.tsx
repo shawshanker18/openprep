@@ -38,8 +38,8 @@ export function BrandBanner({ eyebrow, title, description, children, tone: look 
       <div aria-hidden className={cn("pointer-events-none absolute inset-0 -z-20 hidden bg-cover bg-right desk:block", dark ? PLATE.dark : cn(PLATE.light, "dark:bg-[url('/brand/stage-dark.webp')]"))} />
       <div aria-hidden className={cn("pointer-events-none absolute inset-0 -z-10 hidden desk:block",
         dark ? "bg-gradient-to-r from-black/75 via-black/35 to-transparent" : "bg-gradient-to-r from-background via-background/85 to-transparent dark:from-black/80 dark:via-black/45")} />
-      <div className="relative flex flex-wrap items-end justify-between gap-4 p-5 sm:p-7">
-        <div className="min-w-0 flex-1">
+      <div className="relative flex flex-col gap-4 p-5 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between sm:p-7">
+        <div className="min-w-0 sm:flex-[1_1_16rem]">
           {eyebrow && (
             <p className={cn("mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em]", dark ? "text-white/70" : "text-muted-foreground")}>
               <BrandSymbol height={14} invert={dark} />{eyebrow}
@@ -48,7 +48,7 @@ export function BrandBanner({ eyebrow, title, description, children, tone: look 
           <h1 className="break-words text-2xl font-semibold">{title}</h1>
           {description && <p className={cn("mt-1 max-w-prose text-sm", dark ? "text-white/70" : "text-muted-foreground")}>{description}</p>}
         </div>
-        {children && <div className="shrink-0">{children}</div>}
+        {children && <div className="w-full sm:w-auto sm:shrink-0">{children}</div>}
       </div>
     </section>
   );
