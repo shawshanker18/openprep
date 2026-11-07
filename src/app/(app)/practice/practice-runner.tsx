@@ -17,6 +17,7 @@ import type { PublicQuestion, RevealedQuestion } from "@/server/questions";
 import { toggleBookmark } from "./actions";
 import { ReportQuestion } from "./report-question";
 import { RemixBadge, RemixMenu } from "./remix-bar";
+import { backLabel, returnsToSession } from "@/lib/practice-links";
 import type { Tier } from "@/lib/tiers";
 import { readDraft, writeDraft } from "@/lib/answer-drafts";
 
@@ -96,9 +97,9 @@ export function PracticeRunner(props: Parameters<typeof PracticeRunnerBody>[0] e
   );
 }
 
-function PracticeRunnerBody({ sessionId, userId, mode, title, block, set, back, studentName, tier = "free", calc }: {
+function PracticeRunnerBody({ sessionId, userId, mode, title, block, set, back, studentName, tier = "free", startKind, startPosition, calc }: {
   sessionId: string; userId: string; mode: Mode; title: string; block?: { index: number; target: number } | null;
-  set?: SetConfig; back?: string; studentName?: string; tier?: Tier; calc: CalcControl;
+  set?: SetConfig; back?: string; studentName?: string; tier?: Tier; startKind?: "next" | "jump"; startPosition?: number; calc: CalcControl;
 }) {
   // Choices crossed out, per question, kept for this visit.
   const [crossed, setCrossed] = useState<Record<string, string[]>>({});
@@ -143,7 +144,11 @@ function PracticeRunnerBody({ sessionId, userId, mode, title, block, set, back, 
     setBookmarked(data.bookmarked);carriedMs.current=data.timeMs;setSavedTimeMs(data.timeMs);
     shownAt.current=performance.now();hiddenMs.current=0;hiddenSince.current=null;
   },[sessionId,draftKey]);
-  useEffect(()=>{start(async()=>{await load();});},[load]);
+  useEffect(()=>{start(async()=>{
+    await load(startKind,startPosition);
+    // Refreshing resumes where the student is, not at the question they came back to.
+    if(startKind) {const url=new URL(location.href);url.searchParams.delete("next");history.replaceState(history.state,"",url);}
+  });},[load,startKind,startPosition]);
 
   const save = useCallback(async () => {
     if(s.phase!=="answering") return true;
@@ -254,7 +259,7 @@ function PracticeRunnerBody({ sessionId, userId, mode, title, block, set, back, 
         <p className="text-sm text-muted-foreground">{positions.filter(p=>!p.attempted).length} reached questions are still unattempted. You can return to them above.</p>
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" render={<Link href="/practice/sessions" />}>Saved sessions</Button>
-          {back ? <Button render={<Link href={back} />}>{back.startsWith("/question-bank") ? "Back to the question bank" : back.startsWith('/bookmarks')?'Back to saved questions':back.startsWith('/analysis')?'Back to analysis':"Back to the course"}</Button> : <Button render={<Link href="/practice" />}>Adaptive Practice</Button>}
+          {back ? <Button render={<Link href={back} />}>{backLabel(back)}</Button> : <Button render={<Link href="/practice" />}>Adaptive Practice</Button>}
           <Button variant="outline" render={<Link href="/dashboard" />}>Back to dashboard</Button>
         </div>
       </div>
@@ -289,6 +294,7 @@ function PracticeRunnerBody({ sessionId, userId, mode, title, block, set, back, 
     toast(res.data.bookmarked ? "Bookmarked" : "Bookmark removed");
   };
   const finished = !!set && s.answered >= set.count;
+  const leaving = finished && returnsToSession(back);
 
   return (
     <ExamFrame
@@ -301,7 +307,7 @@ function PracticeRunnerBody({ sessionId, userId, mode, title, block, set, back, 
           <Button variant="outline" size="sm" disabled={pending} onClick={() => start(async () => { if (await save()) router.push(back ?? "/practice/sessions"); else toast.error("Couldn't save. Please try again."); })}>Save and leave</Button>
         </>} />}
       footer={<ExamFooter name={studentName} label={`Question ${questionNumber} of ${target}`}
-        beside={s.phase === "revealed" ? <RemixMenu key={s.q.id} questionId={s.q.id} tier={tier} question={s.q} /> : undefined}
+        beside={s.phase === "revealed" ? <RemixMenu key={s.q.id} questionId={s.q.id} tier={tier} question={s.q} from={{ sessionId, position }} /> : undefined}
         popup={positions.length > 0 ? (
           <div><p className="mb-3 text-center text-sm font-semibold">{title}</p>
             <div className="grid grid-cols-7 gap-1.5">{positions.map((p) => (
@@ -313,8 +319,8 @@ function PracticeRunnerBody({ sessionId, userId, mode, title, block, set, back, 
           </div>) : undefined}
         onBack={position > 0 ? () => navigate("jump", position - 1) : undefined} backDisabled={pending}
         extra={s.phase === "answering" ? <button type="button" disabled={pending} onClick={next} className="min-h-10 rounded-full border-2 border-foreground px-5 text-sm font-semibold disabled:opacity-40">Skip</button> : undefined}
-        onNext={s.phase === "answering" ? submit : next}
-        nextLabel={s.phase === "answering" ? (pending ? "Checking…" : "Check answer") : finished ? "See summary" : "Next"}
+        onNext={s.phase === "answering" ? submit : leaving ? () => router.push(back!) : next}
+        nextLabel={s.phase === "answering" ? (pending ? "Checking…" : "Check answer") : leaving ? backLabel(back!) : finished ? "See summary" : "Next"}
         nextDisabled={s.phase === "answering" ? s.value === null || pending : pending} />}>
       <QuestionView key={s.q.id} fill question={s.q} value={s.value} disabled={s.phase === "revealed" || pending}
         number={questionNumber} eliminated={crossed[s.q.id] ?? []} onEliminate={(next) => setCrossed((c) => ({ ...c, [s.q.id]: next }))}

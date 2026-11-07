@@ -29,11 +29,11 @@ export default function GuestLayout({ children }: { children: React.ReactNode })
           <span className="inline-flex lap:hidden"><SidebarToggle /></span>
           <span className="hidden lap:inline-flex"><Suspense fallback={null}><MobileMenu {...nav} /></Suspense></span>
           <NavArrows />
-          <CurrentSection base={BASE} />
+          <Suspense fallback={null}><CurrentSection base={BASE} /></Suspense>
           {account}
         </div>
         <main className="mx-auto w-full min-w-0 max-w-5xl flex-1 min-[1536px]:max-w-6xl min-[1920px]:max-w-7xl min-[2560px]:max-w-[96rem] min-[3200px]:max-w-[110rem] px-[max(1rem,env(safe-area-inset-left),env(safe-area-inset-right))] pb-8 pt-6 lg:px-8 has-[.question-content]:max-w-none">
-          <div className="mb-4 flex flex-wrap items-center gap-2 desk:hidden"><CurrentSection base={BASE} /></div>
+          <div className="mb-4 flex flex-wrap items-center gap-2 desk:hidden"><Suspense fallback={null}><CurrentSection base={BASE} /></Suspense></div>
           {children}
         </main>
         <SiteFooter scope="app" />

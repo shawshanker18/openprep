@@ -3,7 +3,7 @@ import path from "node:path";
 import { beforeAll, beforeEach, expect, it, vi } from "vitest";
 import { PGlite } from "@electric-sql/pglite";
 import { drizzle } from "drizzle-orm/pglite";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import * as schema from "@/db/schema";
 import { REMIX } from "@/lib/tiers";
 
@@ -31,6 +31,9 @@ beforeEach(async () => {
   gen.mockClear();
   await db.delete(schema.remixUsage);
   await db.delete(schema.questionRemixes);
+  await db.delete(schema.practiceSessions);
+  await db.delete(schema.questionServes);
+  await db.delete(schema.questionExposures);
   await db.delete(schema.questions).where(eq(schema.questions.pool, "remix"));
 });
 
@@ -131,4 +134,24 @@ it("opens in its own list session, and stays out of the shared pool", async () =
   await loadPracticeSession(A, profile, session);
   expect(await db.select({ q: schema.practiceSessionItems.questionId }).from(schema.practiceSessionItems).where(eq(schema.practiceSessionItems.sessionId, session))).toEqual([{ q: id }]);
   expect(await db.select({ id: schema.questions.id }).from(schema.questions).where(and(eq(schema.questions.id, id), availableQuestion(B)))).toEqual([]);
+});
+
+it("comes back to the question after the one remixed, even from an earlier question", async () => {
+  const { createPracticeSession, getPracticeSession, loadPracticeSession } = await import("./practice-sessions");
+  const { publicId } = await import("./questions");
+  const { servePractice } = await import("./delivery");
+  const { startAfter } = await import("@/lib/practice-links");
+  const ids = ["return-1", "return-2", "return-3"];
+  await db.insert(schema.questions).values(ids.map((id) => ({ id, skillId: "m-alg-lin1", section: "math" as const, domain: "m-alg", difficulty: 2, type: "mcq" as const, stemMd: "stem", choices: [{ id: "A", md: "1" }], answer: { choice: "A" }, explanationMd: "because" })));
+  for (const row of await db.select().from(schema.questions).where(inArray(schema.questions.id, ids))) await servePractice(B, row, { ip: null, device: null });
+  const profile = (await db.query.profiles.findFirst({ where: eq(schema.profiles.id, B) }))!;
+  const session = await createPracticeSession(B, { mode: "list", ids: ids.map((id) => publicId(id, B)), count: 3 }, "Question bank", "/question-bank");
+  const cursor = async () => (await getPracticeSession(B, session))!.cursor;
+  await loadPracticeSession(B, profile, session);
+  await loadPracticeSession(B, profile, session, startAfter(await cursor(), 0)!);
+  expect(await cursor()).toBe(1); // remixed the newest question: on to the next one
+  await loadPracticeSession(B, profile, session, { kind: "next", position: 1 });
+  expect(await cursor()).toBe(2);
+  await loadPracticeSession(B, profile, session, startAfter(await cursor(), 0)!);
+  expect(await cursor()).toBe(1); // remixed an earlier question: the one after it, not the furthest reached
 });

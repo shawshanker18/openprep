@@ -70,13 +70,17 @@ function subscribeHeading(onChange: () => void) {
 }
 const pageHeading = () => document.querySelector("main h1")?.textContent?.trim().toLowerCase() ?? "";
 
+/** A question bank session runs at /practice, so the link says which section it belongs to. */
+const inBankRun = (search: URLSearchParams) => search.get("mode") === "bank" || search.get("in") === "bank";
+
 export function CurrentSection({ base = "" }: { base?: string }) {
   const path = usePathname();
+  const search = useSearchParams();
   const item = NAV_GROUPS.flatMap(group => [...group.items]).sort((a, b) => b.href.length - a.href.length).find(item => {
     const target = hrefFor(base, item.href);
     return item.href === "/dashboard" ? path === target : path === target || path.startsWith(`${target}/`);
   });
-  const label = item?.label ?? (path.startsWith(`${base}/pricing`) ? "Upgrade" : path.startsWith(`${base}/account`) ? "Account" : path.startsWith(`${base}/settings`) ? "Study settings" : "OpenPrep");
+  const label = path === `${base}/practice` && inBankRun(search) ? "Question bank" : item?.label ?? (path.startsWith(`${base}/pricing`) ? "Upgrade" : path.startsWith(`${base}/account`) ? "Account" : path.startsWith(`${base}/settings`) ? "Study settings" : "OpenPrep");
   // The page's own heading already says this, so the top bar stays quiet instead of repeating it.
   const heading = useSyncExternalStore(subscribeHeading, pageHeading, () => "");
   const dup = !!heading && heading === String(label).trim().toLowerCase();
@@ -93,7 +97,8 @@ function isActive(path: string, search: URLSearchParams, href: string, base = ""
     const [p, q] = target.split("?");
     return path === p && [...new URLSearchParams(q)].every(([k, v]) => search.get(k) === v);
   }
-  if (href === "/practice") return path === target && !search.has("preset") && search.get("mode") !== "list";
+  if (href === "/practice") return path === target && !search.has("preset") && search.get("mode") !== "list" && !inBankRun(search);
+  if (href === "/question-bank" && path === hrefFor(base, "/practice") && inBankRun(search)) return true;
   if (href === "/dashboard") return path === target;
   return path === target || path.startsWith(`${target}/`);
 }

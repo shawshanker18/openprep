@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireUser } from "@/server/auth";
 import { listPracticeSessions } from "@/server/practice-sessions";
 import { Button } from "@/components/ui/button";
+import { sessionHref } from "@/lib/practice-links";
 export const metadata = {title:"Saved practice sessions"};
 export default async function SavedPracticePage({searchParams}:PageProps<"/practice/sessions">) {
   const {userId,profile}=await requireUser();
@@ -16,7 +17,7 @@ export default async function SavedPracticePage({searchParams}:PageProps<"/pract
     {!sessions.length && <p>No saved sessions yet. Start practicing to create one.</p>}
     {sessions.map(s=><div key={s.id} className="flex items-center justify-between gap-3 rounded-lg border p-4">
       <div><h2 className="font-medium">{s.title}</h2><p className="text-sm text-muted-foreground">{s.status==="completed"?"Completed":"In progress"} · Last saved {s.updatedAt.toLocaleString("en-GB",{timeZone:profile.timezone})}</p></div>
-      <Button variant="outline" render={<Link href={`/practice?session=${s.id}`} />}>{s.status==="completed"?"Review":"Resume"}</Button>
+      <Button variant="outline" render={<Link href={sessionHref(s)} />}>{s.status==="completed"?"Review":"Resume"}</Button>
     </div>)}
     <div className="flex gap-3 text-sm">
       {page>1 && <Link className="underline" href={`/practice/sessions?page=${page-1}`}>Newer sessions</Link>}

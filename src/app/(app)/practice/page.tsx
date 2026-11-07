@@ -14,8 +14,16 @@ import { PracticeRunner } from "./practice-runner";
 import { PracticeSetup } from "@/components/practice-setup";
 import { parseBankFilters, pickBankQuestions } from "@/server/bank-search";
 import { getTier } from "@/server/subscription";
+import { sessionHref, startAfter } from "@/lib/practice-links";
 
-export const metadata = { title: "Adaptive Practice" };
+/** Every kind of session runs here, so the tab says which one this is. */
+export async function generateMetadata({ searchParams }: PageProps<"/practice">) {
+  const sp = await searchParams;
+  if (sp.mode === "bank") return { title: "Question bank" };
+  const id = z.uuid().safeParse(sp.session);
+  const session = id.success ? await safely(async () => getPracticeSession((await requireUser()).userId, id.data), null) : null;
+  return { title: session?.title ?? "Adaptive Practice" };
+}
 
 const list = (v: string | string[] | undefined) => [v ?? []].flat().flatMap((x) => x.split(",")).filter(Boolean);
 
@@ -25,7 +33,7 @@ async function loadPage({ searchParams }: PageProps<"/practice">) {
   if (Object.keys(sp).length === 0) {
     const saved = (await listPracticeSessions(userId)).find(s => s.status === 'active');
     return <div className="flex flex-col gap-6"><h1 className="text-2xl font-semibold">Adaptive Practice</h1>
-      {saved && <section className="rounded-xl border p-5"><h2 className="font-medium">Continue practicing</h2><p className="mb-3 text-sm">{saved.title}</p><Button render={<Link href={`/practice?session=${saved.id}`} />}>Resume session</Button></section>}
+      {saved && <section className="rounded-xl border p-5"><h2 className="font-medium">Continue practicing</h2><p className="mb-3 text-sm">{saved.title}</p><Button render={<Link href={sessionHref(saved)} />}>Resume session</Button></section>}
       <PracticeSetup />
       <div className="flex gap-4 text-sm"><Link className="underline" href="/practice/sessions">Saved sessions</Link><Link className="underline" href="/start">Start from scratch</Link><Link className="underline" href="/desmos">Desmos</Link></div>
     </div>;
@@ -39,7 +47,9 @@ async function loadPage({ searchParams }: PageProps<"/practice">) {
     const session = await getPracticeSession(userId, parsed.data);
     if (!session) notFound();
     const studentName=(await safely(()=>getAuthUser(),null))?.name??undefined;
-    return <PracticeRunner key={session.id} userId={userId} sessionId={session.id} mode={session.config.mode} studentName={studentName}
+    const next=z.coerce.number().int().min(0).max(99).safeParse(sp.next);
+    const startAt=next.success&&sp.next!==undefined?startAfter(session.cursor,next.data):undefined;
+    return <PracticeRunner key={session.id} startKind={startAt?.kind} startPosition={startAt?.position} userId={userId} sessionId={session.id} mode={session.config.mode} studentName={studentName}
       title={session.title} block={block} set={{count:session.config.count??MAX_QUESTIONS_PER_SET}} back={session.back??undefined} tier={await getTier(userId)} />;
   }
   const skillId = typeof sp.skill === "string" ? sp.skill : undefined;
@@ -54,7 +64,7 @@ async function loadPage({ searchParams }: PageProps<"/practice">) {
   if (sp.mode === "bank") {
     const ids = await pickBankQuestions(userId, parseBankFilters(sp));
     const sessionId = await createPracticeSession(userId, { mode: "list", ids, count: ids.length }, "Question bank", "/question-bank");
-    redirect(`/practice?session=${sessionId}`);
+    redirect(sessionHref({ id: sessionId, back: "/question-bank" }));
   }
 
   if (mode === "list") {

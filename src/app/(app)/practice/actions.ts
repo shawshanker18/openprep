@@ -2,6 +2,7 @@
 
 import { and, count, eq, gte } from "drizzle-orm";
 import { z } from "zod";
+import { remixReturn, sessionHref } from "@/lib/practice-links";
 import { text } from "@/lib/text";
 import { db } from "@/db";
 import { attempts, bookmarks, questionReports, questions } from "@/db/schema";
@@ -17,7 +18,7 @@ import { DIRECTIONS, DIRECTION_LABEL } from "@/lib/remix";
 import { getTier } from "@/server/subscription";
 import { getOrCreateRemix, limitRemixRequests, remixOrigin, RemixError } from "@/server/remix";
 import { servePractice } from "@/server/delivery";
-import { createPracticeSession } from "@/server/practice-sessions";
+import { createPracticeSession, getPracticeSession } from "@/server/practice-sessions";
 import { publicId } from "@/server/questions";
 
 const id = text().min(1).max(64);
@@ -108,7 +109,7 @@ export async function reportQuestion(input: z.input<typeof Report>) {
   return { ok: true as const, data: undefined };
 }
 
-const Remix = z.object({ questionId: id, direction: z.enum(DIRECTIONS) });
+const Remix = z.object({ questionId: id, direction: z.enum(DIRECTIONS), from: z.object({ sessionId: z.uuid(), position: z.number().int().min(0).max(99) }).optional() });
 /** Plus and Pro: an easier, same-level or harder AI version of a question already answered. Opens it as a new one-question practice session. */
 export async function remixQuestion(input: z.input<typeof Remix>) {
   const { userId } = await requireUser();
@@ -124,8 +125,10 @@ export async function remixQuestion(input: z.input<typeof Remix>) {
     const [remix] = await db.select().from(questions).where(eq(questions.id, remixId));
     if (!remix) return { ok: false as const, error: "Couldn't open the remix." };
     await servePractice(userId, remix, await deliveryContext());
-    const sessionId = await createPracticeSession(userId, { mode: "list", ids: [publicId(remixId, userId)], count: 1 }, `${DIRECTION_LABEL[p.data.direction]} remix`);
-    return { ok: true as const, data: { url: `/practice?session=${sessionId}` } };
+    const parent = p.data.from ? await getPracticeSession(userId, p.data.from.sessionId) : null;
+    const back = parent ? remixReturn(parent, p.data.from!.position) : undefined;
+    const sessionId = await createPracticeSession(userId, { mode: "list", ids: [publicId(remixId, userId)], count: 1 }, `${DIRECTION_LABEL[p.data.direction]} remix`, back);
+    return { ok: true as const, data: { url: sessionHref({ id: sessionId, back }) } };
   } catch (e) {
     if (e instanceof RemixError || e instanceof DeliveryBlocked) return { ok: false as const, error: e.message };
     throw e;

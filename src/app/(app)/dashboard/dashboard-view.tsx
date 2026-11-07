@@ -10,6 +10,7 @@ import { SKILL_BY_ID, shortSkillName } from "@/content/taxonomy";
 import { formatDate } from "@/lib/dates";
 import type { AuthUser } from "@/server/auth";
 import type { Profile } from "@/db/schema";
+import { sessionHref } from "@/lib/practice-links";
 
 
 const KIND: Record<string, string> = { full: "Full practice test", section: "Section test", module: "Single module", mini: "Mini test", weakness: "Weakness test", custom: "Custom test" };
@@ -54,7 +55,7 @@ export function DashboardView({profile,user,d,summary,home,savedPractice}: {
   // Where you left off, most urgent first.
   const resume: { title: string; detail: string; href: string; action: string }[] = [];
   if (home.openTest) resume.push({ title: KIND[home.openTest.kind] ?? "Test", detail: `In progress · started ${formatDate(home.openTest.startedAt, profile.timezone, true)}`, href: `/test/${home.openTest.id}`, action: "Resume" });
-  if(savedPractice) resume.push({title:savedPractice.title,detail:"Saved practice session",href:`/practice?session=${savedPractice.id}`,action:"Resume"});
+  if(savedPractice) resume.push({title:savedPractice.title,detail:"Saved practice session",href:sessionHref(savedPractice),action:"Resume"});
   if (!savedPractice && home.lastPractice) resume.push({ title: shortSkillName(SKILL_BY_ID[home.lastPractice.skillId]?.name ?? "Practice"), detail: `Last practiced ${ago(home.lastPractice.at)}`, href: `/practice?skill=${home.lastPractice.skillId}`, action: "Continue" });
   if (home.course.next) resume.push({ title: home.course.next.title, detail: `Start from scratch · ${home.course.done} of ${home.course.total} done`, href: `/start/${home.course.next.key}`, action: "Continue" });
   if (d.dueReviews > 0) resume.push({ title: "Mistakes to review", detail: `${d.dueReviews} due now`, href: "/practice?mode=review", action: "Review" });

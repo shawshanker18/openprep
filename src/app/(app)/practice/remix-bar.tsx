@@ -10,7 +10,7 @@ import type { Tier } from "@/lib/tiers";
 import { remixOriginOf, remixQuestion } from "./actions";
 
 /** Remix button beside the question counter: hover or tap for easier / same / harder. Free students see where to get it. */
-export function RemixMenu({ questionId, tier, question }: { questionId: string; tier: Tier; question: Parameters<typeof canSwapNumbers>[0] }) {
+export function RemixMenu({ questionId, tier, question, from }: { questionId: string; tier: Tier; question: Parameters<typeof canSwapNumbers>[0]; from: { sessionId: string; position: number } }) {
   const router = useRouter();
   const [pending, start] = useTransition();
   const [open, setOpen] = useState(false);
@@ -25,7 +25,7 @@ export function RemixMenu({ questionId, tier, question }: { questionId: string; 
   }, [open]);
   if (!canRemixQuestion(question)) return null;
   const go = (direction: Direction) => start(async () => {
-    const res = await remixQuestion({ questionId, direction }).catch(() => ({ ok: false as const, error: "Couldn't remix. Check your connection and try again." }));
+    const res = await remixQuestion({ questionId, direction, from }).catch(() => ({ ok: false as const, error: "Couldn't remix. Check your connection and try again." }));
     if (res.ok) router.push(res.data.url); else toast.error(res.error);
   });
   const onEnter = (e: React.PointerEvent) => { if (e.pointerType === "mouse") { hovering.current = true; setOpen(true); } };
