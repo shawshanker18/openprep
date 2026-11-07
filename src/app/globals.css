@@ -28,6 +28,8 @@
   @media (min-width: 64rem) { @slot; }
   @media (min-width: 40rem) and (orientation: landscape) { @slot; }
 }
+/* Exam bars spell out their labels only with room both ways; a phone, upright or sideways, gets icons and short labels. */
+@custom-variant roomy (@media (min-width: 40rem) and (min-height: 30rem));
 /* Dialogs and forms tighten on short windows. */
 @custom-variant short (@media (max-height: 54rem));
 @custom-variant tiny (@media (max-height: 34rem));

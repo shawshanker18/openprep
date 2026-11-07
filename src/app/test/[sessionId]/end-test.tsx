@@ -5,7 +5,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 export function EndTest({ action, detail }: { action: () => Promise<void>; detail: string }) {
   return (
     <Dialog>
-      <DialogTrigger render={<Button variant="ghost" size="sm" />}>End test</DialogTrigger>
+      <DialogTrigger render={<Button variant="ghost" size="sm" className="min-h-9 px-2 roomy:px-2.5" />}>End<span className="hidden roomy:inline"> test</span></DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>End this test?</DialogTitle>

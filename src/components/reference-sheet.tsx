@@ -1,5 +1,6 @@
 "use client";
 
+import { BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Markdown } from "@/components/markdown";
@@ -26,7 +27,7 @@ A circle has $360°$, or $2\\pi$ radians. The angles of a triangle add up to $18
 export function ReferenceSheet() {
   return (
     <Dialog>
-      <DialogTrigger render={<Button variant="outline" size="sm" />}>Reference</DialogTrigger>
+      <DialogTrigger render={<Button variant="outline" size="sm" aria-label="Reference sheet" className="min-h-9" />}><BookOpen /><span className="hidden roomy:inline">Reference</span></DialogTrigger>
       <DialogContent>
         <DialogHeader><DialogTitle>Reference sheet</DialogTitle></DialogHeader>
         <Markdown className="text-sm">{SHEET}</Markdown>

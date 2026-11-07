@@ -219,7 +219,7 @@ export function TestRunner({ userId, sessionId, module: m, items: initial, serve
       tools={<>
         {isMath && <DesmosDock sessionKey={`openprep:desmos:test:${sessionId}`} />}
         {isMath && <ReferenceSheet />}
-        <span className="w-16 text-center text-xs text-muted-foreground" role="status">{saving === "saving" ? "Saving…" : saving === "error" ? "Not saved" : "Saved"}</span>
+        <span className="sr-only text-center text-xs text-muted-foreground roomy:not-sr-only roomy:w-16" role="status">{saving === "saving" ? "Saving…" : saving === "error" ? "Not saved" : "Saved"}</span>
         <EndTest action={abandon.bind(null, sessionId)} detail="It won't be scored and your answers so far won't count." />
       </>} />
   );
@@ -241,7 +241,7 @@ export function TestRunner({ userId, sessionId, module: m, items: initial, serve
     <ExamFrame top={top} footer={
       <ExamFooter name={studentName} label={`Question ${pos + 1} of ${items.length}`}
         popup={<div><p className="mb-3 text-center text-sm font-semibold">{title}</p><Navigator items={items} current={pos} onPick={go} />
-          <button type="button" data-close onClick={() => go("review")} className="mt-3 min-h-10 w-full rounded-full border text-sm font-medium">Go to review page</button></div>}
+          <button type="button" data-close onClick={() => go("review")} className="mt-3 min-h-10 w-full rounded-md border text-sm font-medium">Go to review page</button></div>}
         onBack={() => go(pos - 1)} backDisabled={pos === 0} onNext={() => go(pos + 1 < items.length ? pos + 1 : "review")} nextLabel={pos + 1 < items.length ? "Next" : "Review"} />}>
       <QuestionView key={it.question.id} fill question={it.question} value={it.response} onChange={(v) => update({ response: v })} disabled={submitting} showMetadata={false}
         number={pos + 1} marked={it.flagged} onMark={() => update({ flagged: !it.flagged })}

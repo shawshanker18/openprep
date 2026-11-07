@@ -18,9 +18,9 @@ export function ExamFrame({ top, footer, children }: { top: React.ReactNode; foo
   }, []);
   return (
     <div className="fixed inset-0 z-40 flex flex-col bg-background text-foreground">
-      <header className="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-0 border-b-2 border-dashed border-foreground/40 bg-muted px-3 py-1 text-foreground">{top}</header>
+      <header className="flex shrink-0 flex-wrap items-center gap-x-2 gap-y-0 sm:gap-x-3 border-b-2 border-dashed border-foreground/40 bg-muted px-3 py-1 text-foreground">{top}</header>
       <main className="flex min-h-0 flex-1 flex-col overflow-y-auto px-3 py-2 split:overflow-hidden split:px-5">{children}</main>
-      <footer className="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-1 border-t-2 border-dashed border-foreground/40 bg-muted px-3 py-1 pb-[max(.25rem,env(safe-area-inset-bottom))]">{footer}</footer>
+      <footer className="flex shrink-0 flex-wrap items-center gap-x-2 gap-y-1 sm:gap-x-3 border-t-2 border-dashed border-foreground/40 bg-muted px-3 py-1 pb-[max(.25rem,env(safe-area-inset-bottom))]">{footer}</footer>
     </div>
   );
 }
@@ -29,12 +29,13 @@ export function ExamFrame({ top, footer, children }: { top: React.ReactNode; foo
 export function ExamTop({ title, subtitle, center, tools }: { title: string; subtitle?: string; center?: React.ReactNode; tools?: React.ReactNode }) {
   return (
     <>
-      <div className="flex min-w-0 flex-1 basis-32 items-baseline gap-2">
-        <p className="truncate text-sm font-semibold">{title}</p>
-        {subtitle && <p className="hidden truncate text-xs text-muted-foreground [@media(min-height:36rem)]:block">{subtitle}</p>}
+      {/* Phones keep this to one row: the title truncates, the subtitle hides and the tools show as icons. */}
+      <div className="flex min-w-0 flex-1 basis-0 items-baseline gap-2 sm:basis-32">
+        <p className="truncate text-sm font-semibold" title={title}>{title}</p>
+        {subtitle && <p className="hidden truncate text-xs text-muted-foreground roomy:[@media(min-height:36rem)]:block">{subtitle}</p>}
       </div>
-      {center && <div className="flex justify-center">{center}</div>}
-      <div className="flex flex-1 basis-32 flex-wrap items-center justify-end gap-1.5">{tools}</div>
+      {center && <div className="flex shrink-0 justify-center">{center}</div>}
+      <div className="flex shrink-0 items-center justify-end gap-1 roomy:flex-1 roomy:basis-32 roomy:gap-1.5">{tools}</div>
     </>
   );
 }
@@ -44,15 +45,15 @@ export function ExamTimer({ label, urgent }: { label: string; urgent?: boolean }
   const [show, setShow] = useState(true);
   return (
     <div className="flex items-center gap-2 leading-none">
-      <span className={cn("min-w-14 text-center text-lg font-semibold tabular-nums", urgent && "text-red-600", !show && "invisible")} aria-live="off">{label}</span>
-      <button type="button" onClick={() => setShow((v) => !v)} className="min-h-8 rounded-full border px-2.5 text-xs">{show ? "Hide" : "Show"}</button>
+      <span className={cn("min-w-12 text-center text-base font-semibold tabular-nums sm:min-w-14 sm:text-lg", urgent && "text-red-600", !show && "invisible")} aria-live="off">{label}</span>
+      <button type="button" onClick={() => setShow((v) => !v)} className="min-h-8 rounded-md border px-2 text-xs">{show ? "Hide" : "Show"}</button>
     </div>
   );
 }
 
 /** Bottom bar: name on the left, "Question n of N" (opens the question list) in the middle, Back and Next on the right. */
 export function ExamFooter({ name, label, popup, onBack, onNext, backDisabled, nextLabel = "Next", nextDisabled, extra, beside }: {
-  name?: string; label: string; popup?: React.ReactNode; onBack?: () => void; onNext?: () => void; backDisabled?: boolean; nextLabel?: string; nextDisabled?: boolean; extra?: React.ReactNode; beside?: React.ReactNode;
+  name?: string; label: string; popup?: React.ReactNode; onBack?: () => void; onNext?: () => void; backDisabled?: boolean; nextLabel?: React.ReactNode; nextDisabled?: boolean; extra?: React.ReactNode; beside?: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
   const box = useRef<HTMLDivElement>(null);
@@ -65,25 +66,26 @@ export function ExamFooter({ name, label, popup, onBack, onNext, backDisabled, n
   }, [open]);
   return (
     <>
-      <p className="min-w-0 flex-1 basis-24 truncate text-sm font-semibold">{name}</p>
+      <p className="hidden min-w-0 flex-1 basis-24 truncate text-sm font-semibold roomy:block">{name}</p>
       <div className="flex items-center justify-center gap-2">
       <div ref={box} className="relative flex justify-center">
         <button type="button" onClick={() => popup && setOpen((v) => !v)} aria-expanded={popup ? open : undefined}
-          className="flex min-h-9 items-center gap-1.5 rounded-md bg-foreground px-4 text-sm font-semibold text-background">
-          {label}{popup && <ChevronUp className={cn("size-4 transition-transform", !open && "rotate-180")} />}
+          className="flex min-h-9 items-center gap-1 rounded-md bg-foreground px-3 text-sm font-semibold text-background tabular-nums sm:gap-1.5 sm:px-4">
+          {/* "Question 4 of 10" reads "4 of 10" on a phone, so Back and Next keep their room. */}
+          {label.startsWith("Question ") ? <><span className="sr-only roomy:not-sr-only">Question </span>{label.slice(9)}</> : label}{popup && <ChevronUp className={cn("size-4 transition-transform", !open && "rotate-180")} />}
         </button>
         {popup && open && (
-          <div className="absolute bottom-12 left-1/2 max-h-[min(60dvh,26rem)] w-[min(24rem,calc(100vw-2rem))] -translate-x-1/2 overflow-y-auto rounded-xl border bg-background p-4 shadow-xl" onClick={(e) => { if ((e.target as HTMLElement).closest("[data-close]")) setOpen(false); }}>
+          <div className="absolute bottom-12 left-0 max-h-[min(60dvh,26rem)] w-[min(24rem,calc(100vw-1.5rem))] sm:left-1/2 sm:-translate-x-1/2 overflow-y-auto rounded-xl border bg-background p-4 shadow-xl" onClick={(e) => { if ((e.target as HTMLElement).closest("[data-close]")) setOpen(false); }}>
             {popup}
           </div>
         )}
       </div>
       {beside}
       </div>
-      <div className="flex flex-1 basis-24 items-center justify-end gap-2">
+      <div className="flex flex-1 basis-auto items-center justify-end gap-1.5 sm:basis-24 sm:gap-2">
         {extra}
-        {onBack && <button type="button" onClick={onBack} disabled={backDisabled} className="min-h-9 rounded-full bg-foreground px-5 text-sm font-semibold text-background disabled:opacity-40">Back</button>}
-        {onNext && <button type="button" onClick={onNext} disabled={nextDisabled} className="min-h-9 rounded-full bg-foreground px-5 text-sm font-semibold text-background disabled:opacity-40">{nextLabel}</button>}
+        {onBack && <button type="button" onClick={onBack} disabled={backDisabled} className="min-h-10 whitespace-nowrap rounded-md bg-foreground px-3.5 text-sm font-semibold text-background disabled:opacity-40 roomy:min-h-9 roomy:px-5">Back</button>}
+        {onNext && <button type="button" onClick={onNext} disabled={nextDisabled} className="min-h-10 whitespace-nowrap rounded-md bg-foreground px-3.5 text-sm font-semibold text-background disabled:opacity-40 roomy:min-h-9 roomy:px-5">{nextLabel}</button>}
       </div>
     </>
   );

@@ -5,7 +5,7 @@ import { CooldownRetry } from "@/components/cooldown-retry";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useReducer, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { Bookmark } from "lucide-react";
+import { Bookmark, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Markdown } from "@/components/markdown";
 import { QuestionView } from "@/components/question-view";
@@ -304,7 +304,7 @@ function PracticeRunnerBody({ sessionId, userId, mode, title, block, set, back, 
           {isMath && <CalculatorButton open={calc.open} onToggle={calc.toggle} />}
           <Button variant="ghost" size="sm" aria-label="Bookmark" aria-pressed={bookmarked} onClick={bookmark}><Bookmark className={bookmarked ? "fill-current" : undefined} /></Button>
           <ReportQuestion questionId={s.q.id} />
-          <Button variant="outline" size="sm" disabled={pending} onClick={() => start(async () => { if (await save()) router.push(back ?? "/practice/sessions"); else toast.error("Couldn't save. Please try again."); })}>Save and leave</Button>
+          <Button variant="outline" size="sm" className="min-h-9" aria-label="Save and leave" disabled={pending} onClick={() => start(async () => { if (await save()) router.push(back ?? "/practice/sessions"); else toast.error("Couldn't save. Please try again."); })}><LogOut className="roomy:hidden" /><span className="hidden roomy:inline">Save and leave</span></Button>
         </>} />}
       footer={<ExamFooter name={studentName} label={`Question ${questionNumber} of ${target}`}
         beside={s.phase === "revealed" ? <RemixMenu key={s.q.id} questionId={s.q.id} tier={tier} question={s.q} from={{ sessionId, position }} /> : undefined}
@@ -318,9 +318,9 @@ function PracticeRunnerBody({ sessionId, userId, mode, title, block, set, back, 
             <Link href="/practice/sessions" className="mt-3 block text-center text-sm underline">Saved sessions</Link>
           </div>) : undefined}
         onBack={position > 0 ? () => navigate("jump", position - 1) : undefined} backDisabled={pending}
-        extra={s.phase === "answering" ? <button type="button" disabled={pending} onClick={next} className="min-h-10 rounded-full border-2 border-foreground px-5 text-sm font-semibold disabled:opacity-40">Skip</button> : undefined}
+        extra={s.phase === "answering" ? <button type="button" disabled={pending} onClick={next} className="min-h-10 rounded-md border-2 border-foreground px-3 text-sm font-semibold disabled:opacity-40 roomy:min-h-9 roomy:px-5">Skip</button> : undefined}
         onNext={s.phase === "answering" ? submit : leaving ? () => router.push(back!) : next}
-        nextLabel={s.phase === "answering" ? (pending ? "Checking…" : "Check answer") : leaving ? backLabel(back!) : finished ? "See summary" : "Next"}
+        nextLabel={s.phase === "answering" ? (pending ? "Checking…" : <>Check<span className="hidden roomy:inline"> answer</span></>) : leaving ? backLabel(back!) : finished ? "See summary" : "Next"}
         nextDisabled={s.phase === "answering" ? s.value === null || pending : pending} />}>
       <QuestionView key={s.q.id} fill question={s.q} value={s.value} disabled={s.phase === "revealed" || pending}
         number={questionNumber} eliminated={crossed[s.q.id] ?? []} onEliminate={(next) => setCrossed((c) => ({ ...c, [s.q.id]: next }))}
@@ -334,7 +334,7 @@ function PracticeRunnerBody({ sessionId, userId, mode, title, block, set, back, 
                 <p className="font-semibold">
                   {r.correct ? "✓ Correct" : `✗ Not quite${"accepted" in r.revealed.answer ? `. The accepted answer is ${r.revealed.answer.accepted.join(" or ")}` : ""}`}
                 </p>
-                <span className="rounded-full bg-muted px-2 py-0.5 text-xs tabular-nums">{r.skillName}: {r.masteryBefore}% → {r.masteryAfter}%</span>
+                <span className="rounded-md bg-muted px-2 py-0.5 text-xs tabular-nums">{r.skillName}: {r.masteryBefore}% → {r.masteryAfter}%</span>
               </div>
               <p className="text-sm">Your answer: <b>{s.value ?? "Not answered"}</b> · Correct answer: <b>{"choice" in r.revealed.answer ? r.revealed.answer.choice : r.revealed.answer.accepted.join(" or ")}</b></p>
               {rationale && <Markdown className="text-sm">{`**Why ${s.value} is wrong:** ${rationale}`}</Markdown>}

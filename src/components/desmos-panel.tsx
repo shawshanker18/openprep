@@ -193,7 +193,7 @@ export function DesmosDock({ sessionKey }: { sessionKey: string }) {
   return (
     <>
       <button type="button" aria-expanded={open} onClick={() => setOpen((o) => !o)}
-        className="flex min-h-9 items-center gap-1.5 rounded-md border px-3 text-sm hover:bg-muted"><Calculator className="size-4" />Calculator</button>
+        aria-label="Calculator" className="flex min-h-9 items-center gap-1.5 rounded-md border px-2.5 text-sm hover:bg-muted roomy:px-3"><Calculator className="size-4" /><span className="hidden roomy:inline">Calculator</span></button>
       <FloatingDesmos sessionKey={sessionKey} open={open} onOpen={() => setOpen(true)} onClose={() => setOpen(false)} />
     </>
   );
@@ -208,15 +208,39 @@ const clampWin = (v: Win): Win => ({
   x: Math.min(Math.max(0, v.x), Math.max(0, window.innerWidth - 120)),
   y: Math.min(Math.max(0, v.y), Math.max(0, window.innerHeight - 48)),
 });
+/** A phone, upright (narrow) or sideways (short): the floating window would not fit beside the question. */
+const isPhone = () => window.innerWidth < 640 || window.innerHeight < 480;
+/** Bars at the top and bottom of the exam screen, kept clear so the timer and Back / Next stay usable. */
+const BAR = 56;
+/**
+ * On a phone the calculator docks: upright it spans the width under the top of the question, sideways it takes the left
+ * part of the screen between the bars. Either way Back / Next stay visible, and it can still be dragged and resized.
+ */
+const phoneLayout = (): Win => {
+  const W = window.innerWidth, H = window.innerHeight;
+  if (W < 640) { const y = Math.round(H * 0.38); return { x: 0, y, w: W, h: Math.max(MIN_H, H - y - BAR) }; }
+  const w = Math.max(MIN_W, Math.min(560, Math.round(W * 0.55)));
+  return { x: 0, y: BAR, w, h: Math.max(160, H - 2 * BAR) };
+};
+/** Keep the whole window on screen, whatever size it was saved at (a layout saved on a laptop, or the phone turned). */
+const fitScreen = (v: Win): Win => {
+  const W = window.innerWidth, H = window.innerHeight;
+  const w = Math.min(v.w, W), h = Math.min(v.h, H);
+  return { w, h, x: Math.min(Math.max(0, v.x), W - w), y: Math.min(Math.max(0, v.y), H - h) };
+};
 /** Where it first appears: against the left edge under the header, about half the width of the question column. */
 const defaultLayout = (): Saved => {
+  if (isPhone()) return { ...phoneLayout(), tab: "graphing" };
   const w = Math.min(560, window.innerWidth - 24), h = Math.min(545, window.innerHeight - 100);
   return { x: 12, y: Math.min(76, Math.max(0, window.innerHeight - h - 8)), w, h, tab: "graphing" };
 };
 const fitSaved = (v: Partial<Saved>): Saved => {
   const d = defaultLayout(), num = (n: unknown, fallback: number) => (typeof n === "number" && Number.isFinite(n) ? n : fallback);
-  const w = Math.min(Math.max(MIN_W, num(v.w, d.w)), window.innerWidth), h = Math.min(Math.max(MIN_H, num(v.h, d.h)), window.innerHeight);
-  return { ...clampWin({ x: num(v.x, d.x), y: num(v.y, d.y), w, h }), tab: v.tab === "scientific" ? "scientific" : "graphing" };
+  const tab = v.tab === "scientific" ? "scientific" : "graphing";
+  const w = Math.max(MIN_W, num(v.w, d.w)), h = Math.max(MIN_H, num(v.h, d.h));
+  // A layout that doesn't fit this phone (most often one saved on a bigger screen) gives way to the phone layout.
+  if (isPhone() && (w > window.innerWidth || h > window.innerHeight - BAR)) return { ...phoneLayout(), tab };
+  return { ...fitScreen({ x: num(v.x, d.x), y: num(v.y, d.y), w, h }), tab };
 };
 
 /**
@@ -300,6 +324,16 @@ function CalculatorWindow({ winKey, sessionKey, initial, open, pull, onClose }: 
   const [expanded, setExpanded] = useState(false);
   const [saving, setSaving] = useState(false);
   const drag = useRef<{ dx: number; dy: number; from: number } | null>(null);
+  // Turning a phone or resizing the window keeps the calculator on screen.
+  useEffect(() => {
+    const refit = () => setWin((v) => {
+      const W = window.innerWidth, H = window.innerHeight;
+      if (isPhone() && (v.w > W || v.h > H - BAR)) return phoneLayout();
+      return fitScreen(v);
+    });
+    window.addEventListener("resize", refit);
+    return () => window.removeEventListener("resize", refit);
+  }, []);
   const remember = (v: Win, t: Tab = tab) => { try { localStorage.setItem(winKey, JSON.stringify({ ...v, tab: t })); } catch { /* storage unavailable */ } };
   const pick = (t: Tab) => { setTab(t); if (t === "scientific") setScientificSeen(true); remember(win, t); };
   const saveDefault = async () => {
@@ -319,7 +353,7 @@ function CalculatorWindow({ winKey, sessionKey, initial, open, pull, onClose }: 
     const d = drag.current; if (!d) return;
     drag.current = null;
     if (win.x < -win.w * 0.3) { const back = clampWin({ ...win, x: d.from }); setWin(back); remember(back); onClose(); return; }
-    const settled = clampWin(win); setWin(settled); remember(settled);
+    const settled = fitScreen(clampWin(win)); setWin(settled); remember(settled);
   };
   const HANDLES: [string, string][] = [
     ["n", "inset-x-3 top-0 h-2 cursor-ns-resize"], ["s", "inset-x-3 bottom-0 h-2 cursor-ns-resize"],
@@ -329,7 +363,7 @@ function CalculatorWindow({ winKey, sessionKey, initial, open, pull, onClose }: 
   ];
   const tabBtn = (t: Tab, label: string, Icon: typeof Calculator) => (
     <button type="button" role="tab" aria-selected={tab === t} onClick={() => pick(t)}
-      className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold ${tab === t ? "bg-white text-neutral-900 shadow-sm ring-1 ring-neutral-300 [&>span]:underline [&>span]:underline-offset-4" : "text-neutral-700 hover:bg-neutral-200"}`}>
+      className={`flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-semibold min-[400px]:px-2.5 ${tab === t ? "bg-white text-neutral-900 shadow-sm ring-1 ring-neutral-300 [&>span]:underline [&>span]:underline-offset-4" : "text-neutral-700 hover:bg-neutral-200"}`}>
       <Icon className="size-3.5" /><span>{label}</span>
     </button>
   );
@@ -340,15 +374,15 @@ function CalculatorWindow({ winKey, sessionKey, initial, open, pull, onClose }: 
   return (
     <div aria-hidden={!open} inert={!open}
       style={{ ...box, transform: open ? "none" : `translateX(${Math.min(0, -away + (pull ?? 0))}px)` }}
-      className={`fixed z-50 flex min-w-[300px] max-w-[100vw] flex-col overflow-hidden rounded-2xl border border-neutral-300 bg-white text-neutral-900 shadow-2xl ${pull !== null ? "" : "transition-[transform,opacity,visibility] duration-300 ease-out"} ${shown ? "opacity-100" : "pointer-events-none invisible opacity-0"}`}>
-      <div className={`flex shrink-0 select-none items-center gap-2 border-b border-neutral-200 bg-neutral-100 px-2.5 py-2 ${expanded ? "" : "cursor-grab touch-none active:cursor-grabbing"}`}
+      className={`fixed z-50 flex min-w-[min(300px,100vw)] max-w-[100vw] flex-col overflow-hidden rounded-2xl border border-neutral-300 bg-white text-neutral-900 shadow-2xl ${pull !== null ? "" : "transition-[transform,opacity,visibility] duration-300 ease-out"} ${shown ? "opacity-100" : "pointer-events-none invisible opacity-0"}`}>
+      <div className={`flex shrink-0 select-none items-center gap-1 border-b border-neutral-200 bg-neutral-100 px-1.5 py-1.5 min-[400px]:gap-2 min-[400px]:px-2.5 min-[400px]:py-2 ${expanded ? "" : "cursor-grab touch-none active:cursor-grabbing"}`}
         onPointerDown={(e) => { if (expanded || (e.target as HTMLElement).closest("button")) return; e.currentTarget.setPointerCapture(e.pointerId); drag.current = { dx: e.clientX - win.x, dy: e.clientY - win.y, from: win.x }; }}
         onPointerMove={dragMove} onPointerUp={dragEnd} onPointerCancel={dragEnd}>
         <div role="tablist" aria-label="Calculator type" className="flex shrink-0 gap-0.5 rounded-xl bg-neutral-200/70 p-0.5">
           {tabBtn("graphing", "Graphing", ChartLine)}{tabBtn("scientific", "Scientific", Calculator)}
         </div>
-        <GripHorizontal aria-hidden className="mx-auto size-5 text-neutral-500" />
-        <div className="flex shrink-0 items-center">
+        <GripHorizontal aria-hidden className="mx-auto hidden size-5 text-neutral-500 min-[400px]:block" />
+        <div className="ml-auto flex shrink-0 items-center min-[400px]:ml-0">
           <button type="button" disabled={saving} onClick={saveDefault} aria-label="Save as default calculator layout" title="Save position, size and calculator as my default" className={icon}><Save className="size-4" /></button>
           <button type="button" onClick={() => setExpanded((v) => !v)} aria-label={expanded ? "Shrink calculator" : "Expand calculator"} title={expanded ? "Shrink" : "Expand"} className={icon}>{expanded ? <Minimize2 className="size-4" /> : <Maximize2 className="size-4" />}</button>
           <button type="button" onClick={onClose} aria-label="Close calculator" title="Close" className={icon}><X className="size-5" /></button>
@@ -369,6 +403,6 @@ function CalculatorWindow({ winKey, sessionKey, initial, open, pull, onClose }: 
 export function CalculatorButton({ open, onToggle }: { open: boolean; onToggle: () => void }) {
   return (
     <button type="button" aria-expanded={open} onClick={onToggle}
-      className="flex min-h-9 items-center gap-1.5 rounded-md border px-3 text-sm hover:bg-muted"><Calculator className="size-4" />Calculator</button>
+      aria-label="Calculator" className="flex min-h-9 items-center gap-1.5 rounded-md border px-2.5 text-sm hover:bg-muted roomy:px-3"><Calculator className="size-4" /><span className="hidden roomy:inline">Calculator</span></button>
   );
 }
